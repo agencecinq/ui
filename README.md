@@ -1,73 +1,122 @@
-# CINQ Monorepo - Shopify Components
+# 🚀 CINQ Monorepo Onboarding Guide
 
-A high-performance, accessible, and scalable component library specifically designed for Shopify themes. Built with **Native Web Components**, **Turborepo**, and **Vite**.
+Welcome to the **CINQ** Shopify development ecosystem. This repository is managed as a monorepo using **pnpm**, **Turborepo**, and **Changesets**.
 
-## Project Structure
+## 🛠 Prerequisites
 
-- `apps/docs`: Development playground and documentation site.
-- `packages/c-drawer`: Highly accessible Drawer (Sidebar) component.
-- `packages/utils`: Shared internal logic (Focus trapping, scroll management, event bus).
+Before starting, ensure you have the following installed:
 
-## Getting Started
-
-### Installation
-```bash
-yarn install
-```
-
-### Development
-Launch all packages and the documentation playground in parallel:
-
-```bash
-yarn dev
-```
-
-### Build
-Compile all packages and sync Liquid snippets:
-
-```bash
-yarn build
-```
-
-## Component: Drawer
-The Drawer is a native custom element (<cinq-drawer>) that manages its own state, visibility, and accessibility requirements.
-
-## Integration in Shopify (Liquid)
-The build process automatically syncs the cinq-drawer.liquid snippet to your theme.
-
-```
-{% render 'cinq-drawer', id: 'cart-drawer' %}
-```
-
-## Control Buttons
-
-Use the <cinq-drawer-button> wrapper to create triggers. It automatically handles aria-expanded and communicates with the target drawer using aria-controls.
-
-```html
-<cinq-drawer-button>
-  <button 
-    type="button" 
-    aria-controls="cart-drawer" 
-    data-trap="cart-drawer"
-  >
-    Open Cart
-  </button>
-</cinq-drawer-button>
-```
-## CINQ Core Principles
-
-Native over Frameworks: We use vanilla Web Components to ensure longevity and zero-dependency bloat in Shopify themes.
-
-Bulletproof Accessibility: Focus trapping (addTrapFocus) and Scroll Locking are mandatory for all modal-like components.
-
-Event-Driven Architecture: Components communicate via a global event bus (document.documentElement), allowing for deep nesting and external control.
-
-Tooling Efficiency: Turborepo ensures that we only rebuild what has changed, keeping the CI/CD pipeline fast.
-
-© 2026 CINQ Agency. Confidential and Proprietary.
-
+* **Node.js** (v22 or higher)
+* **pnpm** (v9 or higher)
 
 ---
 
-### Implementation Note for the Agency
-This README serves as the "Source of Truth" for your developers. It clearly outlines how the **CINQ** philosophy is translated into code.
+## 🏗 Setup & Installation
+
+1. **Clone the repository**:
+```bash
+git clone https://github.com/CINQ/shopify.git
+cd shopify
+
+```
+
+
+2. **Install dependencies**:
+```bash
+pnpm install
+
+```
+
+
+*Note: Do not use `npm install` or `yarn install`. This project relies on pnpm workspaces.*
+
+---
+
+## 💻 Daily Workflow
+
+### Development
+
+To start the development server for all packages and apps:
+
+```bash
+pnpm dev
+
+```
+
+Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in `@agencecinq/drawer` automatically.
+
+### Building
+
+To compile all packages:
+
+```bash
+pnpm build
+
+```
+
+Turbo caches successful builds. If no code has changed, the build will finish in milliseconds.
+
+### Type Checking & Linting
+
+```bash
+pnpm typecheck
+pnpm lint
+
+```
+
+---
+
+## 📦 Publishing New Versions
+
+We use **Changesets** to manage versioning and NPM releases. Never manually update `package.json` version numbers.
+
+### 1. Create a Change File
+
+When your feature or fix is ready, run:
+
+```bash
+pnpm change
+
+```
+
+* Select the packages that were modified (e.g., `drawer`).
+* Choose the version bump (Patch for fixes, Minor for features).
+* Write a brief description of the change.
+
+### 2. Versioning
+
+Before releasing, generate the changelogs and update versions:
+
+```bash
+pnpm version-packages
+
+```
+
+### 3. Release to NPM
+
+To build and publish the packages to the `@agencecinq` scope:
+
+```bash
+pnpm release
+
+```
+
+---
+
+## 📂 Project Structure
+
+* `packages/utils`: Shared logic, event bus, and helpers.
+* `packages/drawer`: The Drawer Web Component and its Vite Plugin.
+* `apps/`: Shopify theme projects (e.g., Zhiggie).
+
+---
+
+## 🛡 Best Practices
+
+1. **Strict ESM**: Always use `import.meta.url` instead of `__dirname` in Node.js scripts (Vite plugins).
+2. **Shared Utils**: If you write a utility function that could be used elsewhere, place it in `@agencecinq/utils`.
+3. **Peer Dependencies**: When adding a dependency to a package, consider if it should be a `peerDependency` to avoid version conflicts in the final Shopify theme.
+
+---
+
+**Happy coding with CINQ!**
