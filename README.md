@@ -1,8 +1,8 @@
-# 🚀 CINQ Monorepo Onboarding Guide
+# CINQ Monorepo Onboarding Guide
 
 Welcome to the **CINQ** Shopify development ecosystem. This repository is managed as a monorepo using **pnpm**, **Turborepo**, and **Changesets**.
 
-## 🛠 Prerequisites
+## Prerequisites
 
 Before starting, ensure you have the following installed:
 
@@ -11,7 +11,7 @@ Before starting, ensure you have the following installed:
 
 ---
 
-## 🏗 Setup & Installation
+## Setup & Installation
 
 1. **Clone the repository**:
 ```bash
@@ -32,7 +32,7 @@ pnpm install
 
 ---
 
-## 💻 Daily Workflow
+## Daily Workflow
 
 ### Development
 
@@ -66,7 +66,7 @@ pnpm lint
 
 ---
 
-## 📦 Publishing New Versions
+## Publishing New Versions
 
 We use **Changesets** to manage versioning and NPM releases. Never manually update `package.json` version numbers.
 
@@ -103,15 +103,15 @@ pnpm release
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 * `packages/utils`: Shared logic, event bus, and helpers.
 * `packages/drawer`: The Drawer Web Component and its Vite Plugin.
-* `apps/`: Shopify theme projects (e.g., Zhiggie).
+* `apps/`: Shopify theme(s) consuming the packages.
 
 ---
 
-## 🛡 Best Practices
+## Best Practices
 
 1. **Strict ESM**: Always use `import.meta.url` instead of `__dirname` in Node.js scripts (Vite plugins).
 2. **Shared Utils**: If you write a utility function that could be used elsewhere, place it in `@agencecinq/utils`.
