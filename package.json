@@ -1,24 +1,22 @@
 {
-  "name": "cinq-shopify",
+  "name": "@agencecinq/shopify",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "docs": "turbo run dev --filter=docs",
+    "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
-    "turbo": "^2.7.6",
-    "typescript": "5.9.2"
+    "turbo": "latest"
   },
-  "engines": {
-    "node": ">=18"
-  },
-  "packageManager": "yarn@1.22.22",
   "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+    "packages/*",
+    "apps/*"
+  ],
+  "packageManager": "yarn@4.12.0",
+  "dependencies": {
+    "@changesets/cli": "^2.29.8"
+  }
 }
