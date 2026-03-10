@@ -1,5 +1,11 @@
 # docs
 
+## 3.5.0
+
+### Minor Changes
+
+- Update docs
+
 ## 3.4.0
 
 ### Minor Changes
