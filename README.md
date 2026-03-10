@@ -105,6 +105,7 @@ pnpm release
 - `packages/utils`: Shared logic, event bus, and helpers.
 - `packages/drawer`: The Drawer Web Component and its Vite Plugin.
 - `packages/modal`: The Modal Web Components (Modal + ModalButton).
+- `packages/tabs`: The Tabs Web Component (`<cinq-tabs>`) and related utilities.
 - `apps/`: Apps / themes consuming the packages (e.g. `apps/docs`).
 
 ---

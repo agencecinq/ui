@@ -9,7 +9,6 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "vite": "latest",
-    "@agencecinq/tabs": "workspace:*"
+    "vite": "latest"
   }
 }
