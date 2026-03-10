@@ -120,6 +120,85 @@
         </dialog>
       </cinq-modal>
 
+      <h1 class="text-3xl font-bold mb-10 mt-16">Composant Tabs</h1>
+
+      <cinq-tabs class="space-y-4" data-tabs-hash="false">
+        <div
+          role="tablist"
+          aria-label="Exemple d'onglets"
+          class="inline-flex gap-2 rounded-lg bg-white p-1 shadow-sm"
+        >
+          <button
+            type="button"
+            class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+            role="tab"
+            aria-selected="true"
+            aria-controls="tab-home-panel"
+            id="tab-home"
+          >
+            Accueil
+          </button>
+          <button
+            type="button"
+            class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-project-panel"
+            id="tab-project"
+            tabindex="-1"
+          >
+            Projet
+          </button>
+          <button
+            type="button"
+            class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-contact-panel"
+            id="tab-contact"
+            tabindex="-1"
+          >
+            Contact
+          </button>
+        </div>
+
+        <section
+          tabindex="0"
+          role="tabpanel"
+          aria-labelledby="tab-home"
+          id="tab-home-panel"
+          class="is-active [&.is-active]:block hidden rounded-xl bg-white p-4 shadow"
+        >
+          <p class="text-gray-700">
+            Contenu de l'onglet <strong>Accueil</strong>.
+          </p>
+        </section>
+
+        <section
+          tabindex="0"
+          role="tabpanel"
+          aria-labelledby="tab-project"
+          id="tab-project-panel"
+          class="[&.is-active]:block hidden rounded-xl bg-white p-4 shadow"
+        >
+          <p class="text-gray-700">
+            Contenu de l'onglet <strong>Projet</strong>.
+          </p>
+        </section>
+
+        <section
+          tabindex="0"
+          role="tabpanel"
+          aria-labelledby="tab-contact"
+          id="tab-contact-panel"
+          class="[&.is-active]:block hidden rounded-xl bg-white p-4 shadow"
+        >
+          <p class="text-gray-700">
+            Contenu de l'onglet <strong>Contact</strong>.
+          </p>
+        </section>
+      </cinq-tabs>
+
       <div
         class="mt-12 p-6 bg-black rounded-lg shadow-inner font-mono text-sm text-green-400"
       >
@@ -148,6 +227,7 @@
     <script type="module">
       import "../../packages/drawer/src/index.ts";
       import "../../packages/modal/src/index.ts";
+      import "../../packages/tabs/src/index.ts";
       import { EVENTS } from "../../packages/utils/src/index.ts";
 
       const logContainer = document.getElementById("log-container");
