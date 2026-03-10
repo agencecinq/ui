@@ -1,0 +1,1 @@
+{"version":3,"file":"focus-trap.d.ts","sourceRoot":"","sources":["../src/focus-trap.ts"],"names":[],"mappings":"AAUA,iBAAS,oBAAoB,CAAC,SAAS,EAAE,WAAW,GAAG,WAAW,EAAE,CAkBnE;AAED,iBAAS,YAAY,CAAC,SAAS,EAAE,WAAW,EAAE,cAAc,GAAE,WAAuB,GAAG,IAAI,CAoC3F;AAED,iBAAS,eAAe,CAAC,cAAc,GAAE,WAAW,GAAG,IAAW,GAAG,IAAI,CAQxE;AAED,OAAO,EAAE,YAAY,EAAE,eAAe,EAAE,oBAAoB,EAAE,CAAC"}

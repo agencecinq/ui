@@ -10,6 +10,9 @@ dist/
 build/
 .next/
 out/
+# Keep package builds versioned (monorepo)
+!packages/*/dist/
+!packages/*/dist/**
 # Cache de build pnpm
 .pnpm-debug.log*
 

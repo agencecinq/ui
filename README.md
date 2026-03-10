@@ -7,7 +7,7 @@ Welcome to the **CINQ** Shopify development ecosystem. This repository is manage
 Before starting, ensure you have the following installed:
 
 - **Node.js** (v22 or higher)
-- **pnpm** (v9 or higher)
+- **pnpm** (v10 or higher)
 
 ---
 
@@ -44,6 +44,7 @@ pnpm dev
 ```
 
 Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in `@agencecinq/drawer` automatically.
+Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in `@agencecinq/drawer` and `@agencecinq/modal` automatically.
 
 ### Building
 
@@ -103,7 +104,8 @@ pnpm release
 
 - `packages/utils`: Shared logic, event bus, and helpers.
 - `packages/drawer`: The Drawer Web Component and its Vite Plugin.
-- `apps/`: Shopify theme(s) consuming the packages.
+- `packages/modal`: The Modal Web Components (Modal + ModalButton).
+- `apps/`: Apps / themes consuming the packages (e.g. `apps/docs`).
 
 ---
 
