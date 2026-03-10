@@ -106,7 +106,6 @@ export class Drawer extends HTMLElement {
     this.style.setProperty('opacity', '1');
     this.style.setProperty('visibility', 'visible');
 
-    // Équivalent de this.emit
     document.documentElement.dispatchEvent(new CustomEvent(EVENTS.DRAWER_OPEN, {
       detail: { drawer: this.cid }
     }));
