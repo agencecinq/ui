@@ -6,14 +6,22 @@ export default defineConfig({
   server: {
     port: 5173,
     fs: {
-      allow: ['../..']
-    }
+      allow: ['../..'],
+    },
   },
   resolve: {
     alias: {
       '@agencecinq/utils': resolve(__dirname, '../../packages/utils/src/index.ts'),
       '@agencecinq/drawer': resolve(__dirname, '../../packages/drawer/src/index.ts'),
-      '@agencecinq/modal': resolve(__dirname, '../../packages/modal/src/index.ts')
-    }
-  }
+      '@agencecinq/modal': resolve(__dirname, '../../packages/modal/src/index.ts'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        tabs: resolve(__dirname, 'tabs.html'),
+      },
+    },
+  },
 });

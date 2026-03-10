@@ -2,7 +2,7 @@ function v(i) {
   const t = i.indexOf("#");
   return t === -1 ? "" : i.substring(t + 1);
 }
-const f = !0, E = 0;
+const f = !1, E = 0;
 class A {
   el;
   id;
