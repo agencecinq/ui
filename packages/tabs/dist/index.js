@@ -111,11 +111,13 @@ class m extends HTMLElement {
   setActiveTab(t) {
     this.current = t, this.deactivateTabs(), this.deactivateTabPanels();
     const e = this.tabs[t];
-    this.tabPanels.find((r) => r.id === e.controls)?.activate(), this.hash && (this.href = e.id, window.location.hash = e.id);
+    this.tabPanels.find((h) => h.id === e.controls)?.activate();
   }
   /** Call after preventing `tab-before-activate` to complete activation (e.g. after async work). */
   activateTab(t) {
-    this.setActiveTab(t), this.tabs[t]?.activate(!1);
+    this.setActiveTab(t);
+    const e = this.tabs[t];
+    e?.activate(!1), this.hash && e && (this.href = e.id, window.location.hash = e.id);
   }
   constructor() {
     super(), this.$tabList = null;
@@ -138,7 +140,9 @@ class m extends HTMLElement {
     ), this.tabs.forEach((t, e) => {
       this.tabPanels.push(
         new A(this.querySelector(`#${t.controls}[role="tabpanel"]`))
-      ), t.init(), t.el.addEventListener(a.ACTIVATE, () => this.setActiveTab(e)), (t.active || t.id === this.href || this.current === e) && (this.setActiveTab(e), t.activate(!1));
+      ), t.init(), t.el.addEventListener(a.ACTIVATE, () => {
+        this.setActiveTab(e), this.hash && (this.href = t.id, window.location.hash = t.id);
+      }), (t.active || t.id === this.href || this.current === e) && (this.setActiveTab(e), t.activate(!1));
     }), this.initEvents());
   }
   initEvents() {
@@ -149,9 +153,9 @@ class m extends HTMLElement {
     return t ? getComputedStyle(t).direction === "rtl" : !1;
   }
   handleKeydown = (t) => {
-    const { key: e, code: s, target: r } = t, n = JSON.parse(
-      r.getAttribute("aria-selected")
-    ), h = () => {
+    const { key: e, code: s, target: h } = t, n = JSON.parse(
+      h.getAttribute("aria-selected")
+    ), r = () => {
       this.current = 0 > this.current - 1 ? this.tabs.length - 1 : this.current - 1, this.tabs[this.current].focus(), this.delay && setTimeout(() => {
         this.tabs[this.current].toggle(!1);
       }, this.delay);
@@ -164,10 +168,10 @@ class m extends HTMLElement {
     }, o = () => {
       t.preventDefault(), this.current = this.tabs.length - 1, this.tabs[this.current].toggle();
     }, d = this.isRtl, u = {
-      ArrowUp: h,
+      ArrowUp: r,
       ArrowDown: l,
-      ArrowLeft: d ? l : h,
-      ArrowRight: d ? h : l,
+      ArrowLeft: d ? l : r,
+      ArrowRight: d ? r : l,
       End: o,
       Home: c,
       PageUp: c,

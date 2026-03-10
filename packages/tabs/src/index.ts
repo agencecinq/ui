@@ -22,17 +22,18 @@ export class Tabs extends HTMLElement {
     const tab = this.tabs[index];
     const panel = this.tabPanels.find((tabPanel) => tabPanel.id === tab.controls);
     panel?.activate();
-
-    if (this.hash) {
-      this.href = tab.id;
-      window.location.hash = tab.id;
-    }
   }
 
   /** Call after preventing `tab-before-activate` to complete activation (e.g. after async work). */
   activateTab(index: number): void {
     this.setActiveTab(index);
-    this.tabs[index]?.activate(false);
+    const tab = this.tabs[index];
+    tab?.activate(false);
+
+    if (this.hash && tab) {
+      this.href = tab.id;
+      window.location.hash = tab.id;
+    }
   }
 
   constructor() {
@@ -75,7 +76,14 @@ export class Tabs extends HTMLElement {
       );
       tab.init();
 
-      tab.el.addEventListener(EVENTS.ACTIVATE, () => this.setActiveTab(index));
+      tab.el.addEventListener(EVENTS.ACTIVATE, () => {
+        this.setActiveTab(index);
+
+        if (this.hash) {
+          this.href = tab.id;
+          window.location.hash = tab.id;
+        }
+      });
 
       if (tab.active || tab.id === this.href || this.current === index) {
         this.setActiveTab(index);

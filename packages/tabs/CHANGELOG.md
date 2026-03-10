@@ -1,5 +1,11 @@
 # @agencecinq/tabs
 
+## 9.2.0
+
+### Minor Changes
+
+- Fix refacto
+
 ## 9.1.0
 
 ### Minor Changes
