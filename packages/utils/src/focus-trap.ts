@@ -4,9 +4,6 @@ const trapFocusHandlers: {
   keydown?: (event: KeyboardEvent) => void;
 } = {};
 
-/**
- * Filtre les éléments réellement visibles et focalisables
- */
 function isVisible(el: HTMLElement): boolean {
   return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
@@ -38,20 +35,17 @@ function addTrapFocus(container: HTMLElement, elementToFocus: HTMLElement = cont
   const first = elements[0];
   const last = elements[elements.length - 1];
 
-  // Nettoyage avant d'ajouter (pour éviter les doublons)
   removeTrapFocus();
 
   trapFocusHandlers.keydown = (event: KeyboardEvent): void => {
     if (event.key !== 'Tab') return;
 
     if (event.shiftKey) {
-      // Tab arrière
       if (document.activeElement === first || document.activeElement === container) {
         event.preventDefault();
         last.focus();
       }
     } else {
-      // Tab avant
       if (document.activeElement === last) {
         event.preventDefault();
         first.focus();
@@ -61,10 +55,8 @@ function addTrapFocus(container: HTMLElement, elementToFocus: HTMLElement = cont
 
   document.addEventListener('keydown', trapFocusHandlers.keydown);
 
-  // Focus initial
   elementToFocus.focus();
 
-  // Support spécifique pour les inputs texte (sélection du contenu)
   if (
     elementToFocus instanceof HTMLInputElement &&
     ['search', 'text', 'email', 'url'].includes(elementToFocus.type) &&
