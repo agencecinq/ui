@@ -12,8 +12,8 @@
     "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.8",
-    "@types/node": "^25.0.10",
+    "@changesets/cli": "^2.30.0",
+    "@types/node": "^25.4.0",
     "turbo": "latest",
     "vite": "^7.3.1"
   },

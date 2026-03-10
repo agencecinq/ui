@@ -6,29 +6,29 @@ Welcome to the **CINQ** Shopify development ecosystem. This repository is manage
 
 Before starting, ensure you have the following installed:
 
-* **Node.js** (v22 or higher)
-* **pnpm** (v9 or higher)
+- **Node.js** (v22 or higher)
+- **pnpm** (v9 or higher)
 
 ---
 
 ## Setup & Installation
 
 1. **Clone the repository**:
+
 ```bash
 git clone https://github.com/agencecinq/shopify.git
 cd shopify
 
 ```
 
-
 2. **Install dependencies**:
+
 ```bash
 pnpm install
 
 ```
 
-
-*Note: Do not use `npm install` or `yarn install`. This project relies on pnpm workspaces.*
+_Note: Do not use `npm install` or `yarn install`. This project relies on pnpm workspaces._
 
 ---
 
@@ -77,9 +77,9 @@ When your feature or fix is ready, run:
 pnpm change
 ```
 
-* Select the packages that were modified (e.g., `drawer`).
-* Choose the version bump (Patch for fixes, Minor for features).
-* Write a brief description of the change.
+- Select the packages that were modified (e.g., `drawer`).
+- Choose the version bump (Patch for fixes, Minor for features).
+- Write a brief description of the change.
 
 ### 2. Versioning
 
@@ -101,9 +101,9 @@ pnpm release
 
 ## Project Structure
 
-* `packages/utils`: Shared logic, event bus, and helpers.
-* `packages/drawer`: The Drawer Web Component and its Vite Plugin.
-* `apps/`: Shopify theme(s) consuming the packages.
+- `packages/utils`: Shared logic, event bus, and helpers.
+- `packages/drawer`: The Drawer Web Component and its Vite Plugin.
+- `apps/`: Shopify theme(s) consuming the packages.
 
 ---
 

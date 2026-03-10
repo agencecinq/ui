@@ -1,24 +1,19 @@
 {
-  "name": "@agencecinq/drawer",
-  "version": "4.0.0",
+  "name": "@agencecinq/modal",
+  "version": "1.0.0",
   "type": "module",
   "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./plugin": {
-      "types": "./dist/plugin.d.ts",
-      "import": "./dist/plugin.js"
     }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist",
-    "src/drawer.liquid"
+    "dist"
   ],
   "scripts": {
     "build": "vite build",
@@ -30,7 +25,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/agencecinq/shopify.git",
-    "directory": "packages/drawer"
+    "directory": "packages/modal"
   },
   "publishConfig": {
     "access": "public"

@@ -32,10 +32,10 @@ export class DrawerButton extends HTMLElement {
     );
 
     this.controls.forEach((control) => {
-      const detail = { 
-        trigger: this.$button, 
+      const detail = {
+        trigger: this.$button,
         trap: document.getElementById(`${this.$button?.getAttribute('data-trap')}`),
-        drawer: control 
+        drawer: control
       };
 
       document.documentElement.dispatchEvent(new CustomEvent(EVENTS.DRAWER_TOGGLE, { detail }));

@@ -36,7 +36,7 @@
 
             <cinq-drawer-button
               cid="drawer-button-test-close"
-              class="cursor-pointer p-2 hover:bg-gray-100 rounded-full"
+              class="cursor-pointer flex items-center justify-center size-8 p-2 hover:bg-gray-100 rounded-full"
             >
               <button aria-controls="drawer-test">
                 <svg
@@ -58,6 +58,67 @@
           </div>
         </div>
       </cinq-drawer>
+
+      <h1 class="text-3xl font-bold mb-10 mt-16">Composant Modal</h1>
+
+      <cinq-modal-button
+        class="bg-black text-white px-6 py-3 rounded-full cursor-pointer hover:bg-gray-800 transition"
+      >
+        <button aria-controls="modal-test" aria-pressed="false">
+          Ouvrir le modal
+        </button>
+      </cinq-modal-button>
+
+      <cinq-modal id="modal-test" class="block mt-6">
+        <dialog
+          role="dialog"
+          class="m-auto w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl backdrop:bg-black/50"
+        >
+          <div class="flex items-start justify-between gap-6">
+            <div>
+              <h2 class="text-2xl font-bold mb-2">Modal CINQ</h2>
+              <p class="text-gray-600">
+                Clique sur le backdrop pour fermer, ou utilise le bouton
+                ci-dessous.
+              </p>
+            </div>
+            <cinq-modal-button class="block">
+              <button
+                type="button"
+                aria-controls="modal-test"
+                aria-pressed="false"
+                class="cursor-pointer p-2 hover:bg-gray-100 rounded-full"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </cinq-modal-button>
+          </div>
+
+          <cinq-modal-button class="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              aria-controls="modal-test"
+              aria-pressed="false"
+              class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+            >
+              Fermer
+            </button>
+          </cinq-modal-button>
+        </dialog>
+      </cinq-modal>
 
       <div
         class="mt-12 p-6 bg-black rounded-lg shadow-inner font-mono text-sm text-green-400"
@@ -86,6 +147,7 @@
 
     <script type="module">
       import "../../packages/drawer/src/index.ts";
+      import "../../packages/modal/src/index.ts";
       import { EVENTS } from "../../packages/utils/src/index.ts";
 
       const logContainer = document.getElementById("log-container");
@@ -113,11 +175,48 @@
       document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, e => {
         addLog("DRAWER_CLOSE", e.detail);
       });
-      
+
       document.documentElement.addEventListener(EVENTS.DRAWER_TOGGLE, e => {
         addLog("DRAWER_TOGGLE", e.detail);
       });
 
+      document.documentElement.addEventListener(EVENTS.MODAL_OPEN, e => {
+        addLog("MODAL_OPEN", e.detail);
+      });
+
+      document.documentElement.addEventListener(EVENTS.MODAL_CLOSE, e => {
+        addLog("MODAL_CLOSE", e.detail);
+      });
+
+      document.documentElement.addEventListener(EVENTS.MODAL_TOGGLE, e => {
+        addLog("MODAL_TOGGLE", e.detail);
+
+        const modalId = e.detail?.modal;
+        if (!modalId) return;
+
+        const $modal =
+          document.querySelector(`cinq-modal#${modalId}`) ||
+          document.getElementById(modalId);
+        if (!$modal) return;
+
+        const dialog =
+          $modal.querySelector?.("dialog") ||
+          ($modal instanceof HTMLDialogElement ? $modal : null);
+        const isOpen =
+          dialog instanceof HTMLDialogElement ? dialog.open : false;
+
+        if (
+          typeof $modal.close === "function" &&
+          typeof $modal.show === "function"
+        ) {
+          isOpen ? $modal.close() : $modal.show();
+          return;
+        }
+
+        if (dialog instanceof HTMLDialogElement) {
+          isOpen ? dialog.close() : dialog.showModal();
+        }
+      });
     </script>
   </body>
 </html>

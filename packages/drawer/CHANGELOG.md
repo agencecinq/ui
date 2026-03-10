@@ -1,5 +1,17 @@
 # @agencecinq/drawer
 
+## 4.0.0
+
+### Major Changes
+
+- Create a new package in @agencecinq/shopify
+
+### Patch Changes
+
+- d8e4559: Fix enableScroll missing false parameter
+- Updated dependencies
+  - @agencecinq/utils@4.0.0
+
 ## 3.0.0
 
 ### Major Changes

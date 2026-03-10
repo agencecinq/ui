@@ -1,8 +1,8 @@
-import { 
-  EVENTS, 
-  disableScroll, 
-  enableScroll, 
-  addTrapFocus, 
+import {
+  EVENTS,
+  disableScroll,
+  enableScroll,
+  addTrapFocus,
   removeTrapFocus,
   getFocusableElements,
   keycode
@@ -27,6 +27,7 @@ export class Drawer extends HTMLElement {
 
   connectedCallback(): void {
     const $overlay = this.querySelector('[data-dom="overlay"]') || this.querySelector('[overlay]');
+
     if ($overlay) {
       $overlay.addEventListener('click', this.handleClick);
     }
@@ -58,7 +59,7 @@ export class Drawer extends HTMLElement {
    * Handles the opening of the drawer when a custom event is triggered.
    */
   handleDrawerOpen = (event: CustomEvent): void => {
-    
+
     if (event.detail.drawer !== this.cid && this.hasAttribute('open')) {
       this.trigger = event.detail.trigger;
       this.removeAttribute('open');
@@ -73,7 +74,7 @@ export class Drawer extends HTMLElement {
 
   handleDrawerToggle = (event: CustomEvent): void => {
     const { trigger, trap, drawer } = event.detail
-    
+
     if (drawer !== this.cid) {
       return;
     }
@@ -81,14 +82,14 @@ export class Drawer extends HTMLElement {
     this.toggle({ trigger, trap });
   };
 
-/**
-   * Toggles the state of the drawer between open and closed.
-   *
-   * @param trigger - The HTML element that triggered the toggle action, or null.
-   * @param trap - The HTML element that will be used as a focus trap when the drawer is open, or null. Will default to the drawer itself.
-   *
-   * @returns boolean - The new state of the drawer (open or closed).
-   */
+  /**
+     * Toggles the state of the drawer between open and closed.
+     *
+     * @param trigger - The HTML element that triggered the toggle action, or null.
+     * @param trap - The HTML element that will be used as a focus trap when the drawer is open, or null. Will default to the drawer itself.
+     *
+     * @returns boolean - The new state of the drawer (open or closed).
+     */
   toggle({ trigger, trap }: { trigger: HTMLElement | null; trap: HTMLElement | null }): boolean {
     if (trigger) {
       this.trigger = trigger;
@@ -136,11 +137,11 @@ export class Drawer extends HTMLElement {
         if (!this.hasAttribute('open')) {
           this.style.setProperty('opacity', '0');
           this.style.setProperty('visibility', 'hidden');
-          
+
           document.documentElement.dispatchEvent(new CustomEvent(EVENTS.DRAWER_CLOSE, {
             detail: { drawer: this.cid }
           }));
-          
+
           enableScroll(false);
         }
       },
@@ -150,7 +151,7 @@ export class Drawer extends HTMLElement {
 
   disconnectedCallback(): void {
     const $overlay = this.querySelector('[data-dom="overlay"]') || this.querySelector('[overlay]');
-    
+
     if ($overlay) {
       $overlay.removeEventListener('click', this.handleClick);
     }
