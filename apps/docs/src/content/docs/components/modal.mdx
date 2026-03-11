@@ -1,0 +1,93 @@
+---
+title: Modal
+description: Native `<dialog>` modal Web Component (`<cinq-modal>`).
+---
+
+import RegisterComponents from '../_components/RegisterComponents.astro';
+
+## Install
+
+```bash
+pnpm add @agencecinq/modal
+```
+
+## Usage
+
+```js
+import '@agencecinq/modal';
+```
+
+```html
+<cinq-modal-button class="block">
+  <button aria-controls="demo-modal" aria-pressed="false">Open modal</button>
+</cinq-modal-button>
+
+<cinq-modal id="demo-modal">
+  <dialog class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-2xl backdrop:bg-black/50">
+    <h2 class="text-xl font-semibold mb-2">Modal</h2>
+    <p class="text-gray-600 mb-4">This is a native <code>&lt;dialog&gt;</code> modal.</p>
+
+    <cinq-modal-button class="block">
+      <button aria-controls="demo-modal" aria-pressed="false">Close</button>
+    </cinq-modal-button>
+  </dialog>
+</cinq-modal>
+```
+
+## API
+
+### Markup
+
+- **`<cinq-modal>`** must contain a **`<dialog>`** (or an element marked with **`[data-dialog]`**).
+- **`id` is required** for event-driven open/close (it must match the `aria-controls` of your buttons).
+
+### Methods
+
+- **`show()`**: opens the native dialog (calls `showModal()`).
+- **`close()`**: closes the dialog.
+
+### Events
+
+- **`modal-toggle`**: dispatched by `cinq-modal-button` on `document.documentElement` with `detail: { modal, trigger, trap }`
+- **`modal-open`**: dispatched by `cinq-modal` with `detail: { modal }`
+- **`modal-close`**: dispatched by `cinq-modal`
+
+## Interactive example
+
+<div class="not-content">
+  <div class="flex flex-col gap-4">
+    <cinq-modal-button class="block">
+      <button
+        class="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        aria-controls="starlight-modal"
+        aria-pressed="false"
+      >
+        Open modal
+      </button>
+    </cinq-modal-button>
+
+    <cinq-modal id="starlight-modal">
+      <dialog class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-8 shadow-2xl backdrop:bg-black/50">
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-2">CINQ modal</h2>
+            <p class="text-gray-600">Click the backdrop or use the button to close.</p>
+          </div>
+          <cinq-modal-button class="block">
+            <button
+              type="button"
+              aria-controls="starlight-modal"
+              aria-pressed="false"
+              class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+            >
+              <span class="text-lg leading-none">✕</span>
+            </button>
+          </cinq-modal-button>
+        </div>
+      </dialog>
+    </cinq-modal>
+  </div>
+</div>
+
+<RegisterComponents />
+

@@ -1,0 +1,35 @@
+---
+title: CINQ UI components
+description: Documentation and interactive examples for CINQ UI Web Components.
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import RegisterComponents from './_components/RegisterComponents.astro';
+
+## Components
+
+<CardGrid stagger>
+  <Card title="Tabs" icon="list">
+    Accessible, WAI-ARIA compliant tabs as a lightweight Web Component.
+
+    [Read the Tabs docs](components/tabs/)
+  </Card>
+  <Card title="Modal" icon="window">
+    Native `<dialog>`-based modal with a tiny event-driven API.
+
+    [Read the Modal docs](components/modal/)
+  </Card>
+  <Card title="Drawer" icon="sidebar">
+    Slide-in drawer with focus trap and scroll lock.
+
+    [Read the Drawer docs](components/drawer/)
+  </Card>
+</CardGrid>
+
+## Philosophy
+
+- **Web Components first**: import once, drop the markup, the browser instantiates it.
+- **Event-driven**: integrate with your app by listening to events and dispatching intents.
+- **WAI‑ARIA aligned**: keyboard navigation and ARIA states follow APG patterns.
+
+<RegisterComponents />

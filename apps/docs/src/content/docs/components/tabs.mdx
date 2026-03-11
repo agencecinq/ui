@@ -1,0 +1,147 @@
+---
+title: Tabs
+description: Accessible tabs Web Component (`<cinq-tabs>`) with hash + delay options.
+---
+
+import RegisterComponents from '../_components/RegisterComponents.astro';
+
+## Install
+
+```bash
+pnpm add @agencecinq/tabs
+```
+
+## Usage
+
+Import once:
+
+```js
+import '@agencecinq/tabs';
+```
+
+Then write the WAI‑ARIA markup:
+
+```html
+<cinq-tabs data-tabs-hash="false" data-tabs-delay="0">
+  <div role="tablist" aria-label="Example tabs">
+    <button id="tab-home" role="tab" aria-selected="true" aria-controls="panel-home">
+      Home
+    </button>
+    <button id="tab-project" role="tab" aria-selected="false" aria-controls="panel-project" tabindex="-1">
+      Project
+    </button>
+  </div>
+
+  <section id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabindex="0">…</section>
+  <section id="panel-project" role="tabpanel" aria-labelledby="tab-project" tabindex="0" hidden>…</section>
+</cinq-tabs>
+```
+
+## Options
+
+Configure via data attributes:
+
+- **`data-tabs-hash`**: `true` (default) / `false` — sync the active tab id to `location.hash` on activation.
+- **`data-tabs-delay`**: number (ms), default `0` — when `> 0`, arrow key navigation activates after a delay.
+
+## API
+
+### Method
+
+- **`activateTab(index: number)`**: activates a tab programmatically (useful after canceling `tab-before-activate`).
+
+### Events
+
+- **`tab-before-activate`** (cancelable): `detail: { index, controls, element }`
+- **`tab-activate`**: `detail: { controls, element }`
+- **`tab-delete`**: `detail: { controls, element }`
+
+## Interactive example
+
+<div class="not-content">
+  <cinq-tabs class="block flex flex-col gap-4" data-tabs-hash="false" data-tabs-delay="0">
+    <div
+      role="tablist"
+      aria-label="Tabs example"
+      class="inline-flex gap-2 rounded-lg bg-white p-1 shadow-sm"
+    >
+      <button
+        type="button"
+        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        role="tab"
+        aria-selected="true"
+        aria-controls="tabs-home-panel"
+        id="tabs-home"
+      >
+        Home
+      </button>
+      <button
+        type="button"
+        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tabs-project-panel"
+        id="tabs-project"
+        tabindex="-1"
+      >
+        Project
+      </button>
+      <button
+        type="button"
+        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tabs-contact-panel"
+        id="tabs-contact"
+        tabindex="-1"
+        data-deletable="true"
+      >
+        Deletable
+      </button>
+    </div>
+
+    <section
+      tabindex="0"
+      role="tabpanel"
+      aria-labelledby="tabs-home"
+      id="tabs-home-panel"
+      class="rounded-xl bg-white p-4 shadow"
+    >
+      <p class="text-gray-700">Barracudas are swift marauders of warm salt waters.</p>
+    </section>
+
+    <section
+      tabindex="0"
+      role="tabpanel"
+      aria-labelledby="tabs-project"
+      id="tabs-project-panel"
+      class="rounded-xl bg-white p-4 shadow"
+      hidden
+    >
+      <p class="text-gray-700">A dracolich is an undead dragon created by forbidden rites.</p>
+    </section>
+
+    <section
+      tabindex="0"
+      role="tabpanel"
+      aria-labelledby="tabs-contact"
+      id="tabs-contact-panel"
+      class="rounded-xl bg-white p-4 shadow"
+      hidden
+    >
+      <p class="text-gray-700">A galeb duhr looks like a boulder until it moves.</p>
+    </section>
+  </cinq-tabs>
+</div>
+
+### RTL
+
+If the tablist inherits `direction: rtl` (e.g. `dir="rtl"`), left/right arrow navigation follows the reading direction.
+
+```html
+<div dir="rtl">
+  <cinq-tabs data-tabs-hash="false">…</cinq-tabs>
+</div>
+```
+
+<RegisterComponents />

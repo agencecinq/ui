@@ -1,0 +1,132 @@
+---
+title: Drawer
+description: Slide-in drawer Web Component (`<cinq-drawer>`).
+---
+
+import RegisterComponents from '../_components/RegisterComponents.astro';
+import PortalToBody from '../_components/PortalToBody.astro';
+
+## Install
+
+```bash
+pnpm add @agencecinq/drawer
+```
+
+## Usage
+
+```js
+import '@agencecinq/drawer';
+```
+
+```html
+<cinq-drawer-button class="block">
+  <button aria-controls="demo-drawer">Open drawer</button>
+</cinq-drawer-button>
+
+<cinq-drawer cid="demo-drawer" class="group">
+  <div data-dom="overlay" class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"></div>
+  <div role="dialog" class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform group-[[open]]:translate-x-0">
+    <div class="p-8 flex flex-col gap-4">
+      <h2 class="text-2xl font-bold">Drawer</h2>
+      <p class="text-gray-600">A slide-in panel with overlay.</p>
+      <cinq-drawer-button class="block">
+        <button aria-controls="demo-drawer">Close</button>
+      </cinq-drawer-button>
+    </div>
+  </div>
+</cinq-drawer>
+```
+
+## API
+
+### Attributes
+
+- **`cid`** (required): drawer identifier (falls back to `id`).
+- **`open`**: reflected state attribute (used for styling).
+
+### Methods
+
+- **`open()`**, **`close()`**, **`toggle()`**
+
+### Events
+
+- **`drawer-toggle`**: dispatched by `cinq-drawer-button` on `document.documentElement` with `detail: { drawer, trigger, trap }`
+- **`drawer-open`** / **`drawer-close`**: dispatched by `cinq-drawer`
+
+## Shopify (Liquid snippet)
+
+If you are integrating in a Shopify theme, you can use the provided snippet and Vite plugin.
+
+### 1) Copy the snippet automatically (Vite)
+
+```ts
+import { defineConfig } from 'vite';
+import { cinqDrawerPlugin } from '@agencecinq/drawer/plugin';
+
+export default defineConfig({
+  plugins: [cinqDrawerPlugin()],
+});
+```
+
+This copies the package snippet to your theme:
+
+- `snippets/cinq-drawer.html.liquid`
+
+### 2) Render the snippet
+
+```liquid
+{% render 'cinq-drawer.html',
+  id: 'cart-drawer',
+  content: '<div class="p-8">Hello from the drawer</div>'
+%}
+
+<cinq-drawer-button class="block">
+  <button aria-controls="cart-drawer" aria-expanded="false">Open cart</button>
+</cinq-drawer-button>
+```
+
+## Interactive example
+
+<div class="not-content">
+  <div class="flex flex-col gap-4">
+    <cinq-drawer-button class="block">
+      <button
+        class="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        aria-controls="starlight-drawer"
+        aria-expanded="false"
+      >
+        Open drawer
+      </button>
+    </cinq-drawer-button>
+
+    <cinq-drawer cid="starlight-drawer" class="group">
+      <div
+        data-dom="overlay"
+        class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
+      ></div>
+      <div
+        role="dialog"
+        class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
+      >
+        <div class="p-8 flex flex-col gap-4">
+          <h2 class="text-2xl font-bold">CINQ drawer</h2>
+          <p class="text-gray-600">Overlay, focus management, and scroll lock.</p>
+          <cinq-drawer-button class="block">
+            <button
+              class="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+              aria-controls="starlight-drawer"
+              aria-expanded="false"
+            >
+              Close
+            </button>
+          </cinq-drawer-button>
+        </div>
+      </div>
+    </cinq-drawer>
+  </div>
+</div>
+
+<PortalToBody selector='cinq-drawer[cid="starlight-drawer"]' />
+
+<RegisterComponents />
+

@@ -11,14 +11,14 @@ export function cinqDrawerPlugin(): Plugin {
     name: 'vite-plugin-cinq-drawer',
 
     async buildStart() {
-      const source = resolve(__dirname, '../src/drawer.liquid'); 
-      const destination = resolve(process.cwd(), 'snippets/cinq-drawer.liquid');
+      const source = resolve(__dirname, '../src/drawer.html.liquid');
+      const destination = resolve(process.cwd(), 'snippets/cinq-drawer.html.liquid');
 
       try {
         if (await fs.pathExists(source)) {
           await fs.ensureDir(dirname(destination));
           await fs.copy(source, destination);
-            console.log('✅ CINQ : Liquid snippet copied.');
+          console.log('✅ CINQ : Liquid snippet copied.');
         }
       } catch (err) {
         console.error('❌ CINQ : Copying error :', err);
@@ -26,7 +26,7 @@ export function cinqDrawerPlugin(): Plugin {
     },
 
     async handleHotUpdate({ file, server }) {
-      if (file.endsWith('drawer.liquid')) {
+      if (file.endsWith('drawer.html.liquid')) {
         const destination = resolve(process.cwd(), 'snippets/cinq-drawer.html.liquid');
         await fs.copy(file, destination);
         server.ws.send({ type: 'full-reload' });

@@ -1,0 +1,25 @@
+---
+type Props = {
+  selector: string;
+};
+
+const { selector } = Astro.props;
+---
+
+<script define:vars={{ selector }}>
+  const portal = () => {
+    const nodes = document.querySelectorAll(selector);
+    nodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      if (node.parentElement === document.body) return;
+      document.body.appendChild(node);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', portal, { once: true });
+  } else {
+    portal();
+  }
+</script>
+

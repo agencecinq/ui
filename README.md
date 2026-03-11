@@ -1,6 +1,6 @@
-# CINQ Monorepo Onboarding Guide
+# CINQ UI Monorepo
 
-Welcome to the **CINQ** Shopify development ecosystem. This repository is managed as a monorepo using **pnpm**, **Turborepo**, and **Changesets**.
+Welcome to the **CINQ UI** monorepo. This repository is managed as a monorepo using **pnpm**, **Turborepo**, and **Changesets**.
 
 ## Prerequisites
 
@@ -16,8 +16,8 @@ Before starting, ensure you have the following installed:
 1. **Clone the repository**:
 
 ```bash
-git clone https://github.com/agencecinq/shopify.git
-cd shopify
+git clone https://github.com/agencecinq/ui.git
+cd ui
 
 ```
 
@@ -114,7 +114,7 @@ pnpm release
 
 1. **Strict ESM**: Always use `import.meta.url` instead of `__dirname` in Node.js scripts (Vite plugins).
 2. **Shared Utils**: If you write a utility function that could be used elsewhere, place it in `@agencecinq/utils`.
-3. **Peer Dependencies**: When adding a dependency to a package, consider if it should be a `peerDependency` to avoid version conflicts in the final Shopify theme.
+3. **Peer Dependencies**: When adding a dependency to a package, consider if it should be a `peerDependency` to avoid version conflicts in the final consumer project.
 
 ---
 

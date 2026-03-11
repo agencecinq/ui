@@ -3,12 +3,25 @@
   "type": "module",
   "version": "3.6.0",
   "private": true,
-  "license": "MIT",
+  "description": "CINQ UI components documentation site (Starlight).",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
-  "devDependencies": {
-    "vite": "latest"
+  "dependencies": {
+    "@agencecinq/drawer": "workspace:*",
+    "@agencecinq/modal": "workspace:*",
+    "@agencecinq/tabs": "workspace:*",
+    "@agencecinq/utils": "workspace:*",
+    "@astrojs/sitemap": "^3.7.1",
+    "@astrojs/starlight": "^0.37.7",
+    "@tailwindcss/vite": "^4.2.1",
+    "astro": "^5.6.1",
+    "sharp": "^0.34.2",
+    "stream-replace-string": "^2.0.0",
+    "tailwindcss": "^4.2.1"
   }
 }
