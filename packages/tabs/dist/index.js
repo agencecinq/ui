@@ -3,14 +3,14 @@ function v(i) {
   return t === -1 ? "" : i.substring(t + 1);
 }
 const f = !1, E = 0;
-class A {
+class g {
   el;
   id;
   constructor(t) {
     this.el = t, this.id = t.id;
   }
   deactivate() {
-    this.el.setAttribute("hidden", "true"), this.el.classList.remove("is-active");
+    console.log("TabPanel.deactivate", this.id), this.el.setAttribute("hidden", "true"), this.el.classList.remove("is-active");
   }
   activate() {
     this.el.removeAttribute("hidden"), this.el.classList.add("is-active");
@@ -20,7 +20,7 @@ class A {
     this.el.removeAttribute("hidden"), this.el.classList.remove("is-active");
   }
 }
-function b(i, t, e) {
+function u(i, t, e) {
   const s = new CustomEvent(e, {
     bubbles: !0,
     cancelable: !1,
@@ -33,7 +33,7 @@ const a = {
   ACTIVATE: "tab-activate",
   DELETE: "tab-delete"
 };
-class g {
+class m {
   el;
   active = !1;
   id = "";
@@ -63,7 +63,7 @@ class g {
       cancelable: !0,
       detail: { index: this.index, controls: this.controls, element: this.el }
     });
-    this.el.dispatchEvent(e), !e.defaultPrevented && (b(this.el, { controls: this.controls, element: this.el }, a.ACTIVATE), this.activate(t));
+    this.el.dispatchEvent(e), !e.defaultPrevented && (u(this.el, { controls: this.controls, element: this.el }, a.ACTIVATE), this.activate(t));
   }
   /**
    * Activate tab
@@ -94,13 +94,13 @@ class g {
    * @return void
    */
   delete = () => {
-    b(this.el, { controls: this.controls, element: this.el }, a.DELETE), this.el.parentElement?.removeChild(this.el);
+    u(this.el, { controls: this.controls, element: this.el }, a.DELETE), this.el.parentElement?.removeChild(this.el);
   };
   destroy() {
     this.el.removeAttribute("tabindex"), this.el.removeAttribute("aria-selected"), this.el.classList.remove("is-active"), this.el.removeEventListener("click", this.handleClick);
   }
 }
-class m extends HTMLElement {
+class A extends HTMLElement {
   $tabList;
   current = 0;
   tabPanels = [];
@@ -108,17 +108,6 @@ class m extends HTMLElement {
   href = "";
   hash = f;
   delay = E;
-  setActiveTab(t) {
-    this.current = t, this.deactivateTabs(), this.deactivateTabPanels();
-    const e = this.tabs[t];
-    this.tabPanels.find((h) => h.id === e.controls)?.activate();
-  }
-  /** Call after preventing `tab-before-activate` to complete activation (e.g. after async work). */
-  activateTab(t) {
-    this.setActiveTab(t);
-    const e = this.tabs[t];
-    e?.activate(!1), this.hash && e && (this.href = e.id, window.location.hash = e.id);
-  }
   constructor() {
     super(), this.$tabList = null;
   }
@@ -136,13 +125,13 @@ class m extends HTMLElement {
   }
   init() {
     this.$tabList && (this.tabs = [...this.$tabList.querySelectorAll('[role="tab"]')].map(
-      (t, e) => new g(t, e)
+      (t, e) => new m(t, e)
     ), this.tabs.forEach((t, e) => {
       this.tabPanels.push(
-        new A(this.querySelector(`#${t.controls}[role="tabpanel"]`))
+        new g(this.querySelector(`#${t.controls}[role="tabpanel"]`))
       ), t.init(), t.el.addEventListener(a.ACTIVATE, () => {
-        this.setActiveTab(e), this.hash && (this.href = t.id, window.location.hash = t.id);
-      }), (t.active || t.id === this.href || this.current === e) && (this.setActiveTab(e), t.activate(!1));
+        this.current = e, this.deactivateTabs(), this.deactivateTabPanels(), this.tabPanels.find((s) => s.id === t.controls).activate(), this.hash && (this.href = t.id, window.location.hash = t.id);
+      }), (t.active || t.id === this.href || this.current === e) && (this.deactivateTabs(), this.deactivateTabPanels(), t.activate(!1), this.tabPanels.find((s) => s.id === t.controls).activate());
     }), this.initEvents());
   }
   initEvents() {
@@ -153,8 +142,8 @@ class m extends HTMLElement {
     return t ? getComputedStyle(t).direction === "rtl" : !1;
   }
   handleKeydown = (t) => {
-    const { key: e, code: s, target: h } = t, n = JSON.parse(
-      h.getAttribute("aria-selected")
+    const { key: e, code: s, target: b } = t, h = JSON.parse(
+      b.getAttribute("aria-selected")
     ), r = () => {
       this.current = 0 > this.current - 1 ? this.tabs.length - 1 : this.current - 1, this.tabs[this.current].focus(), this.delay && setTimeout(() => {
         this.tabs[this.current].toggle(!1);
@@ -163,24 +152,24 @@ class m extends HTMLElement {
       this.current = this.current + 1 > this.tabs.length - 1 ? 0 : this.current + 1, this.tabs[this.current].focus(), this.delay && setTimeout(() => {
         this.tabs[this.current].toggle(!1);
       }, this.delay);
-    }, c = () => {
+    }, n = () => {
       t.preventDefault(), this.current = 0, this.tabs[this.current].toggle();
-    }, o = () => {
+    }, c = () => {
       t.preventDefault(), this.current = this.tabs.length - 1, this.tabs[this.current].toggle();
-    }, d = this.isRtl, u = {
+    }, o = this.isRtl, d = {
       ArrowUp: r,
       ArrowDown: l,
-      ArrowLeft: d ? l : r,
-      ArrowRight: d ? r : l,
-      End: o,
-      Home: c,
-      PageUp: c,
-      PageDown: o,
-      Delete: () => n && this.delete(t),
-      Backspace: () => n && this.delete(t),
+      ArrowLeft: o ? l : r,
+      ArrowRight: o ? r : l,
+      End: c,
+      Home: n,
+      PageUp: n,
+      PageDown: c,
+      Delete: () => h && this.delete(t),
+      Backspace: () => h && this.delete(t),
       default: () => !1
     };
-    return (u[e || s] || u.default)();
+    return (d[e || s] || d.default)();
   };
   deactivateTabs = () => this.tabs.forEach((t) => t.deactivate());
   deactivateTabPanels = () => this.tabPanels.forEach((t) => t.deactivate());
@@ -191,7 +180,7 @@ class m extends HTMLElement {
     this.$tabList?.removeEventListener("keydown", this.handleKeydown), this.tabs.forEach((t) => t.destroy()), this.tabPanels.forEach((t) => t.destroy()), this.tabs = [], this.tabPanels = [];
   }
 }
-customElements.get("cinq-tabs") || customElements.define("cinq-tabs", m);
+customElements.get("cinq-tabs") || customElements.define("cinq-tabs", A);
 export {
-  m as Tabs
+  A as Tabs
 };

@@ -38,13 +38,14 @@ export default class Tab {
 			return;
 		}
 
-		const beforeActivate = new CustomEvent(EVENTS.BEFORE_ACTIVATE, {
+		const event = new CustomEvent(EVENTS.BEFORE_ACTIVATE, {
 			bubbles: true,
 			cancelable: true,
 			detail: { index: this.index, controls: this.controls, element: this.el },
 		});
-		this.el.dispatchEvent(beforeActivate);
-		if (beforeActivate.defaultPrevented) return;
+		this.el.dispatchEvent(event);
+
+		if (event.defaultPrevented) return;
 
 		dispatchEvent(this.el, { controls: this.controls, element: this.el }, EVENTS.ACTIVATE);
 		this.activate(focus);

@@ -8,6 +8,7 @@ export default class TabPanel {
 	}
 
 	deactivate() {
+		console.log('TabPanel.deactivate', this.id);
 		this.el.setAttribute('hidden', 'true');
 		this.el.classList.remove('is-active');
 	}
