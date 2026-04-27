@@ -5,6 +5,7 @@ export declare const EVENTS: {
     MODAL_CLOSE: string;
     MODAL_OPEN: string;
     MODAL_TOGGLE: string;
+    CART_BEFORE_UPDATE: string;
     CART_UPDATE: string;
     VARIANT_CHANGE: string;
 };

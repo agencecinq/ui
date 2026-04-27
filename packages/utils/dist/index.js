@@ -1,10 +1,11 @@
-const _ = {
+const D = {
   DRAWER_CLOSE: "drawer-close",
   DRAWER_OPEN: "drawer-open",
   DRAWER_TOGGLE: "drawer-toggle",
   MODAL_CLOSE: "modal-close",
   MODAL_OPEN: "modal-open",
   MODAL_TOGGLE: "modal-toggle",
+  CART_BEFORE_UPDATE: "cart-before-update",
   CART_UPDATE: "cart-update",
   VARIANT_CHANGE: "variant-change"
 }, f = (e, t) => {
@@ -15,7 +16,7 @@ const _ = {
   return (...c) => {
     r = c, o || (o = setTimeout(s, t));
   };
-}, l = document.documentElement, { body: i } = document, W = l.hasAttribute("data-debug"), n = {
+}, l = document.documentElement, { body: i } = document, C = l.hasAttribute("data-debug"), n = {
   y: 0,
   x: 0
 }, a = {
@@ -29,12 +30,12 @@ window.addEventListener(
   }, 100),
   { passive: !0 }
 );
-const k = {
+const W = {
   lg: window.matchMedia("(width >= 64rem)"),
   xl: window.matchMedia("(min-width: 1280px)"),
   "2xl": window.matchMedia("(min-width: 1440px)"),
   "3xl": window.matchMedia("(min-width: 1920px)")
-}, C = !0, u = (e, t) => {
+}, k = !0, u = (e, t) => {
   typeof e < "u" && (n.x = e), typeof t < "u" && (n.y = t), window.scrollTo(n.x, n.y);
 };
 function M() {
@@ -76,36 +77,36 @@ function G(e, t = e) {
 function E(e = null) {
   d.keydown && document.removeEventListener("keydown", d.keydown), e && e.focus();
 }
-const p = 8, w = 9, h = 13, A = 16, b = 27, g = 32, x = 33, R = 34, v = 35, L = 36, P = 37, O = 38, S = 39, T = 40, D = 46, H = {
+const p = 8, w = 9, A = 13, h = 16, b = 27, g = 32, R = 33, x = 34, P = 35, T = 36, v = 37, L = 38, O = 39, S = 40, _ = 46, H = {
   BACKSPACE: p,
   TAB: w,
-  ENTER: h,
-  SHIFT: A,
+  ENTER: A,
+  SHIFT: h,
   ESCAPE: b,
   SPACE: g,
-  PAGE_UP: x,
-  PAGE_DOWN: R,
-  END: v,
-  HOME: L,
-  ARROW_LEFT: P,
-  ARROW_UP: O,
-  ARROW_RIGHT: S,
-  ARROW_DOWN: T,
-  DELETE: D
+  PAGE_UP: R,
+  PAGE_DOWN: x,
+  END: P,
+  HOME: T,
+  ARROW_LEFT: v,
+  ARROW_UP: L,
+  ARROW_RIGHT: O,
+  ARROW_DOWN: S,
+  DELETE: _
 };
 export {
-  _ as EVENTS,
+  D as EVENTS,
   G as addTrapFocus,
   i as body,
-  k as breakpoints,
+  W as breakpoints,
   M as disableScroll,
   N as enableScroll,
   y as getFocusableElements,
   l as html,
-  W as isDebug,
+  C as isDebug,
   H as keycode,
   a as mouse,
-  C as production,
+  k as production,
   E as removeTrapFocus,
   n as scroll,
   f as throttle

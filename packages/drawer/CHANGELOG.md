@@ -1,5 +1,13 @@
 # @agencecinq/drawer
 
+## 4.1.3
+
+### Patch Changes
+
+- 5000b68: Fix package.json
+- Updated dependencies
+  - @agencecinq/utils@4.0.1
+
 ## 4.1.1
 
 ### Patch Changes
