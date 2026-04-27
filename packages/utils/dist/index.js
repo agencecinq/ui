@@ -1,10 +1,11 @@
-const D = {
+const S = {
   DRAWER_CLOSE: "drawer-close",
   DRAWER_OPEN: "drawer-open",
   DRAWER_TOGGLE: "drawer-toggle",
   MODAL_CLOSE: "modal-close",
   MODAL_OPEN: "modal-open",
   MODAL_TOGGLE: "modal-toggle",
+  CART_BEFORE_ADD: "cart-before-add",
   CART_BEFORE_UPDATE: "cart-before-update",
   CART_UPDATE: "cart-update",
   VARIANT_CHANGE: "variant-change"
@@ -47,10 +48,10 @@ function N(e = 0) {
   typeof e == "number" ? o = e : typeof e == "boolean" && e === !1 && (t = !1), l.style.removeProperty("overflow"), l.style.removeProperty("height"), l.style.removeProperty("scroll-padding-top"), t && u(n.x, o);
 }
 const d = {};
-function m(e) {
+function E(e) {
   return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function y(e) {
+function m(e) {
   if (!e) return [];
   const t = [
     "summary",
@@ -64,50 +65,50 @@ function y(e) {
     "iframe",
     "[contenteditable]"
   ].join(",");
-  return Array.from(e.querySelectorAll(t)).filter((o) => m(o) && o.getAttribute("tabindex") !== "-1");
+  return Array.from(e.querySelectorAll(t)).filter((o) => E(o) && o.getAttribute("tabindex") !== "-1");
 }
 function G(e, t = e) {
-  const o = y(e);
+  const o = m(e);
   if (o.length === 0) return;
   const r = o[0], s = o[o.length - 1];
-  E(), d.keydown = (c) => {
+  y(), d.keydown = (c) => {
     c.key === "Tab" && (c.shiftKey ? (document.activeElement === r || document.activeElement === e) && (c.preventDefault(), s.focus()) : document.activeElement === s && (c.preventDefault(), r.focus()));
   }, document.addEventListener("keydown", d.keydown), t.focus(), t instanceof HTMLInputElement && ["search", "text", "email", "url"].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function E(e = null) {
+function y(e = null) {
   d.keydown && document.removeEventListener("keydown", d.keydown), e && e.focus();
 }
-const p = 8, w = 9, A = 13, h = 16, b = 27, g = 32, R = 33, x = 34, P = 35, T = 36, v = 37, L = 38, O = 39, S = 40, _ = 46, H = {
+const p = 8, w = 9, A = 13, b = 16, h = 27, R = 32, g = 33, x = 34, T = 35, O = 36, P = 37, _ = 38, v = 39, D = 40, L = 46, H = {
   BACKSPACE: p,
   TAB: w,
   ENTER: A,
-  SHIFT: h,
-  ESCAPE: b,
-  SPACE: g,
-  PAGE_UP: R,
+  SHIFT: b,
+  ESCAPE: h,
+  SPACE: R,
+  PAGE_UP: g,
   PAGE_DOWN: x,
-  END: P,
-  HOME: T,
-  ARROW_LEFT: v,
-  ARROW_UP: L,
-  ARROW_RIGHT: O,
-  ARROW_DOWN: S,
-  DELETE: _
+  END: T,
+  HOME: O,
+  ARROW_LEFT: P,
+  ARROW_UP: _,
+  ARROW_RIGHT: v,
+  ARROW_DOWN: D,
+  DELETE: L
 };
 export {
-  D as EVENTS,
+  S as EVENTS,
   G as addTrapFocus,
   i as body,
   W as breakpoints,
   M as disableScroll,
   N as enableScroll,
-  y as getFocusableElements,
+  m as getFocusableElements,
   l as html,
   C as isDebug,
   H as keycode,
   a as mouse,
   k as production,
-  E as removeTrapFocus,
+  y as removeTrapFocus,
   n as scroll,
   f as throttle
 };

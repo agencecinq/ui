@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 4.0.2
+
+### Patch Changes
+
+- Add `CART_BEFORE_ADD` event constant for batching extra items into a single `/cart/add.js` request. Listeners receive a mutable `items` array in `event.detail` and can push their own additions (e.g. free samples) before the AddToCart caller fires the request.
+
 ## 4.0.1
 
 ### Patch Changes

@@ -35,7 +35,7 @@ function y(t = 0) {
   typeof t == "number" ? n = t : typeof t == "boolean" && t === !1 && (e = !1), s.style.removeProperty("overflow"), s.style.removeProperty("height"), s.style.removeProperty("scroll-padding-top"), e && u(o.x, n);
 }
 const a = {};
-function b(t) {
+function w(t) {
   return !!(t.offsetWidth || t.offsetHeight || t.getClientRects().length);
 }
 function h(t) {
@@ -52,9 +52,9 @@ function h(t) {
     "iframe",
     "[contenteditable]"
   ].join(",");
-  return Array.from(t.querySelectorAll(e)).filter((n) => b(n) && n.getAttribute("tabindex") !== "-1");
+  return Array.from(t.querySelectorAll(e)).filter((n) => w(n) && n.getAttribute("tabindex") !== "-1");
 }
-function w(t, e = t) {
+function b(t, e = t) {
   const n = h(t);
   if (n.length === 0) return;
   const i = n[0], l = n[n.length - 1];
@@ -125,7 +125,7 @@ class v extends HTMLElement {
       "transitionend",
       () => {
         const e = h(this.trap);
-        e.length > 0 && w(this.trap, e[0]), p();
+        e.length > 0 && b(this.trap, e[0]), p();
       },
       { once: !0 }
     );

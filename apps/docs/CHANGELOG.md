@@ -1,5 +1,14 @@
 # @agencecinq/docs
 
+## 3.6.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @agencecinq/utils@4.0.2
+  - @agencecinq/drawer@4.1.3
+  - @agencecinq/modal@1.1.0
+
 ## 3.6.2
 
 ### Patch Changes
