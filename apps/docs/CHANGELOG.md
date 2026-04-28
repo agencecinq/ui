@@ -1,5 +1,20 @@
 # @agencecinq/docs
 
+## 4.0.0
+
+### Major Changes
+
+- 3594668: Spinbutton package
+
+### Patch Changes
+
+- Updated dependencies [3594668]
+  - @agencecinq/utils@5.0.0
+  - @agencecinq/spinbutton@1.0.0
+  - @agencecinq/tabs@10.0.0
+  - @agencecinq/drawer@5.0.0
+  - @agencecinq/modal@2.0.0
+
 ## 3.6.3
 
 ### Patch Changes

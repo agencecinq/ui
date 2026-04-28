@@ -29,6 +29,9 @@ importers:
       '@agencecinq/modal':
         specifier: workspace:*
         version: link:../../packages/modal
+      '@agencecinq/spinbutton':
+        specifier: workspace:*
+        version: link:../../packages/spinbutton
       '@agencecinq/tabs':
         specifier: workspace:*
         version: link:../../packages/tabs
@@ -95,8 +98,23 @@ importers:
         specifier: ^4.5.4
         version: 4.5.4(@types/node@25.6.0)(rollup@4.56.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0))
 
+  packages/spinbutton:
+    devDependencies:
+      '@agencecinq/utils':
+        specifier: workspace:*
+        version: link:../utils
+      vite:
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)
+      vite-plugin-dts:
+        specifier: ^4.5.4
+        version: 4.5.4(@types/node@25.6.0)(rollup@4.56.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0))
+
   packages/tabs:
     devDependencies:
+      '@agencecinq/utils':
+        specifier: workspace:*
+        version: link:../utils
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)

@@ -23,6 +23,7 @@ export default defineConfig({
             { label: 'Tabs', slug: 'components/tabs' },
             { label: 'Modal', slug: 'components/modal' },
             { label: 'Drawer', slug: 'components/drawer' },
+            { label: 'Spinbutton', slug: 'components/spinbutton' },
           ],
         },
       ],

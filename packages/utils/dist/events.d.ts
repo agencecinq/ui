@@ -5,6 +5,10 @@ export declare const EVENTS: {
     MODAL_CLOSE: string;
     MODAL_OPEN: string;
     MODAL_TOGGLE: string;
+    SPINBUTTON_CHANGE: string;
+    TAB_BEFORE_ACTIVATE: string;
+    TAB_ACTIVATE: string;
+    TAB_DELETE: string;
     CART_BEFORE_ADD: string;
     CART_BEFORE_UPDATE: string;
     CART_UPDATE: string;

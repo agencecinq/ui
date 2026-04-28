@@ -1,5 +1,5 @@
+import { EVENTS } from '@agencecinq/utils';
 import dispatchEvent from './utils/dispatchEvent';
-import { EVENTS } from './utils/events';
 
 export default class Tab {
 	el: HTMLElement;
@@ -38,7 +38,7 @@ export default class Tab {
 			return;
 		}
 
-		const event = new CustomEvent(EVENTS.BEFORE_ACTIVATE, {
+		const event = new CustomEvent(EVENTS.TAB_BEFORE_ACTIVATE, {
 			bubbles: true,
 			cancelable: true,
 			detail: { index: this.index, controls: this.controls, element: this.el },
@@ -47,7 +47,7 @@ export default class Tab {
 
 		if (event.defaultPrevented) return;
 
-		dispatchEvent(this.el, { controls: this.controls, element: this.el }, EVENTS.ACTIVATE);
+		dispatchEvent(this.el, { controls: this.controls, element: this.el }, EVENTS.TAB_ACTIVATE);
 		this.activate(focus);
 	}
 
@@ -99,7 +99,7 @@ export default class Tab {
 	 * @return void
 	 */
 	delete = () => {
-		dispatchEvent(this.el, { controls: this.controls, element: this.el }, EVENTS.DELETE);
+		dispatchEvent(this.el, { controls: this.controls, element: this.el }, EVENTS.TAB_DELETE);
 		this.el.parentElement?.removeChild(this.el);
 	}
 

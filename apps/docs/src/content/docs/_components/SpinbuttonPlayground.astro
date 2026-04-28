@@ -1,0 +1,487 @@
+---
+---
+
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <!-- Demo 1 — singular / plural text -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Spell level</h3>
+          <p class="text-sm text-gray-600">
+            Pick a spell slot level. Custom singular / plural labels are announced through the live
+            region:
+            <code>data-spinbutton-text='&#123;"single":"level","plural":"levels"&#125;'</code>.
+            Try the keyboard: <kbd>↑</kbd>/<kbd>↓</kbd>, <kbd>Page Up</kbd>/<kbd>Page Down</kbd>,
+            <kbd>Home</kbd>/<kbd>End</kbd>.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-6">
+          <cinq-spinbutton
+            id="spell-spinbutton"
+            data-spinbutton-text='{"single":"level","plural":"levels"}'
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+          >
+            <button
+              type="button"
+              data-spinbutton-action="decrease"
+              tabindex="-1"
+              aria-label="One spell level less"
+              class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              −
+            </button>
+
+            <input
+              type="number"
+              value="1"
+              aria-label="Spell level"
+              aria-valuemin="1"
+              aria-valuemax="9"
+              aria-valuenow="1"
+              class="w-14 bg-transparent text-center font-mono text-base focus:outline-none"
+            />
+
+            <button
+              type="button"
+              data-spinbutton-action="increase"
+              tabindex="-1"
+              aria-label="One spell level more"
+              class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              +
+            </button>
+          </cinq-spinbutton>
+
+          <p class="text-sm text-gray-600">
+            <span data-spinbutton-status="spell" class="font-mono font-medium text-gray-900">
+              1 level
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo 2 — unbounded variants -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Bounded vs. unbounded</h3>
+          <p class="text-sm text-gray-600">
+            <code>aria-valuemin</code> and <code>aria-valuemax</code> are both optional. When absent,
+            the corresponding bound falls back to <code>Number.MIN_SAFE_INTEGER</code> /
+            <code>Number.MAX_SAFE_INTEGER</code> and the matching button is never auto-disabled.
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+          <!-- No bounds -->
+          <div class="flex flex-col gap-2">
+            <span id="bounds-none-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
+              No bounds
+            </span>
+            <cinq-spinbutton
+              class="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+            >
+              <button
+                type="button"
+                data-spinbutton-action="decrease"
+                tabindex="-1"
+                aria-label="Decrease (no bounds)"
+                class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                value="0"
+                aria-labelledby="bounds-none-label"
+                aria-valuenow="0"
+                class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
+              />
+              <button
+                type="button"
+                data-spinbutton-action="increase"
+                tabindex="-1"
+                aria-label="Increase (no bounds)"
+                class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
+              >
+                +
+              </button>
+            </cinq-spinbutton>
+          </div>
+
+          <!-- Min only -->
+          <div class="flex flex-col gap-2">
+            <span id="bounds-min-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
+              Min only (≥ 0)
+            </span>
+            <cinq-spinbutton
+              class="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+            >
+              <button
+                type="button"
+                data-spinbutton-action="decrease"
+                tabindex="-1"
+                aria-label="Decrease (min 0)"
+                class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                value="0"
+                aria-labelledby="bounds-min-label"
+                aria-valuemin="0"
+                aria-valuenow="0"
+                class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
+              />
+              <button
+                type="button"
+                data-spinbutton-action="increase"
+                tabindex="-1"
+                aria-label="Increase (min 0)"
+                class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
+              >
+                +
+              </button>
+            </cinq-spinbutton>
+          </div>
+
+          <!-- Max only -->
+          <div class="flex flex-col gap-2">
+            <span id="bounds-max-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
+              Max only (≤ 10)
+            </span>
+            <cinq-spinbutton
+              class="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+            >
+              <button
+                type="button"
+                data-spinbutton-action="decrease"
+                tabindex="-1"
+                aria-label="Decrease (max 10)"
+                class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                value="0"
+                aria-labelledby="bounds-max-label"
+                aria-valuemax="10"
+                aria-valuenow="0"
+                class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
+              />
+              <button
+                type="button"
+                data-spinbutton-action="increase"
+                tabindex="-1"
+                aria-label="Increase (max 10)"
+                class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                +
+              </button>
+            </cinq-spinbutton>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo 3 — live controls (programmatic API) -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Live controls</h3>
+          <p class="text-sm text-gray-600">
+            Drives a spinbutton through its public API. Type into the inputs below to call
+            <code>setMin()</code>, <code>setMax()</code>, and <code>setValue()</code> at runtime.
+          </p>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-[auto_1fr] md:items-center">
+          <cinq-spinbutton
+            id="controls-spinbutton"
+            data-spinbutton-step="5"
+            class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+          >
+            <button
+              type="button"
+              data-spinbutton-action="decrease"
+              tabindex="-1"
+              aria-label="Decrease"
+              class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              −
+            </button>
+            <input
+              type="number"
+              value="20"
+              aria-label="Stamina"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="20"
+              class="w-16 bg-transparent text-center font-mono text-base focus:outline-none"
+            />
+            <button
+              type="button"
+              data-spinbutton-action="increase"
+              tabindex="-1"
+              aria-label="Increase"
+              class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              +
+            </button>
+          </cinq-spinbutton>
+
+          <div class="grid grid-cols-3 gap-3 text-sm">
+            <label class="flex flex-col gap-1">
+              <span class="font-medium text-gray-700">Minimum</span>
+              <input
+                type="number"
+                value="0"
+                data-control="min"
+                class="rounded-md border border-gray-200 bg-white px-2 py-1 font-mono"
+              />
+            </label>
+            <label class="flex flex-col gap-1">
+              <span class="font-medium text-gray-700">Maximum</span>
+              <input
+                type="number"
+                value="100"
+                data-control="max"
+                class="rounded-md border border-gray-200 bg-white px-2 py-1 font-mono"
+              />
+            </label>
+            <label class="flex flex-col gap-1">
+              <span class="font-medium text-gray-700">Value</span>
+              <input
+                type="number"
+                value="20"
+                data-control="value"
+                class="rounded-md border border-gray-200 bg-white px-2 py-1 font-mono"
+              />
+            </label>
+          </div>
+        </div>
+
+        <p class="text-sm text-gray-600">
+          <code>spinbutton-change</code>:
+          <span data-spinbutton-status="controls" class="font-mono font-medium text-gray-900">
+            20
+          </span>
+        </p>
+      </div>
+    </section>
+
+    <!-- Demo 4 — D&D character sheet -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Character sheet</h3>
+          <p class="text-sm text-gray-600">
+            Six D&D ability scores, each bound between 3 and 18. <strong>Roll 3d6</strong> calls
+            <code>setValue()</code>; picking a <strong>class</strong> raises the minimum on the
+            relevant abilities through <code>setMin()</code> (AD&D-style requirements). Out-of-range
+            scores are clamped automatically.
+          </p>
+        </div>
+
+        <div data-character-sheet class="flex flex-col gap-4">
+          <label class="flex flex-col gap-1 text-sm sm:max-w-xs">
+            <span class="font-medium text-gray-700">Class</span>
+            <select
+              data-character-class
+              class="rounded-md border border-gray-200 bg-white px-2 py-1 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="">— Free build (no requirements) —</option>
+              <option value="barbarian">Barbarian</option>
+              <option value="bard">Bard</option>
+              <option value="cleric">Cleric</option>
+              <option value="druid">Druid</option>
+              <option value="fighter">Fighter</option>
+              <option value="illusionist">Illusionist</option>
+              <option value="mage">Mage</option>
+              <option value="monk">Monk</option>
+              <option value="paladin">Paladin</option>
+              <option value="ranger">Ranger</option>
+              <option value="rogue">Rogue</option>
+              <option value="sorcerer">Sorcerer</option>
+              <option value="thief">Thief</option>
+              <option value="warlock">Warlock</option>
+              <option value="wizard">Wizard</option>
+            </select>
+          </label>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {
+              [
+                ['Strength', 'str'],
+                ['Dexterity', 'dex'],
+                ['Constitution', 'con'],
+                ['Intelligence', 'int'],
+                ['Wisdom', 'wis'],
+                ['Charisma', 'cha'],
+              ].map(([label, key]) => (
+                <div class="flex flex-col gap-2 rounded-xl bg-gray-50 p-3">
+                  <div class="flex items-center justify-between gap-2">
+                    <span id={`${key}-label`} class="text-sm font-semibold text-gray-900">
+                      {label}
+                      <sup
+                        data-requirement={key}
+                        class="ml-1 font-mono text-[10px] font-medium text-gray-500"
+                      />
+                    </span>
+                    <button
+                      type="button"
+                      data-roll={key}
+                      class="rounded-md bg-black px-2 py-1 text-xs font-medium text-white hover:bg-gray-800"
+                    >
+                      Roll 3d6
+                    </button>
+                  </div>
+
+                  <cinq-spinbutton
+                    data-ability={key}
+                    class="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+                  >
+                    <button
+                      type="button"
+                      data-spinbutton-action="decrease"
+                      tabindex="-1"
+                      aria-label={`Decrease ${label}`}
+                      class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      value="10"
+                      aria-labelledby={`${key}-label`}
+                      aria-valuemin="3"
+                      aria-valuemax="18"
+                      aria-valuenow="10"
+                      class="w-12 bg-transparent text-center font-mono text-lg font-semibold focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      data-spinbutton-action="increase"
+                      tabindex="-1"
+                      aria-label={`Increase ${label}`}
+                      class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      +
+                    </button>
+                  </cinq-spinbutton>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  type SpinbuttonElement = HTMLElement & {
+    setValue: (value: number, emit?: boolean) => void;
+    setMin: (value: number, emit?: boolean) => void;
+    setMax: (value: number, emit?: boolean) => void;
+  };
+
+  const wireStatus = (id: string, key: string, format?: (v: number) => string) => {
+    const el = document.getElementById(id);
+    const status = document.querySelector(`[data-spinbutton-status="${key}"]`);
+    if (!el || !status) return;
+
+    el.addEventListener('spinbutton-change', (event) => {
+      const { value } = (event as CustomEvent<{ value: number }>).detail;
+      status.textContent = format ? format(value) : String(value);
+    });
+  };
+
+  wireStatus('spell-spinbutton', 'spell', (v) => `${v} ${v <= 1 ? 'level' : 'levels'}`);
+  wireStatus('controls-spinbutton', 'controls');
+
+  // ── Demo 3 — live controls ────────────────────────────────────────────────
+  {
+    const sb = document.getElementById('controls-spinbutton') as SpinbuttonElement | null;
+    if (sb) {
+      const apply = (key: 'min' | 'max' | 'value', value: number) => {
+        if (Number.isNaN(value)) return;
+        if (key === 'min') sb.setMin(value);
+        if (key === 'max') sb.setMax(value);
+        if (key === 'value') sb.setValue(value);
+      };
+
+      (['min', 'max', 'value'] as const).forEach((key) => {
+        const input = document.querySelector<HTMLInputElement>(`[data-control="${key}"]`);
+        input?.addEventListener('input', () => apply(key, parseInt(input.value, 10)));
+      });
+    }
+  }
+
+  // ── Demo 4 — D&D character sheet (3d6 roller + class requirements) ────────
+  {
+    const root = document.querySelector('[data-character-sheet]');
+    if (root) {
+      type Ability = 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+      type ClassRequirements = Partial<Record<Ability, number>>;
+
+      // AD&D-inspired ability minimums per class (matches the original spinbutton demo).
+      // Classes absent from this map have no minimums.
+      const CLASS_REQUIREMENTS: Record<string, ClassRequirements> = {
+        bard: { dex: 12, int: 13, cha: 15 },
+        cleric: { wis: 9 },
+        druid: { wis: 12, cha: 15 },
+        fighter: { str: 9 },
+        illusionist: { dex: 16 },
+        mage: { int: 9 },
+        paladin: { str: 12, con: 9, wis: 13, cha: 17 },
+        ranger: { str: 13, dex: 13, con: 14, wis: 14 },
+        thief: { dex: 9 },
+      };
+
+      const ABILITIES: readonly Ability[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'] as const;
+      const FLOOR = 3;
+
+      const roll3d6 = () =>
+        Array.from({ length: 3 }, () => 1 + Math.floor(Math.random() * 6)).reduce(
+          (sum, die) => sum + die,
+          0,
+        );
+
+      const getSpinbutton = (ability: Ability) =>
+        root.querySelector<SpinbuttonElement>(`cinq-spinbutton[data-ability="${ability}"]`);
+
+      const getRequirementBadge = (ability: Ability) =>
+        root.querySelector<HTMLElement>(`[data-requirement="${ability}"]`);
+
+      // Roll 3d6 → setValue on the matching spinbutton.
+      root.querySelectorAll<HTMLButtonElement>('[data-roll]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const ability = button.dataset.roll as Ability | undefined;
+          if (!ability) return;
+          getSpinbutton(ability)?.setValue(roll3d6());
+        });
+      });
+
+      // Class change → setMin on each ability + render the requirement badge.
+      const select = root.querySelector<HTMLSelectElement>('[data-character-class]');
+      select?.addEventListener('change', (event) => {
+        const value = (event.target as HTMLSelectElement).value;
+        const reqs = CLASS_REQUIREMENTS[value] ?? {};
+
+        ABILITIES.forEach((ability) => {
+          const min = reqs[ability] ?? FLOOR;
+          getSpinbutton(ability)?.setMin(min);
+
+          const badge = getRequirementBadge(ability);
+          if (badge) badge.textContent = reqs[ability] ? `(min ${reqs[ability]})` : '';
+        });
+      });
+    }
+  }
+</script>

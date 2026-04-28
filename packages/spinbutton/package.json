@@ -1,18 +1,15 @@
 {
-  "name": "@agencecinq/tabs",
-  "version": "10.0.0",
-  "description": "Accessible, WAI-ARIA compliant tabs as a lightweight Web Component.",
+  "name": "@agencecinq/spinbutton",
+  "version": "1.0.0",
+  "description": "Accessible, WAI-ARIA spinbutton as a lightweight Web Component.",
   "type": "module",
-  "files": [
-    "dist"
-  ],
+  "license": "MIT",
+  "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
   "repository": {
     "type": "git",
     "url": "https://github.com/agencecinq/shopify.git",
-    "directory": "packages/tabs"
+    "directory": "packages/spinbutton"
   },
-  "license": "ISC",
-  "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -21,12 +18,13 @@
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build"
-  },
-  "publishConfig": {
-    "access": "public"
+    "build": "vite build",
+    "dev": "vite build --watch"
   },
   "peerDependencies": {
     "@agencecinq/utils": "*"
@@ -35,5 +33,8 @@
     "@agencecinq/utils": "workspace:*",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,8 +1,8 @@
+import { EVENTS } from "@agencecinq/utils";
 import getHash from "./utils/getHash";
 import { hash, delay as defaultDelay } from "./config";
 import TabPanel from "./TabPanel";
 import Tab from "./Tab";
-import { EVENTS } from "./utils/events";
 
 export class Tabs extends HTMLElement {
   $tabList: HTMLElement | null;
@@ -62,7 +62,7 @@ export class Tabs extends HTMLElement {
 
       tab.init();
 
-      tab.el.addEventListener(EVENTS.ACTIVATE, () => {
+      tab.el.addEventListener(EVENTS.TAB_ACTIVATE, () => {
         this.current = index;
 
         this.deactivateTabs();

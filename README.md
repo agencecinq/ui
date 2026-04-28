@@ -43,7 +43,7 @@ pnpm dev
 
 ```
 
-Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in `@agencecinq/drawer` and `@agencecinq/modal` automatically.
+Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in every consuming package (`drawer`, `modal`, `tabs`, `spinbutton`) automatically.
 
 ### Building
 
@@ -101,10 +101,11 @@ pnpm release
 
 ## Project Structure
 
-- `packages/utils`: Shared logic, event bus, and helpers.
+- `packages/utils`: Shared logic, event bus, and helpers (`EVENTS`, `clamp`, `throttle`, `focus-trap`, …).
 - `packages/drawer`: The Drawer Web Component and its Vite Plugin.
 - `packages/modal`: The Modal Web Components (Modal + ModalButton).
 - `packages/tabs`: The Tabs Web Component (`<cinq-tabs>`) and related utilities.
+- `packages/spinbutton`: The Spinbutton Web Component (`<cinq-spinbutton>`), WAI-ARIA APG-compliant.
 - `apps/`: Apps / themes consuming the packages (e.g. `apps/docs`).
 
 ---

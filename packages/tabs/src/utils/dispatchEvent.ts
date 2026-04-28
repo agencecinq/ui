@@ -1,5 +1,3 @@
-import type { Events } from './events';
-
 export type Details = {
 	controls: string;
 	element: HTMLElement;
@@ -8,7 +6,7 @@ export type Details = {
 export default function dispatchEvent(
 	target: HTMLElement,
 	details: Details,
-	name: Events,
+	name: string,
 ): boolean {
 	const event = new CustomEvent(name, {
 		bubbles: true,

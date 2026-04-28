@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 5.0.0
+
+### Major Changes
+
+- 3594668: Spinbutton package
+
 ## 4.0.2
 
 ### Patch Changes

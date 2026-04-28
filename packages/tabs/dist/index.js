@@ -1,8 +1,29 @@
-function v(i) {
+const h = {
+  TAB_BEFORE_ACTIVATE: "tab-before-activate",
+  TAB_ACTIVATE: "tab-activate",
+  TAB_DELETE: "tab-delete"
+}, v = (i, t) => {
+  let e = null, s = null;
+  const a = () => {
+    s && i(...s), e = null;
+  };
+  return (...n) => {
+    s = n, e || (e = setTimeout(a, t));
+  };
+}, f = document.documentElement;
+f.hasAttribute("data-debug");
+window.addEventListener(
+  "pointermove",
+  v(({ x: i, y: t }) => {
+  }, 100),
+  { passive: !0 }
+);
+window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+function m(i) {
   const t = i.indexOf("#");
   return t === -1 ? "" : i.substring(t + 1);
 }
-const f = !1, E = 0;
+const E = !1, A = 0;
 class g {
   el;
   id;
@@ -28,12 +49,7 @@ function b(i, t, e) {
   });
   return i.dispatchEvent(s);
 }
-const a = {
-  BEFORE_ACTIVATE: "tab-before-activate",
-  ACTIVATE: "tab-activate",
-  DELETE: "tab-delete"
-};
-class m {
+class w {
   el;
   active = !1;
   id = "";
@@ -58,12 +74,12 @@ class m {
   toggle(t = !0) {
     if (this.active)
       return;
-    const e = new CustomEvent(a.BEFORE_ACTIVATE, {
+    const e = new CustomEvent(h.TAB_BEFORE_ACTIVATE, {
       bubbles: !0,
       cancelable: !0,
       detail: { index: this.index, controls: this.controls, element: this.el }
     });
-    this.el.dispatchEvent(e), !e.defaultPrevented && (b(this.el, { controls: this.controls, element: this.el }, a.ACTIVATE), this.activate(t));
+    this.el.dispatchEvent(e), !e.defaultPrevented && (b(this.el, { controls: this.controls, element: this.el }, h.TAB_ACTIVATE), this.activate(t));
   }
   /**
    * Activate tab
@@ -94,20 +110,20 @@ class m {
    * @return void
    */
   delete = () => {
-    b(this.el, { controls: this.controls, element: this.el }, a.DELETE), this.el.parentElement?.removeChild(this.el);
+    b(this.el, { controls: this.controls, element: this.el }, h.TAB_DELETE), this.el.parentElement?.removeChild(this.el);
   };
   destroy() {
     this.el.removeAttribute("tabindex"), this.el.removeAttribute("aria-selected"), this.el.classList.remove("is-active"), this.el.removeEventListener("click", this.handleClick);
   }
 }
-class A extends HTMLElement {
+class T extends HTMLElement {
   $tabList;
   current = 0;
   tabPanels = [];
   tabs = [];
   href = "";
-  hash = f;
-  delay = E;
+  hash = E;
+  delay = A;
   constructor() {
     super(), this.$tabList = null;
   }
@@ -120,7 +136,7 @@ class A extends HTMLElement {
       const s = parseInt(e, 10);
       this.delay = Number.isNaN(s) ? 0 : s;
     }
-    this.href = this.hash && v(window.location.hash) || "", this.init();
+    this.href = this.hash && m(window.location.hash) || "", this.init();
   }
   disconnectedCallback() {
     this.destroy();
@@ -129,7 +145,7 @@ class A extends HTMLElement {
     if (!this.$tabList)
       return;
     if (this.tabs = [...this.$tabList.querySelectorAll('[role="tab"]')].map(
-      (e, s) => new m(e, s)
+      (e, s) => new w(e, s)
     ), this.tabs.forEach((e, s) => {
       this.tabPanels.push(
         new g(
@@ -137,8 +153,8 @@ class A extends HTMLElement {
             `#${e.controls}[role="tabpanel"]`
           )
         )
-      ), e.init(), e.el.addEventListener(a.ACTIVATE, () => {
-        this.current = s, this.deactivateTabs(), this.deactivateTabPanels(), e.activate(!1), this.tabPanels.find((n) => n.id === e.controls)?.activate(), this.hash && (this.href = e.id, window.location.hash = e.id);
+      ), e.init(), e.el.addEventListener(h.TAB_ACTIVATE, () => {
+        this.current = s, this.deactivateTabs(), this.deactivateTabPanels(), e.activate(!1), this.tabPanels.find((a) => a.id === e.controls)?.activate(), this.hash && (this.href = e.id, window.location.hash = e.id);
       });
     }), this.href) {
       const e = this.tabs.findIndex((s) => s.id === this.href);
@@ -159,31 +175,31 @@ class A extends HTMLElement {
     return t ? getComputedStyle(t).direction === "rtl" : !1;
   }
   handleKeydown = (t) => {
-    const { key: e, code: s, target: n } = t, l = JSON.parse(
-      n.getAttribute("aria-selected")
-    ), h = () => {
+    const { key: e, code: s, target: a } = t, n = JSON.parse(
+      a.getAttribute("aria-selected")
+    ), r = () => {
       this.current = 0 > this.current - 1 ? this.tabs.length - 1 : this.current - 1, this.tabs[this.current].focus(), this.delay && setTimeout(() => {
         this.tabs[this.current].toggle(!1);
       }, this.delay);
-    }, r = () => {
+    }, l = () => {
       this.current = this.current + 1 > this.tabs.length - 1 ? 0 : this.current + 1, this.tabs[this.current].focus(), this.delay && setTimeout(() => {
         this.tabs[this.current].toggle(!1);
       }, this.delay);
     }, c = () => {
       t.preventDefault(), this.current = 0, this.tabs[this.current].toggle();
-    }, o = () => {
+    }, d = () => {
       t.preventDefault(), this.current = this.tabs.length - 1, this.tabs[this.current].toggle();
-    }, d = this.isRtl, u = {
-      ArrowUp: h,
-      ArrowDown: r,
-      ArrowLeft: d ? r : h,
-      ArrowRight: d ? h : r,
-      End: o,
+    }, o = this.isRtl, u = {
+      ArrowUp: r,
+      ArrowDown: l,
+      ArrowLeft: o ? l : r,
+      ArrowRight: o ? r : l,
+      End: d,
       Home: c,
       PageUp: c,
-      PageDown: o,
-      Delete: () => l && this.delete(t),
-      Backspace: () => l && this.delete(t),
+      PageDown: d,
+      Delete: () => n && this.delete(t),
+      Backspace: () => n && this.delete(t),
       default: () => !1
     };
     return (u[e || s] || u.default)();
@@ -197,7 +213,7 @@ class A extends HTMLElement {
     this.$tabList?.removeEventListener("keydown", this.handleKeydown), this.tabs.forEach((t) => t.destroy()), this.tabPanels.forEach((t) => t.destroy()), this.tabs = [], this.tabPanels = [];
   }
 }
-customElements.get("cinq-tabs") || customElements.define("cinq-tabs", A);
+customElements.get("cinq-tabs") || customElements.define("cinq-tabs", T);
 export {
-  A as Tabs
+  T as Tabs
 };
