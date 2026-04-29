@@ -1,5 +1,5 @@
 import { EVENTS } from '@agencecinq/utils';
-import dispatchEvent from './utils/dispatchEvent';
+import dispatchEvent from './utils/dispatchEvent.js';
 
 export default class Tab {
 	el: HTMLElement;

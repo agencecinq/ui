@@ -1,8 +1,8 @@
-export * from './events';
-export * from './scroll';
-export * from './throttle';
-export * from './environment';
-export * from './focus-trap';
-export * from './keycode';
-export * from './clamp';
+export * from './events.js';
+export * from './scroll.js';
+export * from './throttle.js';
+export * from './environment.js';
+export * from './focus-trap.js';
+export * from './keycode.js';
+export * from './clamp.js';
 //# sourceMappingURL=index.d.ts.map

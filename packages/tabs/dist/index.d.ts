@@ -1,5 +1,5 @@
-import { default as TabPanel } from './TabPanel';
-import { default as Tab } from './Tab';
+import { default as TabPanel } from './TabPanel.js';
+import { default as Tab } from './Tab.js';
 export declare class Tabs extends HTMLElement {
     $tabList: HTMLElement | null;
     current: number;

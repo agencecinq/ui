@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/tabs",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Accessible, WAI-ARIA compliant tabs as a lightweight Web Component.",
   "type": "module",
   "files": [

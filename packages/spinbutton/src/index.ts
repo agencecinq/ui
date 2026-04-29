@@ -1,5 +1,5 @@
 import { EVENTS, clamp, throttle } from "@agencecinq/utils";
-import type { Options, SpinbuttonChangeDetail, Text, Value } from "./types";
+import type { Options, SpinbuttonChangeDetail, Text, Value } from "./types.js";
 
 const DEFAULTS: Options = {
   step: 1,

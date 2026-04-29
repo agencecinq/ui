@@ -1,4 +1,4 @@
-import { Modal } from './modal';
-import { ModalButton } from './modal-button';
+import { Modal } from './modal.js';
+import { ModalButton } from './modal-button.js';
 
 export { Modal, ModalButton };

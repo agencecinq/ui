@@ -1,4 +1,4 @@
-import { throttle } from "./throttle";
+import { throttle } from "./throttle.js";
 
 const html = document.documentElement;
 const { body } = document;

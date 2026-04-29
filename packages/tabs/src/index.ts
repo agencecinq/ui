@@ -1,8 +1,8 @@
 import { EVENTS } from "@agencecinq/utils";
-import getHash from "./utils/getHash";
-import { hash, delay as defaultDelay } from "./config";
-import TabPanel from "./TabPanel";
-import Tab from "./Tab";
+import getHash from "./utils/getHash.js";
+import { hash, delay as defaultDelay } from "./config.js";
+import TabPanel from "./TabPanel.js";
+import Tab from "./Tab.js";
 
 export class Tabs extends HTMLElement {
   $tabList: HTMLElement | null;
