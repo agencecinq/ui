@@ -1,5 +1,11 @@
 # @agencecinq/spinbutton
 
+## 1.0.2
+
+### Patch Changes
+
+- Export public TypeScript interfaces (`Text`, `Options`, `Value`, `SpinbuttonChangeDetail`) from the package entry point.
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,4 +1,5 @@
 import { Options, Text, Value } from './types.js';
+export type { Options, SpinbuttonChangeDetail, Text, Value } from './types.js';
 export declare class Spinbutton extends HTMLElement {
     $input: HTMLInputElement | null;
     $increase: HTMLButtonElement | null;
