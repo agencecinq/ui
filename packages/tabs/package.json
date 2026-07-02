@@ -11,7 +11,7 @@
     "url": "https://github.com/agencecinq/shopify.git",
     "directory": "packages/tabs"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
   "exports": {
     ".": {
@@ -21,8 +21,9 @@
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite build --watch",
     "build": "vite build"
   },
   "publishConfig": {

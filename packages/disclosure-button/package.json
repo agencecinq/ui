@@ -1,7 +1,7 @@
 {
   "name": "@agencecinq/disclosure-button",
   "version": "1.0.0",
-  "description": "Accessible WAI-ARIA disclosure button controller.",
+  "description": "Accessible WAI-ARIA disclosure button Web Component.",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
@@ -31,8 +31,8 @@
   },
   "devDependencies": {
     "@agencecinq/utils": "workspace:*",
-    "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.4"
+    "vite": "^8.1.3",
+    "vite-plugin-dts": "^5.0.3"
   },
   "publishConfig": {
     "access": "public"

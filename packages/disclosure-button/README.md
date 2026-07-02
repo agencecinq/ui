@@ -3,11 +3,12 @@
 
 # @agencecinq/disclosure-button
 
-> Accessible WAI-ARIA disclosure button controller.
+> Accessible WAI-ARIA disclosure button Web Component.
 
-A disclosure button shows or hides a section of content. This package wires up
-the `aria-expanded` / `aria-controls` relationship, toggles the `hidden`
-attribute on controlled regions, and dispatches open/close events.
+A disclosure button shows or hides a section of content. `<cinq-disclosure-button>`
+wraps a trigger, wires up the `aria-expanded` / `aria-controls` relationship,
+toggles the `hidden` attribute on controlled regions, and dispatches open/close
+events.
 
 Implementation follows the
 [WAI-ARIA Authoring Practices disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/).
@@ -21,15 +22,20 @@ pnpm add @agencecinq/disclosure-button
 
 ## Usage
 
+```js
+import '@agencecinq/disclosure-button';
+```
+
 ```html
-<button
-  type="button"
-  class="js-disclosure-button"
-  aria-expanded="false"
-  aria-controls="details-1"
->
-  Show details
-</button>
+<cinq-disclosure-button>
+  <button
+    type="button"
+    aria-expanded="false"
+    aria-controls="details-1"
+  >
+    Show more
+  </button>
+</cinq-disclosure-button>
 
 <div id="details-1" class="foo" hidden>
   Disclosure content
@@ -46,31 +52,36 @@ pnpm add @agencecinq/disclosure-button
 }
 ```
 
-```js
-import { DisclosureButton } from "@agencecinq/disclosure-button";
-
-const $button = document.querySelector(".js-disclosure-button");
-const disclosure = new DisclosureButton($button);
-
-disclosure.init();
-```
-
 ### Required markup
 
 | Attribute / element | Required | Role |
 | ------------------- | -------- | ---- |
+| Inner `<button>`    | **Yes**  | Focusable trigger inside `<cinq-disclosure-button>`. |
 | `aria-expanded`     | **Yes**  | Current disclosure state on the trigger. |
 | `aria-controls`     | **Yes**  | Space-separated IDs of the controlled regions. |
 | `hidden`            | **Yes**  | Set on each controlled region in its collapsed initial state. |
 
-The package toggles the native `hidden` attribute. Layout and visibility styling
-stay in your CSS.
+Use `[data-button]` instead of `<button>` when you need a different focusable
+element as the trigger.
+
+### API
+
+| Attribute | Required | Description |
+| --------- | -------- | ----------- |
+| `expanded` | No | Reflected state on the host — useful for styling the wrapper. |
+
+| Method | Description |
+| ------ | ----------- |
+| `open(emit?)` | Opens the disclosure. |
+| `close(emit?)` | Closes the disclosure. |
+| `toggle()` | Toggles open/closed. |
+| `destroy()` | Detaches listeners. |
 
 ### Keyboard & focus
 
 The trigger must be a native focusable control — typically
 `<button type="button">`. Enter and Space activate the button through browser
-defaults; the controller listens for `click`, which those keys dispatch on
+defaults; the component listens for `click`, which those keys dispatch on
 buttons.
 
 | Key | Function |
@@ -78,17 +89,17 @@ buttons.
 | `Enter` | Toggle the disclosure (native button behavior). |
 | `Space` | Toggle the disclosure (native button behavior). |
 
-The package does **not** move focus into the controlled region on open, nor
+The component does **not** move focus into the controlled region on open, nor
 restore focus on close — focus stays on the trigger. Once open, users can tab
 into focusable elements inside the region if you include any.
 
 While collapsed, `hidden` keeps the region out of the tab order and accessibility
 tree.
 
-On `focus` / `blur`, the controller toggles a `.focus` class on the trigger:
+On `focus` / `blur`, a `.focus` class is toggled on the inner trigger:
 
 ```css
-.js-disclosure-button.focus {
+cinq-disclosure-button button.focus {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
@@ -97,30 +108,22 @@ On `focus` / `blur`, the controller toggles a `.focus` class on the trigger:
 ### One button, multiple targets
 
 `aria-controls` accepts several space-separated IDs — all matched regions open
-and close together:
-
-```html
-<button
-  aria-expanded="false"
-  aria-controls="verbal-component somatic-component material-component"
->
-  Show material components
-</button>
-```
+and close together.
 
 ### Multiple buttons, one target
 
-Several triggers can share the same `aria-controls` ID. Initialise one
-`DisclosureButton` per trigger — each instance listens for bubbling open/close
-events and syncs when `event.detail.elements` references a shared DOM node.
+Several triggers can share the same `aria-controls` ID. Use one
+`<cinq-disclosure-button>` per trigger — each instance listens for bubbling
+open/close events and syncs when `event.detail.elements` references a shared DOM
+node.
 
 ### Programmatic API
 
 ```js
-disclosure.open();
-disclosure.close();
-disclosure.toggle();
-disclosure.destroy();
+const $host = document.querySelector('cinq-disclosure-button');
+
+$host.open();
+$host.close();
 ```
 
 `open()` and `close()` accept an optional `emit` argument (default `true`). Pass
@@ -129,15 +132,15 @@ when the event is dispatched.
 
 ```js
 $openLink.addEventListener("click", () => {
-  disclosure.open();
+  $host.open();
 });
 
 $dismissButton.addEventListener("click", () => {
-  disclosure.close();
+  $host.close();
 });
 ```
 
-Call `destroy()` when removing the trigger from the DOM to detach listeners.
+Call `destroy()` when removing the element from the DOM to detach listeners.
 
 ## Events
 
@@ -149,7 +152,7 @@ Call `destroy()` when removing the trigger from the DOM to detach listeners.
 ```js
 import { EVENTS } from "@agencecinq/utils";
 
-$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
+$host.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
   if (!userMayOpen()) {
     event.preventDefault();
   }
@@ -160,7 +163,7 @@ $button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
 
 ### Updating the button label
 
-The package does not change the trigger's visible text. Listen to the open/close
+The component does not change the trigger's visible text. Listen to the open/close
 events and update the label in your app — useful for Show/Hide copy, i18n, or
 custom designs:
 

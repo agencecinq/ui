@@ -106,7 +106,7 @@ pnpm release
 - `packages/modal`: The Modal Web Components (Modal + ModalButton).
 - `packages/tabs`: The Tabs Web Component (`<cinq-tabs>`) and related utilities.
 - `packages/spinbutton`: The Spinbutton Web Component (`<cinq-spinbutton>`), WAI-ARIA APG-compliant.
-- `packages/disclosure-button`: The Disclosure Button controller for `aria-expanded` triggers.
+- `packages/disclosure-button`: `<cinq-disclosure-button>` Web Component for `aria-expanded` triggers.
 - `apps/`: Apps / themes consuming the packages (e.g. `apps/docs`).
 
 ---
