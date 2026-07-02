@@ -1,35 +1,316 @@
 ---
 ---
 
-<section class="not-content rounded-lg border border-gray-200 p-6">
-  <button
-    type="button"
-    id="docs-disclosure-trigger"
-    class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-sm hover:bg-gray-50"
-    aria-expanded="false"
-    aria-controls="docs-disclosure-panel"
-  >
-    Show spell details
-  </button>
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Basic disclosure</h3>
+          <p class="text-sm text-gray-600">
+            A single trigger toggles one region. The button label stays fixed — open/close events are
+            logged below.
+          </p>
+        </div>
 
-  <div
-    id="docs-disclosure-panel"
-    class="mt-4 rounded-md border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
-    aria-hidden="true"
-    style="display: none"
-  >
-    <p class="m-0">
-      Fireball deals <strong>8d6</strong> fire damage in a 20-foot-radius sphere.
-      Creatures in the area make a Dexterity saving throw, taking full damage on
-      a failed save or half on a success.
-    </p>
+        <button
+          type="button"
+          id="docs-disclosure-trigger"
+          class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          aria-expanded="false"
+          aria-controls="docs-disclosure-region"
+        >
+          Show spell details
+        </button>
+
+        <div
+          id="docs-disclosure-region"
+          class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+          hidden
+        >
+          <p class="m-0">
+            Fireball deals <strong>8d6</strong> fire damage in a 20-foot-radius sphere. Creatures in
+            the area make a Dexterity saving throw, taking full damage on a failed save or half on a
+            success.
+          </p>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last event: <span id="docs-disclosure-status" class="font-mono font-medium text-gray-900">—</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Updating the button label</h3>
+          <p class="text-sm text-gray-600">
+            Listen to <code>DISCLOSURE_BUTTON_OPEN</code> / <code>DISCLOSURE_BUTTON_CLOSE</code> and
+            update the trigger text yourself — useful for Show/Hide copy or i18n.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          id="docs-disclosure-label-trigger"
+          class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          aria-expanded="false"
+          aria-controls="docs-disclosure-label-region"
+        >
+          Show details
+        </button>
+
+        <div
+          id="docs-disclosure-label-region"
+          class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+          hidden
+        >
+          <p class="m-0">Extra product details, sizing chart, or shipping information.</p>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Current label: <span id="docs-disclosure-label-status" class="font-mono font-medium text-gray-900">Show details</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Read more / Read less</h3>
+          <p class="text-sm text-gray-600">
+            A short excerpt stays visible; the rest lives in a hidden region. Style the trigger as an
+            inline text control and swap the label on open/close.
+          </p>
+        </div>
+
+        <article class="max-w-prose text-sm leading-relaxed text-gray-700">
+          <p class="m-0">
+            Nestled between the pines, La Cabane overlooks the lake — a timber lodge built for slow
+            mornings and long dinners.
+          </p>
+
+          <div id="docs-disclosure-readmore-region" hidden>
+            <p class="mb-0 mt-3">
+              The main room opens onto a covered terrace with a wood-fired oven. Upstairs, four
+              bedrooms share a single bathroom with a clawfoot tub. In winter, the sauna by the shore
+              is heated every evening.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            id="docs-disclosure-readmore-trigger"
+            class="mt-2 p-0 text-sm font-medium text-gray-900 underline decoration-gray-400 underline-offset-2 hover:decoration-gray-900"
+            aria-expanded="false"
+            aria-controls="docs-disclosure-readmore-region"
+          >
+            Read more
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">One button, multiple targets</h3>
+          <p class="text-sm text-gray-600">
+            <code>aria-controls</code> accepts a space-separated list of IDs. One trigger opens or
+            closes every listed region at once — here, the three components of a spell.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          id="docs-disclosure-components-trigger"
+          class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          aria-expanded="false"
+          aria-controls="docs-disclosure-verbal-component docs-disclosure-somatic-component docs-disclosure-material-component"
+        >
+          Show material components
+        </button>
+
+        <div class="grid gap-3 sm:grid-cols-3">
+          <div
+            id="docs-disclosure-verbal-component"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+            hidden
+          >
+            <h4 class="m-0 text-sm font-semibold text-gray-900">Verbal</h4>
+            <p class="mb-0 mt-2">A forceful invocation ending in <em>ignis!</em></p>
+          </div>
+
+          <div
+            id="docs-disclosure-somatic-component"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+            hidden
+          >
+            <h4 class="m-0 text-sm font-semibold text-gray-900">Somatic</h4>
+            <p class="mb-0 mt-2">Pinch sulfur, then thrust both hands toward the target.</p>
+          </div>
+
+          <div
+            id="docs-disclosure-material-component"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+            hidden
+          >
+            <h4 class="m-0 text-sm font-semibold text-gray-900">Material</h4>
+            <p class="mb-0 mt-2">A tiny ball of bat guano and sulfur.</p>
+          </div>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Regions visible: <span id="docs-disclosure-multi-status" class="font-mono font-medium text-gray-900">0</span> / 3
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Multiple buttons, one target</h3>
+          <p class="text-sm text-gray-600">
+            Several triggers can share the same <code>aria-controls</code> ID. Each instance listens
+            for bubbling open/close events and syncs when <code>event.detail.elements</code>
+            references a shared DOM node.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-disclosure-glyph-trigger"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+            aria-expanded="false"
+            aria-controls="docs-disclosure-shared-lore"
+          >
+            Inspect glyph
+          </button>
+
+          <button
+            type="button"
+            id="docs-disclosure-journal-trigger"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+            aria-expanded="false"
+            aria-controls="docs-disclosure-shared-lore"
+          >
+            Read journal entry
+          </button>
+        </div>
+
+        <div
+          id="docs-disclosure-shared-lore"
+          class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+          hidden
+        >
+          <p class="m-0">
+            The rune translates to <strong>“Beware the sleeping flame”</strong> — the same warning
+            appears in the adventurer’s journal beside a sketch of the dungeon door.
+          </p>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Lore excerpt: <span id="docs-disclosure-shared-status" class="font-mono font-medium text-gray-900">hidden</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Programmatic open &amp; close</h3>
+          <p class="text-sm text-gray-600">
+            Call <code>disclosure.open()</code> or <code>disclosure.close()</code> from anywhere —
+            an external control, a dismiss button inside the region, or your own routing logic.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-disclosure-programmatic-trigger"
+            class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+            aria-expanded="false"
+            aria-controls="docs-disclosure-programmatic-region"
+          >
+            Show session notes
+          </button>
+
+          <button
+            type="button"
+            id="docs-disclosure-programmatic-open"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+          >
+            Open from elsewhere
+          </button>
+        </div>
+
+        <div
+          id="docs-disclosure-programmatic-region"
+          class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+          hidden
+        >
+          <p class="mt-0">
+            The party spotted a hidden door behind the tapestry. Roll for investigation before the
+            torch burns out.
+          </p>
+          <button
+            type="button"
+            id="docs-disclosure-programmatic-dismiss"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+          >
+            Dismiss
+          </button>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Region state: <span id="docs-disclosure-programmatic-status" class="font-mono font-medium text-gray-900">closed</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Cancellable events</h3>
+          <p class="text-sm text-gray-600">
+            Open and close events fire <em>before</em> the state changes. Call
+            <code>event.preventDefault()</code> to abort — useful for confirmations or gating access.
+          </p>
+        </div>
+
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="docs-disclosure-cancel-allow" class="rounded border-gray-300" checked />
+          Allow opening
+        </label>
+
+        <button
+          type="button"
+          id="docs-disclosure-cancel-trigger"
+          class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          aria-expanded="false"
+          aria-controls="docs-disclosure-cancel-region"
+        >
+          Reveal treasure map
+        </button>
+
+        <div
+          id="docs-disclosure-cancel-region"
+          class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+          hidden
+        >
+          <p class="m-0">X marks a sunken vault beneath the old lighthouse — approach at low tide only.</p>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last attempt: <span id="docs-disclosure-cancel-status" class="font-mono font-medium text-gray-900">—</span>
+        </p>
+      </div>
+    </section>
   </div>
-
-  <p class="mt-4 text-sm text-gray-600">
-    Last event:
-    <span id="docs-disclosure-status" class="font-mono font-medium text-gray-900">—</span>
-  </p>
-</section>
+</div>
 
 <script>
   import { DisclosureButton } from '@agencecinq/disclosure-button';
@@ -48,6 +329,130 @@
 
     trigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
       status.textContent = EVENTS.DISCLOSURE_BUTTON_CLOSE;
+    });
+  }
+
+  const labelTrigger = document.getElementById('docs-disclosure-label-trigger');
+  const labelStatus = document.getElementById('docs-disclosure-label-status');
+
+  if (labelTrigger && labelStatus) {
+    const labels = { closed: 'Show details', open: 'Hide details' };
+    const disclosure = new DisclosureButton(labelTrigger);
+    disclosure.init();
+
+    labelTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      labelTrigger.textContent = labels.open;
+      labelStatus.textContent = labels.open;
+    });
+
+    labelTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+      labelTrigger.textContent = labels.closed;
+      labelStatus.textContent = labels.closed;
+    });
+  }
+
+  const readMoreTrigger = document.getElementById('docs-disclosure-readmore-trigger');
+
+  if (readMoreTrigger) {
+    const labels = { closed: 'Read more', open: 'Read less' };
+    new DisclosureButton(readMoreTrigger).init();
+
+    readMoreTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      readMoreTrigger.textContent = labels.open;
+    });
+
+    readMoreTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+      readMoreTrigger.textContent = labels.closed;
+    });
+  }
+
+  const componentsTrigger = document.getElementById('docs-disclosure-components-trigger');
+  const multiStatus = document.getElementById('docs-disclosure-multi-status');
+
+  const countVisibleRegions = (elements: HTMLElement[]) =>
+    elements.filter((element) => !element.hidden).length;
+
+  if (componentsTrigger && multiStatus) {
+    const disclosure = new DisclosureButton(componentsTrigger);
+    disclosure.init();
+
+    const updateMultiStatus = () => {
+      multiStatus.textContent = String(countVisibleRegions(disclosure.elements));
+    };
+
+    componentsTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, updateMultiStatus);
+    componentsTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, updateMultiStatus);
+  }
+
+  const glyphTrigger = document.getElementById('docs-disclosure-glyph-trigger');
+  const journalTrigger = document.getElementById('docs-disclosure-journal-trigger');
+  const sharedStatus = document.getElementById('docs-disclosure-shared-status');
+
+  if (glyphTrigger && journalTrigger && sharedStatus) {
+    new DisclosureButton(glyphTrigger).init();
+    new DisclosureButton(journalTrigger).init();
+
+    const updateSharedStatus = () => {
+      sharedStatus.textContent =
+        glyphTrigger.getAttribute('aria-expanded') === 'true' ? 'visible' : 'hidden';
+    };
+
+    glyphTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, updateSharedStatus);
+    glyphTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, updateSharedStatus);
+    journalTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, updateSharedStatus);
+    journalTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, updateSharedStatus);
+  }
+
+  const programmaticTrigger = document.getElementById('docs-disclosure-programmatic-trigger');
+  const programmaticOpen = document.getElementById('docs-disclosure-programmatic-open');
+  const programmaticDismiss = document.getElementById('docs-disclosure-programmatic-dismiss');
+  const programmaticStatus = document.getElementById('docs-disclosure-programmatic-status');
+
+  const syncProgrammaticStatus = (trigger: HTMLElement, status: HTMLElement, label: string) => {
+    status.textContent = `${label} (aria-expanded=${trigger.getAttribute('aria-expanded')})`;
+  };
+
+  if (programmaticTrigger && programmaticOpen && programmaticDismiss && programmaticStatus) {
+    const disclosure = new DisclosureButton(programmaticTrigger);
+    disclosure.init();
+
+    programmaticTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      syncProgrammaticStatus(programmaticTrigger, programmaticStatus, 'open');
+    });
+
+    programmaticTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+      syncProgrammaticStatus(programmaticTrigger, programmaticStatus, 'closed');
+    });
+
+    programmaticOpen.addEventListener('click', () => {
+      disclosure.open();
+    });
+
+    programmaticDismiss.addEventListener('click', () => {
+      disclosure.close();
+    });
+  }
+
+  const cancelAllow = document.getElementById('docs-disclosure-cancel-allow') as HTMLInputElement | null;
+  const cancelTrigger = document.getElementById('docs-disclosure-cancel-trigger');
+  const cancelStatus = document.getElementById('docs-disclosure-cancel-status');
+
+  if (cancelAllow && cancelTrigger && cancelStatus) {
+    const disclosure = new DisclosureButton(cancelTrigger);
+    disclosure.init();
+
+    cancelTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
+      if (!cancelAllow.checked) {
+        event.preventDefault();
+        cancelStatus.textContent = 'blocked (preventDefault)';
+        return;
+      }
+
+      cancelStatus.textContent = 'opened';
+    });
+
+    cancelTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+      cancelStatus.textContent = 'closed';
     });
   }
 </script>

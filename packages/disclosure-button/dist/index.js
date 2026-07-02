@@ -1,51 +1,49 @@
-var n = {
+var i = {
   DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
   DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close"
-}, d = (t, e) => {
-  let i = null, s = null, o = () => {
-    s && t(...s), i = null;
+}, a = (t, e) => {
+  let s = null, l = null, d = () => {
+    l && t(...l), s = null;
   };
-  return (...a) => {
-    s = a, i ||= setTimeout(o, e);
+  return (...o) => {
+    l = o, s ||= setTimeout(d, e);
   };
-}, u = document.documentElement;
-u.hasAttribute("data-debug");
-window.addEventListener("pointermove", d(({ x: t, y: e }) => {
+}, h = document.documentElement;
+h.hasAttribute("data-debug");
+window.addEventListener("pointermove", a(({ x: t, y: e }) => {
 }, 100), { passive: !0 });
 window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-const r = (t, e, i) => t.dispatchEvent(
-  new CustomEvent(i, {
-    bubbles: !1,
+const n = (t, e, s) => t.dispatchEvent(
+  new CustomEvent(s, {
+    bubbles: !0,
     cancelable: !0,
     detail: e
   })
-), l = (t) => {
-  const e = t.getAttribute("style");
-  if (e && e.includes("display")) {
-    if (t.style.display === "block") {
-      t.style.setProperty("display", "none");
-      return;
-    }
-    t.style.display === "none" && t.style.setProperty("display", "block");
-  }
+), r = (t, e) => {
+  t.hidden = !e;
+}, u = (t) => {
+  t.forEach((e) => {
+    r(e, !0);
+  });
 }, c = (t) => {
-  t.hasAttribute("aria-hidden") && (t.setAttribute("aria-hidden", "true"), t.classList.remove("is-active"), t.style.setProperty("pointer-events", "none"));
-}, h = (t) => {
-  t.hasAttribute("aria-hidden") && (t.setAttribute("aria-hidden", "false"), t.classList.add("is-active"), t.style.setProperty("pointer-events", "auto"));
-};
-class m {
+  t.forEach((e) => {
+    r(e, !1);
+  });
+}, E = (t) => !t.hidden, m = (t) => t ? t.trim().split(/\s+/).map((e) => e.trim()).filter(Boolean) : [], p = (t, e) => t.elements.some((s) => e.includes(s));
+class L {
   el;
   elements = [];
-  ids = [];
+  controlIds = [];
   constructor(e) {
     this.el = e;
   }
   init() {
-    const e = this.el.getAttribute("aria-controls");
-    e && (this.ids = e.trim().split(" ").map((i) => `#${i.trim()}`), this.elements = [...document.querySelectorAll(this.ids.join(","))], this.initEvents());
+    if (this.controlIds = m(this.el.getAttribute("aria-controls")), this.controlIds.length === 0) return;
+    const e = this.controlIds.map((s) => `#${s}`).join(",");
+    this.elements = [...document.querySelectorAll(e)], this.initEvents(), this.updateExpandedFromElements();
   }
   initEvents() {
-    this.el.addEventListener("click", this.onClick), this.el.addEventListener("focus", this.onFocus), this.el.addEventListener("blur", this.onBlur);
+    this.el.addEventListener("click", this.onClick), this.el.addEventListener("focus", this.onFocus), this.el.addEventListener("blur", this.onBlur), document.addEventListener(i.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange), document.addEventListener(i.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange);
   }
   onClick = () => {
     this.toggle();
@@ -56,26 +54,40 @@ class m {
   onBlur = () => {
     this.el.classList.remove("focus");
   };
+  onLinkedChange = (e) => {
+    if (!(e instanceof CustomEvent)) return;
+    const s = e.detail;
+    s.el !== this.el && p(s, this.elements) && queueMicrotask(() => {
+      this.updateExpandedFromElements();
+    });
+  };
   get detail() {
-    return { ids: this.ids, elements: this.elements, el: this.el };
+    return { ids: this.controlIds, elements: this.elements, el: this.el };
+  }
+  isExpanded() {
+    return this.el.getAttribute("aria-expanded") === "true";
+  }
+  updateExpandedFromElements() {
+    if (this.elements.length === 0) {
+      this.el.setAttribute("aria-expanded", "false");
+      return;
+    }
+    const e = this.elements.every((s) => E(s));
+    this.el.setAttribute("aria-expanded", e ? "true" : "false");
   }
   toggle() {
-    return this.el.getAttribute("aria-expanded") === "true" ? (this.close(), r(this.el, this.detail, n.DISCLOSURE_BUTTON_CLOSE)) : (this.open(), r(this.el, this.detail, n.DISCLOSURE_BUTTON_OPEN));
+    return this.isExpanded() ? n(this.el, this.detail, i.DISCLOSURE_BUTTON_CLOSE) ? (this.close(!1), !0) : !1 : n(this.el, this.detail, i.DISCLOSURE_BUTTON_OPEN) ? (this.open(!1), !0) : !1;
   }
-  close() {
-    this.el.setAttribute("aria-expanded", "false"), this.elements.forEach((e) => {
-      l(e), c(e);
-    });
+  close(e = !0) {
+    e && this.isExpanded() && !n(this.el, this.detail, i.DISCLOSURE_BUTTON_CLOSE) || (c(this.elements), this.updateExpandedFromElements());
   }
-  open() {
-    this.el.setAttribute("aria-expanded", "true"), this.elements.forEach((e) => {
-      l(e), h(e);
-    });
+  open(e = !0) {
+    e && !this.isExpanded() && !n(this.el, this.detail, i.DISCLOSURE_BUTTON_OPEN) || (u(this.elements), this.updateExpandedFromElements());
   }
   destroy() {
-    this.el.removeEventListener("click", this.onClick), this.el.removeEventListener("focus", this.onFocus), this.el.removeEventListener("blur", this.onBlur);
+    this.el.removeEventListener("click", this.onClick), this.el.removeEventListener("focus", this.onFocus), this.el.removeEventListener("blur", this.onBlur), document.removeEventListener(i.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange), document.removeEventListener(i.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange);
   }
 }
 export {
-  m as DisclosureButton
+  L as DisclosureButton
 };

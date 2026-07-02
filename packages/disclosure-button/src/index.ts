@@ -10,41 +10,44 @@ const dispatchEvent = (
 ): boolean =>
   target.dispatchEvent(
     new CustomEvent<DisclosureButtonDetail>(eventName, {
-      bubbles: false,
+      bubbles: true,
       cancelable: true,
       detail: details,
     }),
   );
 
-const toggleDisplay = ($el: HTMLElement): void => {
-  const style = $el.getAttribute("style");
-
-  if (style && style.includes("display")) {
-    if ($el.style.display === "block") {
-      $el.style.setProperty("display", "none");
-      return;
-    }
-    if ($el.style.display === "none") {
-      $el.style.setProperty("display", "block");
-    }
-  }
+const setHidden = (element: HTMLElement, open: boolean): void => {
+  element.hidden = !open;
 };
 
-const setAriaHiddenTrue = ($el: HTMLElement): void => {
-  if (!$el.hasAttribute("aria-hidden")) return;
-
-  $el.setAttribute("aria-hidden", "true");
-  $el.classList.remove("is-active");
-  $el.style.setProperty("pointer-events", "none");
+const applyOpenState = (elements: HTMLElement[]): void => {
+  elements.forEach((element) => {
+    setHidden(element, true);
+  });
 };
 
-const setAriaHiddenFalse = ($el: HTMLElement): void => {
-  if (!$el.hasAttribute("aria-hidden")) return;
-
-  $el.setAttribute("aria-hidden", "false");
-  $el.classList.add("is-active");
-  $el.style.setProperty("pointer-events", "auto");
+const applyCloseState = (elements: HTMLElement[]): void => {
+  elements.forEach((element) => {
+    setHidden(element, false);
+  });
 };
+
+const isElementOpen = (element: HTMLElement): boolean => !element.hidden;
+
+const parseControlIds = (controls: string | null): string[] => {
+  if (!controls) return [];
+
+  return controls
+    .trim()
+    .split(/\s+/)
+    .map((id) => id.trim())
+    .filter(Boolean);
+};
+
+const isLinkedDetail = (
+  detail: DisclosureButtonDetail,
+  elements: HTMLElement[],
+): boolean => detail.elements.some((element) => elements.includes(element));
 
 /**
  * Disclosure button controller for elements with `aria-expanded` and `aria-controls`.
@@ -54,29 +57,29 @@ const setAriaHiddenFalse = ($el: HTMLElement): void => {
 export class DisclosureButton {
   el: HTMLElement;
   elements: HTMLElement[] = [];
-  ids: string[] = [];
+  private controlIds: string[] = [];
 
   constructor(el: HTMLElement) {
     this.el = el;
   }
 
   init(): void {
-    const controls = this.el.getAttribute("aria-controls");
-    if (!controls) return;
+    this.controlIds = parseControlIds(this.el.getAttribute("aria-controls"));
+    if (this.controlIds.length === 0) return;
 
-    this.ids = controls
-      .trim()
-      .split(" ")
-      .map((id) => `#${id.trim()}`);
+    const selectors = this.controlIds.map((id) => `#${id}`).join(",");
+    this.elements = [...document.querySelectorAll<HTMLElement>(selectors)];
 
-    this.elements = [...document.querySelectorAll<HTMLElement>(this.ids.join(","))];
     this.initEvents();
+    this.updateExpandedFromElements();
   }
 
   private initEvents(): void {
     this.el.addEventListener("click", this.onClick);
     this.el.addEventListener("focus", this.onFocus);
     this.el.addEventListener("blur", this.onBlur);
+    document.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange);
+    document.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange);
   }
 
   private onClick = (): void => {
@@ -91,41 +94,81 @@ export class DisclosureButton {
     this.el.classList.remove("focus");
   };
 
+  private onLinkedChange = (event: Event): void => {
+    if (!(event instanceof CustomEvent)) return;
+
+    const detail = event.detail as DisclosureButtonDetail;
+    if (detail.el === this.el) return;
+    if (!isLinkedDetail(detail, this.elements)) return;
+
+    queueMicrotask(() => {
+      this.updateExpandedFromElements();
+    });
+  };
+
   private get detail(): DisclosureButtonDetail {
-    return { ids: this.ids, elements: this.elements, el: this.el };
+    return { ids: this.controlIds, elements: this.elements, el: this.el };
+  }
+
+  private isExpanded(): boolean {
+    return this.el.getAttribute("aria-expanded") === "true";
+  }
+
+  private updateExpandedFromElements(): void {
+    if (this.elements.length === 0) {
+      this.el.setAttribute("aria-expanded", "false");
+      return;
+    }
+
+    const expanded = this.elements.every((element) => isElementOpen(element));
+    this.el.setAttribute("aria-expanded", expanded ? "true" : "false");
   }
 
   toggle(): boolean {
-    if (this.el.getAttribute("aria-expanded") === "true") {
-      this.close();
-      return dispatchEvent(this.el, this.detail, EVENTS.DISCLOSURE_BUTTON_CLOSE);
+    if (this.isExpanded()) {
+      if (!dispatchEvent(this.el, this.detail, EVENTS.DISCLOSURE_BUTTON_CLOSE)) {
+        return false;
+      }
+
+      this.close(false);
+      return true;
     }
 
-    this.open();
-    return dispatchEvent(this.el, this.detail, EVENTS.DISCLOSURE_BUTTON_OPEN);
+    if (!dispatchEvent(this.el, this.detail, EVENTS.DISCLOSURE_BUTTON_OPEN)) {
+      return false;
+    }
+
+    this.open(false);
+    return true;
   }
 
-  close(): void {
-    this.el.setAttribute("aria-expanded", "false");
+  close(emit = true): void {
+    if (emit && this.isExpanded()) {
+      if (!dispatchEvent(this.el, this.detail, EVENTS.DISCLOSURE_BUTTON_CLOSE)) {
+        return;
+      }
+    }
 
-    this.elements.forEach(($el) => {
-      toggleDisplay($el);
-      setAriaHiddenTrue($el);
-    });
+    applyCloseState(this.elements);
+    this.updateExpandedFromElements();
   }
 
-  open(): void {
-    this.el.setAttribute("aria-expanded", "true");
+  open(emit = true): void {
+    if (emit && !this.isExpanded()) {
+      if (!dispatchEvent(this.el, this.detail, EVENTS.DISCLOSURE_BUTTON_OPEN)) {
+        return;
+      }
+    }
 
-    this.elements.forEach(($el) => {
-      toggleDisplay($el);
-      setAriaHiddenFalse($el);
-    });
+    applyOpenState(this.elements);
+    this.updateExpandedFromElements();
   }
 
   destroy(): void {
     this.el.removeEventListener("click", this.onClick);
     this.el.removeEventListener("focus", this.onFocus);
     this.el.removeEventListener("blur", this.onBlur);
+    document.removeEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange);
+    document.removeEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange);
   }
 }

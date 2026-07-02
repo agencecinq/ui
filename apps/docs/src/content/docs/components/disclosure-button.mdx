@@ -6,7 +6,7 @@ description: Accessible WAI-ARIA disclosure button controller for aria-expanded 
 import DisclosurePlayground from '../_components/DisclosurePlayground.astro';
 
 A disclosure button shows or hides a section of content. The controller wires up
-`aria-expanded` / `aria-controls`, toggles panel visibility, and dispatches
+`aria-expanded` / `aria-controls`, toggles the visibility of controlled regions, and dispatches
 open/close events.
 
 Inspired by the
@@ -25,12 +25,12 @@ pnpm add @agencecinq/disclosure-button
   type="button"
   class="js-disclosure-button"
   aria-expanded="false"
-  aria-controls="panel-1"
+  aria-controls="details-1"
 >
   Show details
 </button>
 
-<div id="panel-1" aria-hidden="true" style="display: none">
+<div id="details-1" hidden>
   Disclosure content
 </div>
 ```
@@ -52,22 +52,180 @@ controller class you attach to an existing trigger element.
 | Attribute / element | Required | Role |
 | ------------------- | -------- | ---- |
 | `aria-expanded` | **Yes** | Current disclosure state on the trigger. |
-| `aria-controls` | **Yes** | Space-separated IDs of the controlled panels. |
-| `aria-hidden` | Optional | When present on a panel, updated on open/close. |
-| `style="display: …"` | Optional | When present, toggled between `block` and `none`. |
+| `aria-controls` | **Yes** | Space-separated IDs of the controlled regions. |
+| `hidden` | **Yes** | Set on each controlled region in its collapsed initial state. |
+
+The package toggles the native `hidden` attribute on open/close. Layout is yours
+— use CSS such as `.foo[hidden] { display: none; }` and `.foo { display: flex; }`.
+
+## Keyboard & focus
+
+The trigger must be a native focusable control — typically
+`<button type="button">`. Enter and Space activate the button through browser
+defaults; the controller listens for `click`, which those keys dispatch on
+buttons.
+
+| Key | Function |
+| --- | -------- |
+| `Enter` | Toggle the disclosure (native button behavior). |
+| `Space` | Toggle the disclosure (native button behavior). |
+
+The package does **not** move focus into the controlled region on open, nor
+restore focus on close. That matches the
+[APG disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/):
+focus stays on the trigger. Once open, users can tab into focusable elements
+inside the region if you include any.
+
+While a region is collapsed, the `hidden` attribute keeps its content out of the
+tab order and accessibility tree.
+
+On `focus` / `blur`, the controller toggles a `.focus` class on the trigger so
+you can style the focused state without relying solely on `:focus`:
+
+```css
+.js-disclosure-button.focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+```
+
+## One button, multiple targets
+
+`aria-controls` accepts a space-separated list of IDs. One disclosure opens or
+closes **every listed region at once**:
+
+```html
+<button
+  type="button"
+  aria-expanded="false"
+  aria-controls="verbal-component somatic-component material-component"
+>
+  Show material components
+</button>
+
+<div id="verbal-component" hidden>…</div>
+<div id="somatic-component" hidden>…</div>
+<div id="material-component" hidden>…</div>
+```
+
+```js
+$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
+  console.log(event.detail.elements.length); // 3
+});
+```
+
+## Multiple buttons, one target
+
+Several triggers can point to the **same** ID. Initialise one `DisclosureButton`
+per trigger — each instance listens for bubbling open/close events and syncs when
+`event.detail.elements` references a shared DOM node:
+
+```html
+<button aria-expanded="false" aria-controls="lore-excerpt">Inspect glyph</button>
+<button aria-expanded="false" aria-controls="lore-excerpt">Read journal entry</button>
+
+<div id="lore-excerpt" hidden>…</div>
+```
+
+```js
+new DisclosureButton($glyphButton).init();
+new DisclosureButton($journalButton).init();
+```
+
+Events bubble. `aria-expanded` on each trigger reflects whether **all** of its own
+controlled regions are visible.
 
 ## Events
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `disclosure-button:open` | Yes | `{ ids, elements, el }` | Fired after the disclosure opens. |
-| `disclosure-button:close` | Yes | `{ ids, elements, el }` | Fired after the disclosure closes. |
+| `disclosure-button:open` | Yes | `{ ids, elements, el }` | Fired before the disclosure opens. Cancel to abort. |
+| `disclosure-button:close` | Yes | `{ ids, elements, el }` | Fired before the disclosure closes. Cancel to abort. |
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
 
 $button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
   console.log(event.detail.elements);
+});
+```
+
+Both events are cancelable. Call `event.preventDefault()` to abort before the
+state changes:
+
+```js
+$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
+  if (!userMayOpen()) {
+    event.preventDefault();
+  }
+});
+```
+
+`event.detail` carries `{ ids, elements, el }` — `ids` are the raw
+`aria-controls` tokens, `elements` the resolved DOM nodes, and `el` the trigger
+that initiated the action.
+
+## Updating the button label
+
+The package does not change the trigger's visible text — that stays with the
+consumer so copy, locale, and design stay under your control. Listen to the
+open/close events and update the label yourself:
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+const labels = { closed: "Show details", open: "Hide details" };
+
+$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+  $button.textContent = labels.open;
+});
+
+$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+  $button.textContent = labels.closed;
+});
+```
+
+## Read more / Read less
+
+Keep a short excerpt in the document flow and put the rest in a hidden region. The
+trigger is often styled as inline text rather than a prominent button:
+
+```html
+<article>
+  <p>
+    Nestled between the pines, La Cabane overlooks the lake — a timber lodge built
+    for slow mornings and long dinners.
+  </p>
+
+  <div id="listing-details" hidden>
+    <p>
+      The main room opens onto a covered terrace with a wood-fired oven. Upstairs,
+      four bedrooms share a single bathroom with a clawfoot tub.
+    </p>
+  </div>
+
+  <button
+    type="button"
+    class="read-more"
+    aria-expanded="false"
+    aria-controls="listing-details"
+  >
+    Read more
+  </button>
+</article>
+```
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+const labels = { closed: "Read more", open: "Read less" };
+
+$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+  $button.textContent = labels.open;
+});
+
+$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+  $button.textContent = labels.closed;
 });
 ```
 
@@ -80,6 +238,39 @@ disclosure.toggle();
 disclosure.destroy();
 ```
 
-## Interactive example
+`open()` and `close()` accept an optional `emit` flag (default `true`). When
+`true`, they dispatch `disclosure-button:open` / `disclosure-button:close`
+before updating state — the same events as `toggle()`. Pass `false` to update
+state silently.
+
+Linked triggers that share a target are kept in sync through bubbling
+`disclosure-button:open` / `disclosure-button:close` events — each instance
+updates itself when `event.detail.elements` overlaps with its own controlled
+elements.
+
+Open from an external control:
+
+```js
+$openLink.addEventListener("click", () => {
+  disclosure.open();
+});
+```
+
+Close from a dismiss control inside the content:
+
+```js
+$dismissButton.addEventListener("click", () => {
+  disclosure.close();
+});
+```
+
+Use `close(false)` only when you intentionally skip the event and accept that
+linked triggers will not sync.
+
+Call `destroy()` when removing the trigger from the DOM — for example in a SPA
+route change or when tearing down dynamic content. It removes click, focus, and
+document listeners registered by that instance.
+
+## Playground (live)
 
 <DisclosurePlayground />

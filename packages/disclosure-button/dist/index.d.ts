@@ -7,17 +7,20 @@ export type { DisclosureButtonDetail } from './types.js';
 export declare class DisclosureButton {
     el: HTMLElement;
     elements: HTMLElement[];
-    ids: string[];
+    private controlIds;
     constructor(el: HTMLElement);
     init(): void;
     private initEvents;
     private onClick;
     private onFocus;
     private onBlur;
+    private onLinkedChange;
     private get detail();
+    private isExpanded;
+    private updateExpandedFromElements;
     toggle(): boolean;
-    close(): void;
-    open(): void;
+    close(emit?: boolean): void;
+    open(emit?: boolean): void;
     destroy(): void;
 }
 //# sourceMappingURL=index.d.ts.map
