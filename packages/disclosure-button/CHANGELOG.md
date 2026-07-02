@@ -1,5 +1,11 @@
 # @agencecinq/disclosure-button
 
+## 1.1.0
+
+### Minor Changes
+
+- e5e3c14: Toggle the native `hidden` attribute on controlled regions. Linked triggers sync through bubbling disclosure events. `<cinq-disclosure-button>` Web Component with `DisclosureButton` class (aligned with drawer/modal button wrappers).
+
 ## 1.0.0
 
 ### Major Changes

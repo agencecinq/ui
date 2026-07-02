@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/disclosure-button",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Accessible WAI-ARIA disclosure button Web Component.",
   "type": "module",
   "license": "MIT",
