@@ -6,6 +6,8 @@ export declare const EVENTS: {
     MODAL_OPEN: string;
     MODAL_TOGGLE: string;
     SPINBUTTON_CHANGE: string;
+    DISCLOSURE_BUTTON_OPEN: string;
+    DISCLOSURE_BUTTON_CLOSE: string;
     TAB_BEFORE_ACTIVATE: string;
     TAB_ACTIVATE: string;
     TAB_DELETE: string;

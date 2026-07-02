@@ -1,5 +1,17 @@
 # @agencecinq/docs
 
+## 4.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @agencecinq/disclosure-button@1.0.0
+  - @agencecinq/utils@5.0.2
+  - @agencecinq/drawer@5.0.1
+  - @agencecinq/modal@2.0.1
+  - @agencecinq/spinbutton@1.0.2
+  - @agencecinq/tabs@10.0.1
+
 ## 4.0.1
 
 ### Patch Changes

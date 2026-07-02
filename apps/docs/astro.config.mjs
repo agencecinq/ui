@@ -24,6 +24,7 @@ export default defineConfig({
             { label: 'Modal', slug: 'components/modal' },
             { label: 'Drawer', slug: 'components/drawer' },
             { label: 'Spinbutton', slug: 'components/spinbutton' },
+            { label: 'Disclosure Button', slug: 'components/disclosure-button' },
           ],
         },
       ],

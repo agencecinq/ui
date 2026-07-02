@@ -1,7 +1,7 @@
 {
   "name": "@agencecinq/docs",
   "type": "module",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "private": true,
   "description": "CINQ UI components documentation site (Starlight).",
   "scripts": {
@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@agencecinq/disclosure-button": "workspace:*",
     "@agencecinq/drawer": "workspace:*",
     "@agencecinq/modal": "workspace:*",
     "@agencecinq/spinbutton": "workspace:*",

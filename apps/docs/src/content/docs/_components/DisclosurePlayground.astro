@@ -1,0 +1,53 @@
+---
+---
+
+<section class="not-content rounded-lg border border-gray-200 p-6">
+  <button
+    type="button"
+    id="docs-disclosure-trigger"
+    class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-sm hover:bg-gray-50"
+    aria-expanded="false"
+    aria-controls="docs-disclosure-panel"
+  >
+    Show spell details
+  </button>
+
+  <div
+    id="docs-disclosure-panel"
+    class="mt-4 rounded-md border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+    aria-hidden="true"
+    style="display: none"
+  >
+    <p class="m-0">
+      Fireball deals <strong>8d6</strong> fire damage in a 20-foot-radius sphere.
+      Creatures in the area make a Dexterity saving throw, taking full damage on
+      a failed save or half on a success.
+    </p>
+  </div>
+
+  <p class="mt-4 text-sm text-gray-600">
+    Last event:
+    <span id="docs-disclosure-status" class="font-mono font-medium text-gray-900">—</span>
+  </p>
+</section>
+
+<script>
+  import { DisclosureButton } from '@agencecinq/disclosure-button';
+  import { EVENTS } from '@agencecinq/utils';
+
+  const trigger = document.getElementById('docs-disclosure-trigger');
+  const status = document.getElementById('docs-disclosure-status');
+
+  if (trigger && status) {
+    const disclosure = new DisclosureButton(trigger);
+    disclosure.init();
+
+    trigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      status.textContent = EVENTS.DISCLOSURE_BUTTON_OPEN;
+    });
+
+    trigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+      status.textContent = EVENTS.DISCLOSURE_BUTTON_CLOSE;
+    });
+  }
+</script>

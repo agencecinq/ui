@@ -1,0 +1,40 @@
+{
+  "name": "@agencecinq/disclosure-button",
+  "version": "1.0.0",
+  "description": "Accessible WAI-ARIA disclosure button controller.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agencecinq/shopify.git",
+    "directory": "packages/disclosure-button"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "@agencecinq/utils": "*"
+  },
+  "devDependencies": {
+    "@agencecinq/utils": "workspace:*",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

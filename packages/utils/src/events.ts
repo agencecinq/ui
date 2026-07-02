@@ -6,6 +6,8 @@ export const EVENTS = {
   MODAL_OPEN: 'modal-open',
   MODAL_TOGGLE: 'modal-toggle',
   SPINBUTTON_CHANGE: 'spinbutton-change',
+  DISCLOSURE_BUTTON_OPEN: 'disclosure-button:open',
+  DISCLOSURE_BUTTON_CLOSE: 'disclosure-button:close',
   TAB_BEFORE_ACTIVATE: 'tab-before-activate',
   TAB_ACTIVATE: 'tab-activate',
   TAB_DELETE: 'tab-delete',

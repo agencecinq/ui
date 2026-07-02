@@ -1,0 +1,85 @@
+---
+title: Disclosure Button
+description: Accessible WAI-ARIA disclosure button controller for aria-expanded triggers.
+---
+
+import DisclosurePlayground from '../_components/DisclosurePlayground.astro';
+
+A disclosure button shows or hides a section of content. The controller wires up
+`aria-expanded` / `aria-controls`, toggles panel visibility, and dispatches
+open/close events.
+
+Inspired by the
+[WAI-ARIA Authoring Practices disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/).
+
+## Installation
+
+```bash
+pnpm add @agencecinq/disclosure-button
+```
+
+## Usage
+
+```html
+<button
+  type="button"
+  class="js-disclosure-button"
+  aria-expanded="false"
+  aria-controls="panel-1"
+>
+  Show details
+</button>
+
+<div id="panel-1" aria-hidden="true" style="display: none">
+  Disclosure content
+</div>
+```
+
+```js
+import { DisclosureButton } from "@agencecinq/disclosure-button";
+
+const $button = document.querySelector(".js-disclosure-button");
+const disclosure = new DisclosureButton($button);
+
+disclosure.init();
+```
+
+Unlike the Web Components in this library, `DisclosureButton` is a small
+controller class you attach to an existing trigger element.
+
+## Required markup
+
+| Attribute / element | Required | Role |
+| ------------------- | -------- | ---- |
+| `aria-expanded` | **Yes** | Current disclosure state on the trigger. |
+| `aria-controls` | **Yes** | Space-separated IDs of the controlled panels. |
+| `aria-hidden` | Optional | When present on a panel, updated on open/close. |
+| `style="display: …"` | Optional | When present, toggled between `block` and `none`. |
+
+## Events
+
+| Event | Cancelable | Detail | Description |
+| ----- | ---------- | ------ | ----------- |
+| `disclosure-button:open` | Yes | `{ ids, elements, el }` | Fired after the disclosure opens. |
+| `disclosure-button:close` | Yes | `{ ids, elements, el }` | Fired after the disclosure closes. |
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+$button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
+  console.log(event.detail.elements);
+});
+```
+
+## Programmatic API
+
+```js
+disclosure.open();
+disclosure.close();
+disclosure.toggle();
+disclosure.destroy();
+```
+
+## Interactive example
+
+<DisclosurePlayground />

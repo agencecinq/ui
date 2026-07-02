@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 5.0.2
+
+### Patch Changes
+
+- Add `@agencecinq/disclosure-button` package with `DisclosureButton` class, open/close/toggle API, and typed event details. Export `DISCLOSURE_BUTTON_OPEN` and `DISCLOSURE_BUTTON_CLOSE` from `@agencecinq/utils`.
+
 ## 5.0.0
 
 ### Major Changes
