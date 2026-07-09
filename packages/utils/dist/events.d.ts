@@ -8,6 +8,8 @@ export declare const EVENTS: {
     SPINBUTTON_CHANGE: string;
     DISCLOSURE_BUTTON_OPEN: string;
     DISCLOSURE_BUTTON_CLOSE: string;
+    SWITCH_ACTIVATE: string;
+    SWITCH_DEACTIVATE: string;
     TAB_BEFORE_ACTIVATE: string;
     TAB_ACTIVATE: string;
     TAB_DELETE: string;

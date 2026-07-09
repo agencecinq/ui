@@ -1,0 +1,328 @@
+---
+title: Switch
+description: Accessible WAI-ARIA switch Web Component (`<cinq-switch>`) for binary on/off settings.
+---
+
+import RegisterComponents from "../_components/RegisterComponents.astro";
+import SwitchPlayground from "../_components/SwitchPlayground.astro";
+
+A switch is an on/off control that represents a binary setting. `<cinq-switch>`
+provides an accessible, keyboard-navigable interface following the
+[WAI-ARIA Authoring Practices switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/),
+reads its state from the markup, syncs an optional hidden checkbox, and
+dispatches events when toggled.
+
+Inspired by [`@19h47/switch`](https://github.com/19h47/19h47-switch).
+
+## Install
+
+```bash
+pnpm add @agencecinq/switch
+```
+
+## Usage
+
+Import once:
+
+```js
+import "@agencecinq/switch";
+```
+
+Then write the WAI-ARIA markup. The host `<cinq-switch>` is the focusable switch
+element — set `role="switch"`, `aria-checked`, and `tabindex` explicitly.
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
+> Lighthouse) to catch invalid markup.
+
+```html
+<cinq-switch role="switch" aria-checked="false" tabindex="0">
+  <span class="label">Notifications</span>
+  <span class="switch" aria-hidden="true"><span></span></span>
+  <span class="on" aria-hidden="true">On</span>
+  <span class="off" aria-hidden="true">Off</span>
+  <div hidden>
+    <input type="checkbox" name="notifications" tabindex="-1" aria-hidden="true" />
+  </div>
+</cinq-switch>
+```
+
+When disabled, use `disabled` or `aria-disabled="true"` and `tabindex="-1"`:
+
+```html
+<cinq-switch role="switch" aria-checked="false" disabled aria-disabled="true" tabindex="-1">
+  <span class="label">Disabled switch</span>
+  <span class="switch" aria-hidden="true"><span></span></span>
+  <div hidden>
+    <input type="checkbox" tabindex="-1" aria-hidden="true" disabled />
+  </div>
+</cinq-switch>
+```
+
+The component upgrades automatically on `connectedCallback` — no manual
+initialization is needed.
+
+## Required markup
+
+| Attribute / element | Required | Role |
+| ------------------- | -------- | ---- |
+| `<cinq-switch>` | **Yes** | Host element with `role="switch"`. |
+| `role="switch"` | **Yes** | Identifies the control as a switch. |
+| `aria-checked` | **Yes** | Current on/off state (`"true"` or `"false"`). |
+| `tabindex="0"` | **Yes** | Makes the switch keyboard-focusable (use `-1` when disabled). |
+| Accessible name | **Yes** | Via `aria-label`, `aria-labelledby`, or visible label text. |
+| Hidden `input[type="checkbox"]` | Optional | Form helper only — not the switch. Keep it in a `hidden` container with `tabindex="-1"` and `aria-hidden="true"`. |
+| `aria-hidden="true"` on On/Off text | Recommended | Decorative state labels must not appear in the accessible name. |
+
+Use `[data-switch-input]` instead of `input[type="checkbox"]` when you need a
+more specific selector.
+
+Per the [APG switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/),
+the switch **label must not change** when its state changes. Style On/Off
+decorative text with CSS and mark it `aria-hidden="true"`.
+
+For multiple switches, use a `<fieldset>` / `<legend>` or `role="group"` with
+`aria-labelledby`.
+
+## Markup variants
+
+The playground below covers every supported markup pattern:
+
+| Variant | When to use |
+| ------- | ----------- |
+| Visible label text | Default — text inside `<cinq-switch>` becomes the accessible name. |
+| `aria-label` | Icon-only or compact switches with no visible label. |
+| `aria-labelledby` | Name lives in a separate visible element (heading, table cell, etc.). |
+| `aria-describedby` | Extra static help text announced with the switch. |
+| Minimal | No slider, no checkbox — UI-only toggle outside a form. |
+| Pre-checked | `aria-checked="true"` (+ optional `checked` for initial CSS). |
+| Form helper | Hidden `input[type="checkbox"]` or `[data-switch-input]` for submission. |
+| Switch group | `<fieldset>` / `<legend>` wrapping several switches. |
+| Disabled | `disabled` + `aria-disabled` + `tabindex="-1"`, or `aria-disabled` alone. |
+
+### `aria-label`
+
+```html
+<cinq-switch
+  role="switch"
+  aria-checked="false"
+  tabindex="0"
+  aria-label="Sound effects"
+>
+  <span class="slider" aria-hidden="true"></span>
+</cinq-switch>
+```
+
+### `aria-labelledby`
+
+```html
+<span id="prefs-reduced-motion">Reduced motion</span>
+
+<cinq-switch
+  role="switch"
+  aria-checked="false"
+  tabindex="0"
+  aria-labelledby="prefs-reduced-motion"
+>
+  <span class="slider" aria-hidden="true"></span>
+</cinq-switch>
+```
+
+### `aria-describedby`
+
+```html
+<cinq-switch
+  role="switch"
+  aria-checked="false"
+  tabindex="0"
+  aria-describedby="push-desc"
+>
+  <span class="label">Push notifications</span>
+  <span class="slider" aria-hidden="true"></span>
+</cinq-switch>
+
+<p id="push-desc">Also sends an alert on mobile when an order ships.</p>
+```
+
+### Minimal (no form)
+
+```html
+<cinq-switch
+  class="autoplay-switch"
+  role="switch"
+  aria-checked="false"
+  tabindex="0"
+>
+  Autoplay videos
+</cinq-switch>
+```
+
+```css
+.autoplay-switch {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  color: #6b7280;
+}
+
+.autoplay-switch[aria-checked="true"],
+.autoplay-switch[checked] {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+```
+
+### Pre-checked
+
+```html
+<cinq-switch role="switch" aria-checked="true" checked tabindex="0">
+  <span class="label">Marketing emails</span>
+  <span class="slider" aria-hidden="true"></span>
+</cinq-switch>
+```
+
+Set `checked` on the host in markup when you style with `cinq-switch[checked]` before the
+first toggle. The component reflects `checked` automatically after state changes.
+
+### Switch group
+
+```html
+<fieldset>
+  <legend>Accessibility preferences</legend>
+
+  <cinq-switch role="switch" aria-checked="false" tabindex="0">
+    <span class="label">Show captions</span>
+    <span class="slider" aria-hidden="true"></span>
+  </cinq-switch>
+
+  <cinq-switch role="switch" aria-checked="true" checked tabindex="0">
+    <span class="label">Reduced motion</span>
+    <span class="slider" aria-hidden="true"></span>
+  </cinq-switch>
+</fieldset>
+```
+
+### `[data-switch-input]`
+
+```html
+<cinq-switch role="switch" aria-checked="false" tabindex="0">
+  <span class="label">Newsletter</span>
+  <span class="slider" aria-hidden="true"></span>
+  <div hidden>
+    <input
+      type="checkbox"
+      data-switch-input
+      name="newsletter"
+      tabindex="-1"
+      aria-hidden="true"
+    />
+  </div>
+</cinq-switch>
+```
+
+## Accessibility
+
+### Accessible label is required
+
+The switch **must** have an accessible name. Use one of:
+
+- `aria-label="…"` on `<cinq-switch>`
+- `aria-labelledby="some-id"` referencing a visible label
+- Visible label text inside the slotted content (when it provides the name)
+
+The component does not check this — rely on axe-core / Lighthouse / your CI.
+
+## Keyboard support
+
+| Key | Function |
+| --- | -------- |
+| `Tab` | Moves keyboard focus to the switch (`tabindex="0"` in markup). |
+| `Space` | Toggles between on and off when focused. |
+| `Enter` | Toggles between on and off when focused (optional per APG). |
+
+On `focus` / `blur`, a `.focus` class is toggled on the host so you can style
+the focused state without relying solely on `:focus`:
+
+```css
+cinq-switch.focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+```
+
+## API
+
+### Attributes
+
+| Attribute | Required | Description |
+| --------- | -------- | ----------- |
+| `checked` | No | Reflected state on the host — useful for styling (`cinq-switch[checked]`). |
+| `disabled` | No | Observed — syncs the hidden checkbox and blurs focus when set externally. Pair with `aria-disabled="true"` and `tabindex="-1"` in markup. |
+
+### Methods
+
+| Method | Description |
+| ------ | ----------- |
+| `activate(emit?)` | Turns the switch on. Dispatches an event by default. |
+| `deactivate(emit?)` | Turns the switch off. Dispatches an event by default. |
+| `toggle()` | Toggles on/off. Returns `false` if disabled or a cancelable event was aborted. |
+| `destroy()` | Detaches listeners when removing the element from the DOM. |
+
+### Properties
+
+| Property | Description |
+| -------- | ----------- |
+| `checked` | Whether the switch is currently on. |
+| `disabled` | Whether the switch is disabled. |
+| `$input` | The optional hidden checkbox element. |
+
+## Events
+
+| Event | Cancelable | Detail | Description |
+| ----- | ---------- | ------ | ----------- |
+| `switch:activate` | Yes | `{ el }` | Fired before the switch turns on. Cancel to abort. |
+| `switch:deactivate` | Yes | `{ el }` | Fired before the switch turns off. Cancel to abort. |
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+$switch.addEventListener(EVENTS.SWITCH_ACTIVATE, (event) => {
+  console.log("activated", event.detail.el);
+});
+
+$switch.addEventListener(EVENTS.SWITCH_DEACTIVATE, (event) => {
+  console.log("deactivated", event.detail.el);
+});
+```
+
+Call `event.preventDefault()` to abort before the state changes:
+
+```js
+$switch.addEventListener(EVENTS.SWITCH_ACTIVATE, (event) => {
+  if (!userMayEnable()) {
+    event.preventDefault();
+  }
+});
+```
+
+## Programmatic API
+
+```js
+const $switch = document.querySelector("cinq-switch");
+
+$switch.activate();
+$switch.deactivate();
+$switch.toggle();
+$switch.destroy();
+```
+
+`activate()` and `deactivate()` accept an optional `emit` flag (default `true`).
+Pass `false` to update state without dispatching an event.
+
+## Examples
+
+<SwitchPlayground />
+
+<RegisterComponents />

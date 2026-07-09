@@ -9,6 +9,8 @@ var e = {
 	SPINBUTTON_CHANGE: "spinbutton-change",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
+	SWITCH_ACTIVATE: "switch:activate",
+	SWITCH_DEACTIVATE: "switch:deactivate",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -94,21 +96,21 @@ var a = (e, t, n) => e.dispatchEvent(new CustomEvent(n, {
 		this.$button && (t && !this.isExpanded() && !a(this.$button, this.detail, e.DISCLOSURE_BUTTON_OPEN) || (s(this.elements), this.updateExpandedFromElements()));
 	}
 	destroy() {
-		this.$button && (this.$button.removeEventListener("click", this.onClick), this.$button.removeEventListener("focus", this.onFocus), this.$button.removeEventListener("blur", this.onBlur), document.removeEventListener(e.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange), document.removeEventListener(e.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange), this.observer?.disconnect(), this.observer = null);
+		this.$button && (this.$button.removeEventListener("click", this.handleClick), this.$button.removeEventListener("focus", this.handleFocus), this.$button.removeEventListener("blur", this.handleBlur), document.removeEventListener(e.DISCLOSURE_BUTTON_OPEN, this.handleLinkedChange), document.removeEventListener(e.DISCLOSURE_BUTTON_CLOSE, this.handleLinkedChange), this.observer?.disconnect(), this.observer = null);
 	}
 	initEvents() {
-		this.$button && (this.$button.addEventListener("click", this.onClick), this.$button.addEventListener("focus", this.onFocus), this.$button.addEventListener("blur", this.onBlur), document.addEventListener(e.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange), document.addEventListener(e.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange));
+		this.$button && (this.$button.addEventListener("click", this.handleClick), this.$button.addEventListener("focus", this.handleFocus), this.$button.addEventListener("blur", this.handleBlur), document.addEventListener(e.DISCLOSURE_BUTTON_OPEN, this.handleLinkedChange), document.addEventListener(e.DISCLOSURE_BUTTON_CLOSE, this.handleLinkedChange));
 	}
-	onClick = () => {
+	handleClick = () => {
 		this.toggle();
 	};
-	onFocus = () => {
+	handleFocus = () => {
 		this.$button?.classList.add("focus");
 	};
-	onBlur = () => {
+	handleBlur = () => {
 		this.$button?.classList.remove("focus");
 	};
-	onLinkedChange = (e) => {
+	handleLinkedChange = (e) => {
 		if (!(e instanceof CustomEvent) || !this.$button) return;
 		let t = e.detail;
 		t.el !== this.$button && d(t, this.elements) && queueMicrotask(() => {

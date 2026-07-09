@@ -178,11 +178,11 @@ export class DisclosureButton extends HTMLElement {
   destroy(): void {
     if (!this.$button) return;
 
-    this.$button.removeEventListener("click", this.onClick);
-    this.$button.removeEventListener("focus", this.onFocus);
-    this.$button.removeEventListener("blur", this.onBlur);
-    document.removeEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange);
-    document.removeEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange);
+    this.$button.removeEventListener("click", this.handleClick);
+    this.$button.removeEventListener("focus", this.handleFocus);
+    this.$button.removeEventListener("blur", this.handleBlur);
+    document.removeEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, this.handleLinkedChange);
+    document.removeEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, this.handleLinkedChange);
 
     this.observer?.disconnect();
     this.observer = null;
@@ -191,26 +191,26 @@ export class DisclosureButton extends HTMLElement {
   private initEvents(): void {
     if (!this.$button) return;
 
-    this.$button.addEventListener("click", this.onClick);
-    this.$button.addEventListener("focus", this.onFocus);
-    this.$button.addEventListener("blur", this.onBlur);
-    document.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, this.onLinkedChange);
-    document.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, this.onLinkedChange);
+    this.$button.addEventListener("click", this.handleClick);
+    this.$button.addEventListener("focus", this.handleFocus);
+    this.$button.addEventListener("blur", this.handleBlur);
+    document.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, this.handleLinkedChange);
+    document.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, this.handleLinkedChange);
   }
 
-  private onClick = (): void => {
+  private handleClick = (): void => {
     this.toggle();
   };
 
-  private onFocus = (): void => {
+  private handleFocus = (): void => {
     this.$button?.classList.add("focus");
   };
 
-  private onBlur = (): void => {
+  private handleBlur = (): void => {
     this.$button?.classList.remove("focus");
   };
 
-  private onLinkedChange = (event: Event): void => {
+  private handleLinkedChange = (event: Event): void => {
     if (!(event instanceof CustomEvent) || !this.$button) return;
 
     const detail = event.detail as DisclosureButtonDetail;

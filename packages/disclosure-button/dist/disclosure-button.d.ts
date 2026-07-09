@@ -20,10 +20,10 @@ export declare class DisclosureButton extends HTMLElement {
     open(emit?: boolean): void;
     destroy(): void;
     private initEvents;
-    private onClick;
-    private onFocus;
-    private onBlur;
-    private onLinkedChange;
+    private handleClick;
+    private handleFocus;
+    private handleBlur;
+    private handleLinkedChange;
     private get detail();
     private isExpanded;
     private updateExpandedFromElements;

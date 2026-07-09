@@ -1,5 +1,22 @@
 # @agencecinq/docs
 
+## 4.1.0
+
+### Minor Changes
+
+- Add `@agencecinq/switch` Web Component (`<cinq-switch>`) with activate/deactivate/toggle API, WAI-ARIA switch pattern support, and interactive docs playground. Export `SWITCH_ACTIVATE` and `SWITCH_DEACTIVATE` from `@agencecinq/utils`. Align disclosure-button event handlers to `handle*` naming convention.
+
+### Patch Changes
+
+- Updated dependencies
+  - @agencecinq/switch@2.0.0
+  - @agencecinq/utils@5.0.3
+  - @agencecinq/disclosure-button@1.1.1
+  - @agencecinq/drawer@5.0.1
+  - @agencecinq/modal@2.0.1
+  - @agencecinq/spinbutton@1.0.2
+  - @agencecinq/tabs@10.0.1
+
 ## 4.0.3
 
 ### Patch Changes

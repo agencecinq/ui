@@ -9,6 +9,8 @@ var e = {
 	SPINBUTTON_CHANGE: "spinbutton-change",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
+	SWITCH_ACTIVATE: "switch:activate",
+	SWITCH_DEACTIVATE: "switch:deactivate",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",

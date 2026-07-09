@@ -43,7 +43,7 @@ pnpm dev
 
 ```
 
-Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in every consuming package (`drawer`, `modal`, `tabs`, `spinbutton`, `disclosure-button`) automatically.
+Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in every consuming package (`drawer`, `modal`, `tabs`, `spinbutton`, `disclosure-button`, `switch`) automatically.
 
 ### Building
 
@@ -107,6 +107,7 @@ pnpm release
 - `packages/tabs`: The Tabs Web Component (`<cinq-tabs>`) and related utilities.
 - `packages/spinbutton`: The Spinbutton Web Component (`<cinq-spinbutton>`), WAI-ARIA APG-compliant.
 - `packages/disclosure-button`: `<cinq-disclosure-button>` Web Component for `aria-expanded` triggers.
+- `packages/switch`: `<cinq-switch>` Web Component for binary on/off settings (WAI-ARIA switch pattern).
 - `apps/`: Apps / themes consuming the packages (e.g. `apps/docs`).
 
 ---

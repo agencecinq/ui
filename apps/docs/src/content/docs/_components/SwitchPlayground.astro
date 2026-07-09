@@ -1,0 +1,651 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-switch {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 2px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+    user-select: none;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease-in-out,
+      outline-color 0.15s ease-in-out;
+  }
+
+  .docs-switch:hover,
+  .docs-switch.focus {
+    background-color: #e0f2fe;
+    outline-color: #0369a1;
+  }
+
+  .docs-switch[aria-disabled='true'] {
+    opacity: 0.65;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .docs-switch[aria-disabled='true']:hover,
+  .docs-switch[aria-disabled='true'].focus {
+    background-color: transparent;
+    outline-color: transparent;
+  }
+
+  .docs-switch .label {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #111827;
+  }
+
+  .docs-switch .slider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    width: 1.75rem;
+    min-width: 1.75rem;
+    height: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #adb5bd;
+    background-color: #fff;
+    transition:
+      background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out;
+  }
+
+  .docs-switch .slider::before {
+    content: '';
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #adb5bd;
+    transform: translateX(0.1rem);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .docs-switch[aria-checked='true'] .slider {
+    border-color: #2563eb;
+    background-color: #2563eb;
+  }
+
+  .docs-switch[aria-checked='true'] .slider::before {
+    background-color: #fff;
+    transform: translateX(0.75rem);
+  }
+
+  .docs-switch.large .slider {
+    justify-content: space-between;
+    padding: 0 6px;
+    width: 60px;
+    height: 1.5rem;
+    border-radius: 0.75rem;
+  }
+
+  .docs-switch.large .slider span {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+  }
+
+  .docs-switch.large[aria-checked='false'] .slider span:last-child {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .docs-switch.large[aria-checked='true'] .slider span:first-child {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .docs-switch.large .slider::before {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    margin-top: -7px;
+    height: 14px;
+    width: 14px;
+    transform: translateX(4px);
+  }
+
+  .docs-switch.large[aria-checked='true'] .slider::before {
+    transform: translateX(2.25rem);
+  }
+
+  .docs-switch[checked] .label {
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  .docs-switch-fieldset {
+    margin: 0;
+    padding: 1rem;
+    border: 1px dashed #d1d5db;
+    border-radius: 0.75rem;
+  }
+
+  .docs-switch-fieldset legend {
+    padding: 0 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .docs-switch-fieldset .docs-switch + .docs-switch {
+    margin-top: 0.5rem;
+  }
+
+  .docs-switch-minimal {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+    color: #6b7280;
+    transition:
+      background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out,
+      color 0.15s ease-in-out;
+  }
+
+  .docs-switch-minimal[aria-checked='true'],
+  .docs-switch-minimal[checked] {
+    border-color: #2563eb;
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 600;
+  }
+
+  .docs-switch-minimal[aria-checked='true']:hover,
+  .docs-switch-minimal[aria-checked='true'].focus,
+  .docs-switch-minimal[checked]:hover,
+  .docs-switch-minimal[checked].focus {
+    background-color: #dbeafe;
+    outline-color: #2563eb;
+  }
+</style>
+
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Basic switch</h3>
+          <p class="text-sm text-gray-600">
+            Click or press <kbd>Space</kbd> / <kbd>Enter</kbd> to toggle. Activate and deactivate
+            events are logged below.
+          </p>
+        </div>
+
+        <cinq-switch
+          id="docs-switch-basic"
+          class="docs-switch self-start"
+          role="switch"
+          aria-checked="false"
+          tabindex="0"
+        >
+          <span class="label">Email notifications</span>
+          <span class="slider" aria-hidden="true"></span>
+          <div hidden>
+            <input type="checkbox" name="notifications" tabindex="-1" aria-hidden="true" />
+          </div>
+        </cinq-switch>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last event: <span id="docs-switch-status" class="font-mono font-medium text-gray-900">—</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">On / Off labels</h3>
+          <p class="text-sm text-gray-600">
+            A larger track can reveal <strong>On</strong> and <strong>Off</strong> text inside the
+            slider. Style with <code>[aria-checked="true"]</code> or the reflected
+            <code>checked</code> attribute on the host.
+          </p>
+        </div>
+
+        <cinq-switch
+          id="docs-switch-labels"
+          class="docs-switch large self-start"
+          role="switch"
+          aria-checked="false"
+          tabindex="0"
+        >
+          <span class="label">Dark mode</span>
+          <span class="slider" aria-hidden="true">
+            <span class="on" aria-hidden="true">On</span>
+            <span class="off" aria-hidden="true">Off</span>
+          </span>
+          <div hidden>
+            <input type="checkbox" name="dark-mode" tabindex="-1" aria-hidden="true" />
+          </div>
+        </cinq-switch>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          State: <span id="docs-switch-labels-status" class="font-mono font-medium text-gray-900">off</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Accessible naming</h3>
+          <p class="text-sm text-gray-600">
+            Per the <a href="https://www.w3.org/WAI/ARIA/apg/patterns/switch/">APG</a>, the switch
+            needs an accessible name via visible text, <code>aria-label</code>, or
+            <code>aria-labelledby</code>.
+          </p>
+        </div>
+
+        <div class="grid gap-6 sm:grid-cols-2">
+          <div class="flex flex-col gap-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-gray-500">
+              <code>aria-label</code>
+            </span>
+            <cinq-switch
+              class="docs-switch self-start"
+              role="switch"
+              aria-checked="false"
+              tabindex="0"
+              aria-label="Sound effects"
+            >
+              <span class="slider" aria-hidden="true"></span>
+            </cinq-switch>
+            <p class="text-xs text-gray-500">No visible label — name comes from <code>aria-label</code>.</p>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <span
+              id="docs-switch-aria-labelledby-label"
+              class="text-xs font-medium uppercase tracking-wide text-gray-500"
+            >
+              <code>aria-labelledby</code>
+            </span>
+            <cinq-switch
+              class="docs-switch self-start"
+              role="switch"
+              aria-checked="false"
+              tabindex="0"
+              aria-labelledby="docs-switch-aria-labelledby-label"
+            >
+              <span class="slider" aria-hidden="true"></span>
+            </cinq-switch>
+            <p class="text-xs text-gray-500">
+              The visible heading above is referenced by <code>aria-labelledby</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Minimal markup</h3>
+          <p class="text-sm text-gray-600">
+            No slider, no hidden checkbox — enough when you do not submit a form. The visible text
+            inside the host provides the accessible name. Style the on state with
+            <code>[aria-checked="true"]</code> or <code>[checked]</code>.
+          </p>
+        </div>
+
+        <cinq-switch
+          class="docs-switch docs-switch-minimal self-start"
+          role="switch"
+          aria-checked="false"
+          tabindex="0"
+        >
+          Autoplay videos
+        </cinq-switch>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Pre-checked state</h3>
+          <p class="text-sm text-gray-600">
+            Set <code>aria-checked="true"</code> in markup for an initially on switch. Add
+            <code>checked</code> on the host too if you style with <code>cinq-switch[checked]</code>
+            — the component reflects <code>checked</code> after the first toggle.
+          </p>
+        </div>
+
+        <cinq-switch
+          class="docs-switch self-start"
+          role="switch"
+          aria-checked="true"
+          checked
+          tabindex="0"
+        >
+          <span class="label">Marketing emails</span>
+          <span class="slider" aria-hidden="true"></span>
+        </cinq-switch>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Description</h3>
+          <p class="text-sm text-gray-600">
+            Use <code>aria-describedby</code> when additional static help text should be announced
+            with the switch.
+          </p>
+        </div>
+
+        <cinq-switch
+          class="docs-switch self-start"
+          role="switch"
+          aria-checked="false"
+          tabindex="0"
+          aria-describedby="docs-switch-push-desc"
+        >
+          <span class="label">Push notifications</span>
+          <span class="slider" aria-hidden="true"></span>
+        </cinq-switch>
+
+        <p id="docs-switch-push-desc" class="text-sm text-gray-600">
+          Also sends an alert on mobile when an order ships.
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Switch group</h3>
+          <p class="text-sm text-gray-600">
+            Wrap related switches in a <code>&lt;fieldset&gt;</code> with a
+            <code>&lt;legend&gt;</code>, or use <code>role="group"</code> with
+            <code>aria-labelledby</code>.
+          </p>
+        </div>
+
+        <fieldset class="docs-switch-fieldset self-start">
+          <legend>Accessibility preferences</legend>
+
+          <cinq-switch
+            class="docs-switch"
+            role="switch"
+            aria-checked="false"
+            tabindex="0"
+          >
+            <span class="label">Show captions</span>
+            <span class="slider" aria-hidden="true"></span>
+          </cinq-switch>
+
+          <cinq-switch
+            class="docs-switch"
+            role="switch"
+            aria-checked="true"
+            checked
+            tabindex="0"
+          >
+            <span class="label">Reduced motion</span>
+            <span class="slider" aria-hidden="true"></span>
+          </cinq-switch>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Form helper input</h3>
+          <p class="text-sm text-gray-600">
+            Use <code>[data-switch-input]</code> when several checkboxes live inside the host. Keep
+            it hidden from assistive tech — the host is the switch.
+          </p>
+        </div>
+
+        <cinq-switch
+          class="docs-switch self-start"
+          role="switch"
+          aria-checked="false"
+          tabindex="0"
+        >
+          <span class="label">Newsletter</span>
+          <span class="slider" aria-hidden="true"></span>
+          <div hidden>
+            <input
+              type="checkbox"
+              data-switch-input
+              name="newsletter"
+              tabindex="-1"
+              aria-hidden="true"
+            />
+          </div>
+        </cinq-switch>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Disabled</h3>
+          <p class="text-sm text-gray-600">
+            Pair <code>disabled</code> with <code>aria-disabled="true"</code> and
+            <code>tabindex="-1"</code>. The getter also respects <code>aria-disabled</code> alone.
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-gray-500">
+              <code>disabled</code> + <code>aria-disabled</code>
+            </span>
+            <cinq-switch
+              class="docs-switch self-start"
+              role="switch"
+              aria-checked="false"
+              disabled
+              aria-disabled="true"
+              tabindex="-1"
+            >
+              <span class="label">Beta features</span>
+              <span class="slider" aria-hidden="true"></span>
+              <div hidden>
+                <input type="checkbox" tabindex="-1" aria-hidden="true" disabled />
+              </div>
+            </cinq-switch>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-gray-500">
+              <code>aria-disabled</code> only
+            </span>
+            <cinq-switch
+              class="docs-switch self-start"
+              role="switch"
+              aria-checked="false"
+              aria-disabled="true"
+              tabindex="-1"
+            >
+              <span class="label">Legacy API</span>
+              <span class="slider" aria-hidden="true"></span>
+            </cinq-switch>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Programmatic API</h3>
+          <p class="text-sm text-gray-600">
+            Call <code>activate()</code>, <code>deactivate()</code>, or <code>toggle()</code> from
+            external controls.
+          </p>
+        </div>
+
+        <cinq-switch
+          id="docs-switch-programmatic"
+          class="docs-switch self-start"
+          role="switch"
+          aria-checked="false"
+          tabindex="0"
+        >
+          <span class="label">Auto-save drafts</span>
+          <span class="slider" aria-hidden="true"></span>
+          <div hidden>
+            <input type="checkbox" name="autosave" tabindex="-1" aria-hidden="true" />
+          </div>
+        </cinq-switch>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-switch-programmatic-on"
+            class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          >
+            Turn on
+          </button>
+          <button
+            type="button"
+            id="docs-switch-programmatic-off"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+          >
+            Turn off
+          </button>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          State: <span id="docs-switch-programmatic-status" class="font-mono font-medium text-gray-900">off</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Cancellable events</h3>
+          <p class="text-sm text-gray-600">
+            Activate and deactivate events fire <em>before</em> the state changes. Call
+            <code>event.preventDefault()</code> to abort — useful for confirmations or gating access.
+          </p>
+        </div>
+
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="docs-switch-cancel-allow" class="rounded border-gray-300" checked />
+          Allow activation
+        </label>
+
+        <cinq-switch
+          id="docs-switch-cancel"
+          class="docs-switch self-start"
+          role="switch"
+          aria-checked="false"
+          tabindex="0"
+        >
+          <span class="label">Premium analytics</span>
+          <span class="slider" aria-hidden="true"></span>
+          <div hidden>
+            <input type="checkbox" name="analytics" tabindex="-1" aria-hidden="true" />
+          </div>
+        </cinq-switch>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last attempt: <span id="docs-switch-cancel-status" class="font-mono font-medium text-gray-900">—</span>
+        </p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import type { Switch } from '@agencecinq/switch';
+  import { EVENTS } from '@agencecinq/utils';
+
+  const syncSwitchStatus = (host: Switch, statusEl: HTMLElement) => {
+    statusEl.textContent = host.checked ? 'on' : 'off';
+  };
+
+  const basicHost = document.getElementById('docs-switch-basic');
+  const status = document.getElementById('docs-switch-status');
+
+  if (basicHost && status) {
+    basicHost.addEventListener(EVENTS.SWITCH_ACTIVATE, () => {
+      status.textContent = EVENTS.SWITCH_ACTIVATE;
+    });
+
+    basicHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, () => {
+      status.textContent = EVENTS.SWITCH_DEACTIVATE;
+    });
+  }
+
+  const labelsHost = document.getElementById('docs-switch-labels') as Switch | null;
+  const labelsStatus = document.getElementById('docs-switch-labels-status');
+
+  if (labelsHost && labelsStatus) {
+    const update = () => syncSwitchStatus(labelsHost, labelsStatus);
+
+    labelsHost.addEventListener(EVENTS.SWITCH_ACTIVATE, update);
+    labelsHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, update);
+  }
+
+  const programmaticHost = document.getElementById(
+    'docs-switch-programmatic',
+  ) as Switch | null;
+  const programmaticOn = document.getElementById('docs-switch-programmatic-on');
+  const programmaticOff = document.getElementById('docs-switch-programmatic-off');
+  const programmaticStatus = document.getElementById('docs-switch-programmatic-status');
+
+  if (programmaticHost && programmaticStatus) {
+    const update = () => syncSwitchStatus(programmaticHost, programmaticStatus);
+
+    programmaticHost.addEventListener(EVENTS.SWITCH_ACTIVATE, update);
+    programmaticHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, update);
+
+    programmaticOn?.addEventListener('click', () => {
+      programmaticHost.activate();
+    });
+
+    programmaticOff?.addEventListener('click', () => {
+      programmaticHost.deactivate();
+    });
+  }
+
+  const cancelHost = document.getElementById('docs-switch-cancel') as Switch | null;
+  const cancelAllow = document.getElementById(
+    'docs-switch-cancel-allow',
+  ) as HTMLInputElement | null;
+  const cancelStatus = document.getElementById('docs-switch-cancel-status');
+
+  if (cancelHost && cancelStatus) {
+    cancelHost.addEventListener(EVENTS.SWITCH_ACTIVATE, (event) => {
+      if (cancelAllow && !cancelAllow.checked) {
+        event.preventDefault();
+        cancelStatus.textContent = 'activation blocked';
+        return;
+      }
+
+      cancelStatus.textContent = 'activated';
+    });
+
+    cancelHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, () => {
+      cancelStatus.textContent = 'deactivated';
+    });
+  }
+</script>

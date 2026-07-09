@@ -9,6 +9,8 @@ var e = {
 	SPINBUTTON_CHANGE: "spinbutton-change",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
+	SWITCH_ACTIVATE: "switch:activate",
+	SWITCH_DEACTIVATE: "switch:deactivate",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -71,8 +73,8 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = {
 		this.$increase = this.querySelector("[data-spinbutton-action=\"increase\"]"), this.$decrease = this.querySelector("[data-spinbutton-action=\"decrease\"]"), this.$liveRegion = document.createElement("div"), this.$liveRegion.setAttribute("aria-live", "polite"), this.$liveRegion.setAttribute("aria-atomic", "true"), Object.assign(this.$liveRegion.style, s), this.appendChild(this.$liveRegion), this.text = this.parseText(), this.options.step = u(this, "data-spinbutton-step", o.step), this.options.delay = u(this, "data-spinbutton-delay", o.delay);
 		let e = this.$input.getAttribute("aria-valuemin"), t = this.$input.getAttribute("aria-valuemax"), n = u(this.$input, "aria-valuenow", 0);
 		this.value = {
-			min: e === null ? !1 : parseInt(e, 10),
-			max: t === null ? !1 : parseInt(t, 10),
+			min: e !== null && parseInt(e, 10),
+			max: t !== null && parseInt(t, 10),
 			now: n,
 			text: c(n, this.text)
 		}, this.init();
