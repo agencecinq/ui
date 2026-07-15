@@ -11,6 +11,8 @@ var e = {
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
 	SWITCH_ACTIVATE: "switch:activate",
 	SWITCH_DEACTIVATE: "switch:deactivate",
+	ACCORDION_PANEL_OPEN: "accordion-panel:open",
+	ACCORDION_PANEL_CLOSE: "accordion-panel:close",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",

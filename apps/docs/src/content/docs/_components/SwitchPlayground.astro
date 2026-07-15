@@ -24,8 +24,8 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-switch:hover,
   .docs-switch.focus {
-    background-color: #e0f2fe;
-    outline-color: #0369a1;
+    background-color: #f3f4f6;
+    outline-color: #111827;
   }
 
   .docs-switch[aria-disabled='true'] {
@@ -74,8 +74,8 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-switch[aria-checked='true'] .slider {
-    border-color: #2563eb;
-    background-color: #2563eb;
+    border-color: #111827;
+    background-color: #111827;
   }
 
   .docs-switch[aria-checked='true'] .slider::before {
@@ -129,7 +129,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-switch[checked] .label {
     font-weight: 600;
-    color: #1d4ed8;
+    color: #111827;
   }
 
   .docs-switch-fieldset {
@@ -165,9 +165,9 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-switch-minimal[aria-checked='true'],
   .docs-switch-minimal[checked] {
-    border-color: #2563eb;
-    background-color: #eff6ff;
-    color: #1d4ed8;
+    border-color: #111827;
+    background-color: #111827;
+    color: #fff;
     font-weight: 600;
   }
 
@@ -175,8 +175,8 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-switch-minimal[aria-checked='true'].focus,
   .docs-switch-minimal[checked]:hover,
   .docs-switch-minimal[checked].focus {
-    background-color: #dbeafe;
-    outline-color: #2563eb;
+    background-color: #1f2937;
+    outline-color: #111827;
   }
 </style>
 
@@ -199,10 +199,10 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-checked="false"
           tabindex="0"
         >
-          <span class="label">Email notifications</span>
+          <span class="label">Infravision</span>
           <span class="slider" aria-hidden="true"></span>
           <div hidden>
-            <input type="checkbox" name="notifications" tabindex="-1" aria-hidden="true" />
+            <input type="checkbox" name="infravision" tabindex="-1" aria-hidden="true" />
           </div>
         </cinq-switch>
 
@@ -230,7 +230,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-checked="false"
           tabindex="0"
         >
-          <span class="label">Dark mode</span>
+          <span class="label">Underdark vision</span>
           <span class="slider" aria-hidden="true">
             <span class="on" aria-hidden="true">On</span>
             <span class="off" aria-hidden="true">Off</span>
@@ -267,7 +267,7 @@ import RegisterComponents from './RegisterComponents.astro';
               role="switch"
               aria-checked="false"
               tabindex="0"
-              aria-label="Sound effects"
+              aria-label="Battle cries"
             >
               <span class="slider" aria-hidden="true"></span>
             </cinq-switch>
@@ -315,7 +315,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-checked="false"
           tabindex="0"
         >
-          Autoplay videos
+          Auto-map corridors
         </cinq-switch>
       </div>
     </section>
@@ -338,7 +338,7 @@ import RegisterComponents from './RegisterComponents.astro';
           checked
           tabindex="0"
         >
-          <span class="label">Marketing emails</span>
+          <span class="label">Sage's gazette</span>
           <span class="slider" aria-hidden="true"></span>
         </cinq-switch>
       </div>
@@ -361,12 +361,12 @@ import RegisterComponents from './RegisterComponents.astro';
           tabindex="0"
           aria-describedby="docs-switch-push-desc"
         >
-          <span class="label">Push notifications</span>
+          <span class="label">Torch light</span>
           <span class="slider" aria-hidden="true"></span>
         </cinq-switch>
 
         <p id="docs-switch-push-desc" class="text-sm text-gray-600">
-          Also sends an alert on mobile when an order ships.
+          Keeps a dim light source active while the party explores underground.
         </p>
       </div>
     </section>
@@ -383,7 +383,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
 
         <fieldset class="docs-switch-fieldset self-start">
-          <legend>Accessibility preferences</legend>
+          <legend>Campaign preferences</legend>
 
           <cinq-switch
             class="docs-switch"
@@ -391,7 +391,7 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-checked="false"
             tabindex="0"
           >
-            <span class="label">Show captions</span>
+            <span class="label">Identify magic items</span>
             <span class="slider" aria-hidden="true"></span>
           </cinq-switch>
 
@@ -402,7 +402,7 @@ import RegisterComponents from './RegisterComponents.astro';
             checked
             tabindex="0"
           >
-            <span class="label">Reduced motion</span>
+            <span class="label">Show THAC0</span>
             <span class="slider" aria-hidden="true"></span>
           </cinq-switch>
         </fieldset>
@@ -425,7 +425,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-checked="false"
           tabindex="0"
         >
-          <span class="label">Newsletter</span>
+          <span class="label">Henchman reports</span>
           <span class="slider" aria-hidden="true"></span>
           <div hidden>
             <input
@@ -463,7 +463,7 @@ import RegisterComponents from './RegisterComponents.astro';
               aria-disabled="true"
               tabindex="-1"
             >
-              <span class="label">Beta features</span>
+              <span class="label">Experimental kits</span>
               <span class="slider" aria-hidden="true"></span>
               <div hidden>
                 <input type="checkbox" tabindex="-1" aria-hidden="true" disabled />
@@ -482,7 +482,7 @@ import RegisterComponents from './RegisterComponents.astro';
               aria-disabled="true"
               tabindex="-1"
             >
-              <span class="label">Legacy API</span>
+              <span class="label">1st-edition THAC0</span>
               <span class="slider" aria-hidden="true"></span>
             </cinq-switch>
           </div>
@@ -507,7 +507,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-checked="false"
           tabindex="0"
         >
-          <span class="label">Auto-save drafts</span>
+          <span class="label">Auto-save session notes</span>
           <span class="slider" aria-hidden="true"></span>
           <div hidden>
             <input type="checkbox" name="autosave" tabindex="-1" aria-hidden="true" />
@@ -559,7 +559,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-checked="false"
           tabindex="0"
         >
-          <span class="label">Premium analytics</span>
+          <span class="label">Scrying pool access</span>
           <span class="slider" aria-hidden="true"></span>
           <div hidden>
             <input type="checkbox" name="analytics" tabindex="-1" aria-hidden="true" />

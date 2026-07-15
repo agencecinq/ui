@@ -8,6 +8,13 @@ import TabsDestroyCreate from "../_components/TabsDestroyCreate.astro";
 import TabsAddRuntime from "../_components/TabsAddRuntime.astro";
 import TabsAsyncMonsters from "../_components/TabsAsyncMonsters.astro";
 
+Tabs organize content into selectable panels. `<cinq-tabs>` wires keyboard
+navigation between tab triggers, `aria-selected` / `hidden` state, optional URL
+hash sync, and activation events.
+
+Inspired by the
+[WAI-ARIA Authoring Practices tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+
 ## Install
 
 ```bash
@@ -22,42 +29,47 @@ Import once:
 import "@agencecinq/tabs";
 ```
 
-Then write the WAI‑ARIA markup:
+Then write the WAI-ARIA markup explicitly — the component adds interactivity
+only.
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
+> Lighthouse) to catch invalid markup.
 
 ```html
 <cinq-tabs data-tabs-hash="false" data-tabs-delay="0">
-  <div role="tablist" aria-label="Example tabs">
+  <div role="tablist" aria-label="Bestiary tabs">
     <button
-      id="tab-home"
+      id="tab-troll"
       role="tab"
       aria-selected="true"
-      aria-controls="panel-home"
+      aria-controls="panel-troll"
     >
-      Home
+      Troll
     </button>
     <button
-      id="tab-project"
+      id="tab-dracolich"
       role="tab"
       aria-selected="false"
-      aria-controls="panel-project"
+      aria-controls="panel-dracolich"
       tabindex="-1"
     >
-      Project
+      Dracolich
     </button>
   </div>
 
   <section
-    id="panel-home"
+    id="panel-troll"
     role="tabpanel"
-    aria-labelledby="tab-home"
+    aria-labelledby="tab-troll"
     tabindex="0"
   >
     …
   </section>
   <section
-    id="panel-project"
+    id="panel-dracolich"
     role="tabpanel"
-    aria-labelledby="tab-project"
+    aria-labelledby="tab-dracolich"
     tabindex="0"
     hidden
   >
@@ -228,7 +240,7 @@ tabsEl.addEventListener("tab-before-activate", event => {
 
 #### Example
 
-The live demo below wires `tab-before-activate` to the public D&D 5e monsters API and only activates the tab once the monster data has been fetched and rendered:
+The live demo below wires `tab-before-activate` to a public monster reference API and only activates the tab once the creature data has been fetched and rendered:
 
 <TabsAsyncMonsters />
 
@@ -330,7 +342,7 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
   <cinq-tabs class="block flex flex-col gap-4" data-tabs-hash="false" data-tabs-delay="0">
     <div
       role="tablist"
-      aria-label="Tabs example"
+      aria-label="Bestiary tabs"
       class="inline-flex gap-2 rounded-lg bg-white p-1 shadow-sm"
     >
       <button
@@ -338,41 +350,41 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
         class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="true"
-        aria-controls="tabs-home-panel"
-        id="tabs-home"
+        aria-controls="tabs-barracuda-panel"
+        id="tabs-barracuda"
       >
-        Home
+        Barracuda
       </button>
       <button
         type="button"
         class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="false"
-        aria-controls="tabs-project-panel"
-        id="tabs-project"
+        aria-controls="tabs-dracolich-panel"
+        id="tabs-dracolich"
         tabindex="-1"
       >
-        Project
+        Dracolich
       </button>
       <button
         type="button"
         class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="false"
-        aria-controls="tabs-contact-panel"
-        id="tabs-contact"
+        aria-controls="tabs-jermlaine-panel"
+        id="tabs-jermlaine"
         tabindex="-1"
         data-deletable="true"
       >
-        Deletable
+        Jermlaine
       </button>
     </div>
 
     <section
       tabindex="0"
       role="tabpanel"
-      aria-labelledby="tabs-home"
-      id="tabs-home-panel"
+      aria-labelledby="tabs-barracuda"
+      id="tabs-barracuda-panel"
       class="rounded-xl bg-white p-4 shadow"
     >
       <p class="text-gray-700">Barracudas are swift marauders of warm salt waters.</p>
@@ -381,8 +393,8 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
     <section
       tabindex="0"
       role="tabpanel"
-      aria-labelledby="tabs-project"
-      id="tabs-project-panel"
+      aria-labelledby="tabs-dracolich"
+      id="tabs-dracolich-panel"
       class="rounded-xl bg-white p-4 shadow"
       hidden
     >
@@ -392,8 +404,8 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
     <section
       tabindex="0"
       role="tabpanel"
-      aria-labelledby="tabs-contact"
-      id="tabs-contact-panel"
+      aria-labelledby="tabs-jermlaine"
+      id="tabs-jermlaine-panel"
       class="rounded-xl bg-white p-4 shadow"
       hidden
     >

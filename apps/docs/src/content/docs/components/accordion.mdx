@@ -1,0 +1,186 @@
+---
+title: Accordion
+description: Accessible WAI-ARIA accordion Web Component (`<cinq-accordion>`) for expandable sections.
+---
+
+import AccordionPlayground from "../_components/AccordionPlayground.astro";
+
+An accordion shows and hides sections of content. `<cinq-accordion>` wires up
+header buttons, `aria-expanded` / `aria-controls` relationships, optional height
+transitions, keyboard navigation between headers, and open/close events.
+
+Inspired by [`@19h47/accordion`](https://github.com/19h47/19h47-accordion).
+
+## Install
+
+```bash
+pnpm add @agencecinq/accordion
+```
+
+## Usage
+
+Import once:
+
+```js
+import "@agencecinq/accordion";
+```
+
+Then write the WAI-ARIA markup explicitly — the component adds interactivity
+only.
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
+> Lighthouse) to catch invalid markup.
+
+```html
+<cinq-accordion>
+  <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+    <button
+      type="button"
+      data-accordion-header
+      id="scores-header"
+      aria-expanded="true"
+      aria-controls="scores-body"
+    >
+      Ability scores
+    </button>
+
+    <div id="scores-body" role="region" aria-labelledby="scores-header">
+      <div data-accordion-inner>Roll 3d6 for each ability and assign the results.</div>
+    </div>
+  </div>
+
+  <div data-accordion-panel data-accordion-open="false">
+    <button
+      type="button"
+      data-accordion-header
+      id="class-header"
+      aria-expanded="false"
+      aria-controls="class-body"
+    >
+      Class &amp; kit
+    </button>
+
+    <div id="class-body" role="region" aria-labelledby="class-header" hidden>
+      <div data-accordion-inner>Check minimum ability scores, then pick a kit for starting gear.</div>
+    </div>
+  </div>
+</cinq-accordion>
+```
+
+## Required markup
+
+| Selector / attribute | Required | Role |
+| -------------------- | -------- | ---- |
+| `<cinq-accordion>` | **Yes** | Accordion container. |
+| `[data-accordion-panel]` | **Yes** | Panel wrapper for each section. |
+| `[data-accordion-header]` ‖ `button` | **Yes** | Focusable trigger inside each panel. |
+| `aria-expanded` | **Yes** | Current panel state on the trigger. |
+| `aria-controls` | **Yes** | ID of the controlled region. |
+| `role="region"` | **Yes** | On each panel body element. |
+| `aria-labelledby` | **Yes** | On each region, referencing the header `id`. |
+| `hidden` | **Yes** | On collapsed regions in their initial state. |
+| `[data-accordion-inner]` | Recommended | Inner wrapper used for height measurement. |
+
+## Options
+
+| Attribute | Default | Description |
+| --------- | ------- | ----------- |
+| `data-accordion-multiselectable` | `false` | Allow multiple panels open at once. |
+| `data-accordion-hash` | `true` | Open the panel whose region `id` matches the URL hash. |
+
+Per panel:
+
+| Attribute | Default | Description |
+| --------- | ------- | ----------- |
+| `data-accordion-deselect` | `false` | Allow collapsing when already open. |
+| `data-accordion-open` | — | Reflected open state for styling. |
+
+## Nested accordion
+
+You can nest a `<cinq-accordion>` inside a panel body. Each instance only
+controls its own direct panels — inner headers are excluded from the outer
+keyboard group, and arrow keys stay scoped to the focused accordion.
+
+Set `data-accordion-hash="false"` on nested hosts to avoid hash collisions.
+
+```html
+<cinq-accordion data-accordion-hash="false">
+  <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+    <button
+      type="button"
+      data-accordion-header
+      id="character-header"
+      aria-expanded="true"
+      aria-controls="character-body"
+    >
+      Character creation
+    </button>
+
+    <div id="character-body" role="region" aria-labelledby="character-header">
+      <div data-accordion-inner>
+        <p>Roll ability scores, pick a class, then flesh out your adventurer.</p>
+
+        <cinq-accordion data-accordion-hash="false">
+          <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+            <button
+              type="button"
+              data-accordion-header
+              id="scores-header"
+              aria-expanded="true"
+              aria-controls="scores-body"
+            >
+              Ability scores
+            </button>
+
+            <div id="scores-body" role="region" aria-labelledby="scores-header">
+              <div data-accordion-inner>Roll 3d6 for each ability…</div>
+            </div>
+          </div>
+        </cinq-accordion>
+      </div>
+    </div>
+  </div>
+</cinq-accordion>
+```
+
+## Keyboard support
+
+| Key | Function |
+| --- | -------- |
+| `Tab` / `Shift + Tab` | Move focus through focusable elements. |
+| `Space` / `Enter` | Toggle the focused header (native button). |
+| `Arrow Up` / `Arrow Down` | Move focus between headers. |
+| `Arrow Left` / `Arrow Right` | Move focus between headers. |
+| `Home` / `End` | Focus first / last header. |
+
+## API
+
+| Method | Description |
+| ------ | ----------- |
+| `closeAll()` | Closes every panel without emitting events. |
+| `destroy()` | Detaches listeners. |
+
+| Property | Description |
+| -------- | ----------- |
+| `panels` | Internal panel controller instances. |
+| `options` | Resolved `multiselectable` and `hash` options. |
+
+## Events
+
+| Event | Cancelable | Detail | Description |
+| ----- | ---------- | ------ | ----------- |
+| `accordion-panel:open` | Yes | `{ el, index }` | Fired before a panel opens. |
+| `accordion-panel:close` | Yes | `{ el, index }` | Fired before a panel closes. |
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+$accordion.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, (event) => {
+  console.log(event.detail.index);
+});
+```
+
+## Examples
+
+<AccordionPlayground />

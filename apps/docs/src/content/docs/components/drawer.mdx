@@ -3,9 +3,12 @@ title: Drawer
 description: Slide-in drawer Web Component (`<cinq-drawer>`).
 ---
 
-import RegisterComponents from "../_components/RegisterComponents.astro";
 import PortalToBody from "../_components/PortalToBody.astro";
 import DrawerPlayground from "../_components/DrawerPlayground.astro";
+
+A drawer slides a panel in from the edge of the viewport. `<cinq-drawer>` wraps
+your overlay and panel markup, handles focus trap, scroll lock, and open/close
+events. `<cinq-drawer-button>` connects triggers through `aria-controls`.
 
 ## Install
 
@@ -15,9 +18,18 @@ pnpm add @agencecinq/drawer
 
 ## Usage
 
+Import once:
+
 ```js
-import '@agencecinq/drawer';
+import "@agencecinq/drawer";
 ```
+
+Then write the markup — overlay, panel (`role="dialog"`), and buttons with
+matching `aria-controls`. The component adds interactivity only.
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
+> Lighthouse) to catch invalid markup.
 
 ```html
 <cinq-drawer-button class="block">
@@ -89,12 +101,12 @@ This copies the package snippet to your theme:
 
 ```liquid
 {% render 'cinq-drawer.html',
-  id: 'cart-drawer',
+  id: 'bestiary-drawer',
   content: '<div class="p-8"><p class="mb-2">The galeb duhr looks like a boulder until it moves.</p><p class="mb-0">Trolls and jermlaines skulk deeper in the dungeon corridors.</p></div>'
 %}
 
 <cinq-drawer-button class="block">
-  <button aria-controls="cart-drawer" aria-expanded="false">Open cart</button>
+  <button aria-controls="bestiary-drawer" aria-expanded="false">Open bestiary</button>
 </cinq-drawer-button>
 ```
 
@@ -147,6 +159,4 @@ This copies the package snippet to your theme:
 ## Playground (live)
 
 <DrawerPlayground />
-
-<RegisterComponents />
 

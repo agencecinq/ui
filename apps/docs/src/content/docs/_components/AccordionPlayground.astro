@@ -1,0 +1,464 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-accordion [role='region'] {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .docs-accordion > [data-accordion-panel]:first-child > [data-accordion-header] {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+  }
+
+  .docs-accordion > [data-accordion-panel]:last-child > [data-accordion-header][aria-expanded='false'] {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  .docs-accordion > [data-accordion-panel]:last-child [data-accordion-inner] {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  .docs-accordion-chevron {
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    flex-shrink: 0;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    margin-top: -0.125rem;
+    transition: transform 0.2s ease;
+  }
+
+  .docs-accordion [data-accordion-header][aria-expanded='true'] .docs-accordion-chevron {
+    transform: rotate(-135deg);
+    margin-top: 0.125rem;
+  }
+
+  .docs-accordion [data-accordion-header].focus {
+    outline: 2px solid #111827;
+    outline-offset: -2px;
+  }
+</style>
+
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Basic accordion</h3>
+          <p class="text-sm text-gray-600">
+            One panel open at a time. Use arrow keys to move between headers,
+            <kbd>Space</kbd> / <kbd>Enter</kbd> to toggle.
+          </p>
+        </div>
+
+        <cinq-accordion
+          id="docs-accordion-basic"
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+        >
+          <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-basic-1-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="true"
+              aria-controls="docs-accordion-basic-1-body"
+            >
+              Ability scores
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-basic-1-body"
+              role="region"
+              aria-labelledby="docs-accordion-basic-1-header"
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+              >
+                <p class="m-0">
+                  Roll 3d6 for each ability — Strength, Dexterity, Constitution,
+                  Intelligence, Wisdom, and Charisma — then assign the totals.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div data-accordion-panel data-accordion-open="false">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-basic-2-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="false"
+              aria-controls="docs-accordion-basic-2-body"
+            >
+              Class &amp; race
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-basic-2-body"
+              role="region"
+              aria-labelledby="docs-accordion-basic-2-header"
+              hidden
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+              >
+                <p class="m-0">
+                  Check minimum ability scores for your chosen class. Elves, dwarves,
+                  and halflings adjust scores per the Player's Handbook.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div data-accordion-panel data-accordion-open="false">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-basic-3-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="false"
+              aria-controls="docs-accordion-basic-3-body"
+            >
+              Starting equipment
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-basic-3-body"
+              role="region"
+              aria-labelledby="docs-accordion-basic-3-header"
+              hidden
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+              >
+                <p class="m-0">
+                  Starting gold and gear come from your class and kit tables — weapons,
+                  armour, packs, and a handful of gold pieces.
+                </p>
+              </div>
+            </div>
+          </div>
+        </cinq-accordion>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last event: <span id="docs-accordion-status" class="font-mono font-medium text-gray-900">—</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Multiselectable</h3>
+          <p class="text-sm text-gray-600">
+            Set <code>data-accordion-multiselectable="true"</code> on the host to
+            keep multiple panels open.
+          </p>
+        </div>
+
+        <cinq-accordion
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+          data-accordion-multiselectable="true"
+        >
+          <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-multi-1-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="true"
+              aria-controls="docs-accordion-multi-1-body"
+            >
+              Weapon proficiencies
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-multi-1-body"
+              role="region"
+              aria-labelledby="docs-accordion-multi-1-header"
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+              >
+                <p class="m-0">Extra weapon slots beyond your class list — long sword, bow, or staff.</p>
+              </div>
+            </div>
+          </div>
+
+          <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-multi-2-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="true"
+              aria-controls="docs-accordion-multi-2-body"
+            >
+              Non-weapon proficiencies
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-multi-2-body"
+              role="region"
+              aria-labelledby="docs-accordion-multi-2-header"
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+              >
+                <p class="m-0">Languages, riding, and other NWP slots from your class and Intelligence score.</p>
+              </div>
+            </div>
+          </div>
+        </cinq-accordion>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Nested accordion</h3>
+          <p class="text-sm text-gray-600">
+            Place a second <code>&lt;cinq-accordion&gt;</code> inside a panel body.
+            Each instance only binds its own panels — keyboard navigation stays scoped
+            to the focused accordion. Disable hash sync on nested hosts with
+            <code>data-accordion-hash="false"</code>.
+          </p>
+        </div>
+
+        <cinq-accordion
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+          data-accordion-hash="false"
+        >
+          <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-nested-1-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="true"
+              aria-controls="docs-accordion-nested-1-body"
+            >
+              Character creation
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-nested-1-body"
+              role="region"
+              aria-labelledby="docs-accordion-nested-1-header"
+            >
+              <div
+                data-accordion-inner
+                class="flex flex-col gap-4 border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+              >
+                <p class="m-0">
+                  Roll ability scores, pick a class, then flesh out your adventurer.
+                </p>
+
+                <cinq-accordion
+                  class="docs-accordion overflow-hidden rounded-xl border border-gray-300 bg-white divide-y divide-gray-200"
+                  data-accordion-hash="false"
+                >
+                  <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+                    <button
+                      type="button"
+                      data-accordion-header
+                      id="docs-accordion-nested-1-1-header"
+                      class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+                      aria-expanded="true"
+                      aria-controls="docs-accordion-nested-1-1-body"
+                    >
+                      Ability scores
+                      <span class="docs-accordion-chevron" aria-hidden="true"></span>
+                    </button>
+                    <div
+                      id="docs-accordion-nested-1-1-body"
+                      role="region"
+                      aria-labelledby="docs-accordion-nested-1-1-header"
+                    >
+                      <div
+                        data-accordion-inner
+                        class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                      >
+                        <p class="m-0">
+                          Roll 3d6 for each ability, assign to Strength, Dexterity,
+                          Constitution, Intelligence, Wisdom, and Charisma.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div data-accordion-panel data-accordion-open="false">
+                    <button
+                      type="button"
+                      data-accordion-header
+                      id="docs-accordion-nested-1-2-header"
+                      class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+                      aria-expanded="false"
+                      aria-controls="docs-accordion-nested-1-2-body"
+                    >
+                      Class &amp; kit
+                      <span class="docs-accordion-chevron" aria-hidden="true"></span>
+                    </button>
+                    <div
+                      id="docs-accordion-nested-1-2-body"
+                      role="region"
+                      aria-labelledby="docs-accordion-nested-1-2-header"
+                      hidden
+                    >
+                      <div
+                        data-accordion-inner
+                        class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                      >
+                        <p class="m-0">
+                          Check minimum ability scores for your class, then choose a
+                          kit for extra proficiencies and starting equipment.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </cinq-accordion>
+              </div>
+            </div>
+          </div>
+
+          <div data-accordion-panel data-accordion-open="false">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-nested-2-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="false"
+              aria-controls="docs-accordion-nested-2-body"
+            >
+              Equipment
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-nested-2-body"
+              role="region"
+              aria-labelledby="docs-accordion-nested-2-header"
+              hidden
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+              >
+                <p class="m-0">
+                  Starting gear comes from your class and background tables — weapons,
+                  armour, packs, and a handful of gold pieces.
+                </p>
+              </div>
+            </div>
+          </div>
+        </cinq-accordion>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Deselect disabled</h3>
+          <p class="text-sm text-gray-600">
+            Without <code>data-accordion-deselect="true"</code>, clicking an open
+            header does not collapse it — typical accordion behaviour.
+          </p>
+        </div>
+
+        <cinq-accordion
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+        >
+          <div data-accordion-panel data-accordion-open="true">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-lock-1-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="true"
+              aria-controls="docs-accordion-lock-1-body"
+            >
+              Primary class
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-lock-1-body"
+              role="region"
+              aria-labelledby="docs-accordion-lock-1-header"
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+              >
+                <p class="m-0">
+                  Try clicking this header again — it stays open until you select
+                  another class.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div data-accordion-panel data-accordion-open="false">
+            <button
+              type="button"
+              data-accordion-header
+              id="docs-accordion-lock-2-header"
+              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              aria-expanded="false"
+              aria-controls="docs-accordion-lock-2-body"
+            >
+              Dual-class option
+              <span class="docs-accordion-chevron" aria-hidden="true"></span>
+            </button>
+            <div
+              id="docs-accordion-lock-2-body"
+              role="region"
+              aria-labelledby="docs-accordion-lock-2-header"
+              hidden
+            >
+              <div
+                data-accordion-inner
+                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+              >
+                <p class="m-0">Opens when selected and closes the first panel — typical dual-class flow.</p>
+              </div>
+            </div>
+          </div>
+        </cinq-accordion>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { EVENTS } from '@agencecinq/utils';
+
+  const basic = document.getElementById('docs-accordion-basic');
+  const status = document.getElementById('docs-accordion-status');
+
+  if (basic && status) {
+    basic.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, (event) => {
+      const { index } = (event as CustomEvent<{ index: number }>).detail;
+      status.textContent = `${EVENTS.ACCORDION_PANEL_OPEN} (panel ${index})`;
+    });
+
+    basic.addEventListener(EVENTS.ACCORDION_PANEL_CLOSE, (event) => {
+      const { index } = (event as CustomEvent<{ index: number }>).detail;
+      status.textContent = `${EVENTS.ACCORDION_PANEL_CLOSE} (panel ${index})`;
+    });
+  }
+</script>

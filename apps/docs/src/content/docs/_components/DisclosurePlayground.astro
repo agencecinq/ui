@@ -34,9 +34,9 @@ import RegisterComponents from './RegisterComponents.astro';
           hidden
         >
           <p class="m-0">
-            Fireball deals <strong>8d6</strong> fire damage in a 20-foot-radius sphere. Creatures in
-            the area make a Dexterity saving throw, taking full damage on a failed save or half on a
-            success.
+            Fireball deals <strong>1d6 per caster level</strong> (maximum 10d6) in a
+            20-foot-radius sphere. Creatures in the area may save vs. spell for half
+            damage if they have Dexterity 15+ and room to dive for cover.
           </p>
         </div>
 
@@ -64,7 +64,7 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-expanded="false"
             aria-controls="docs-disclosure-label-region"
           >
-            Show details
+            Show stat block
           </button>
         </cinq-disclosure-button>
 
@@ -73,11 +73,14 @@ import RegisterComponents from './RegisterComponents.astro';
           class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
           hidden
         >
-          <p class="m-0">Extra product details, sizing chart, or shipping information.</p>
+          <p class="m-0">
+            HD 6+6, THAC0 13, #AT 3, Dmg 1d4/1d4/1d8+6. Special: regeneration 3 hp/round
+            unless burned or acid-treated. Treasure type: Q (×3), S.
+          </p>
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Current label: <span id="docs-disclosure-label-status" class="font-mono font-medium text-gray-900">Show details</span>
+          Current label: <span id="docs-disclosure-label-status" class="font-mono font-medium text-gray-900">Show stat block</span>
         </p>
       </div>
     </section>
@@ -94,15 +97,14 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <article class="max-w-prose text-sm leading-relaxed text-gray-700">
           <p class="m-0">
-            Nestled between the pines, La Cabane overlooks the lake — a timber lodge built for slow
-            mornings and long dinners.
+            The ruined keep broods over the moors — a crumbling fortress built for siege
+            and betrayal.
           </p>
 
           <div id="docs-disclosure-readmore-region" hidden>
             <p class="mb-0 mt-3">
-              The main room opens onto a covered terrace with a wood-fired oven. Upstairs, four
-              bedrooms share a single bathroom with a clawfoot tub. In winter, the sauna by the shore
-              is heated every evening.
+              The great hall opens onto a collapsed battlement. Below, three cellars share
+              a flooded oubliette once used to hold political prisoners.
             </p>
           </div>
 
@@ -114,7 +116,7 @@ import RegisterComponents from './RegisterComponents.astro';
               aria-expanded="false"
               aria-controls="docs-disclosure-readmore-region"
             >
-              Read more
+              Read full entry
             </button>
           </cinq-disclosure-button>
         </article>
@@ -352,7 +354,7 @@ import RegisterComponents from './RegisterComponents.astro';
   const labelStatus = document.getElementById('docs-disclosure-label-status');
 
   if (labelTrigger && labelStatus) {
-    const labels = { closed: 'Show details', open: 'Hide details' };
+    const labels = { closed: 'Show stat block', open: 'Hide stat block' };
 
     labelTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
       labelTrigger.textContent = labels.open;
@@ -368,7 +370,7 @@ import RegisterComponents from './RegisterComponents.astro';
   const readMoreTrigger = document.getElementById('docs-disclosure-readmore-trigger');
 
   if (readMoreTrigger) {
-    const labels = { closed: 'Read more', open: 'Read less' };
+    const labels = { closed: 'Read full entry', open: 'Hide entry' };
 
     readMoreTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
       readMoreTrigger.textContent = labels.open;

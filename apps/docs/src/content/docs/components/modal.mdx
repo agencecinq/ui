@@ -3,8 +3,11 @@ title: Modal
 description: Native `<dialog>` modal Web Component (`<cinq-modal>`).
 ---
 
-import RegisterComponents from "../_components/RegisterComponents.astro";
 import ModalPlayground from "../_components/ModalPlayground.astro";
+
+A modal presents content in a layer above the page. `<cinq-modal>` wraps a native
+`<dialog>` element, wires `showModal()` / `close()`, focus management, and
+open/close events. `<cinq-modal-button>` connects triggers through `aria-controls`.
 
 ## Install
 
@@ -14,9 +17,18 @@ pnpm add @agencecinq/modal
 
 ## Usage
 
+Import once:
+
 ```js
 import "@agencecinq/modal";
 ```
+
+Then write the markup — a native `<dialog>` inside `<cinq-modal>`, and buttons
+with matching `aria-controls`. The component adds interactivity only.
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
+> Lighthouse) to catch invalid markup.
 
 ```html
 <cinq-modal-button class="block">
@@ -145,5 +157,3 @@ Copy‑paste starter markup:
 ## Playground (live)
 
 <ModalPlayground />
-
-<RegisterComponents />

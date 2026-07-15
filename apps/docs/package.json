@@ -1,7 +1,7 @@
 {
   "name": "@agencecinq/docs",
   "type": "module",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "private": true,
   "description": "CINQ UI components documentation site (Starlight).",
   "scripts": {
@@ -17,6 +17,7 @@
     "@agencecinq/modal": "workspace:*",
     "@agencecinq/spinbutton": "workspace:*",
     "@agencecinq/switch": "workspace:*",
+    "@agencecinq/accordion": "workspace:*",
     "@agencecinq/tabs": "workspace:*",
     "@agencecinq/utils": "workspace:*",
     "@astrojs/sitemap": "^3.7.3",

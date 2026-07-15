@@ -3,7 +3,6 @@ title: Spinbutton
 description: Accessible WAI-ARIA spinbutton Web Component (`<cinq-spinbutton>`) for constrained numeric input.
 ---
 
-import RegisterComponents from "../_components/RegisterComponents.astro";
 import SpinbuttonPlayground from "../_components/SpinbuttonPlayground.astro";
 
 A spinbutton restricts its value to a range of discrete numeric values. It
@@ -44,7 +43,7 @@ to it on every value change. The host `<cinq-spinbutton>` carries no ARIA state.
 
   <input
     type="number"
-    aria-label="Quantity"
+    aria-label="Spell level"
     aria-valuemin="0"
     aria-valuemax="10"
     aria-valuenow="1"
@@ -100,7 +99,7 @@ Configured via data attributes on the host:
 | ----------------------- | -------- | ------- | ------------------------------------------------------------------------ |
 | `data-spinbutton-step`  | `number` | `1`     | Increment used by buttons and arrow keys.                                |
 | `data-spinbutton-delay` | `number` | `20`    | Throttle (ms) before the `spinbutton-change` event is dispatched.        |
-| `data-spinbutton-text`  | `JSON`   | -       | `{"single":"item","plural":"items"}` — appended to `aria-valuetext`.     |
+| `data-spinbutton-text`  | `JSON`   | -       | `{"single":"slot","plural":"slots"}` — appended to `aria-valuetext`.     |
 
 ## Keyboard support
 
@@ -149,5 +148,3 @@ $spinbutton?.addEventListener("spinbutton-change", (event) => {
 ## Examples
 
 <SpinbuttonPlayground />
-
-<RegisterComponents />

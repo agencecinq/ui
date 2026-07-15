@@ -3,7 +3,6 @@ title: Switch
 description: Accessible WAI-ARIA switch Web Component (`<cinq-switch>`) for binary on/off settings.
 ---
 
-import RegisterComponents from "../_components/RegisterComponents.astro";
 import SwitchPlayground from "../_components/SwitchPlayground.astro";
 
 A switch is an on/off control that represents a binary setting. `<cinq-switch>`
@@ -37,12 +36,12 @@ element — set `role="switch"`, `aria-checked`, and `tabindex` explicitly.
 
 ```html
 <cinq-switch role="switch" aria-checked="false" tabindex="0">
-  <span class="label">Notifications</span>
+  <span class="label">Infravision</span>
   <span class="switch" aria-hidden="true"><span></span></span>
   <span class="on" aria-hidden="true">On</span>
   <span class="off" aria-hidden="true">Off</span>
   <div hidden>
-    <input type="checkbox" name="notifications" tabindex="-1" aria-hidden="true" />
+    <input type="checkbox" name="infravision" tabindex="-1" aria-hidden="true" />
   </div>
 </cinq-switch>
 ```
@@ -51,7 +50,7 @@ When disabled, use `disabled` or `aria-disabled="true"` and `tabindex="-1"`:
 
 ```html
 <cinq-switch role="switch" aria-checked="false" disabled aria-disabled="true" tabindex="-1">
-  <span class="label">Disabled switch</span>
+  <span class="label">Cursed item</span>
   <span class="switch" aria-hidden="true"><span></span></span>
   <div hidden>
     <input type="checkbox" tabindex="-1" aria-hidden="true" disabled />
@@ -107,7 +106,7 @@ The playground below covers every supported markup pattern:
   role="switch"
   aria-checked="false"
   tabindex="0"
-  aria-label="Sound effects"
+  aria-label="Battle cries"
 >
   <span class="slider" aria-hidden="true"></span>
 </cinq-switch>
@@ -116,7 +115,7 @@ The playground below covers every supported markup pattern:
 ### `aria-labelledby`
 
 ```html
-<span id="prefs-reduced-motion">Reduced motion</span>
+<span id="prefs-reduced-motion">Show THAC0</span>
 
 <cinq-switch
   role="switch"
@@ -137,11 +136,11 @@ The playground below covers every supported markup pattern:
   tabindex="0"
   aria-describedby="push-desc"
 >
-  <span class="label">Push notifications</span>
+  <span class="label">Torch light</span>
   <span class="slider" aria-hidden="true"></span>
 </cinq-switch>
 
-<p id="push-desc">Also sends an alert on mobile when an order ships.</p>
+<p id="push-desc">Keeps a dim light source active while the party explores underground.</p>
 ```
 
 ### Minimal (no form)
@@ -153,7 +152,7 @@ The playground below covers every supported markup pattern:
   aria-checked="false"
   tabindex="0"
 >
-  Autoplay videos
+  Auto-map corridors
 </cinq-switch>
 ```
 
@@ -167,9 +166,9 @@ The playground below covers every supported markup pattern:
 
 .autoplay-switch[aria-checked="true"],
 .autoplay-switch[checked] {
-  border-color: #2563eb;
-  background-color: #eff6ff;
-  color: #1d4ed8;
+  border-color: #111827;
+  background-color: #111827;
+  color: #fff;
   font-weight: 600;
 }
 ```
@@ -178,7 +177,7 @@ The playground below covers every supported markup pattern:
 
 ```html
 <cinq-switch role="switch" aria-checked="true" checked tabindex="0">
-  <span class="label">Marketing emails</span>
+  <span class="label">Sage's gazette</span>
   <span class="slider" aria-hidden="true"></span>
 </cinq-switch>
 ```
@@ -190,15 +189,15 @@ first toggle. The component reflects `checked` automatically after state changes
 
 ```html
 <fieldset>
-  <legend>Accessibility preferences</legend>
+  <legend>Campaign preferences</legend>
 
   <cinq-switch role="switch" aria-checked="false" tabindex="0">
-    <span class="label">Show captions</span>
+    <span class="label">Identify magic items</span>
     <span class="slider" aria-hidden="true"></span>
   </cinq-switch>
 
   <cinq-switch role="switch" aria-checked="true" checked tabindex="0">
-    <span class="label">Reduced motion</span>
+    <span class="label">Show THAC0</span>
     <span class="slider" aria-hidden="true"></span>
   </cinq-switch>
 </fieldset>
@@ -208,7 +207,7 @@ first toggle. The component reflects `checked` automatically after state changes
 
 ```html
 <cinq-switch role="switch" aria-checked="false" tabindex="0">
-  <span class="label">Newsletter</span>
+  <span class="label">Henchman reports</span>
   <span class="slider" aria-hidden="true"></span>
   <div hidden>
     <input
@@ -324,5 +323,3 @@ Pass `false` to update state without dispatching an event.
 ## Examples
 
 <SwitchPlayground />
-
-<RegisterComponents />

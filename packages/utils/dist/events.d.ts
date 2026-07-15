@@ -10,6 +10,8 @@ export declare const EVENTS: {
     DISCLOSURE_BUTTON_CLOSE: string;
     SWITCH_ACTIVATE: string;
     SWITCH_DEACTIVATE: string;
+    ACCORDION_PANEL_OPEN: string;
+    ACCORDION_PANEL_CLOSE: string;
     TAB_BEFORE_ACTIVATE: string;
     TAB_ACTIVATE: string;
     TAB_DELETE: string;

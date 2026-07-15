@@ -10,9 +10,10 @@ wraps a trigger, wires up `aria-expanded` / `aria-controls`, toggles the visibil
 of controlled regions, and dispatches open/close events.
 
 Inspired by the
-[WAI-ARIA Authoring Practices disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/).
+[WAI-ARIA Authoring Practices disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/)
+and [`@19h47/disclosure-button`](https://github.com/19h47/19h47-disclosure-button).
 
-## Installation
+## Install
 
 ```bash
 pnpm add @agencecinq/disclosure-button
@@ -20,9 +21,18 @@ pnpm add @agencecinq/disclosure-button
 
 ## Usage
 
+Import once:
+
 ```js
-import '@agencecinq/disclosure-button';
+import "@agencecinq/disclosure-button";
 ```
+
+Then write the WAI-ARIA markup explicitly — the component adds interactivity
+only.
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
+> Lighthouse) to catch invalid markup.
 
 ```html
 <cinq-disclosure-button>
@@ -31,12 +41,12 @@ import '@agencecinq/disclosure-button';
     aria-expanded="false"
     aria-controls="details-1"
   >
-    Show more
+    Show spell details
   </button>
 </cinq-disclosure-button>
 
 <div id="details-1" hidden>
-  Disclosure content
+  Range: 150 yards. Area of effect: 20-foot radius.
 </div>
 ```
 
@@ -195,7 +205,7 @@ open/close events and update the label yourself:
 ```js
 import { EVENTS } from "@agencecinq/utils";
 
-const labels = { closed: "Show details", open: "Hide details" };
+const labels = { closed: "Show stat block", open: "Hide stat block" };
 
 $button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
   $button.textContent = labels.open;
@@ -214,14 +224,14 @@ trigger is often styled as inline text rather than a prominent button:
 ```html
 <article>
   <p>
-    Nestled between the pines, La Cabane overlooks the lake — a timber lodge built
-    for slow mornings and long dinners.
+    The ruined keep broods over the moors — a crumbling fortress built for siege
+    and betrayal.
   </p>
 
   <div id="listing-details" hidden>
     <p>
-      The main room opens onto a covered terrace with a wood-fired oven. Upstairs,
-      four bedrooms share a single bathroom with a clawfoot tub.
+      The great hall opens onto a collapsed battlement. Below, three cellars share
+      a flooded oubliette once used to hold political prisoners.
     </p>
   </div>
 
@@ -232,7 +242,7 @@ trigger is often styled as inline text rather than a prominent button:
       aria-expanded="false"
       aria-controls="listing-details"
     >
-      Read more
+      Read full entry
     </button>
   </cinq-disclosure-button>
 </article>
@@ -241,7 +251,7 @@ trigger is often styled as inline text rather than a prominent button:
 ```js
 import { EVENTS } from "@agencecinq/utils";
 
-const labels = { closed: "Read more", open: "Read less" };
+const labels = { closed: "Read full entry", open: "Hide entry" };
 
 $button.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
   $button.textContent = labels.open;

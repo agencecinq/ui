@@ -1,6 +1,24 @@
 ---
 ---
 
+<style is:global>
+  /* Custom elements default to inline — block is required for width, margins, etc.
+     Placed in @layer components so Tailwind utilities (e.g. inline-flex on spinbuttons) still win. */
+  @layer components {
+    cinq-accordion,
+    cinq-disclosure-button,
+    cinq-switch,
+    cinq-spinbutton,
+    cinq-modal,
+    cinq-modal-button,
+    cinq-drawer,
+    cinq-drawer-button,
+    cinq-tabs {
+      display: block;
+    }
+  }
+</style>
+
 <script>
   import '@agencecinq/tabs';
   import '@agencecinq/modal';
@@ -8,5 +26,6 @@
   import '@agencecinq/spinbutton';
   import '@agencecinq/disclosure-button';
   import '@agencecinq/switch';
+  import '@agencecinq/accordion';
 </script>
 

@@ -1,9 +1,11 @@
 ---
+import RegisterComponents from './RegisterComponents.astro';
 ---
+
+<RegisterComponents />
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
-    <!-- Demo 1 — singular / plural text -->
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
@@ -17,12 +19,11 @@
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-6">
-          <cinq-spinbutton
-            id="spell-spinbutton"
-            data-spinbutton-text='{"single":"level","plural":"levels"}'
-            class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
-          >
+        <cinq-spinbutton
+          id="spell-spinbutton"
+          data-spinbutton-text='{"single":"level","plural":"levels"}'
+          class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+        >
             <button
               type="button"
               data-spinbutton-action="decrease"
@@ -50,20 +51,19 @@
               aria-label="One spell level more"
               class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              +
-            </button>
-          </cinq-spinbutton>
+            +
+          </button>
+        </cinq-spinbutton>
 
-          <p class="text-sm text-gray-600">
-            <span data-spinbutton-status="spell" class="font-mono font-medium text-gray-900">
-              1 level
-            </span>
-          </p>
-        </div>
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Live region:
+          <span data-spinbutton-status="spell" class="font-mono font-medium text-gray-900">
+            1 level
+          </span>
+        </p>
       </div>
     </section>
 
-    <!-- Demo 2 — unbounded variants -->
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
@@ -76,7 +76,6 @@
         </div>
 
         <div class="grid gap-4 sm:grid-cols-3">
-          <!-- No bounds -->
           <div class="flex flex-col gap-2">
             <span id="bounds-none-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
               No bounds
@@ -112,7 +111,6 @@
             </cinq-spinbutton>
           </div>
 
-          <!-- Min only -->
           <div class="flex flex-col gap-2">
             <span id="bounds-min-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
               Min only (≥ 0)
@@ -149,7 +147,6 @@
             </cinq-spinbutton>
           </div>
 
-          <!-- Max only -->
           <div class="flex flex-col gap-2">
             <span id="bounds-max-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
               Max only (≤ 10)
@@ -189,7 +186,6 @@
       </div>
     </section>
 
-    <!-- Demo 3 — live controls (programmatic API) -->
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
@@ -218,7 +214,7 @@
             <input
               type="number"
               value="20"
-              aria-label="Stamina"
+              aria-label="Hit points"
               aria-valuemin="0"
               aria-valuemax="100"
               aria-valuenow="20"
@@ -266,7 +262,7 @@
           </div>
         </div>
 
-        <p class="text-sm text-gray-600">
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           <code>spinbutton-change</code>:
           <span data-spinbutton-status="controls" class="font-mono font-medium text-gray-900">
             20
@@ -275,15 +271,14 @@
       </div>
     </section>
 
-    <!-- Demo 4 — D&D character sheet -->
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Character sheet</h3>
           <p class="text-sm text-gray-600">
-            Six D&D ability scores, each bound between 3 and 18. <strong>Roll 3d6</strong> calls
+            Six AD&amp;D ability scores, each bound between 3 and 18. <strong>Roll 3d6</strong> calls
             <code>setValue()</code>; picking a <strong>class</strong> raises the minimum on the
-            relevant abilities through <code>setMin()</code> (AD&D-style requirements). Out-of-range
+            relevant abilities through <code>setMin()</code> (2nd-edition requirements). Out-of-range
             scores are clamped automatically.
           </p>
         </div>
@@ -296,21 +291,15 @@
               class="rounded-md border border-gray-200 bg-white px-2 py-1 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="">— Free build (no requirements) —</option>
-              <option value="barbarian">Barbarian</option>
               <option value="bard">Bard</option>
               <option value="cleric">Cleric</option>
               <option value="druid">Druid</option>
               <option value="fighter">Fighter</option>
               <option value="illusionist">Illusionist</option>
               <option value="mage">Mage</option>
-              <option value="monk">Monk</option>
               <option value="paladin">Paladin</option>
               <option value="ranger">Ranger</option>
-              <option value="rogue">Rogue</option>
-              <option value="sorcerer">Sorcerer</option>
               <option value="thief">Thief</option>
-              <option value="warlock">Warlock</option>
-              <option value="wizard">Wizard</option>
             </select>
           </label>
 
@@ -405,7 +394,6 @@
   wireStatus('spell-spinbutton', 'spell', (v) => `${v} ${v <= 1 ? 'level' : 'levels'}`);
   wireStatus('controls-spinbutton', 'controls');
 
-  // ── Demo 3 — live controls ────────────────────────────────────────────────
   {
     const sb = document.getElementById('controls-spinbutton') as SpinbuttonElement | null;
     if (sb) {
@@ -423,7 +411,6 @@
     }
   }
 
-  // ── Demo 4 — D&D character sheet (3d6 roller + class requirements) ────────
   {
     const root = document.querySelector('[data-character-sheet]');
     if (root) {
