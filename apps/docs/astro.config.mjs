@@ -27,6 +27,7 @@ export default defineConfig({
             { label: 'Disclosure Button', slug: 'components/disclosure-button' },
             { label: 'Switch', slug: 'components/switch' },
             { label: 'Accordion', slug: 'components/accordion' },
+            { label: 'Combobox', slug: 'components/combobox' },
           ],
         },
       ],

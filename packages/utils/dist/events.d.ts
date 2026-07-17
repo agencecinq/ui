@@ -12,6 +12,11 @@ export declare const EVENTS: {
     SWITCH_DEACTIVATE: string;
     ACCORDION_PANEL_OPEN: string;
     ACCORDION_PANEL_CLOSE: string;
+    COMBOBOX_LOADING: string;
+    COMBOBOX_LOADED: string;
+    COMBOBOX_UPDATE: string;
+    COMBOBOX_SUBMIT: string;
+    COMBOBOX_EMPTY: string;
     TAB_BEFORE_ACTIVATE: string;
     TAB_ACTIVATE: string;
     TAB_DELETE: string;

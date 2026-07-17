@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 5.0.5
+
+### Patch Changes
+
+- Add `@agencecinq/combobox` with `<cinq-combobox>` Web Component for editable list autocomplete (managed and external modes, async search with AbortSignal, host events). Export `COMBOBOX_LOADING`, `COMBOBOX_LOADED`, `COMBOBOX_UPDATE`, `COMBOBOX_SUBMIT`, and `COMBOBOX_EMPTY` from `@agencecinq/utils`. Add combobox docs page and live playground.
+
 ## 5.0.4
 
 ### Patch Changes

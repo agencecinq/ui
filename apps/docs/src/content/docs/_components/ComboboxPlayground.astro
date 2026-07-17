@@ -1,0 +1,574 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-combobox {
+    position: relative;
+    display: flex;
+    max-width: 28rem;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #fff;
+  }
+
+  .docs-combobox:focus-within {
+    outline: 2px solid #111827;
+    outline-offset: 2px;
+  }
+
+  .docs-combobox input[role='combobox'] {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #111827;
+  }
+
+  .docs-combobox input[role='combobox']:focus {
+    outline: none;
+  }
+
+  .docs-combobox button[aria-controls] {
+    flex-shrink: 0;
+    border: 0;
+    border-left: 1px solid #e5e7eb;
+    background: #f9fafb;
+    padding: 0 0.75rem;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .docs-combobox button[aria-controls]:hover {
+    background: #f3f4f6;
+  }
+
+  .docs-combobox [role='listbox'] {
+    position: absolute;
+    z-index: 10;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.25rem;
+    list-style: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    max-height: 16rem;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .docs-combobox [role='listbox'][hidden] {
+    display: none;
+  }
+
+  .docs-combobox [role='option'] {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: #111827;
+    cursor: pointer;
+  }
+
+  .docs-combobox [role='option'][aria-selected='true'] {
+    background: #f3f4f6;
+  }
+
+  .docs-combobox[busy] input[role='combobox'],
+  .docs-combobox[busy] [role='listbox'] {
+    opacity: 0.75;
+  }
+
+  .docs-combobox-group-label {
+    margin: 0;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+    background: #f9fafb;
+  }
+
+  .docs-combobox-option-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .docs-combobox-event-log {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    max-height: 10rem;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .docs-combobox-event-log:empty::before {
+    content: 'No events yet…';
+    color: #9ca3af;
+  }
+
+  .docs-combobox-empty {
+    display: none;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .docs-combobox-empty.is-visible {
+    display: block;
+  }
+</style>
+
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <!-- 1. Managed — sync local list -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Undermountain bestiary</h3>
+          <p class="text-sm text-gray-600">
+            <code>mode: 'managed'</code> (default) — synchronous <code>search</code> over a local
+            list, with an optional open button (<code>tabindex="-1"</code>).
+          </p>
+        </div>
+
+        <label for="docs-monster-local" class="text-sm font-medium text-gray-700">Monster</label>
+        <cinq-combobox id="docs-monster-local" class="docs-combobox">
+          <input
+            id="docs-monster-local-input"
+            type="text"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="docs-monster-local-listbox"
+            autocomplete="off"
+            placeholder="e.g. Mind Flayer"
+          />
+          <button
+            type="button"
+            tabindex="-1"
+            aria-label="Monsters"
+            aria-controls="docs-monster-local-listbox"
+            aria-expanded="false"
+          >
+            ▼
+          </button>
+          <ul
+            id="docs-monster-local-listbox"
+            role="listbox"
+            aria-label="AD&amp;D 2e monsters"
+            hidden
+          ></ul>
+        </cinq-combobox>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800" aria-live="polite">
+          Status:&nbsp;<span data-combobox-status="local" class="font-mono font-medium text-gray-900">—</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. Managed — async fetch + event log -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Scroll of summoning</h3>
+          <p class="text-sm text-gray-600">
+            Async <code>search</code> with <code>fetch</code> + <code>AbortSignal</code> (blob URL,
+            no network), a short artificial delay so <code>busy</code> is visible, and an event log
+            (<code>loading</code> / <code>loaded</code> / <code>submit</code> / <code>update</code>).
+          </p>
+        </div>
+
+        <label for="docs-monster-api" class="text-sm font-medium text-gray-700">Monster</label>
+        <cinq-combobox id="docs-monster-api" class="docs-combobox">
+          <input
+            id="docs-monster-api-input"
+            type="text"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="docs-monster-api-listbox"
+            autocomplete="off"
+            placeholder="e.g. Quaggoth"
+          />
+          <ul
+            id="docs-monster-api-listbox"
+            role="listbox"
+            aria-label="Monsters from API"
+            hidden
+          ></ul>
+        </cinq-combobox>
+
+        <p class="text-sm text-gray-600" aria-live="polite">
+          Status:&nbsp;<span data-combobox-status="api" class="font-mono font-medium text-gray-900">Idle</span>
+        </p>
+        <div
+          data-combobox-log="api"
+          class="docs-combobox-event-log"
+          aria-label="API event log"
+        ></div>
+      </div>
+    </section>
+
+    <!-- 3. External — grouped HTML -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Compendium search (external)</h3>
+          <p class="text-sm text-gray-600">
+            <code>mode: 'external'</code> + <code>selectMode: 'custom'</code> — grouped HTML,
+            debounce, <code>minLength</code>, <code>openOnEmpty</code>, and
+            <code>combobox:empty</code>. Enter on a focused option follows the link; Enter without
+            focus would submit the parent form.
+          </p>
+        </div>
+
+        <form data-combobox-form="external" action="#" method="get" role="search" class="flex flex-col gap-2 max-w-md">
+          <label for="docs-monster-external" class="text-sm font-medium text-gray-700">Query</label>
+          <cinq-combobox
+            id="docs-monster-external"
+            class="docs-combobox"
+            data-combobox-mode="external"
+            data-combobox-select-mode="custom"
+            data-combobox-debounce="280"
+            data-combobox-min-length="2"
+            data-combobox-open-on-empty
+          >
+            <input
+              id="docs-monster-external-input"
+              type="search"
+              name="q"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded="false"
+              aria-controls="docs-monster-external-listbox"
+              autocomplete="off"
+              placeholder="Type at least 2 characters…"
+            />
+            <div
+              id="docs-monster-external-listbox"
+              role="listbox"
+              aria-label="Search results"
+              hidden
+            ></div>
+          </cinq-combobox>
+          <p
+            data-combobox-empty="external"
+            class="docs-combobox-empty rounded-lg border border-gray-200 bg-gray-50"
+            role="status"
+          ></p>
+          <p class="sr-only" data-combobox-live="external" aria-live="polite" aria-atomic="true"></p>
+        </form>
+
+        <p class="text-sm text-gray-600" aria-live="polite">
+          Hint:&nbsp;<span data-combobox-hint="external" class="font-mono font-medium text-gray-900">Idle — try “be”, “mi”, or “xx”.</span>
+        </p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { EVENTS } from '@agencecinq/utils';
+
+  type ComboboxHost = HTMLElement & {
+    search: (
+      value: string,
+      context: { signal: AbortSignal },
+    ) =>
+      | string[]
+      | Promise<string[]>
+      | { html: string }
+      | Promise<{ html: string }>;
+    onSelect: ((detail: { option: { element: HTMLElement } | null }) => void) | null;
+    options: { length: number };
+  };
+
+  const LOCAL_MONSTERS = [
+    'Aarakocra',
+    'Aboleth',
+    'Ankheg',
+    'Basilisk',
+    'Beholder',
+    'Bugbear',
+    'Bulette',
+    'Carrion Crawler',
+    'Chimera',
+    'Cockatrice',
+    'Displacer Beast',
+    'Dragon, Red',
+    'Drow',
+    'Dryad',
+    'Ettin',
+    'Gargoyle',
+    'Gelatinous Cube',
+    'Ghast',
+    'Ghoul',
+    'Giant, Hill',
+    'Gnoll',
+    'Goblin',
+    'Golem, Flesh',
+    'Griffon',
+    'Harpy',
+    'Hell Hound',
+    'Hippogriff',
+    'Hobgoblin',
+    'Hook Horror',
+    'Hydra',
+    'Intellect Devourer',
+    'Invisible Stalker',
+    'Kenku',
+    'Kobold',
+    'Lich',
+    'Lizard Man',
+    'Manticore',
+    'Medusa',
+    'Mind Flayer',
+    'Minotaur',
+    'Mummy',
+    'Naga, Guardian',
+    'Nightmare',
+    'Ogre',
+    'Orc',
+    'Owlbear',
+    'Pegasus',
+    'Phase Spider',
+    'Purple Worm',
+    'Quaggoth',
+    'Rakshasa',
+    'Remorhaz',
+    'Roc',
+    'Roper',
+    'Rust Monster',
+    'Satyr',
+    'Shadow',
+    'Skeleton',
+    'Spectre',
+    'Stirge',
+    'Tarrasque',
+    'Treant',
+    'Troll',
+    'Umber Hulk',
+    'Unicorn',
+    'Vampire',
+    'Wight',
+    "Will-o'-Wisp",
+    'Wraith',
+    'Wyvern',
+    'Xorn',
+    'Yuan-ti',
+    'Zombie',
+  ];
+
+  /** Real `fetch` + AbortSignal, without a network dependency. */
+  const MONSTERS_URL = URL.createObjectURL(
+    new Blob([JSON.stringify(LOCAL_MONSTERS)], { type: 'application/json' }),
+  );
+
+  const escapeHtml = (value: string) =>
+    value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+
+  const filterMonsters = (list: string[], input: string) => {
+    if (input.length < 1) return list;
+    return list.filter((name) => name.toLowerCase().startsWith(input.toLowerCase()));
+  };
+
+  const classifyMonster = (name: string) => {
+    const initial = name.trim().charAt(0).toUpperCase();
+    return initial <= 'M' ? 'Aberrations & beasts' : 'Undermountain denizens';
+  };
+
+  const renderGroupedResults = async (query: string, signal: AbortSignal) => {
+    const response = await fetch(MONSTERS_URL, { signal });
+    if (!response.ok) {
+      throw new Error(`Failed to load monsters: ${response.status}`);
+    }
+
+    const remote = (await response.json()) as string[];
+    const matches = filterMonsters(remote, query);
+    if (matches.length === 0) return '';
+
+    const groups = new Map<string, string[]>();
+    matches.forEach((name) => {
+      const group = classifyMonster(name);
+      const bucket = groups.get(group) ?? [];
+      bucket.push(name);
+      groups.set(group, bucket);
+    });
+
+    let optionIndex = 0;
+
+    return [...groups.entries()]
+      .map(([label, names]) => {
+        const options = names
+          .map((name) => {
+            const optionId = `docs-external-option-${optionIndex}`;
+            optionIndex += 1;
+            return `<div role="option" id="${optionId}" data-value="${escapeHtml(name)}">
+  <a class="docs-combobox-option-link" href="#monster-${encodeURIComponent(name)}" tabindex="-1">
+    ${escapeHtml(name)}
+  </a>
+</div>`;
+          })
+          .join('');
+
+        return `<div role="group" aria-label="${escapeHtml(label)}">
+  <p class="docs-combobox-group-label">${escapeHtml(label)}</p>
+  ${options}
+</div>`;
+      })
+      .join('');
+  };
+
+  // ── 1. Managed local ──────────────────────────────────────────────────────
+  {
+    const host = document.getElementById('docs-monster-local') as ComboboxHost | null;
+    const status = document.querySelector('[data-combobox-status="local"]');
+    if (host && status) {
+      host.search = (value) => filterMonsters(LOCAL_MONSTERS, value);
+
+      host.addEventListener(EVENTS.COMBOBOX_SUBMIT, (event) => {
+        const { value } = (event as CustomEvent<{ value: string }>).detail;
+        status.textContent = `Selected: ${value}`;
+      });
+    }
+  }
+
+  // ── 2. Async fetch + event log ────────────────────────────────────────────
+  {
+    const host = document.getElementById('docs-monster-api') as ComboboxHost | null;
+    const status = document.querySelector('[data-combobox-status="api"]');
+    const logEl = document.querySelector('[data-combobox-log="api"]');
+    if (host && status && logEl) {
+      const log = (message: string) => {
+        const line = document.createElement('div');
+        line.textContent = message;
+        logEl.prepend(line);
+      };
+
+      host.search = async (value, { signal }) => {
+        status.textContent = 'Fetching bestiary…';
+
+        const response = await fetch(MONSTERS_URL, { signal });
+        if (!response.ok) {
+          status.textContent = `Error ${response.status}`;
+          throw new Error(`Failed to load monsters: ${response.status}`);
+        }
+
+        const remote = (await response.json()) as string[];
+
+        // Keep busy/loading visible; honour abort while waiting.
+        await new Promise<void>((resolve, reject) => {
+          const timer = window.setTimeout(resolve, 350);
+          const onAbort = () => {
+            window.clearTimeout(timer);
+            reject(signal.reason ?? new DOMException('Aborted', 'AbortError'));
+          };
+          if (signal.aborted) {
+            onAbort();
+            return;
+          }
+          signal.addEventListener('abort', onAbort, { once: true });
+        });
+
+        const results = filterMonsters(remote, value);
+        status.textContent = `${results.length} result(s)`;
+        return results;
+      };
+
+      host.addEventListener(EVENTS.COMBOBOX_LOADING, () => log('loading'));
+      host.addEventListener(EVENTS.COMBOBOX_LOADED, () => log('loaded'));
+      host.addEventListener(EVENTS.COMBOBOX_SUBMIT, (event) => {
+        const { value, index } = (event as CustomEvent<{ value: string; index: number }>).detail;
+        log(`submit → ${value} (index ${index})`);
+      });
+      host.addEventListener(EVENTS.COMBOBOX_UPDATE, (event) => {
+        const { options, index, value } = (
+          event as CustomEvent<{ options: unknown[]; index: number; value: string }>
+        ).detail;
+        log(`update value="${value}" index=${index} (${options.length})`);
+      });
+    }
+  }
+
+  // ── 3. External grouped ───────────────────────────────────────────────────
+  {
+    const host = document.getElementById('docs-monster-external') as ComboboxHost | null;
+    const form = document.querySelector<HTMLFormElement>('[data-combobox-form="external"]');
+    const emptyEl = document.querySelector<HTMLElement>('[data-combobox-empty="external"]');
+    const liveEl = document.querySelector('[data-combobox-live="external"]');
+    const hint = document.querySelector('[data-combobox-hint="external"]');
+
+    if (host && form && emptyEl && liveEl && hint) {
+      const hideEmpty = () => {
+        emptyEl.textContent = '';
+        emptyEl.classList.remove('is-visible');
+        liveEl.textContent = '';
+      };
+
+      const showEmpty = (message: string) => {
+        emptyEl.textContent = message;
+        emptyEl.classList.add('is-visible');
+        liveEl.textContent = message;
+      };
+
+      host.search = async (query, { signal }) => {
+        hideEmpty();
+        hint.textContent = `Searching “${query}”…`;
+        const html = await renderGroupedResults(query, signal);
+        return { html };
+      };
+
+      host.onSelect = ({ option }) => {
+        const link = option?.element.querySelector('a');
+        hint.textContent = link
+          ? `Selected → ${link.textContent?.trim()} (${link.getAttribute('href')})`
+          : 'Selected option without link';
+        link?.click();
+      };
+
+      host.addEventListener(EVENTS.COMBOBOX_EMPTY, (event) => {
+        const { value } = (event as CustomEvent<{ value: string }>).detail;
+        const message =
+          value.trim().length < 2
+            ? 'Type at least 2 characters to search.'
+            : `No monsters match “${value}”.`;
+        showEmpty(message);
+        hint.textContent = message;
+      });
+
+      host.addEventListener(EVENTS.COMBOBOX_LOADED, () => {
+        if (host.options.length > 0) {
+          hideEmpty();
+          hint.textContent = `${host.options.length} result(s)`;
+        }
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const input = host.querySelector<HTMLInputElement>('input');
+        hint.textContent = `Form submit → q=${input?.value || '(empty)'}`;
+      });
+    }
+  }
+</script>
