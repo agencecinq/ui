@@ -1,0 +1,327 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-panes {
+    position: relative;
+    display: flex;
+    height: 16rem;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #fff;
+  }
+
+  .docs-panes--horizontal {
+    flex-direction: column;
+    height: 20rem;
+  }
+
+  .docs-pane {
+    overflow: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: #111827;
+  }
+
+  .docs-pane--primary {
+    background: #eff6ff;
+  }
+
+  .docs-pane--secondary {
+    flex: 1;
+    background: #f9fafb;
+  }
+
+  .docs-panes cinq-windowsplitter {
+    flex: 0 0 auto;
+    position: absolute;
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #111827;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .docs-panes cinq-windowsplitter[aria-orientation='vertical'] {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    margin-left: -3px;
+    cursor: col-resize;
+  }
+
+  .docs-panes cinq-windowsplitter[aria-orientation='horizontal'] {
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 6px;
+    margin-top: -3px;
+    cursor: row-resize;
+  }
+
+  .docs-panes cinq-windowsplitter:focus {
+    outline: none;
+  }
+
+  .docs-panes cinq-windowsplitter:focus-visible {
+    outline: 2px solid #111827;
+    outline-offset: 2px;
+  }
+
+  .docs-panes cinq-windowsplitter[dragging] {
+    background: #374151;
+  }
+
+  .docs-panes cinq-windowsplitter[disabled],
+  .docs-panes cinq-windowsplitter[aria-disabled='true'] {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .docs-comparison {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .docs-comparison__layer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .docs-comparison__after {
+    background: #111827;
+    color: #fff;
+  }
+
+  .docs-comparison__before {
+    background: #1d4ed8;
+    color: #fff;
+    clip-path: inset(0 50% 0 0);
+  }
+
+  .docs-comparison cinq-windowsplitter {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    z-index: 3;
+    width: 3rem;
+    margin-left: -1.5rem;
+    border: 0;
+    background: transparent;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .docs-comparison cinq-windowsplitter::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 2px;
+    background: #fff;
+  }
+
+  .docs-comparison__handle {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background: #fff;
+    color: #111827;
+    font-size: 1.25rem;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 6%),
+      0 4px 12px rgb(0 0 0 / 12%);
+  }
+
+  .docs-comparison cinq-windowsplitter:focus-visible .docs-comparison__handle {
+    outline: 2px solid #111827;
+    outline-offset: 2px;
+  }
+
+  .docs-windowsplitter-state {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+    padding: 0.5rem 0.75rem;
+    color: #374151;
+  }
+</style>
+
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <!-- 1. Vertical resize -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Dungeon map (vertical)</h3>
+          <p class="text-sm text-gray-600">
+            <code>mode: 'resize'</code> — drag or arrow keys resize the primary pane.
+            <kbd>Enter</kbd> collapses / restores.
+          </p>
+        </div>
+
+        <div class="docs-panes" data-windowsplitter-demo="vertical">
+          <div id="docs-ws-toc" class="docs-pane docs-pane--primary" style="width: 30%">
+            <strong id="docs-ws-toc-label">Party roster</strong>
+            <p class="mt-2 mb-0">Primary pane — sized by the splitter value.</p>
+          </div>
+          <cinq-windowsplitter
+            role="separator"
+            tabindex="0"
+            aria-orientation="vertical"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="30"
+            aria-controls="docs-ws-toc"
+            aria-labelledby="docs-ws-toc-label"
+          ></cinq-windowsplitter>
+          <div class="docs-pane docs-pane--secondary">
+            <strong>Encounter notes</strong>
+            <p class="mt-2 mb-0">Secondary pane fills the remaining space.</p>
+          </div>
+        </div>
+
+        <p class="docs-windowsplitter-state" data-windowsplitter-state="vertical" aria-live="polite">
+          —
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. Horizontal -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Spellbook (horizontal)</h3>
+          <p class="text-sm text-gray-600">
+            <code>aria-orientation="horizontal"</code> — Up / Down move the bar;
+            <kbd>Enter</kbd> collapses the top pane.
+          </p>
+        </div>
+
+        <div class="docs-panes docs-panes--horizontal" data-windowsplitter-demo="horizontal">
+          <div id="docs-ws-notes" class="docs-pane docs-pane--primary" style="height: 40%">
+            <strong id="docs-ws-notes-label">Prepared spells</strong>
+            <p class="mt-2 mb-0">Primary pane — height follows the splitter value.</p>
+          </div>
+          <cinq-windowsplitter
+            role="separator"
+            tabindex="0"
+            aria-orientation="horizontal"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="40"
+            aria-controls="docs-ws-notes"
+            aria-labelledby="docs-ws-notes-label"
+          ></cinq-windowsplitter>
+          <div class="docs-pane docs-pane--secondary">
+            <strong>Spell description</strong>
+            <p class="mt-2 mb-0">Secondary pane fills the remaining space below.</p>
+          </div>
+        </div>
+
+        <p class="docs-windowsplitter-state" data-windowsplitter-state="horizontal" aria-live="polite">
+          —
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. Comparison clip -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Before / after (clip)</h3>
+          <p class="text-sm text-gray-600">
+            <code>data-windowsplitter-mode="clip"</code> — overlay panes and clip the primary
+            layer (same interaction as a comparison slider).
+          </p>
+        </div>
+
+        <div
+          class="docs-comparison"
+          data-windowsplitter-demo="clip"
+          role="region"
+          aria-label="Before and after comparison"
+        >
+          <div class="docs-comparison__layer docs-comparison__after" aria-hidden="true">After</div>
+          <div id="docs-ws-before" class="docs-comparison__layer docs-comparison__before">
+            Before
+          </div>
+          <cinq-windowsplitter
+            role="separator"
+            tabindex="0"
+            aria-orientation="vertical"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="50"
+            aria-controls="docs-ws-before"
+            aria-label="Reveal after image"
+            data-windowsplitter-mode="clip"
+            data-windowsplitter-step="5"
+            data-windowsplitter-page="20"
+          >
+            <span class="docs-comparison__handle" aria-hidden="true">⟷</span>
+          </cinq-windowsplitter>
+        </div>
+
+        <p class="docs-windowsplitter-state" data-windowsplitter-state="clip" aria-live="polite">
+          —
+        </p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { EVENTS } from '@agencecinq/utils';
+  import type { WindowSplitter } from '@agencecinq/windowsplitter';
+
+  const bindState = (key: string) => {
+    const host = document.querySelector<WindowSplitter>(
+      `[data-windowsplitter-demo="${key}"] cinq-windowsplitter`,
+    );
+    const state = document.querySelector(`[data-windowsplitter-state="${key}"]`);
+    if (!host || !state) return;
+
+    const render = () => {
+      state.textContent = `value=${host.value} ratio=${host.ratio.toFixed(2)} collapsed=${host.collapsed}`;
+    };
+
+    host.addEventListener(EVENTS.WINDOWSPLITTER_CHANGE, render);
+    render();
+  };
+
+  bindState('vertical');
+  bindState('horizontal');
+  bindState('clip');
+</script>

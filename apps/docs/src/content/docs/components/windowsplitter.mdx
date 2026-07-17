@@ -1,0 +1,148 @@
+---
+title: Window Splitter
+description: Accessible WAI-ARIA window splitter Web Component (`<cinq-windowsplitter>`) for resizable panes.
+---
+
+import WindowSplitterPlayground from "../_components/WindowSplitterPlayground.astro";
+
+A window splitter lets users resize a primary pane with a focusable separator.
+`<cinq-windowsplitter>` is the separator itself: it wires pointer drag, keyboard
+steps, collapse / restore, and layout updates (`resize` or `clip`).
+
+Inspired by [`@19h47/windowsplitter`](https://github.com/19h47/19h47-windowsplitter)
+and the
+[WAI-ARIA Authoring Practices window splitter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/).
+
+## Install
+
+```bash
+pnpm add @agencecinq/windowsplitter
+```
+
+## Usage
+
+Import once:
+
+```js
+import "@agencecinq/windowsplitter";
+```
+
+Then write the separator markup explicitly — the component adds interactivity
+only. Set `role`, `tabindex`, `aria-orientation`, value attributes, labelling,
+and `aria-controls` (primary pane id) in HTML.
+
+```html
+<div class="panes">
+  <div id="toc" class="pane pane--primary" style="width: 30%">
+    <strong id="toc-label">Table of Contents</strong>
+  </div>
+  <cinq-windowsplitter
+    role="separator"
+    tabindex="0"
+    aria-orientation="vertical"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="30"
+    aria-controls="toc"
+    aria-labelledby="toc-label"
+  ></cinq-windowsplitter>
+  <div class="pane pane--secondary">Content</div>
+</div>
+```
+
+`aria-valuemin` / `aria-valuemax` must match the **real** allowed range of the
+primary pane. If the pane cannot fully collapse, set min above `0`.
+
+> **Note on `role`:** the APG documents `role="separator"`. Some screen readers
+> handle a focusable `role="slider"` more reliably. The component does not
+> enforce the role — pick what works for your AT testing.
+
+## Required markup
+
+| Selector / attribute | Required | Role |
+| -------------------- | -------- | ---- |
+| `<cinq-windowsplitter>` | **Yes** | Focusable separator (host). |
+| `role="separator"` (or `slider`) | **Yes** | On the host. |
+| `tabindex="0"` | **Yes** | Include in the tab sequence. |
+| `aria-orientation` | Recommended | `vertical` (default) or `horizontal`. |
+| `aria-valuemin` / `aria-valuemax` / `aria-valuenow` | **Yes** | Size range and current value. |
+| `aria-controls` | **Yes** (for `resize` / `clip`) | Id of the primary pane. |
+| `aria-label` / `aria-labelledby` | **Yes** | Accessible name. |
+
+The bounds container defaults to the host’s `parentElement`.
+
+## Options
+
+| Attribute / property | Type | Default | Description |
+| -------------------- | ---- | ------- | ----------- |
+| `data-windowsplitter-mode` | `resize` \| `clip` \| `none` | `resize` | How the primary pane is updated |
+| `data-windowsplitter-step` | number | `1` | Arrow key increment |
+| `data-windowsplitter-page` | number | `10` | PageUp / PageDown / Shift+Arrow |
+| `data-windowsplitter-fixed` | boolean | `false` | Enter / pointer toggle only |
+| `disabled` / `aria-disabled` | boolean | `false` | Disable interaction |
+| `formatSize` (property) | `(ctx) => string` | `` `${value}%` `` | CSS size in `resize` mode |
+| `formatValue` (property) | `(value) => string` | `String(value)` | `aria-valuetext` |
+| `container` (property) | `HTMLElement \| null` | `parentElement` | Drag bounds |
+
+```js
+const host = document.querySelector("cinq-windowsplitter");
+
+host.formatSize = ({ offset }) => `${offset}px`;
+host.formatValue = (value) => `${value} %`;
+```
+
+## Styling hooks
+
+| Hook | When |
+| ---- | ---- |
+| `[collapsed]` | Primary pane at `aria-valuemin` |
+| `[dragging]` | Pointer drag in progress |
+| `[disabled]` / `[aria-disabled="true"]` | Interaction disabled |
+| `:focus-visible` | Keyboard focus |
+| `--windowsplitter-value` / `--windowsplitter-ratio` / `--windowsplitter-offset` | On the container |
+
+## Methods
+
+| Method | Description |
+| ------ | ----------- |
+| `setValue(value, trigger?)` | Set `aria-valuenow` and update layout |
+| `collapse(trigger?)` / `restore(trigger?)` / `toggle(trigger?)` | Collapse helpers |
+| `sync()` | Re-read ARIA and re-apply layout |
+| `destroy()` | Remove listeners and observers |
+
+Readable state: `value`, `min`, `max`, `ratio`, `collapsed`, `disabled`, `vertical`, `$primary`, `$container`.
+
+## Events
+
+Dispatched on the **host** `<cinq-windowsplitter>` (bubble). Constants live on
+`@agencecinq/utils` `EVENTS`:
+
+| Event | Constant | Detail | When |
+| ----- | -------- | ------ | ---- |
+| `windowsplitter:change` | `WINDOWSPLITTER_CHANGE` | `{ value, min, max, ratio, collapsed }` | After a user-driven (or `trigger: true`) value change |
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+$host.addEventListener(EVENTS.WINDOWSPLITTER_CHANGE, ({ detail }) => {
+  console.log(detail.value, detail.collapsed);
+});
+```
+
+## Keyboard
+
+| Key | Function |
+| --- | -------- |
+| `←` / `→` | Move a **vertical** splitter |
+| `↑` / `↓` | Move a **horizontal** splitter (or adjust vertical value per APG) |
+| `Enter` | Collapse / restore |
+| `Home` / `End` | Jump to min / max |
+| `PageUp` / `PageDown` | Step by `page` |
+| `Shift` + Arrow | Step by `page` |
+
+A fixed splitter (`data-windowsplitter-fixed`) omits arrow keys and only
+implements Enter (and pointer toggle).
+
+## Playground (live)
+
+<WindowSplitterPlayground />

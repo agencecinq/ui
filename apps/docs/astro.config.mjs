@@ -28,6 +28,7 @@ export default defineConfig({
             { label: 'Switch', slug: 'components/switch' },
             { label: 'Accordion', slug: 'components/accordion' },
             { label: 'Combobox', slug: 'components/combobox' },
+            { label: 'Window Splitter', slug: 'components/windowsplitter' },
           ],
         },
       ],

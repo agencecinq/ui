@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 5.0.6
+
+### Patch Changes
+
+- Add `@agencecinq/windowsplitter` with `<cinq-windowsplitter>` Web Component for accessible pane resizing (resize/clip/none modes, keyboard + pointer, collapse/restore). Export `WINDOWSPLITTER_CHANGE` from `@agencecinq/utils`. Add window splitter docs page and live playground.
+
 ## 5.0.5
 
 ### Patch Changes
