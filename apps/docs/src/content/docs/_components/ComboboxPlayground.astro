@@ -232,10 +232,10 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Compendium search (external)</h3>
           <p class="text-sm text-gray-600">
-            <code>mode: 'external'</code> + <code>selectMode: 'custom'</code> — grouped HTML,
-            debounce, <code>minLength</code>, <code>openOnEmpty</code>, and
-            <code>combobox:empty</code>. Enter on a focused option follows the link; Enter without
-            focus would submit the parent form.
+            <code>mode: 'external'</code> — grouped HTML, debounce, <code>minLength</code>,
+            <code>openOnEmpty</code>, and <code>combobox:empty</code>. Selection uses the default
+            <code>selectMode: 'value'</code> so the chosen label fills the textbox; <code>onSelect</code>
+            still runs for side effects (here: update the hint).
           </p>
         </div>
 
@@ -245,7 +245,6 @@ import RegisterComponents from './RegisterComponents.astro';
             id="docs-monster-external"
             class="docs-combobox"
             data-combobox-mode="external"
-            data-combobox-select-mode="custom"
             data-combobox-debounce="280"
             data-combobox-min-length="2"
             data-combobox-open-on-empty
@@ -539,12 +538,11 @@ import RegisterComponents from './RegisterComponents.astro';
         return { html };
       };
 
-      host.onSelect = ({ option }) => {
+      host.onSelect = ({ option, value }) => {
         const link = option?.element.querySelector('a');
         hint.textContent = link
-          ? `Selected → ${link.textContent?.trim()} (${link.getAttribute('href')})`
-          : 'Selected option without link';
-        link?.click();
+          ? `Selected → ${value} (${link.getAttribute('href')})`
+          : `Selected → ${value || '(empty)'}`;
       };
 
       host.addEventListener(EVENTS.COMBOBOX_EMPTY, (event) => {
