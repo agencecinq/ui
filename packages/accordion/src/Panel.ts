@@ -1,19 +1,6 @@
-import { EVENTS } from "@agencecinq/utils";
+import { EVENTS, dispatchEvent, parseList } from "@agencecinq/utils";
 import type { AccordionPanelDetail } from "./types.js";
 import { parseBooleanAttr, setActive, setInactive } from "./utils.js";
-
-const dispatchEvent = (
-  target: HTMLElement,
-  eventName: string,
-  detail: AccordionPanelDetail,
-): boolean =>
-  target.dispatchEvent(
-    new CustomEvent<AccordionPanelDetail>(eventName, {
-      bubbles: true,
-      cancelable: true,
-      detail,
-    }),
-  );
 
 /**
  * Accordion panel controller.
@@ -43,8 +30,7 @@ export default class Panel {
 
     if (!this.$button) return;
 
-    const control =
-      this.$button.getAttribute("aria-controls")?.trim().split(/\s+/)[0] || "";
+    const control = parseList(this.$button.getAttribute("aria-controls"))[0] || "";
 
     this.$body = control ? document.getElementById(control) : null;
 

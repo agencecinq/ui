@@ -1,4 +1,4 @@
-import { EVENTS, clamp, throttle } from "@agencecinq/utils";
+import { EVENTS, clamp, dispatchEvent, throttle } from "@agencecinq/utils";
 import type { Options, SpinbuttonChangeDetail, Text, Value } from "./types.js";
 
 export type { Options, SpinbuttonChangeDetail, Text, Value } from "./types.js";
@@ -216,13 +216,7 @@ export class Spinbutton extends HTMLElement {
       this.throttledEmit ??
       (this.throttledEmit = throttle(() => {
         const detail: SpinbuttonChangeDetail = { value: this.value.now };
-        this.dispatchEvent(
-          new CustomEvent<SpinbuttonChangeDetail>(EVENTS.SPINBUTTON_CHANGE, {
-            bubbles: true,
-            cancelable: true,
-            detail,
-          }),
-        );
+        dispatchEvent(this, EVENTS.SPINBUTTON_CHANGE, detail);
       }, this.options.delay));
     emit();
   }

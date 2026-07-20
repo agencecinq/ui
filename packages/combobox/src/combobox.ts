@@ -1,4 +1,4 @@
-import { EVENTS } from "@agencecinq/utils";
+import { EVENTS, dispatchEvent, parseList } from "@agencecinq/utils";
 import Props from "./Props.js";
 import Keyboard from "./keyboard.js";
 import type {
@@ -446,7 +446,7 @@ export class Combobox extends HTMLElement {
           continue;
         }
 
-        const ids = controls.trim().split(/\s+/);
+        const ids = parseList(controls);
 
         if (ids.includes(id)) {
           return button;
@@ -660,12 +660,7 @@ export class Combobox extends HTMLElement {
   }
 
   private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(
-      new CustomEvent(name, {
-        detail,
-        bubbles: true,
-      }),
-    );
+    dispatchEvent(this, name, detail, { cancelable: false });
   }
 
   private setLoading(on: boolean): void {

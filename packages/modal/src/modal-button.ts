@@ -1,4 +1,4 @@
-import { EVENTS } from '@agencecinq/utils';
+import { EVENTS, dispatchEvent, parseList } from '@agencecinq/utils';
 
 export class ModalButton extends HTMLElement {
     private $button: HTMLButtonElement | null = null;
@@ -19,7 +19,7 @@ export class ModalButton extends HTMLElement {
             throw new Error('ModalButton: No button found');
         }
 
-        this.controls = this.$button.getAttribute('aria-controls')?.trim().split(' ') || [];
+        this.controls = parseList(this.$button.getAttribute('aria-controls'));
 
         this.$button.addEventListener('click', this.show);
         document.documentElement.addEventListener(EVENTS.MODAL_CLOSE, this.handleModalClose as EventListener);
@@ -48,7 +48,10 @@ export class ModalButton extends HTMLElement {
                 modal: control
             };
 
-            document.documentElement.dispatchEvent(new CustomEvent(EVENTS.MODAL_TOGGLE, { detail }));
+            dispatchEvent(document.documentElement, EVENTS.MODAL_TOGGLE, detail, {
+                bubbles: false,
+                cancelable: false,
+            });
         });
     };
 }

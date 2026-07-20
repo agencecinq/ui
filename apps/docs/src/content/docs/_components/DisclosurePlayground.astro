@@ -125,11 +125,20 @@ import RegisterComponents from './RegisterComponents.astro';
 
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
-        <div>
-          <h3 class="text-lg font-semibold text-gray-900">One button, multiple targets</h3>
-          <p class="text-sm text-gray-600">
-            <code>aria-controls</code> accepts a space-separated list of IDs. One trigger opens or
-            closes every listed region at once — here, the three components of a spell.
+        <div class="flex flex-col gap-3">
+          <h3 class="m-0 text-lg font-semibold text-gray-900">One button, multiple targets</h3>
+          <p class="m-0 text-sm text-gray-600">
+            <code>aria-controls</code> is an ID reference list — one trigger can open every listed
+            region. Each region can be dismissed on its own, then <code>update()</code> keeps
+            <code>aria-expanded</code> honest.
+          </p>
+          <p
+            class="m-0 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-950"
+            role="note"
+          >
+            <strong>Note:</strong> multi-target is valid ARIA (see MDN’s
+            <code>ariaControlsElements</code> example). Here <code>aria-expanded</code> is
+            <code>true</code> while at least one region is visible; a click closes if any remains open.
           </p>
         </div>
 
@@ -151,7 +160,17 @@ import RegisterComponents from './RegisterComponents.astro';
             class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
             hidden
           >
-            <h4 class="m-0 text-sm font-semibold text-gray-900">Verbal</h4>
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="m-0 text-sm font-semibold text-gray-900">Verbal</h4>
+              <button
+                type="button"
+                class="shrink-0 text-xs font-medium text-gray-500 hover:text-gray-900"
+                data-disclosure-dismiss
+                aria-label="Dismiss verbal component"
+              >
+                Dismiss
+              </button>
+            </div>
             <p class="mb-0 mt-2">A forceful invocation ending in <em>ignis!</em></p>
           </div>
 
@@ -160,7 +179,17 @@ import RegisterComponents from './RegisterComponents.astro';
             class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
             hidden
           >
-            <h4 class="m-0 text-sm font-semibold text-gray-900">Somatic</h4>
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="m-0 text-sm font-semibold text-gray-900">Somatic</h4>
+              <button
+                type="button"
+                class="shrink-0 text-xs font-medium text-gray-500 hover:text-gray-900"
+                data-disclosure-dismiss
+                aria-label="Dismiss somatic component"
+              >
+                Dismiss
+              </button>
+            </div>
             <p class="mb-0 mt-2">Pinch sulfur, then thrust both hands toward the target.</p>
           </div>
 
@@ -169,13 +198,23 @@ import RegisterComponents from './RegisterComponents.astro';
             class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
             hidden
           >
-            <h4 class="m-0 text-sm font-semibold text-gray-900">Material</h4>
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="m-0 text-sm font-semibold text-gray-900">Material</h4>
+              <button
+                type="button"
+                class="shrink-0 text-xs font-medium text-gray-500 hover:text-gray-900"
+                data-disclosure-dismiss
+                aria-label="Dismiss material component"
+              >
+                Dismiss
+              </button>
+            </div>
             <p class="mb-0 mt-2">A tiny ball of bat guano and sulfur.</p>
           </div>
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Regions visible: <span id="docs-disclosure-multi-status" class="font-mono font-medium text-gray-900">0</span> / 3
+          Regions visible:&nbsp;<span id="docs-disclosure-multi-status" class="font-mono font-medium text-gray-900">0</span> / 3
         </p>
       </div>
     </section>
@@ -185,9 +224,9 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Multiple buttons, one target</h3>
           <p class="text-sm text-gray-600">
-            Several triggers can share the same <code>aria-controls</code> ID. Each
-            <code>cinq-disclosure-button</code> listens for bubbling open/close events and syncs when
-            <code>event.detail.elements</code> references a shared DOM node.
+            Several triggers can share the same <code>aria-controls</code> ID. Listen to the
+            open/close events and keep each trigger’s <code>aria-expanded</code> in sync yourself —
+            use <code>event.detail.open</code> and <code>event.detail.el</code>.
           </p>
         </div>
 
@@ -384,18 +423,39 @@ import RegisterComponents from './RegisterComponents.astro';
   const componentsHost = document.getElementById(
     'docs-disclosure-components-host',
   ) as DisclosureButton | null;
+  const componentsTrigger = document.getElementById('docs-disclosure-components-trigger');
   const multiStatus = document.getElementById('docs-disclosure-multi-status');
 
   const countVisibleRegions = (elements: HTMLElement[]) =>
     elements.filter((element) => !element.hidden).length;
 
-  if (componentsHost && multiStatus) {
-    const updateMultiStatus = () => {
-      multiStatus.textContent = String(countVisibleRegions(componentsHost.elements));
+  if (componentsHost && componentsTrigger && multiStatus) {
+    const labels = {
+      closed: 'Show material components',
+      open: 'Hide material components',
     };
 
-    componentsHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, updateMultiStatus);
-    componentsHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, updateMultiStatus);
+    const updateMultiUI = () => {
+      const visible = countVisibleRegions(componentsHost.elements);
+      multiStatus.textContent = String(visible);
+      componentsTrigger.textContent = visible > 0 ? labels.open : labels.closed;
+    };
+
+    // Events fire before the DOM mutates — refresh after open/close apply.
+    componentsHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      queueMicrotask(updateMultiUI);
+    });
+    componentsHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+      queueMicrotask(updateMultiUI);
+    });
+
+    componentsHost.elements.forEach((region) => {
+      region.querySelector('[data-disclosure-dismiss]')?.addEventListener('click', () => {
+        region.hidden = true;
+        componentsHost.update();
+        updateMultiUI();
+      });
+    });
   }
 
   const glyphTrigger = document.getElementById('docs-disclosure-glyph-trigger');
@@ -403,15 +463,26 @@ import RegisterComponents from './RegisterComponents.astro';
   const sharedStatus = document.getElementById('docs-disclosure-shared-status');
 
   if (glyphTrigger && journalTrigger && sharedStatus) {
-    const updateSharedStatus = () => {
-      sharedStatus.textContent =
-        glyphTrigger.getAttribute('aria-expanded') === 'true' ? 'visible' : 'hidden';
+    const triggers = [glyphTrigger, journalTrigger];
+
+    const syncSharedTriggers = (event: Event) => {
+      if (!(event instanceof CustomEvent)) return;
+
+      const { el, open } = event.detail as { el: HTMLElement; open: boolean };
+
+      triggers.forEach((trigger) => {
+        if (trigger !== el) {
+          trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+      });
+
+      sharedStatus.textContent = open ? 'visible' : 'hidden';
     };
 
-    glyphTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, updateSharedStatus);
-    glyphTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, updateSharedStatus);
-    journalTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, updateSharedStatus);
-    journalTrigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, updateSharedStatus);
+    triggers.forEach((trigger) => {
+      trigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, syncSharedTriggers);
+      trigger.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, syncSharedTriggers);
+    });
   }
 
   const programmaticHost = document.getElementById(

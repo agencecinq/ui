@@ -26,25 +26,32 @@ var e = {
 	CART_BEFORE_UPDATE: "cart-before-update",
 	CART_UPDATE: "cart-update",
 	VARIANT_CHANGE: "variant-change"
-}, t = (e, t) => {
+}, t = (e, t, n, r = {}) => {
+	let { bubbles: i = !0, cancelable: a = !0 } = r;
+	return e.dispatchEvent(new CustomEvent(t, {
+		bubbles: i,
+		cancelable: a,
+		detail: n
+	}));
+}, n = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug");
-var i = {
+}, r = document.documentElement, { body: i } = document;
+r.hasAttribute("data-debug");
+var a = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", t(({ x: e, y: t }) => {
-	i.x = e, i.y = t;
+window.addEventListener("pointermove", n(({ x: e, y: t }) => {
+	a.x = e, a.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
 //#region src/modal.ts
-var a = class extends HTMLElement {
+var o = class extends HTMLElement {
 	$modal = null;
 	handleClick = (e) => {
 		e.target === e.currentTarget && this.close();
@@ -64,16 +71,22 @@ var a = class extends HTMLElement {
 		this.$modal && this.$modal.removeEventListener("click", this.handleClick), document.documentElement.removeEventListener(e.MODAL_TOGGLE, this.handleModalToggle), this.$modal = null;
 	}
 	close = () => {
-		this.$modal && (this.$modal.close(), document.documentElement.dispatchEvent(new CustomEvent(e.MODAL_CLOSE)));
+		this.$modal && (this.$modal.close(), t(document.documentElement, e.MODAL_CLOSE, void 0, {
+			bubbles: !1,
+			cancelable: !1
+		}));
 	};
 	show = () => {
-		this.$modal && (this.$modal.showModal(), document.documentElement.dispatchEvent(new CustomEvent(e.MODAL_OPEN, { detail: { modal: this.id } })));
+		this.$modal && (this.$modal.showModal(), t(document.documentElement, e.MODAL_OPEN, { modal: this.id }, {
+			bubbles: !1,
+			cancelable: !1
+		}));
 	};
 };
-customElements.get("cinq-modal") || customElements.define("cinq-modal", a);
+customElements.get("cinq-modal") || customElements.define("cinq-modal", o);
 //#endregion
 //#region src/modal-button.ts
-var o = class extends HTMLElement {
+var s = class extends HTMLElement {
 	$button = null;
 	controls = [];
 	handleModalClose = () => this.$button?.setAttribute("aria-pressed", "false");
@@ -89,16 +102,19 @@ var o = class extends HTMLElement {
 		this.$button && this.$button.removeEventListener("click", this.show), document.documentElement.removeEventListener(e.MODAL_CLOSE, this.handleModalClose), document.documentElement.removeEventListener(e.MODAL_OPEN, this.handleModalOpen), this.$button = null, this.controls = [];
 	}
 	show = () => {
-		this.$button && (this.$button.setAttribute("aria-pressed", "true"), this.controls.forEach((t) => {
-			let n = {
+		this.$button && (this.$button.setAttribute("aria-pressed", "true"), this.controls.forEach((n) => {
+			let r = {
 				trigger: this.$button,
 				trap: document.getElementById(`${this.$button?.getAttribute("data-trap")}`),
-				modal: t
+				modal: n
 			};
-			document.documentElement.dispatchEvent(new CustomEvent(e.MODAL_TOGGLE, { detail: n }));
+			t(document.documentElement, e.MODAL_TOGGLE, r, {
+				bubbles: !1,
+				cancelable: !1
+			});
 		}));
 	};
 };
-customElements.get("cinq-modal-button") || customElements.define("cinq-modal-button", o);
+customElements.get("cinq-modal-button") || customElements.define("cinq-modal-button", s);
 //#endregion
-export { a as Modal, o as ModalButton };
+export { o as Modal, s as ModalButton };

@@ -26,25 +26,32 @@ var e = {
 	CART_BEFORE_UPDATE: "cart-before-update",
 	CART_UPDATE: "cart-update",
 	VARIANT_CHANGE: "variant-change"
-}, t = (e, t) => {
+}, t = (e, t, n, r = {}) => {
+	let { bubbles: i = !0, cancelable: a = !0 } = r;
+	return e.dispatchEvent(new CustomEvent(t, {
+		bubbles: i,
+		cancelable: a,
+		detail: n
+	}));
+}, n = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug");
-var i = {
+}, r = document.documentElement, { body: i } = document;
+r.hasAttribute("data-debug");
+var a = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", t(({ x: e, y: t }) => {
-	i.x = e, i.y = t;
+window.addEventListener("pointermove", n(({ x: e, y: t }) => {
+	a.x = e, a.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
 //#region src/Props.ts
-var a = class {
+var o = class {
 	id;
 	role;
 	"aria-posinset";
@@ -57,7 +64,7 @@ var a = class {
 		let e = this;
 		return Object.keys(this).reduce((t, n) => `${t} ${n}="${e[n]}"`, "");
 	}
-}, o = class {
+}, s = class {
 	host;
 	constructor(e) {
 		this.host = e;
@@ -156,29 +163,29 @@ var a = class {
 		let { length: n } = t.input.value;
 		t.input.setSelectionRange(n, n);
 	}
-}, s = (e, t) => {
+}, c = (e, t) => {
 	e.value = t;
-}, c = (e, t) => `<li${t}>${e}</li>`, l = [
+}, l = (e, t) => `<li${t}>${e}</li>`, u = [
 	"data-combobox-mode",
 	"data-combobox-select-mode",
 	"data-combobox-debounce",
 	"data-combobox-min-length",
 	"data-combobox-open-on-empty",
 	"data-combobox-autoselect"
-], u = (e, t) => {
+], d = (e, t) => {
 	let n = e.getAttribute(t);
 	return n !== null && n !== "false" && n !== "0";
-}, d = (e, t, n) => {
+}, f = (e, t, n) => {
 	let r = e.getAttribute(t);
 	if (r === null) return n;
 	let i = parseInt(r, 10);
 	return Number.isNaN(i) ? n : i;
-}, f = class extends HTMLElement {
+}, p = class extends HTMLElement {
 	static observedAttributes = [
 		"value",
 		"disabled",
 		"expanded",
-		...l
+		...u
 	];
 	$input = null;
 	$listbox = null;
@@ -193,12 +200,12 @@ var a = class {
 	debounce = 0;
 	minLength = 0;
 	openOnEmpty = !1;
-	write = s;
+	write = c;
 	onSelect = null;
 	_value = "";
 	_expanded = !1;
 	_search = null;
-	_render = c;
+	_render = l;
 	searchId = 0;
 	debounceTimer = null;
 	abortController = null;
@@ -227,7 +234,7 @@ var a = class {
 				});
 				return;
 			}
-			l.includes(e) && this.syncOptionsFromAttributes();
+			u.includes(e) && this.syncOptionsFromAttributes();
 		}
 	}
 	get value() {
@@ -324,14 +331,14 @@ var a = class {
 		if (this.destroy(), !this.isConnected || !this.$input || !this.$listbox || !this._search) return;
 		this.syncOptionsFromAttributes(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list", this.$button ||= this.resolveButton();
 		let e = this.getAttribute("value");
-		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.syncDisabled(), this.keyboard = new o(this), this.sync(-1), this.hide({
+		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.syncDisabled(), this.keyboard = new s(this), this.sync(-1), this.hide({
 			force: !0,
 			clear: !1
 		}), this.bind(), this.bound = !0;
 	}
 	syncOptionsFromAttributes() {
 		let e = this.getAttribute("data-combobox-mode") ?? "managed", t = this.getAttribute("data-combobox-select-mode") ?? "value";
-		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, d(this, "data-combobox-debounce", 0)), this.minLength = Math.max(0, d(this, "data-combobox-min-length", 0)), this.openOnEmpty = u(this, "data-combobox-open-on-empty"), this.autoselect = u(this, "data-combobox-autoselect");
+		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, f(this, "data-combobox-debounce", 0)), this.minLength = Math.max(0, f(this, "data-combobox-min-length", 0)), this.openOnEmpty = d(this, "data-combobox-open-on-empty"), this.autoselect = d(this, "data-combobox-autoselect");
 	}
 	syncDisabled() {
 		let e = this.disabled;
@@ -405,8 +412,8 @@ var a = class {
 		this.listbox.innerHTML = "";
 		let { length: n } = t, { id: r } = this.listbox;
 		t.forEach((t, i) => {
-			let o = new a(i, e, r, n);
-			this.listbox.insertAdjacentHTML("beforeend", this._render(t, o));
+			let a = new o(i, e, r, n);
+			this.listbox.insertAdjacentHTML("beforeend", this._render(t, a));
 		}), this.sync(e);
 	}
 	sync(e) {
@@ -436,11 +443,8 @@ var a = class {
 	clearActiveDescendant() {
 		this.$input?.removeAttribute("aria-activedescendant");
 	}
-	emit(e, t) {
-		this.dispatchEvent(new CustomEvent(e, {
-			detail: t,
-			bubbles: !0
-		}));
+	emit(e, n) {
+		t(this, e, n, { cancelable: !1 });
 	}
 	setLoading(e) {
 		if (this.loading = e, e) {
@@ -566,6 +570,6 @@ var a = class {
 		this.reflectingAttribute = !0, e ? this.setAttribute("busy", "") : this.removeAttribute("busy"), this.reflectingAttribute = !1;
 	}
 };
-customElements.get("cinq-combobox") || customElements.define("cinq-combobox", f);
+customElements.get("cinq-combobox") || customElements.define("cinq-combobox", p);
 //#endregion
-export { f as Combobox, a as Props };
+export { p as Combobox, o as Props };

@@ -1,4 +1,4 @@
-import { EVENTS } from '@agencecinq/utils';
+import { EVENTS, dispatchEvent } from '@agencecinq/utils';
 
 export class Modal extends HTMLElement {
     private $modal: HTMLDialogElement | null = null;
@@ -50,7 +50,10 @@ export class Modal extends HTMLElement {
         }
 
         this.$modal.close();
-        document.documentElement.dispatchEvent(new CustomEvent(EVENTS.MODAL_CLOSE));
+        dispatchEvent(document.documentElement, EVENTS.MODAL_CLOSE, undefined, {
+            bubbles: false,
+            cancelable: false,
+        });
     };
 
     show = () => {
@@ -59,10 +62,11 @@ export class Modal extends HTMLElement {
         }
 
         this.$modal.showModal();
-        document.documentElement.dispatchEvent(
-            new CustomEvent(EVENTS.MODAL_OPEN, {
-                detail: { modal: this.id },
-            }),
+        dispatchEvent(
+            document.documentElement,
+            EVENTS.MODAL_OPEN,
+            { modal: this.id },
+            { bubbles: false, cancelable: false },
         );
     };
 }

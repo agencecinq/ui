@@ -26,31 +26,38 @@ var e = {
 	CART_BEFORE_UPDATE: "cart-before-update",
 	CART_UPDATE: "cart-update",
 	VARIANT_CHANGE: "variant-change"
-}, t = (e, t) => {
+}, t = (e, t, n, r = {}) => {
+	let { bubbles: i = !0, cancelable: a = !0 } = r;
+	return e.dispatchEvent(new CustomEvent(t, {
+		bubbles: i,
+		cancelable: a,
+		detail: n
+	}));
+}, n = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug");
-var i = {
+}, r = document.documentElement, { body: i } = document;
+r.hasAttribute("data-debug");
+var a = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", t(({ x: e, y: t }) => {
-	i.x = e, i.y = t;
+window.addEventListener("pointermove", n(({ x: e, y: t }) => {
+	a.x = e, a.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
 //#region src/utils/getHash.ts
-function a(e) {
+function o(e) {
 	let t = e.indexOf("#");
 	return t === -1 ? "" : e.substring(t + 1);
 }
 //#endregion
 //#region src/TabPanel.ts
-var o = class {
+var s = class {
 	el;
 	id;
 	constructor(e) {
@@ -66,20 +73,7 @@ var o = class {
 	destroy() {
 		this.el.removeAttribute("hidden"), this.el.classList.remove("is-active");
 	}
-};
-//#endregion
-//#region src/utils/dispatchEvent.ts
-function s(e, t, n) {
-	let r = new CustomEvent(n, {
-		bubbles: !0,
-		cancelable: !1,
-		detail: t
-	});
-	return e.dispatchEvent(r);
-}
-//#endregion
-//#region src/Tab.ts
-var c = class {
+}, c = class {
 	el;
 	active = !1;
 	id = "";
@@ -93,21 +87,15 @@ var c = class {
 	init = () => this.initEvents();
 	initEvents = () => this.el.addEventListener("click", this.handleClick);
 	handleClick = () => this.toggle();
-	toggle(t = !0) {
-		if (this.active) return;
-		let n = new CustomEvent(e.TAB_BEFORE_ACTIVATE, {
-			bubbles: !0,
-			cancelable: !0,
-			detail: {
-				index: this.index,
-				controls: this.controls,
-				element: this.el
-			}
-		});
-		this.el.dispatchEvent(n), !n.defaultPrevented && (s(this.el, {
+	toggle(n = !0) {
+		this.active || t(this.el, e.TAB_BEFORE_ACTIVATE, {
+			index: this.index,
 			controls: this.controls,
 			element: this.el
-		}, e.TAB_ACTIVATE), this.activate(t));
+		}) && (t(this.el, e.TAB_ACTIVATE, {
+			controls: this.controls,
+			element: this.el
+		}, { cancelable: !1 }), this.activate(n));
 	}
 	activate(e = !0) {
 		this.active = !0, this.el.setAttribute("tabindex", "0"), this.el.setAttribute("aria-selected", "true"), this.el.classList.add("is-active"), e && this.focus();
@@ -117,10 +105,10 @@ var c = class {
 	}
 	focus = () => this.el.focus();
 	delete = () => {
-		s(this.el, {
+		t(this.el, e.TAB_DELETE, {
 			controls: this.controls,
 			element: this.el
-		}, e.TAB_DELETE), this.el.parentElement?.removeChild(this.el);
+		}, { cancelable: !1 }), this.el.parentElement?.removeChild(this.el);
 	};
 	destroy() {
 		this.el.removeAttribute("tabindex"), this.el.removeAttribute("aria-selected"), this.el.classList.remove("is-active"), this.el.removeEventListener("click", this.handleClick);
@@ -143,7 +131,7 @@ var c = class {
 			let e = parseInt(t, 10);
 			this.delay = Number.isNaN(e) ? 0 : e;
 		}
-		this.href = this.hash && a(window.location.hash) || "", this.init();
+		this.href = this.hash && o(window.location.hash) || "", this.init();
 	}
 	disconnectedCallback() {
 		this.destroy();
@@ -151,7 +139,7 @@ var c = class {
 	init() {
 		if (!this.$tabList) return;
 		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new c(e, t)), this.tabs.forEach((t, n) => {
-			this.tabPanels.push(new o(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TAB_ACTIVATE, () => {
+			this.tabPanels.push(new s(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TAB_ACTIVATE, () => {
 				this.current = n, this.deactivateTabs(), this.deactivateTabPanels(), t.activate(!1), this.tabPanels.find((e) => e.id === t.controls)?.activate(), this.hash && (this.href = t.id, window.location.hash = t.id);
 			});
 		}), this.href) {

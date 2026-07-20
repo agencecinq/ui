@@ -26,37 +26,44 @@ var e = {
 	CART_BEFORE_UPDATE: "cart-before-update",
 	CART_UPDATE: "cart-update",
 	VARIANT_CHANGE: "variant-change"
-}, t = (e, t) => {
+}, t = (e, t, n, r = {}) => {
+	let { bubbles: i = !0, cancelable: a = !0 } = r;
+	return e.dispatchEvent(new CustomEvent(t, {
+		bubbles: i,
+		cancelable: a,
+		detail: n
+	}));
+}, n = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug");
-var i = {
+}, r = document.documentElement, { body: i } = document;
+r.hasAttribute("data-debug");
+var a = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", t(({ x: e, y: t }) => {
-	i.x = e, i.y = t;
+window.addEventListener("pointermove", n(({ x: e, y: t }) => {
+	a.x = e, a.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`, s = (e) => String(e), c = (e, t) => {
+var o = (e, t, n) => Math.min(Math.max(e, t), n), s = ({ value: e }) => `${e}%`, c = (e) => String(e), l = (e, t) => {
 	let n = Number(e);
 	return Number.isFinite(n) ? n : t;
-}, l = (e, t) => {
+}, u = (e, t) => {
 	let n = e.getAttribute(t);
 	return n !== null && n !== "false" && n !== "0";
-}, u = (e, t, n) => {
+}, d = (e, t, n) => {
 	let r = e.getAttribute(t);
 	if (r === null || r === "") return n;
 	let i = Number(r);
 	return Number.isFinite(i) ? i : n;
-}, d = (e) => {
+}, f = (e) => {
 	let t = e.getAttribute("aria-orientation");
 	return t === "horizontal" || t === "vertical" ? t : "vertical";
-}, f = class extends HTMLElement {
+}, p = class extends HTMLElement {
 	static observedAttributes = [
 		"disabled",
 		"data-windowsplitter-mode",
@@ -70,8 +77,8 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`,
 	step = 1;
 	page = 10;
 	fixed = !1;
-	formatSize = o;
-	formatValue = s;
+	formatSize = s;
+	formatValue = c;
 	previousValue = null;
 	isMoving = !1;
 	pointerId = null;
@@ -91,19 +98,19 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`,
 		this.reflectingAttribute || !this.bound || (this.syncOptionsFromAttributes(), this.sync());
 	}
 	get orientation() {
-		return d(this);
+		return f(this);
 	}
 	get vertical() {
 		return this.orientation === "vertical";
 	}
 	get min() {
-		return c(this.getAttribute("aria-valuemin"), 0);
+		return l(this.getAttribute("aria-valuemin"), 0);
 	}
 	get max() {
-		return c(this.getAttribute("aria-valuemax"), 100);
+		return l(this.getAttribute("aria-valuemax"), 100);
 	}
 	get value() {
-		return c(this.getAttribute("aria-valuenow"), this.min);
+		return l(this.getAttribute("aria-valuenow"), this.min);
 	}
 	set value(e) {
 		this.setValue(e, !1);
@@ -132,7 +139,7 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`,
 	}
 	setValue(e, t = !0) {
 		if (this.disabled) return !1;
-		let n = this.value, r = a(Math.round(e), this.min, this.max), i = r !== n || !this.hasAttribute("aria-valuenow");
+		let n = this.value, r = o(Math.round(e), this.min, this.max), i = r !== n || !this.hasAttribute("aria-valuenow");
 		return i && !this.collapsed && r === this.min && (this.previousValue = n), this.setAttribute("aria-valuenow", String(r)), this.setAttribute("aria-valuetext", this.formatValue(r)), this.apply(r, t && i), i;
 	}
 	collapse(e = !0) {
@@ -160,7 +167,7 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`,
 	}
 	syncOptionsFromAttributes() {
 		let e = this.getAttribute("data-windowsplitter-mode");
-		this.mode = e === "clip" || e === "none" || e === "resize" ? e : "resize", this.step = u(this, "data-windowsplitter-step", 1), this.page = u(this, "data-windowsplitter-page", 10), this.fixed = l(this, "data-windowsplitter-fixed");
+		this.mode = e === "clip" || e === "none" || e === "resize" ? e : "resize", this.step = d(this, "data-windowsplitter-step", 1), this.page = d(this, "data-windowsplitter-page", 10), this.fixed = u(this, "data-windowsplitter-fixed");
 	}
 	resolveContainer() {
 		this.$container = this.containerOverride ?? this.parentElement;
@@ -203,8 +210,8 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`,
 		return this.vertical ? e.clientX - t : e.clientY - n;
 	}
 	valueFromPointer(e) {
-		let t = this.containerLength(), { min: n, max: r } = this, i = r - n, o = this.pointerPosition(e) - this.grabOffset, s = t > 0 ? o / t : 0;
-		return a(Math.round(n + i * s), n, r);
+		let t = this.containerLength(), { min: n, max: r } = this, i = r - n, a = this.pointerPosition(e) - this.grabOffset, s = t > 0 ? a / t : 0;
+		return o(Math.round(n + i * s), n, r);
 	}
 	handlePointerdown = (e) => {
 		if (this.disabled || e.button !== 0) return;
@@ -260,19 +267,16 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`,
 			default: break;
 		}
 	};
-	emit(t, n, r) {
-		if (!t) return;
-		let i = {
-			value: n,
+	emit(n, r, i) {
+		if (!n) return;
+		let a = {
+			value: r,
 			min: this.min,
 			max: this.max,
-			ratio: r,
-			collapsed: n === this.min
+			ratio: i,
+			collapsed: r === this.min
 		};
-		this.dispatchEvent(new CustomEvent(e.WINDOWSPLITTER_CHANGE, {
-			bubbles: !0,
-			detail: i
-		}));
+		t(this, e.WINDOWSPLITTER_CHANGE, a, { cancelable: !1 });
 	}
 	reflectCollapsedAttribute() {
 		this.reflectingAttribute = !0, this.collapsed ? this.setAttribute("collapsed", "") : this.removeAttribute("collapsed"), this.reflectingAttribute = !1;
@@ -284,6 +288,6 @@ var a = (e, t, n) => Math.min(Math.max(e, t), n), o = ({ value: e }) => `${e}%`,
 		this.reflectingAttribute = !0, this.disabled ? this.setAttribute("disabled", "") : this.getAttribute("aria-disabled") !== "true" && this.removeAttribute("disabled"), this.reflectingAttribute = !1;
 	}
 };
-customElements.get("cinq-windowsplitter") || customElements.define("cinq-windowsplitter", f);
+customElements.get("cinq-windowsplitter") || customElements.define("cinq-windowsplitter", p);
 //#endregion
-export { f as WindowSplitter };
+export { p as WindowSplitter };

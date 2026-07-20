@@ -1,18 +1,5 @@
-import { EVENTS, keycode } from "@agencecinq/utils";
+import { EVENTS, dispatchEvent, keycode } from "@agencecinq/utils";
 import type { SwitchDetail } from "./types.js";
-
-const dispatchEvent = (
-  target: HTMLElement,
-  eventName: string,
-  detail: SwitchDetail,
-): boolean =>
-  target.dispatchEvent(
-    new CustomEvent<SwitchDetail>(eventName, {
-      bubbles: true,
-      cancelable: true,
-      detail,
-    }),
-  );
 
 /**
  * Switch Web Component implementing the WAI-ARIA switch pattern.

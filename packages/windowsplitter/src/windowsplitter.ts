@@ -1,4 +1,4 @@
-import { EVENTS, clamp } from "@agencecinq/utils";
+import { EVENTS, clamp, dispatchEvent } from "@agencecinq/utils";
 import type {
   FormatSize,
   FormatValue,
@@ -472,12 +472,9 @@ export class WindowSplitter extends HTMLElement {
       collapsed: value === this.min,
     };
 
-    this.dispatchEvent(
-      new CustomEvent(EVENTS.WINDOWSPLITTER_CHANGE, {
-        bubbles: true,
-        detail,
-      }),
-    );
+    dispatchEvent(this, EVENTS.WINDOWSPLITTER_CHANGE, detail, {
+      cancelable: false,
+    });
   }
 
   private reflectCollapsedAttribute(): void {

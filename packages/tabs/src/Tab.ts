@@ -1,5 +1,4 @@
-import { EVENTS } from '@agencecinq/utils';
-import dispatchEvent from './utils/dispatchEvent.js';
+import { EVENTS, dispatchEvent, parseList } from '@agencecinq/utils';
 
 export default class Tab {
 	el: HTMLElement;
@@ -13,7 +12,7 @@ export default class Tab {
 		this.index = index;
 		this.id = el.id;
 
-		this.controls = el.getAttribute('aria-controls')?.trim().split(' ')[0] || '';
+		this.controls = parseList(el.getAttribute('aria-controls'))[0] || '';
 
 		const selected = el.getAttribute('aria-selected');
 		this.active = selected === 'true';
@@ -38,16 +37,22 @@ export default class Tab {
 			return;
 		}
 
-		const event = new CustomEvent(EVENTS.TAB_BEFORE_ACTIVATE, {
-			bubbles: true,
-			cancelable: true,
-			detail: { index: this.index, controls: this.controls, element: this.el },
-		});
-		this.el.dispatchEvent(event);
+		if (
+			!dispatchEvent(
+				this.el,
+				EVENTS.TAB_BEFORE_ACTIVATE,
+				{ index: this.index, controls: this.controls, element: this.el },
+			)
+		) {
+			return;
+		}
 
-		if (event.defaultPrevented) return;
-
-		dispatchEvent(this.el, { controls: this.controls, element: this.el }, EVENTS.TAB_ACTIVATE);
+		dispatchEvent(
+			this.el,
+			EVENTS.TAB_ACTIVATE,
+			{ controls: this.controls, element: this.el },
+			{ cancelable: false },
+		);
 		this.activate(focus);
 	}
 
@@ -99,7 +104,12 @@ export default class Tab {
 	 * @return void
 	 */
 	delete = () => {
-		dispatchEvent(this.el, { controls: this.controls, element: this.el }, EVENTS.TAB_DELETE);
+		dispatchEvent(
+			this.el,
+			EVENTS.TAB_DELETE,
+			{ controls: this.controls, element: this.el },
+			{ cancelable: false },
+		);
 		this.el.parentElement?.removeChild(this.el);
 	}
 

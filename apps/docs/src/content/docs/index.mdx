@@ -63,6 +63,10 @@ import RegisterComponents from './_components/RegisterComponents.astro';
 - **Event-driven**: integrate with your app by listening to events and dispatching intents.
 - **WAI‑ARIA aligned**: keyboard navigation and ARIA states follow APG patterns.
 
+## Conventions
+
+- **`$` prefix**: a property or local named with a leading `$` (e.g. `$button`, `$input`) holds a DOM node — an `HTMLElement` (or a more specific subtype such as `HTMLButtonElement`). Plain names are reserved for values, IDs, and non-DOM state.
+
 Interactive examples use **AD&D 2nd Edition** flavour — ability scores, spell slots, bestiary entries, and dungeon delves — so demos read like a campaign sheet rather than a generic web app.
 
 <RegisterComponents />

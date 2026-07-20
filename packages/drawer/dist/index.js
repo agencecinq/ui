@@ -26,41 +26,48 @@ var e = {
 	CART_BEFORE_UPDATE: "cart-before-update",
 	CART_UPDATE: "cart-update",
 	VARIANT_CHANGE: "variant-change"
-}, t = (e, t) => {
+}, t = (e, t, n, r = {}) => {
+	let { bubbles: i = !0, cancelable: a = !0 } = r;
+	return e.dispatchEvent(new CustomEvent(t, {
+		bubbles: i,
+		cancelable: a,
+		detail: n
+	}));
+}, n = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug");
-var i = {
+}, r = document.documentElement, { body: i } = document;
+r.hasAttribute("data-debug");
+var a = {
 	y: 0,
 	x: 0
-}, a = {
+}, o = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", t(({ x: e, y: t }) => {
-	a.x = e, a.y = t;
+window.addEventListener("pointermove", n(({ x: e, y: t }) => {
+	o.x = e, o.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var o = (e, t) => {
-	e !== void 0 && (i.x = e), t !== void 0 && (i.y = t), window.scrollTo(i.x, i.y);
+var s = (e, t) => {
+	e !== void 0 && (a.x = e), t !== void 0 && (a.y = t), window.scrollTo(a.x, a.y);
 };
-function s() {
-	let e = n.scrollLeft, t = n.scrollTop, a = r.scrollLeft, s = r.scrollTop;
-	i.x = window.scrollX || e || a, i.y = window.scrollY || t || s || 0, n.style.setProperty("overflow", "hidden"), n.style.setProperty("height", "100%"), n.style.setProperty("scroll-padding-top", "0px"), o(i.x, i.y);
+function c() {
+	let e = r.scrollLeft, t = r.scrollTop, n = i.scrollLeft, o = i.scrollTop;
+	a.x = window.scrollX || e || n, a.y = window.scrollY || t || o || 0, r.style.setProperty("overflow", "hidden"), r.style.setProperty("height", "100%"), r.style.setProperty("scroll-padding-top", "0px"), s(a.x, a.y);
 }
-function c(e = 0) {
-	let t = !0, r = i.y;
-	typeof e == "number" ? r = e : typeof e == "boolean" && e === !1 && (t = !1), n.style.removeProperty("overflow"), n.style.removeProperty("height"), n.style.removeProperty("scroll-padding-top"), t && o(i.x, r);
+function l(e = 0) {
+	let t = !0, n = a.y;
+	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), r.style.removeProperty("overflow"), r.style.removeProperty("height"), r.style.removeProperty("scroll-padding-top"), t && s(a.x, n);
 }
-var l = {};
-function u(e) {
+var u = {};
+function d(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function d(e) {
+function f(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -74,25 +81,25 @@ function d(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => u(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => d(e) && e.getAttribute("tabindex") !== "-1");
 }
-function f(e, t = e) {
-	let n = d(e);
+function p(e, t = e) {
+	let n = f(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	p(), l.keydown = (t) => {
+	m(), u.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", l.keydown), t.focus(), t instanceof HTMLInputElement && [
+	}, document.addEventListener("keydown", u.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
 		"text",
 		"email",
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function p(e = null) {
-	l.keydown && document.removeEventListener("keydown", l.keydown), e && e.focus();
+function m(e = null) {
+	u.keydown && document.removeEventListener("keydown", u.keydown), e && e.focus();
 }
-var m = {
+var h = {
 	BACKSPACE: 8,
 	TAB: 9,
 	ENTER: 13,
@@ -108,7 +115,7 @@ var m = {
 	ARROW_RIGHT: 39,
 	ARROW_DOWN: 40,
 	DELETE: 46
-}, h = class extends HTMLElement {
+}, g = class extends HTMLElement {
 	trigger = null;
 	trap = null;
 	constructor() {
@@ -129,7 +136,7 @@ var m = {
 		trap: null
 	});
 	handleKeyUp = (e) => {
-		(e.which || e.keyCode) === m.ESCAPE && this.hasAttribute("open") && this.removeAttribute("open");
+		(e.which || e.keyCode) === h.ESCAPE && this.hasAttribute("open") && this.removeAttribute("open");
 	};
 	handleDrawerOpen = (e) => {
 		e.detail.drawer !== this.cid && this.hasAttribute("open") && (this.trigger = e.detail.trigger, this.removeAttribute("open")), e.detail.drawer === this.cid && !this.hasAttribute("open") && (this.trigger = e.detail.trigger, this.setAttribute("open", ""));
@@ -145,14 +152,20 @@ var m = {
 		return e && (this.trigger = e), this.trap = t || this, this.toggleAttribute("open");
 	}
 	open() {
-		this.style.setProperty("opacity", "1"), this.style.setProperty("visibility", "visible"), document.documentElement.dispatchEvent(new CustomEvent(e.DRAWER_OPEN, { detail: { drawer: this.cid } })), this.addEventListener("transitionend", () => {
-			let e = d(this.trap);
-			e.length > 0 && f(this.trap, e[0]), s();
+		this.style.setProperty("opacity", "1"), this.style.setProperty("visibility", "visible"), t(document.documentElement, e.DRAWER_OPEN, { drawer: this.cid }, {
+			bubbles: !1,
+			cancelable: !1
+		}), this.addEventListener("transitionend", () => {
+			let e = f(this.trap);
+			e.length > 0 && p(this.trap, e[0]), c();
 		}, { once: !0 });
 	}
 	close() {
-		p(this.trigger), this.addEventListener("transitionend", () => {
-			this.hasAttribute("open") || (this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden"), document.documentElement.dispatchEvent(new CustomEvent(e.DRAWER_CLOSE, { detail: { drawer: this.cid } })), c(!1));
+		m(this.trigger), this.addEventListener("transitionend", () => {
+			this.hasAttribute("open") || (this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden"), t(document.documentElement, e.DRAWER_CLOSE, { drawer: this.cid }, {
+				bubbles: !1,
+				cancelable: !1
+			}), l(!1));
 		}, { once: !0 });
 	}
 	disconnectedCallback() {
@@ -163,10 +176,10 @@ var m = {
 		e === "open" && (n === null ? this.close() : this.open());
 	}
 };
-customElements.get("cinq-drawer") || customElements.define("cinq-drawer", h);
+customElements.get("cinq-drawer") || customElements.define("cinq-drawer", g);
 //#endregion
 //#region src/drawer-button.ts
-var g = class extends HTMLElement {
+var _ = class extends HTMLElement {
 	controls = [];
 	$button = null;
 	handleDrawerClose = (e) => {
@@ -180,19 +193,22 @@ var g = class extends HTMLElement {
 		this.controls = this.$button.getAttribute("aria-controls")?.trim().split(" ") || [], this.$button.addEventListener("click", this.handleClick), document.documentElement.addEventListener(e.DRAWER_CLOSE, this.handleDrawerClose), document.documentElement.addEventListener(e.DRAWER_OPEN, this.handleDrawerOpen);
 	}
 	handleClick = () => {
-		this.$button.setAttribute("aria-expanded", this.$button.getAttribute("aria-expanded") === "true" ? "false" : "true"), this.controls.forEach((t) => {
-			let n = {
+		this.$button.setAttribute("aria-expanded", this.$button.getAttribute("aria-expanded") === "true" ? "false" : "true"), this.controls.forEach((n) => {
+			let r = {
 				trigger: this.$button,
 				trap: document.getElementById(`${this.$button?.getAttribute("data-trap")}`),
-				drawer: t
+				drawer: n
 			};
-			document.documentElement.dispatchEvent(new CustomEvent(e.DRAWER_TOGGLE, { detail: n }));
+			t(document.documentElement, e.DRAWER_TOGGLE, r, {
+				bubbles: !1,
+				cancelable: !1
+			});
 		});
 	};
 	disconnectedCallback() {
 		this.$button.removeEventListener("click", this.handleClick), document.documentElement.removeEventListener(e.DRAWER_CLOSE, this.handleDrawerClose), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.handleDrawerOpen);
 	}
 };
-customElements.get("cinq-drawer-button") || customElements.define("cinq-drawer-button", g);
+customElements.get("cinq-drawer-button") || customElements.define("cinq-drawer-button", _);
 //#endregion
-export { h as Drawer, g as DrawerButton };
+export { g as Drawer, _ as DrawerButton };

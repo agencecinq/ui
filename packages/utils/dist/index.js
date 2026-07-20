@@ -26,46 +26,53 @@ var e = {
 	CART_BEFORE_UPDATE: "cart-before-update",
 	CART_UPDATE: "cart-update",
 	VARIANT_CHANGE: "variant-change"
-}, t = (e, t) => {
+}, t = (e, t, n, r = {}) => {
+	let { bubbles: i = !0, cancelable: a = !0 } = r;
+	return e.dispatchEvent(new CustomEvent(t, {
+		bubbles: i,
+		cancelable: a,
+		detail: n
+	}));
+}, n = (e) => e ? e.trim().split(/\s+/).filter(Boolean) : [], r = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, n = document.documentElement, { body: r } = document, i = n.hasAttribute("data-debug"), a = {
+}, i = document.documentElement, { body: a } = document, o = i.hasAttribute("data-debug"), s = {
 	y: 0,
 	x: 0
-}, o = {
+}, c = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", t(({ x: e, y: t }) => {
-	o.x = e, o.y = t;
+window.addEventListener("pointermove", r(({ x: e, y: t }) => {
+	c.x = e, c.y = t;
 }, 100), { passive: !0 });
-var s = {
+var l = {
 	lg: window.matchMedia("(width >= 64rem)"),
 	xl: window.matchMedia("(min-width: 1280px)"),
 	"2xl": window.matchMedia("(min-width: 1440px)"),
 	"3xl": window.matchMedia("(min-width: 1920px)")
-}, c = !0, l = (e, t) => {
-	e !== void 0 && (a.x = e), t !== void 0 && (a.y = t), window.scrollTo(a.x, a.y);
+}, u = !0, d = (e, t) => {
+	e !== void 0 && (s.x = e), t !== void 0 && (s.y = t), window.scrollTo(s.x, s.y);
 };
-function u() {
-	let e = n.scrollLeft, t = n.scrollTop, i = r.scrollLeft, o = r.scrollTop;
-	a.x = window.scrollX || e || i, a.y = window.scrollY || t || o || 0, n.style.setProperty("overflow", "hidden"), n.style.setProperty("height", "100%"), n.style.setProperty("scroll-padding-top", "0px"), l(a.x, a.y);
+function f() {
+	let e = i.scrollLeft, t = i.scrollTop, n = a.scrollLeft, r = a.scrollTop;
+	s.x = window.scrollX || e || n, s.y = window.scrollY || t || r || 0, i.style.setProperty("overflow", "hidden"), i.style.setProperty("height", "100%"), i.style.setProperty("scroll-padding-top", "0px"), d(s.x, s.y);
 }
-function d(e = 0) {
-	let t = !0, r = a.y;
-	typeof e == "number" ? r = e : typeof e == "boolean" && e === !1 && (t = !1), n.style.removeProperty("overflow"), n.style.removeProperty("height"), n.style.removeProperty("scroll-padding-top"), t && l(a.x, r);
+function p(e = 0) {
+	let t = !0, n = s.y;
+	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), i.style.removeProperty("overflow"), i.style.removeProperty("height"), i.style.removeProperty("scroll-padding-top"), t && d(s.x, n);
 }
 //#endregion
 //#region src/focus-trap.ts
-var f = {};
-function p(e) {
+var m = {};
+function h(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function m(e) {
+function g(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -79,25 +86,25 @@ function m(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => p(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => h(e) && e.getAttribute("tabindex") !== "-1");
 }
-function h(e, t = e) {
-	let n = m(e);
+function _(e, t = e) {
+	let n = g(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	g(), f.keydown = (t) => {
+	v(), m.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", f.keydown), t.focus(), t instanceof HTMLInputElement && [
+	}, document.addEventListener("keydown", m.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
 		"text",
 		"email",
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function g(e = null) {
-	f.keydown && document.removeEventListener("keydown", f.keydown), e && e.focus();
+function v(e = null) {
+	m.keydown && document.removeEventListener("keydown", m.keydown), e && e.focus();
 }
-var _ = {
+var y = {
 	BACKSPACE: 8,
 	TAB: 9,
 	ENTER: 13,
@@ -113,6 +120,6 @@ var _ = {
 	ARROW_RIGHT: 39,
 	ARROW_DOWN: 40,
 	DELETE: 46
-}, v = (e, t, n) => Math.min(Math.max(e, t), n);
+}, b = (e, t, n) => Math.min(Math.max(e, t), n);
 //#endregion
-export { e as EVENTS, h as addTrapFocus, r as body, s as breakpoints, v as clamp, u as disableScroll, d as enableScroll, m as getFocusableElements, n as html, i as isDebug, _ as keycode, o as mouse, c as production, g as removeTrapFocus, a as scroll, t as throttle };
+export { e as EVENTS, _ as addTrapFocus, a as body, l as breakpoints, b as clamp, f as disableScroll, t as dispatchEvent, p as enableScroll, g as getFocusableElements, i as html, o as isDebug, y as keycode, c as mouse, n as parseList, u as production, v as removeTrapFocus, s as scroll, r as throttle };

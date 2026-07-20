@@ -26,23 +26,30 @@ var e = {
 	CART_BEFORE_UPDATE: "cart-before-update",
 	CART_UPDATE: "cart-update",
 	VARIANT_CHANGE: "variant-change"
-}, t = (e, t) => {
+}, t = (e, t, n, r = {}) => {
+	let { bubbles: i = !0, cancelable: a = !0 } = r;
+	return e.dispatchEvent(new CustomEvent(t, {
+		bubbles: i,
+		cancelable: a,
+		detail: n
+	}));
+}, n = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug");
-var i = {
+}, r = document.documentElement, { body: i } = document;
+r.hasAttribute("data-debug");
+var a = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", t(({ x: e, y: t }) => {
-	i.x = e, i.y = t;
+window.addEventListener("pointermove", n(({ x: e, y: t }) => {
+	a.x = e, a.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var a = {
+var o = {
 	BACKSPACE: 8,
 	TAB: 9,
 	ENTER: 13,
@@ -58,11 +65,7 @@ var a = {
 	ARROW_RIGHT: 39,
 	ARROW_DOWN: 40,
 	DELETE: 46
-}, o = (e, t, n) => e.dispatchEvent(new CustomEvent(t, {
-	bubbles: !0,
-	cancelable: !0,
-	detail: n
-})), s = class extends HTMLElement {
+}, s = class extends HTMLElement {
 	static observedAttributes = ["checked", "disabled"];
 	$input = null;
 	reflectingAttribute = !1;
@@ -94,11 +97,11 @@ var a = {
 	toggle() {
 		return this.disabled ? !1 : this.checked ? this.deactivate() : this.activate();
 	}
-	activate(t = !0) {
-		return this.disabled || this.checked || t && !o(this, e.SWITCH_ACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "true"), this.syncInput(), this.reflectCheckedAttribute(), !0);
+	activate(n = !0) {
+		return this.disabled || this.checked || n && !t(this, e.SWITCH_ACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "true"), this.syncInput(), this.reflectCheckedAttribute(), !0);
 	}
-	deactivate(t = !0) {
-		return this.disabled || !this.checked || t && !o(this, e.SWITCH_DEACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "false"), this.syncInput(), this.reflectCheckedAttribute(), !0);
+	deactivate(n = !0) {
+		return this.disabled || !this.checked || n && !t(this, e.SWITCH_DEACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "false"), this.syncInput(), this.reflectCheckedAttribute(), !0);
 	}
 	destroy() {
 		this.removeEventListener("click", this.handleClick), this.removeEventListener("keydown", this.handleKeydown), this.removeEventListener("focus", this.handleFocus), this.removeEventListener("blur", this.handleBlur);
@@ -107,7 +110,7 @@ var a = {
 		this.disabled || e.detail !== 0 && this.toggle();
 	};
 	handleKeydown = (e) => {
-		this.disabled || e.keyCode !== a.SPACE && e.keyCode !== a.ENTER || (e.preventDefault(), this.toggle());
+		this.disabled || e.keyCode !== o.SPACE && e.keyCode !== o.ENTER || (e.preventDefault(), this.toggle());
 	};
 	handleFocus = () => {
 		this.classList.add("focus");

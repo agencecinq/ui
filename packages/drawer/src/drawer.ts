@@ -5,7 +5,8 @@ import {
   addTrapFocus,
   removeTrapFocus,
   getFocusableElements,
-  keycode
+  keycode,
+  dispatchEvent,
 } from '@agencecinq/utils';
 
 export class Drawer extends HTMLElement {
@@ -107,9 +108,12 @@ export class Drawer extends HTMLElement {
     this.style.setProperty('opacity', '1');
     this.style.setProperty('visibility', 'visible');
 
-    document.documentElement.dispatchEvent(new CustomEvent(EVENTS.DRAWER_OPEN, {
-      detail: { drawer: this.cid }
-    }));
+    dispatchEvent(
+      document.documentElement,
+      EVENTS.DRAWER_OPEN,
+      { drawer: this.cid },
+      { bubbles: false, cancelable: false },
+    );
 
     this.addEventListener(
       'transitionend',
@@ -138,9 +142,12 @@ export class Drawer extends HTMLElement {
           this.style.setProperty('opacity', '0');
           this.style.setProperty('visibility', 'hidden');
 
-          document.documentElement.dispatchEvent(new CustomEvent(EVENTS.DRAWER_CLOSE, {
-            detail: { drawer: this.cid }
-          }));
+          dispatchEvent(
+            document.documentElement,
+            EVENTS.DRAWER_CLOSE,
+            { drawer: this.cid },
+            { bubbles: false, cancelable: false },
+          );
 
           enableScroll(false);
         }
