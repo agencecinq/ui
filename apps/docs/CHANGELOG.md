@@ -1,5 +1,21 @@
 # @agencecinq/docs
 
+## 4.4.1
+
+### Patch Changes
+
+- Updated dependencies [2e12ffb]
+  - @agencecinq/utils@5.1.0
+  - @agencecinq/disclosure-button@2.0.0
+  - @agencecinq/accordion@1.0.1
+  - @agencecinq/tabs@10.0.2
+  - @agencecinq/switch@2.0.1
+  - @agencecinq/drawer@5.0.2
+  - @agencecinq/modal@2.0.2
+  - @agencecinq/combobox@1.0.1
+  - @agencecinq/spinbutton@1.0.3
+  - @agencecinq/windowsplitter@1.0.1
+
 ## 4.4.0
 
 ### Minor Changes

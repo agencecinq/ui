@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/spinbutton",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Accessible, WAI-ARIA spinbutton as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",

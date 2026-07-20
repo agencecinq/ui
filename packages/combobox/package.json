@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/combobox",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Accessible editable combobox with list autocomplete as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",
