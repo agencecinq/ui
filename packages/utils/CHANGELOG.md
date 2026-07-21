@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 5.2.0
+
+### Minor Changes
+
+- ec6a727: Add `parseNumber` and `parseBoolean` helpers alongside `parseList` in a single `parse` module, and use them in combobox, accordion, and spinbutton.
+
 ## 5.1.1
 
 ### Patch Changes
