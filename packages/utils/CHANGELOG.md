@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 5.1.1
+
+### Patch Changes
+
+- 264c92a: Resolve `aria-controls` targets via `Element.ariaControlsElements` instead of `parseList` + `getElementById`.
+
 ## 5.1.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/accordion",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Accessible, WAI-ARIA accordion as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",

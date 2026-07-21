@@ -1,5 +1,11 @@
 # @agencecinq/modal
 
+## 2.0.3
+
+### Patch Changes
+
+- 264c92a: Resolve `aria-controls` targets via `Element.ariaControlsElements` instead of `parseList` + `getElementById`.
+
 ## 2.0.2
 
 ### Patch Changes

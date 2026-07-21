@@ -1,5 +1,11 @@
 # @agencecinq/combobox
 
+## 1.0.2
+
+### Patch Changes
+
+- 264c92a: Resolve `aria-controls` targets via `Element.ariaControlsElements` instead of `parseList` + `getElementById`.
+
 ## 1.0.1
 
 ### Patch Changes

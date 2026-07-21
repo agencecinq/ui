@@ -1,5 +1,11 @@
 # @agencecinq/drawer
 
+## 5.0.3
+
+### Patch Changes
+
+- 264c92a: Resolve `aria-controls` targets via `Element.ariaControlsElements` instead of `parseList` + `getElementById`.
+
 ## 5.0.2
 
 ### Patch Changes
