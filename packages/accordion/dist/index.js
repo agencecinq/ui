@@ -83,9 +83,7 @@ var o = {
 		this.el = e, this.index = t;
 	}
 	init() {
-		if (this.$button = this.el.querySelector("[data-accordion-header]") || this.el.querySelector("button"), !this.$button) return;
-		let e = this.$button.getAttribute("aria-controls")?.trim().split(/\s+/)[0] || "";
-		this.$body = e ? document.getElementById(e) : null, this.$body && (this.$inner = this.$body.querySelector("[data-accordion-inner]") || this.$body.firstElementChild, this.isDeselect = u(this.el.getAttribute("data-accordion-deselect")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.measure(), this.$button.addEventListener("click", this.handleClick), this.$button.addEventListener("focus", this.handleFocus), this.$button.addEventListener("blur", this.handleBlur), window.addEventListener("resize", this.handleResize));
+		this.$button = this.el.querySelector("[data-accordion-header]") || this.el.querySelector("button"), this.$button && (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? null, this.$body && (this.$inner = this.$body.querySelector("[data-accordion-inner]") || this.$body.firstElementChild, this.isDeselect = u(this.el.getAttribute("data-accordion-deselect")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.measure(), this.$button.addEventListener("click", this.handleClick), this.$button.addEventListener("focus", this.handleFocus), this.$button.addEventListener("blur", this.handleBlur), window.addEventListener("resize", this.handleResize)));
 	}
 	get open() {
 		return this.$button?.getAttribute("aria-expanded") === "true";

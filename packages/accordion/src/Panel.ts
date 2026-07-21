@@ -1,4 +1,4 @@
-import { EVENTS, dispatchEvent, parseList } from "@agencecinq/utils";
+import { EVENTS, dispatchEvent } from "@agencecinq/utils";
 import type { AccordionPanelDetail } from "./types.js";
 import { parseBooleanAttr, setActive, setInactive } from "./utils.js";
 
@@ -30,9 +30,11 @@ export default class Panel {
 
     if (!this.$button) return;
 
-    const control = parseList(this.$button.getAttribute("aria-controls"))[0] || "";
-
-    this.$body = control ? document.getElementById(control) : null;
+    // IDL: `ariaControlsElements` reflects `aria-controls` ID references.
+    this.$body =
+      ((this.$button.ariaControlsElements ?? [])[0] as
+        | HTMLElement
+        | undefined) ?? null;
 
     if (!this.$body) return;
 

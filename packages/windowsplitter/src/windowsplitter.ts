@@ -277,8 +277,9 @@ export class WindowSplitter extends HTMLElement {
   }
 
   private resolvePrimary(): void {
-    const id = this.getAttribute("aria-controls");
-    this.$primary = id ? document.getElementById(id) : null;
+    // IDL: `ariaControlsElements` reflects `aria-controls` ID references.
+    this.$primary =
+      ((this.ariaControlsElements ?? [])[0] as HTMLElement | undefined) ?? null;
   }
 
   private observeContainer(): void {

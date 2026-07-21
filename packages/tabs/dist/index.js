@@ -80,9 +80,11 @@ var s = class {
 	index;
 	controls;
 	constructor(e, t) {
-		this.el = e, this.index = t, this.id = e.id, this.controls = e.getAttribute("aria-controls")?.trim().split(" ")[0] || "";
-		let n = e.getAttribute("aria-selected");
-		this.active = n === "true";
+		this.el = e, this.index = t, this.id = e.id;
+		let n = (e.ariaControlsElements ?? [])[0];
+		this.controls = n?.id ?? "";
+		let r = e.getAttribute("aria-selected");
+		this.active = r === "true";
 	}
 	init = () => this.initEvents();
 	initEvents = () => this.el.addEventListener("click", this.handleClick);

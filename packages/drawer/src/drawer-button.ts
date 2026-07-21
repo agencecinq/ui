@@ -1,6 +1,7 @@
-import { EVENTS, dispatchEvent, parseList } from '@agencecinq/utils';
+import { EVENTS, dispatchEvent } from '@agencecinq/utils';
 
 export class DrawerButton extends HTMLElement {
+  /** Controlled drawer element IDs from `ariaControlsElements`. */
   controls: string[] = [];
   $button: HTMLButtonElement | null = null;
 
@@ -24,9 +25,11 @@ export class DrawerButton extends HTMLElement {
       throw new Error('DrawerButton: button element not found');
     }
 
-    // Aria-controls can be a space-separated list of element IDs that the
-    // button controls, See https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-controls
-    this.controls = parseList(this.$button.getAttribute('aria-controls'));
+    // IDL: `ariaControlsElements` reflects `aria-controls` ID references.
+    // See https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements
+    this.controls = (this.$button.ariaControlsElements ?? []).map(
+      (element) => element.id,
+    );
 
     this.$button.addEventListener('click', this.handleClick);
     document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, this.handleDrawerClose as EventListener);

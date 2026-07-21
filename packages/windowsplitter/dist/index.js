@@ -173,8 +173,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = ({ value: e }) => `${e}%`,
 		this.$container = this.containerOverride ?? this.parentElement;
 	}
 	resolvePrimary() {
-		let e = this.getAttribute("aria-controls");
-		this.$primary = e ? document.getElementById(e) : null;
+		this.$primary = (this.ariaControlsElements ?? [])[0] ?? null;
 	}
 	observeContainer() {
 		this.resizeObserver?.disconnect(), this.resizeObserver = null, !(!this.$container || typeof ResizeObserver > "u") && (this.resizeObserver = new ResizeObserver(() => this.apply(this.value, !1)), this.resizeObserver.observe(this.$container));

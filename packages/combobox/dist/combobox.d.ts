@@ -74,8 +74,8 @@ export declare class Combobox extends HTMLElement {
     private syncOptionsFromAttributes;
     private syncDisabled;
     /**
-     * Find the optional open button linked through `aria-controls`
-     * (space-separated id list supported). Prefer the host, then document.
+     * Find the optional open button linked through `ariaControlsElements`.
+     * Prefer the host, then document.
      */
     private resolveButton;
     private bind;

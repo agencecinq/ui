@@ -1,4 +1,4 @@
-import { EVENTS, dispatchEvent, parseList } from "@agencecinq/utils";
+import { EVENTS, dispatchEvent } from "@agencecinq/utils";
 import Props from "./Props.js";
 import Keyboard from "./keyboard.js";
 import type {
@@ -424,13 +424,13 @@ export class Combobox extends HTMLElement {
   }
 
   /**
-   * Find the optional open button linked through `aria-controls`
-   * (space-separated id list supported). Prefer the host, then document.
+   * Find the optional open button linked through `ariaControlsElements`.
+   * Prefer the host, then document.
    */
   private resolveButton(): HTMLButtonElement | null {
-    const { id } = this.listbox;
+    const listbox = this.$listbox;
 
-    if (!id) {
+    if (!listbox) {
       return null;
     }
 
@@ -440,15 +440,9 @@ export class Combobox extends HTMLElement {
       );
 
       for (const button of buttons) {
-        const controls = button.getAttribute("aria-controls");
+        const controlled = button.ariaControlsElements ?? [];
 
-        if (!controls) {
-          continue;
-        }
-
-        const ids = parseList(controls);
-
-        if (ids.includes(id)) {
+        if (controlled.includes(listbox)) {
           return button;
         }
       }

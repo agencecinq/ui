@@ -3,6 +3,7 @@ export default class Tab {
     active: boolean;
     id: string;
     index: number;
+    /** ID of the controlled tabpanel (`aria-controls` / `ariaControlsElements`). */
     controls: string;
     constructor(el: HTMLElement, index: number);
     init: () => void;

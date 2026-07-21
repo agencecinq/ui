@@ -345,14 +345,11 @@ var o = class {
 		this.$input && (this.$input.disabled = e, e ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled")), this.$button && (this.$button.disabled = e, e ? this.$button.setAttribute("disabled", "") : this.$button.removeAttribute("disabled")), e && this._expanded && this.hide({ force: !0 });
 	}
 	resolveButton() {
-		let { id: e } = this.listbox;
+		let e = this.$listbox;
 		if (!e) return null;
 		for (let t of [this, document]) {
 			let n = t.querySelectorAll("button[aria-controls]");
-			for (let t of n) {
-				let n = t.getAttribute("aria-controls");
-				if (n && n.trim().split(/\s+/).includes(e)) return t;
-			}
+			for (let t of n) if ((t.ariaControlsElements ?? []).includes(e)) return t;
 		}
 		return null;
 	}

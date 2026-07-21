@@ -1,10 +1,11 @@
-import { EVENTS, dispatchEvent, parseList } from '@agencecinq/utils';
+import { EVENTS, dispatchEvent } from '@agencecinq/utils';
 
 export default class Tab {
 	el: HTMLElement;
 	active: boolean = false;
 	id: string = '';
 	index: number;
+	/** ID of the controlled tabpanel (`aria-controls` / `ariaControlsElements`). */
 	controls: string;
 
 	constructor(el: HTMLElement, index: number) {
@@ -12,7 +13,10 @@ export default class Tab {
 		this.index = index;
 		this.id = el.id;
 
-		this.controls = parseList(el.getAttribute('aria-controls'))[0] || '';
+		const controlled = (el.ariaControlsElements ?? [])[0] as
+			| HTMLElement
+			| undefined;
+		this.controls = controlled?.id ?? '';
 
 		const selected = el.getAttribute('aria-selected');
 		this.active = selected === 'true';
