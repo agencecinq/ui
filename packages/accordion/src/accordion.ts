@@ -1,7 +1,7 @@
-import { EVENTS, keycode } from "@agencecinq/utils";
+import { EVENTS, keycode, parseBoolean } from "@agencecinq/utils";
 import Panel from "./Panel.js";
 import type { AccordionOptions } from "./types.js";
-import { getURLHash, getAccordionPanels, parseBooleanAttr } from "./utils.js";
+import { getURLHash, getAccordionPanels } from "./utils.js";
 
 const DEFAULTS: AccordionOptions = {
   multiselectable: false,
@@ -23,8 +23,8 @@ export class Accordion extends HTMLElement {
     const hash = this.getAttribute("data-accordion-hash");
 
     this.options = {
-      multiselectable: parseBooleanAttr(multiselectable, false),
-      hash: hash === null ? DEFAULTS.hash : parseBooleanAttr(hash, true),
+      multiselectable: parseBoolean(multiselectable),
+      hash: parseBoolean(hash, DEFAULTS.hash),
     };
 
     const panelElements = getAccordionPanels(this);

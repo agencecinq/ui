@@ -38,7 +38,7 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #f9fafb;
   }
 
-  .docs-panes cinq-windowsplitter {
+  .docs-panes > [role='separator'] {
     flex: 0 0 auto;
     position: absolute;
     z-index: 2;
@@ -50,7 +50,7 @@ import RegisterComponents from './RegisterComponents.astro';
     user-select: none;
   }
 
-  .docs-panes cinq-windowsplitter[aria-orientation='vertical'] {
+  .docs-panes > [role='separator'][aria-orientation='vertical'] {
     top: 0;
     bottom: 0;
     left: 0;
@@ -59,7 +59,7 @@ import RegisterComponents from './RegisterComponents.astro';
     cursor: col-resize;
   }
 
-  .docs-panes cinq-windowsplitter[aria-orientation='horizontal'] {
+  .docs-panes > [role='separator'][aria-orientation='horizontal'] {
     left: 0;
     right: 0;
     top: 0;
@@ -68,21 +68,21 @@ import RegisterComponents from './RegisterComponents.astro';
     cursor: row-resize;
   }
 
-  .docs-panes cinq-windowsplitter:focus {
+  .docs-panes > [role='separator']:focus {
     outline: none;
   }
 
-  .docs-panes cinq-windowsplitter:focus-visible {
+  .docs-panes > [role='separator']:focus-visible {
     outline: 2px solid #111827;
     outline-offset: 2px;
   }
 
-  .docs-panes cinq-windowsplitter[dragging] {
+  .docs-panes[dragging] > [role='separator'] {
     background: #374151;
   }
 
-  .docs-panes cinq-windowsplitter[disabled],
-  .docs-panes cinq-windowsplitter[aria-disabled='true'] {
+  .docs-panes[disabled] > [role='separator'],
+  .docs-panes[aria-disabled='true'] > [role='separator'] {
     opacity: 0.35;
     pointer-events: none;
   }
@@ -118,7 +118,7 @@ import RegisterComponents from './RegisterComponents.astro';
     clip-path: inset(0 50% 0 0);
   }
 
-  .docs-comparison cinq-windowsplitter {
+  .docs-comparison > [role='separator'] {
     position: absolute;
     inset-block: 0;
     left: 0;
@@ -135,11 +135,13 @@ import RegisterComponents from './RegisterComponents.astro';
     user-select: none;
   }
 
-  .docs-comparison cinq-windowsplitter::before {
+  .docs-comparison > [role='separator']::before {
     content: '';
     position: absolute;
     inset-block: 0;
+    left: 50%;
     width: 2px;
+    transform: translateX(-50%);
     background: #fff;
   }
 
@@ -153,16 +155,18 @@ import RegisterComponents from './RegisterComponents.astro';
     border-radius: 9999px;
     background: #fff;
     color: #111827;
-    font-size: 1.25rem;
-    font-weight: 300;
-    line-height: 1;
-    letter-spacing: -0.05em;
     box-shadow:
       0 1px 2px rgb(0 0 0 / 6%),
       0 4px 12px rgb(0 0 0 / 12%);
   }
 
-  .docs-comparison cinq-windowsplitter:focus-visible .docs-comparison__handle {
+  .docs-comparison__handle svg {
+    display: block;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .docs-comparison > [role='separator']:focus-visible .docs-comparison__handle {
     outline: 2px solid #111827;
     outline-offset: 2px;
   }
@@ -191,12 +195,15 @@ import RegisterComponents from './RegisterComponents.astro';
           </p>
         </div>
 
-        <div class="docs-panes" data-windowsplitter-demo="vertical">
+        <cinq-windowsplitter
+          class="docs-panes"
+          data-windowsplitter-demo="vertical"
+        >
           <div id="docs-ws-toc" class="docs-pane docs-pane--primary" style="width: 30%">
             <strong id="docs-ws-toc-label">Party roster</strong>
             <p class="mt-2 mb-0">Primary pane — sized by the splitter value.</p>
           </div>
-          <cinq-windowsplitter
+          <div
             role="separator"
             tabindex="0"
             aria-orientation="vertical"
@@ -205,12 +212,12 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-valuenow="30"
             aria-controls="docs-ws-toc"
             aria-labelledby="docs-ws-toc-label"
-          ></cinq-windowsplitter>
+          ></div>
           <div class="docs-pane docs-pane--secondary">
             <strong>Encounter notes</strong>
             <p class="mt-2 mb-0">Secondary pane fills the remaining space.</p>
           </div>
-        </div>
+        </cinq-windowsplitter>
 
         <p class="docs-windowsplitter-state" data-windowsplitter-state="vertical" aria-live="polite">
           —
@@ -229,12 +236,15 @@ import RegisterComponents from './RegisterComponents.astro';
           </p>
         </div>
 
-        <div class="docs-panes docs-panes--horizontal" data-windowsplitter-demo="horizontal">
+        <cinq-windowsplitter
+          class="docs-panes docs-panes--horizontal"
+          data-windowsplitter-demo="horizontal"
+        >
           <div id="docs-ws-notes" class="docs-pane docs-pane--primary" style="height: 40%">
             <strong id="docs-ws-notes-label">Prepared spells</strong>
             <p class="mt-2 mb-0">Primary pane — height follows the splitter value.</p>
           </div>
-          <cinq-windowsplitter
+          <div
             role="separator"
             tabindex="0"
             aria-orientation="horizontal"
@@ -243,12 +253,12 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-valuenow="40"
             aria-controls="docs-ws-notes"
             aria-labelledby="docs-ws-notes-label"
-          ></cinq-windowsplitter>
+          ></div>
           <div class="docs-pane docs-pane--secondary">
             <strong>Spell description</strong>
             <p class="mt-2 mb-0">Secondary pane fills the remaining space below.</p>
           </div>
-        </div>
+        </cinq-windowsplitter>
 
         <p class="docs-windowsplitter-state" data-windowsplitter-state="horizontal" aria-live="polite">
           —
@@ -267,9 +277,12 @@ import RegisterComponents from './RegisterComponents.astro';
           </p>
         </div>
 
-        <div
+        <cinq-windowsplitter
           class="docs-comparison"
           data-windowsplitter-demo="clip"
+          data-windowsplitter-mode="clip"
+          data-windowsplitter-step="5"
+          data-windowsplitter-page="20"
           role="region"
           aria-label="Before and after comparison"
         >
@@ -277,7 +290,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <div id="docs-ws-before" class="docs-comparison__layer docs-comparison__before">
             Before
           </div>
-          <cinq-windowsplitter
+          <div
             role="separator"
             tabindex="0"
             aria-orientation="vertical"
@@ -286,13 +299,20 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-valuenow="50"
             aria-controls="docs-ws-before"
             aria-label="Reveal after image"
-            data-windowsplitter-mode="clip"
-            data-windowsplitter-step="5"
-            data-windowsplitter-page="20"
           >
-            <span class="docs-comparison__handle" aria-hidden="true">⟷</span>
-          </cinq-windowsplitter>
-        </div>
+            <span class="docs-comparison__handle" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5M2 8h12"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </div>
+        </cinq-windowsplitter>
 
         <p class="docs-windowsplitter-state" data-windowsplitter-state="clip" aria-live="polite">
           —
@@ -308,7 +328,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
   const bindState = (key: string) => {
     const host = document.querySelector<WindowSplitter>(
-      `[data-windowsplitter-demo="${key}"] cinq-windowsplitter`,
+      `cinq-windowsplitter[data-windowsplitter-demo="${key}"]`,
     );
     const state = document.querySelector(`[data-windowsplitter-state="${key}"]`);
     if (!host || !state) return;

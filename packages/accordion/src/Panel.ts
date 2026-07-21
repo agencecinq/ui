@@ -1,6 +1,6 @@
-import { EVENTS, dispatchEvent } from "@agencecinq/utils";
+import { EVENTS, dispatchEvent, parseBoolean } from "@agencecinq/utils";
 import type { AccordionPanelDetail } from "./types.js";
-import { parseBooleanAttr, setActive, setInactive } from "./utils.js";
+import { setActive, setInactive } from "./utils.js";
 
 /**
  * Accordion panel controller.
@@ -42,7 +42,7 @@ export default class Panel {
       this.$body.querySelector<HTMLElement>("[data-accordion-inner]") ||
       (this.$body.firstElementChild as HTMLElement | null);
 
-    this.isDeselect = parseBooleanAttr(
+    this.isDeselect = parseBoolean(
       this.el.getAttribute("data-accordion-deselect"),
     );
     this.isOpen = this.$button.getAttribute("aria-expanded") === "true";

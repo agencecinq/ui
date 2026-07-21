@@ -34,24 +34,28 @@ var e = {
 		detail: n
 	}));
 }, n = (e, t) => {
+	if (e == null || e === "") return t;
+	let n = Number(e);
+	return Number.isFinite(n) ? n : t;
+}, r = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", i = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug");
-var a = {
+}, a = document.documentElement, { body: o } = document;
+a.hasAttribute("data-debug");
+var s = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", n(({ x: e, y: t }) => {
-	a.x = e, a.y = t;
+window.addEventListener("pointermove", i(({ x: e, y: t }) => {
+	s.x = e, s.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
 //#region src/Props.ts
-var o = class {
+var c = class {
 	id;
 	role;
 	"aria-posinset";
@@ -64,7 +68,7 @@ var o = class {
 		let e = this;
 		return Object.keys(this).reduce((t, n) => `${t} ${n}="${e[n]}"`, "");
 	}
-}, s = class {
+}, l = class {
 	host;
 	constructor(e) {
 		this.host = e;
@@ -163,29 +167,21 @@ var o = class {
 		let { length: n } = t.input.value;
 		t.input.setSelectionRange(n, n);
 	}
-}, c = (e, t) => {
+}, u = (e, t) => {
 	e.value = t;
-}, l = (e, t) => `<li${t}>${e}</li>`, u = [
+}, d = (e, t) => `<li${t}>${e}</li>`, f = [
 	"data-combobox-mode",
 	"data-combobox-select-mode",
 	"data-combobox-debounce",
 	"data-combobox-min-length",
 	"data-combobox-open-on-empty",
 	"data-combobox-autoselect"
-], d = (e, t) => {
-	let n = e.getAttribute(t);
-	return n !== null && n !== "false" && n !== "0";
-}, f = (e, t, n) => {
-	let r = e.getAttribute(t);
-	if (r === null) return n;
-	let i = parseInt(r, 10);
-	return Number.isNaN(i) ? n : i;
-}, p = class extends HTMLElement {
+], p = class extends HTMLElement {
 	static observedAttributes = [
 		"value",
 		"disabled",
 		"expanded",
-		...u
+		...f
 	];
 	$input = null;
 	$listbox = null;
@@ -200,12 +196,12 @@ var o = class {
 	debounce = 0;
 	minLength = 0;
 	openOnEmpty = !1;
-	write = c;
+	write = u;
 	onSelect = null;
 	_value = "";
 	_expanded = !1;
 	_search = null;
-	_render = l;
+	_render = d;
 	searchId = 0;
 	debounceTimer = null;
 	abortController = null;
@@ -234,7 +230,7 @@ var o = class {
 				});
 				return;
 			}
-			u.includes(e) && this.syncOptionsFromAttributes();
+			f.includes(e) && this.syncOptionsFromAttributes();
 		}
 	}
 	get value() {
@@ -331,14 +327,14 @@ var o = class {
 		if (this.destroy(), !this.isConnected || !this.$input || !this.$listbox || !this._search) return;
 		this.syncOptionsFromAttributes(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list", this.$button ||= this.resolveButton();
 		let e = this.getAttribute("value");
-		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.syncDisabled(), this.keyboard = new s(this), this.sync(-1), this.hide({
+		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.syncDisabled(), this.keyboard = new l(this), this.sync(-1), this.hide({
 			force: !0,
 			clear: !1
 		}), this.bind(), this.bound = !0;
 	}
 	syncOptionsFromAttributes() {
 		let e = this.getAttribute("data-combobox-mode") ?? "managed", t = this.getAttribute("data-combobox-select-mode") ?? "value";
-		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, f(this, "data-combobox-debounce", 0)), this.minLength = Math.max(0, f(this, "data-combobox-min-length", 0)), this.openOnEmpty = d(this, "data-combobox-open-on-empty"), this.autoselect = d(this, "data-combobox-autoselect");
+		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, n(this.getAttribute("data-combobox-debounce"), 0)), this.minLength = Math.max(0, n(this.getAttribute("data-combobox-min-length"), 0)), this.openOnEmpty = r(this.getAttribute("data-combobox-open-on-empty")), this.autoselect = r(this.getAttribute("data-combobox-autoselect"));
 	}
 	syncDisabled() {
 		let e = this.disabled;
@@ -409,7 +405,7 @@ var o = class {
 		this.listbox.innerHTML = "";
 		let { length: n } = t, { id: r } = this.listbox;
 		t.forEach((t, i) => {
-			let a = new o(i, e, r, n);
+			let a = new c(i, e, r, n);
 			this.listbox.insertAdjacentHTML("beforeend", this._render(t, a));
 		}), this.sync(e);
 	}
@@ -569,4 +565,4 @@ var o = class {
 };
 customElements.get("cinq-combobox") || customElements.define("cinq-combobox", p);
 //#endregion
-export { p as Combobox, o as Props };
+export { p as Combobox, c as Props };

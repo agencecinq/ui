@@ -1,14 +1,13 @@
-export type Orientation = "horizontal" | "vertical";
 export type Mode = "resize" | "clip" | "none";
-export type SizeContext = {
+export type Size = {
     value: number;
     ratio: number;
     offset: number;
     length: number;
 };
-export type FormatSize = (context: SizeContext) => string;
+export type FormatSize = (size: Size) => string;
 export type FormatValue = (value: number) => string;
-export type WindowSplitterDetail = {
+export type Detail = {
     value: number;
     min: number;
     max: number;

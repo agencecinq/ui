@@ -33,23 +33,23 @@ var e = {
 		cancelable: a,
 		detail: n
 	}));
-}, n = (e, t) => {
+}, n = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", r = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug");
-var a = {
+}, i = document.documentElement, { body: a } = document;
+i.hasAttribute("data-debug");
+var o = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", n(({ x: e, y: t }) => {
-	a.x = e, a.y = t;
+window.addEventListener("pointermove", r(({ x: e, y: t }) => {
+	o.x = e, o.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var o = {
+var s = {
 	BACKSPACE: 8,
 	TAB: 9,
 	ENTER: 13,
@@ -65,11 +65,11 @@ var o = {
 	ARROW_RIGHT: 39,
 	ARROW_DOWN: 40,
 	DELETE: 46
-}, s = (e) => {
-	e.classList.remove("is-active");
 }, c = (e) => {
+	e.classList.remove("is-active");
+}, l = (e) => {
 	e.classList.add("is-active");
-}, l = () => document.location.hash.replace(/^#\//, ""), u = (e, t = !1) => e === null ? t : e !== "false" && e !== "0", d = (e) => [...e.querySelectorAll("[data-accordion-panel]")].filter((t) => t.closest("cinq-accordion") === e), f = class {
+}, u = () => document.location.hash.replace(/^#\//, ""), d = (e) => [...e.querySelectorAll("[data-accordion-panel]")].filter((t) => t.closest("cinq-accordion") === e), f = class {
 	el;
 	$body = null;
 	$button = null;
@@ -83,7 +83,7 @@ var o = {
 		this.el = e, this.index = t;
 	}
 	init() {
-		this.$button = this.el.querySelector("[data-accordion-header]") || this.el.querySelector("button"), this.$button && (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? null, this.$body && (this.$inner = this.$body.querySelector("[data-accordion-inner]") || this.$body.firstElementChild, this.isDeselect = u(this.el.getAttribute("data-accordion-deselect")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.measure(), this.$button.addEventListener("click", this.handleClick), this.$button.addEventListener("focus", this.handleFocus), this.$button.addEventListener("blur", this.handleBlur), window.addEventListener("resize", this.handleResize)));
+		this.$button = this.el.querySelector("[data-accordion-header]") || this.el.querySelector("button"), this.$button && (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? null, this.$body && (this.$inner = this.$body.querySelector("[data-accordion-inner]") || this.$body.firstElementChild, this.isDeselect = n(this.el.getAttribute("data-accordion-deselect")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.measure(), this.$button.addEventListener("click", this.handleClick), this.$button.addEventListener("focus", this.handleFocus), this.$button.addEventListener("blur", this.handleBlur), window.addEventListener("resize", this.handleResize)));
 	}
 	get open() {
 		return this.$button?.getAttribute("aria-expanded") === "true";
@@ -93,14 +93,14 @@ var o = {
 			this.$body.style.setProperty("max-height", `${this.height}px`), window.setTimeout(() => {
 				this.$body.style.removeProperty("max-height");
 			}, this.transitionDuration);
-		}), c(this.el), this.isOpen = !0, !0);
+		}), l(this.el), this.isOpen = !0, !0);
 	}
 	close(n = !0) {
 		return !this.$button || !this.$body || !this.open || n && !t(this.el, e.ACCORDION_PANEL_CLOSE, this.detail) ? !1 : (this.$button.setAttribute("aria-expanded", "false"), this.el.setAttribute("data-accordion-open", "false"), this.measure(), this.$body.style.setProperty("max-height", `${this.height}px`), requestAnimationFrame(() => {
 			this.$body.style.setProperty("max-height", "0");
 		}), window.setTimeout(() => {
 			this.$body.setAttribute("hidden", "");
-		}, this.transitionDuration), s(this.el), this.isOpen = !1, !0);
+		}, this.transitionDuration), c(this.el), this.isOpen = !1, !0);
 	}
 	toggle() {
 		return !this.isDeselect && this.open ? !1 : this.open ? this.close() : this.openPanel();
@@ -109,7 +109,7 @@ var o = {
 		this.$button?.focus();
 	}
 	destroy() {
-		this.$button?.removeEventListener("click", this.handleClick), this.$button?.removeEventListener("focus", this.handleFocus), this.$button?.removeEventListener("blur", this.handleBlur), window.removeEventListener("resize", this.handleResize), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), s(this.el), this.$body = null, this.$button = null, this.$inner = null;
+		this.$button?.removeEventListener("click", this.handleClick), this.$button?.removeEventListener("focus", this.handleFocus), this.$button?.removeEventListener("blur", this.handleBlur), window.removeEventListener("resize", this.handleResize), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), c(this.el), this.$body = null, this.$button = null, this.$inner = null;
 	}
 	handleClick = () => {
 		this.toggle();
@@ -143,13 +143,13 @@ var o = {
 	current = 0;
 	options = { ...p };
 	connectedCallback() {
-		let t = this.getAttribute("data-accordion-multiselectable"), n = this.getAttribute("data-accordion-hash");
+		let t = this.getAttribute("data-accordion-multiselectable"), r = this.getAttribute("data-accordion-hash");
 		this.options = {
-			multiselectable: u(t, !1),
-			hash: n === null ? p.hash : u(n, !0)
+			multiselectable: n(t),
+			hash: n(r, p.hash)
 		};
-		let r = d(this);
-		this.panels = r.map((e, t) => {
+		let i = d(this);
+		this.panels = i.map((e, t) => {
 			let n = new f(e, t);
 			return n.init(), n;
 		}), this.panels.forEach((t, n) => {
@@ -171,7 +171,7 @@ var o = {
 		});
 	};
 	handleHashChange = () => {
-		let e = l();
+		let e = u();
 		e && this.panels.forEach((t, n) => {
 			t.$body && t.$body.id === e && (this.current = n, this.panels.forEach((e, t) => {
 				t !== n && e.close(!1);
@@ -188,18 +188,18 @@ var o = {
 			this.current = this.current - 1 < 0 ? this.panels.length - 1 : this.current - 1, this.panels[this.current]?.focus(), e.preventDefault();
 		}, a = () => {
 			this.current = this.current + 1 > this.panels.length - 1 ? 0 : this.current + 1, this.panels[this.current]?.focus(), e.preventDefault();
-		}, s = () => {
+		}, o = () => {
 			this.current = 0, this.panels[0]?.focus(), e.preventDefault();
 		}, c = () => {
 			this.current = this.panels.length - 1, this.panels[this.current]?.focus(), e.preventDefault();
 		};
 		({
-			[o.ARROW_UP]: i,
-			[o.ARROW_DOWN]: a,
-			[o.ARROW_LEFT]: i,
-			[o.ARROW_RIGHT]: a,
-			[o.HOME]: s,
-			[o.END]: c
+			[s.ARROW_UP]: i,
+			[s.ARROW_DOWN]: a,
+			[s.ARROW_LEFT]: i,
+			[s.ARROW_RIGHT]: a,
+			[s.HOME]: o,
+			[s.END]: c
 		})[e.keyCode]?.();
 	};
 };

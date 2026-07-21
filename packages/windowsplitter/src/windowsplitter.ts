@@ -1,67 +1,42 @@
-import { EVENTS, clamp, dispatchEvent } from "@agencecinq/utils";
+import { EVENTS, clamp, dispatchEvent, parseBoolean, parseNumber } from "@agencecinq/utils";
+import Keyboard from "./keyboard.js";
 import type {
   FormatSize,
   FormatValue,
   Mode,
-  Orientation,
-  SizeContext,
-  WindowSplitterDetail,
+  Size,
+  Detail,
 } from "./types.js";
 
-const defaultFormatSize = ({ value }: SizeContext) => `${value}%`;
+const defaultFormatSize = ({ value }: Size) => `${value}%`;
 const defaultFormatValue = (value: number) => String(value);
 
-const toNumber = (value: string | null, fallback: number): number => {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
-};
+const parseMode = (value: string | null | undefined): Mode =>
+  value === "clip" || value === "none" || value === "resize" ? value : "resize";
 
-const parseBooleanAttr = (el: HTMLElement, attr: string): boolean => {
-  const raw = el.getAttribute(attr);
-  if (raw === null) return false;
-  return raw !== "false" && raw !== "0";
-};
-
-const parseIntAttr = (
-  el: HTMLElement,
-  attr: string,
-  fallback: number,
-): number => {
-  const raw = el.getAttribute(attr);
-  if (raw === null || raw === "") return fallback;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : fallback;
-};
-
-const resolveOrientation = (el: HTMLElement): Orientation => {
-  const attr = el.getAttribute("aria-orientation");
-  if (attr === "horizontal" || attr === "vertical") return attr;
-  return "vertical";
-};
 
 /**
  * Window splitter Web Component (APG-style).
  *
- * The host `<cinq-windowsplitter>` is the focusable separator. HTML is the
- * source of truth for roles and ARIA (`aria-orientation`, `aria-valuemin` /
- * `max` / `now`, `aria-controls`, labelling). Style via ARIA / host attrs
- * (`[collapsed]`, `[dragging]`, `[disabled]`, `:focus-visible`) — no invented
- * CSS classes.
+ * The host `<cinq-windowsplitter>` is the **layout wrapper** (bounds + CSS
+ * custom properties). A nested separator (`role="separator"` or `slider`) is
+ * the focusable control: ARIA value attributes and `aria-controls` live there.
+ * Style the host via `[collapsed]` / `[dragging]` / `[disabled]`, or the
+ * separator via `[role="separator"]`.
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
  * @see https://github.com/19h47/19h47-windowsplitter
  */
 export class WindowSplitter extends HTMLElement {
   static observedAttributes = [
-    "disabled",
     "data-windowsplitter-mode",
     "data-windowsplitter-step",
     "data-windowsplitter-page",
     "data-windowsplitter-fixed",
   ];
 
-  $container: HTMLElement | null = null;
-  $primary: HTMLElement | null = null;
+  /** Focusable separator control inside the host. */
+  $separator: HTMLElement | null = null;
 
   mode: Mode = "resize";
   step = 1;
@@ -70,48 +45,132 @@ export class WindowSplitter extends HTMLElement {
   formatSize: FormatSize = defaultFormatSize;
   formatValue: FormatValue = defaultFormatValue;
 
-  private previousValue: number | null = null;
-  private isMoving = false;
-  private pointerId: number | null = null;
-  private grabOffset = 0;
-  private previousTouchAction = "";
+  private history: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private keyboard: Keyboard | null = null;
   private bound = false;
-  private reflectingAttribute = false;
-  private containerOverride: HTMLElement | null = null;
+  /** Active pointer drag; `null` when idle. `id` is `PointerEvent.pointerId`. */
+  private drag: {
+    offset: number;
+    origin: number;
+    length: number;
+    id: number;
+  } | null = null;
 
   connectedCallback(): void {
-    this.mount();
+    this.$separator = this.querySelector<HTMLElement>(
+      '[role="separator"], [role="slider"]',
+    );
+
+    if (!this.$separator) {
+      throw new Error(
+        'cinq-windowsplitter: nested [role="separator"] or [role="slider"] not found',
+      );
+    }
+
+    this.read();
+    this.$separator.style.touchAction = "none";
+
+    this.keyboard = new Keyboard(this);
+    this.$separator.addEventListener("keydown", this.keyboard.handle);
+    this.$separator.addEventListener("pointerdown", this.handlePointerdown);
+    this.$separator.addEventListener("pointermove", this.handlePointermove);
+    this.$separator.addEventListener("pointerup", this.handlePointerup);
+    this.$separator.addEventListener("pointercancel", this.handlePointerup);
+    this.$separator.addEventListener(
+      "lostpointercapture",
+      this.handlePointerup,
+    );
+
+    this.bound = true;
+    this.observe();
+    this.sync();
   }
 
   disconnectedCallback(): void {
     this.destroy();
   }
 
-  attributeChangedCallback(): void {
-    if (this.reflectingAttribute || !this.bound) return;
-    this.syncOptionsFromAttributes();
-    this.sync();
+  /** Detaches listeners and observers. Called automatically from `disconnectedCallback`. */
+  destroy(): void {
+    if (this.bound && this.$separator) {
+      if (this.keyboard) {
+        this.$separator.removeEventListener("keydown", this.keyboard.handle);
+      }
+      this.$separator.removeEventListener("pointerdown", this.handlePointerdown);
+      this.$separator.removeEventListener("pointermove", this.handlePointermove);
+      this.$separator.removeEventListener("pointerup", this.handlePointerup);
+      this.$separator.removeEventListener("pointercancel", this.handlePointerup);
+      this.$separator.removeEventListener(
+        "lostpointercapture",
+        this.handlePointerup,
+      );
+      this.$separator.style.removeProperty("touch-action");
+      this.bound = false;
+    }
+
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
+    this.keyboard = null;
+    this.removeAttribute("dragging");
+    this.$separator = null;
   }
 
-  get orientation(): Orientation {
-    return resolveOrientation(this);
+  attributeChangedCallback(
+    name: string,
+    _oldValue: string | null,
+    newValue: string | null,
+  ): void {
+    if (!this.bound) return;
+
+    if (name === "data-windowsplitter-mode") {
+      this.mode = parseMode(newValue);
+      this.sync();
+      return;
+    }
+
+    if (name === "data-windowsplitter-step") {
+      this.step = parseNumber(newValue, 1);
+      return;
+    }
+
+    if (name === "data-windowsplitter-page") {
+      this.page = parseNumber(newValue, 10);
+      return;
+    }
+
+    if (name === "data-windowsplitter-fixed") {
+      this.fixed = parseBoolean(newValue);
+    }
   }
 
-  get vertical(): boolean {
-    return this.orientation === "vertical";
+  /** Raw `aria-orientation` on `$separator` (HTML source of truth). */
+  get orientation(): string | null {
+    return this.$separator?.getAttribute("aria-orientation") ?? null;
+  }
+
+  /**
+   * Primary pane from `$separator.ariaControlsElements`
+   * (reflects `aria-controls`; HTML source of truth).
+   */
+  get $primary(): HTMLElement | null {
+    return (
+      ((this.$separator?.ariaControlsElements ?? [])[0] as
+        | HTMLElement
+        | undefined) ?? null
+    );
   }
 
   get min(): number {
-    return toNumber(this.getAttribute("aria-valuemin"), 0);
+    return parseNumber(this.$separator?.getAttribute("aria-valuemin"), 0);
   }
 
   get max(): number {
-    return toNumber(this.getAttribute("aria-valuemax"), 100);
+    return parseNumber(this.$separator?.getAttribute("aria-valuemax"), 100);
   }
 
   get value(): number {
-    return toNumber(this.getAttribute("aria-valuenow"), this.min);
+    return parseNumber(this.$separator?.getAttribute("aria-valuenow"), this.min);
   }
 
   set value(next: number) {
@@ -127,69 +186,50 @@ export class WindowSplitter extends HTMLElement {
   get disabled(): boolean {
     return (
       this.hasAttribute("disabled") ||
-      this.getAttribute("aria-disabled") === "true"
+      this.getAttribute("aria-disabled") === "true" ||
+      this.$separator?.getAttribute("aria-disabled") === "true"
     );
   }
 
   set disabled(on: boolean) {
-    this.reflectingAttribute = true;
     if (on) {
       this.setAttribute("disabled", "");
       this.setAttribute("aria-disabled", "true");
-    } else {
-      this.removeAttribute("disabled");
-      this.removeAttribute("aria-disabled");
+      this.$separator?.setAttribute("aria-disabled", "true");
+      return;
     }
-    this.reflectingAttribute = false;
-    this.sync();
+
+    this.removeAttribute("disabled");
+    this.removeAttribute("aria-disabled");
+    this.$separator?.removeAttribute("aria-disabled");
   }
 
   get collapsed(): boolean {
     return this.value === this.min;
   }
 
-  /** Optional bounds container; defaults to `parentElement`. */
-  set container(el: HTMLElement | null) {
-    this.containerOverride = el;
-    if (this.bound) {
-      this.resolveContainer();
-      this.observeContainer();
-      this.sync();
-    }
-  }
-
-  get container(): HTMLElement | null {
-    return this.$container;
-  }
-
-  /** Re-read ARIA / primary pane and apply layout. */
+  /** Re-read ARIA and apply layout. */
   sync(): void {
-    if (!this.$container) return;
+    if (!this.$separator) return;
 
-    this.resolvePrimary();
-    this.setAttribute("aria-valuetext", this.formatValue(this.value));
-    this.reflectCollapsedAttribute();
-    this.reflectDisabledAttribute();
+    this.$separator.setAttribute("aria-valuetext", this.formatValue(this.value));
     this.apply(this.value, false);
   }
 
   /**
    * Set the splitter value (primary pane size).
-   * Writes `aria-valuenow`, positions the separator, updates the primary pane.
+   * Writes `aria-valuenow` on the separator, positions it, updates the primary pane.
    */
   setValue(next: number, trigger = true): boolean {
-    if (this.disabled) return false;
+    if (!this.$separator || this.disabled) return false;
 
     const previous = this.value;
     const value = clamp(Math.round(next), this.min, this.max);
-    const changed = value !== previous || !this.hasAttribute("aria-valuenow");
+    const changed =
+      value !== previous || !this.$separator.hasAttribute("aria-valuenow");
 
-    if (changed && !this.collapsed && value === this.min) {
-      this.previousValue = previous;
-    }
-
-    this.setAttribute("aria-valuenow", String(value));
-    this.setAttribute("aria-valuetext", this.formatValue(value));
+    this.$separator.setAttribute("aria-valuenow", String(value));
+    this.$separator.setAttribute("aria-valuetext", this.formatValue(value));
     this.apply(value, trigger && changed);
 
     return changed;
@@ -197,18 +237,23 @@ export class WindowSplitter extends HTMLElement {
 
   /** Collapse the primary pane to `aria-valuemin` (remembers previous value). */
   collapse(trigger = true): boolean {
-    if (this.disabled || this.collapsed) return false;
-    this.previousValue = this.value;
+    if (this.disabled || this.collapsed) {
+      return false;
+    }
+
+    this.history = this.value;
     return this.setValue(this.min, trigger);
   }
 
   /** Restore the primary pane to its pre-collapse value (or midpoint). */
   restore(trigger = true): boolean {
-    if (this.disabled || !this.collapsed) return false;
+    if (this.disabled || !this.collapsed) {
+      return false;
+    }
 
     const fallback = Math.round((this.min + this.max) / 2);
-    const next = this.previousValue ?? fallback;
-    this.previousValue = null;
+    const next = this.history ?? fallback;
+    this.history = null;
     return this.setValue(next, trigger);
   }
 
@@ -216,102 +261,61 @@ export class WindowSplitter extends HTMLElement {
     return this.collapsed ? this.restore(trigger) : this.collapse(trigger);
   }
 
-  destroy(): void {
-    if (this.bound) {
-      this.removeEventListener("keydown", this.handleKeydown);
-      this.removeEventListener("pointerdown", this.handlePointerdown);
-      this.removeEventListener("pointermove", this.handlePointermove);
-      this.removeEventListener("pointerup", this.handlePointerup);
-      this.removeEventListener("pointercancel", this.handlePointerup);
-      this.removeEventListener("lostpointercapture", this.handlePointerup);
-      this.style.touchAction = this.previousTouchAction;
-      this.removeAttribute("dragging");
-      this.bound = false;
-    }
+  private read(): void {
+    this.mode = parseMode(this.getAttribute("data-windowsplitter-mode"));
+    this.step = parseNumber(this.getAttribute("data-windowsplitter-step"), 1);
+    this.page = parseNumber(this.getAttribute("data-windowsplitter-page"), 10);
+    this.fixed = parseBoolean(this.getAttribute("data-windowsplitter-fixed"));
+  }
 
+  private observe(): void {
     this.resizeObserver?.disconnect();
-    this.resizeObserver = null;
-    this.$primary = null;
-    this.$container = null;
-  }
-
-  private mount(): void {
-    if (this.bound) return;
-
-    this.syncOptionsFromAttributes();
-    this.resolveContainer();
-
-    if (!this.$container) {
-      console.warn("cinq-windowsplitter: container not found (no parentElement)");
-      return;
-    }
-
-    this.previousTouchAction = this.style.touchAction;
-    this.style.touchAction = "none";
-
-    this.addEventListener("keydown", this.handleKeydown);
-    this.addEventListener("pointerdown", this.handlePointerdown);
-    this.addEventListener("pointermove", this.handlePointermove);
-    this.addEventListener("pointerup", this.handlePointerup);
-    this.addEventListener("pointercancel", this.handlePointerup);
-    this.addEventListener("lostpointercapture", this.handlePointerup);
-
-    this.bound = true;
-    this.observeContainer();
-    this.sync();
-  }
-
-  private syncOptionsFromAttributes(): void {
-    const mode = this.getAttribute("data-windowsplitter-mode") as Mode | null;
-    this.mode =
-      mode === "clip" || mode === "none" || mode === "resize" ? mode : "resize";
-    this.step = parseIntAttr(this, "data-windowsplitter-step", 1);
-    this.page = parseIntAttr(this, "data-windowsplitter-page", 10);
-    this.fixed = parseBooleanAttr(this, "data-windowsplitter-fixed");
-  }
-
-  private resolveContainer(): void {
-    this.$container =
-      this.containerOverride ??
-      (this.parentElement as HTMLElement | null);
-  }
-
-  private resolvePrimary(): void {
-    // IDL: `ariaControlsElements` reflects `aria-controls` ID references.
-    this.$primary =
-      ((this.ariaControlsElements ?? [])[0] as HTMLElement | undefined) ?? null;
-  }
-
-  private observeContainer(): void {
-    this.resizeObserver?.disconnect();
-    this.resizeObserver = null;
-
-    if (!this.$container || typeof ResizeObserver === "undefined") return;
-
     this.resizeObserver = new ResizeObserver(() => this.apply(this.value, false));
-    this.resizeObserver.observe(this.$container);
+    this.resizeObserver.observe(this);
   }
 
   private apply(value: number, trigger: boolean): void {
-    if (!this.$container) return;
+    if (!this.$separator) {
+      return;
+    }
 
     const { min, max } = this;
     const span = Math.max(1, max - min);
-    const ratio = (value - min) / span;
-    const length = this.containerLength();
-    const offset = Math.round(ratio * length);
+    let length = 0;
 
-    this.$container.style.setProperty("--windowsplitter-value", String(value));
-    this.$container.style.setProperty("--windowsplitter-ratio", String(ratio));
-    this.$container.style.setProperty("--windowsplitter-offset", `${offset}px`);
-
-    if (this.vertical) {
-      this.style.setProperty("transform", `translate3d(${offset}px, 0, 0)`);
-    } else {
-      this.style.setProperty("transform", `translate3d(0, ${offset}px, 0)`);
+    if (this.drag) {
+      length = this.drag.length;
     }
 
-    this.reflectCollapsedAttribute();
+    if (!this.drag) {
+      const { width, height } = this.getBoundingClientRect();
+      length = this.orientation === "vertical" ? width : height;
+    }
+
+    const offset = Math.round(((value - min) / span) * length);
+    const ratio = (value - min) / span;
+
+    this.style.setProperty("--windowsplitter-value", String(value));
+    this.style.setProperty("--windowsplitter-ratio", String(ratio));
+    this.style.setProperty("--windowsplitter-offset", `${offset}px`);
+
+    if (this.orientation === "vertical") {
+      this.$separator.style.setProperty(
+        "transform",
+        `translate3d(${offset}px, 0, 0)`,
+      );
+    } else {
+      this.$separator.style.setProperty(
+        "transform",
+        `translate3d(0, ${offset}px, 0)`,
+      );
+    }
+
+    if (this.collapsed) {
+      this.setAttribute("collapsed", "");
+    } else {
+      this.removeAttribute("collapsed");
+    }
     this.update(value, ratio, length, offset);
     this.emit(trigger, value, ratio);
   }
@@ -322,12 +326,14 @@ export class WindowSplitter extends HTMLElement {
     length: number,
     offset: number,
   ): void {
-    if (!this.$primary || this.mode === "none") return;
+    if (!this.$primary || this.mode === "none") {
+      return;
+    }
 
     if (this.mode === "clip") {
       const remaining = Math.max(0, length - offset);
 
-      if (this.vertical) {
+      if (this.orientation === "vertical") {
         this.$primary.style.clipPath = `inset(0px ${remaining}px 0px 0px)`;
       } else {
         this.$primary.style.clipPath = `inset(0px 0px ${remaining}px 0px)`;
@@ -338,134 +344,19 @@ export class WindowSplitter extends HTMLElement {
 
     const size = this.formatSize({ value, ratio, offset, length });
 
-    if (this.vertical) {
+    if (this.orientation === "vertical") {
       this.$primary.style.width = size;
-      this.$primary.style.flexBasis = size;
     } else {
       this.$primary.style.height = size;
-      this.$primary.style.flexBasis = size;
     }
   }
-
-  private containerLength(): number {
-    if (!this.$container) return 0;
-    const { width, height } = this.$container.getBoundingClientRect();
-    return this.vertical ? width : height;
-  }
-
-  private pointerPosition(event: PointerEvent): number {
-    if (!this.$container) return 0;
-    const { left, top } = this.$container.getBoundingClientRect();
-    return this.vertical ? event.clientX - left : event.clientY - top;
-  }
-
-  private valueFromPointer(event: PointerEvent): number {
-    const length = this.containerLength();
-    const { min, max } = this;
-    const span = max - min;
-    const position = this.pointerPosition(event) - this.grabOffset;
-    const ratio = length > 0 ? position / length : 0;
-    return clamp(Math.round(min + span * ratio), min, max);
-  }
-
-  private handlePointerdown = (event: PointerEvent): void => {
-    if (this.disabled || event.button !== 0) return;
-
-    this.focus({ preventScroll: true });
-    event.preventDefault();
-
-    if (this.fixed) {
-      this.toggle();
-      return;
-    }
-
-    const length = this.containerLength();
-    const currentOffset = this.ratio * length;
-
-    this.grabOffset = this.pointerPosition(event) - currentOffset;
-    this.isMoving = true;
-    this.pointerId = event.pointerId;
-    this.reflectDraggingAttribute(true);
-    this.setPointerCapture(event.pointerId);
-  };
-
-  private handlePointermove = (event: PointerEvent): void => {
-    if (!this.isMoving || event.pointerId !== this.pointerId) return;
-    this.setValue(this.valueFromPointer(event));
-    event.preventDefault();
-  };
-
-  private handlePointerup = (event: PointerEvent): void => {
-    if (event.pointerId !== this.pointerId && this.pointerId !== null) return;
-
-    this.isMoving = false;
-    this.pointerId = null;
-    this.grabOffset = 0;
-    this.reflectDraggingAttribute(false);
-
-    if (this.hasPointerCapture?.(event.pointerId)) {
-      this.releasePointerCapture(event.pointerId);
-    }
-  };
-
-  private handleKeydown = (event: KeyboardEvent): void => {
-    if (this.disabled) return;
-
-    const { key, shiftKey } = event;
-    const step = shiftKey ? this.page : this.step;
-    const current = this.value;
-
-    const move = (next: number) => {
-      this.setValue(next);
-      event.preventDefault();
-    };
-
-    const toggle = () => {
-      this.toggle();
-      event.preventDefault();
-    };
-
-    if (key === "Enter") {
-      toggle();
-      return;
-    }
-
-    if (this.fixed) return;
-
-    switch (key) {
-      case "Home":
-        move(this.min);
-        break;
-      case "End":
-        move(this.max);
-        break;
-      case "PageUp":
-        move(current + this.page);
-        break;
-      case "PageDown":
-        move(current - this.page);
-        break;
-      case "ArrowLeft":
-        move(current - step);
-        break;
-      case "ArrowRight":
-        move(current + step);
-        break;
-      case "ArrowUp":
-        move(this.vertical ? current + step : current - step);
-        break;
-      case "ArrowDown":
-        move(this.vertical ? current - step : current + step);
-        break;
-      default:
-        break;
-    }
-  };
 
   private emit(trigger: boolean, value: number, ratio: number): void {
-    if (!trigger) return;
+    if (!trigger) {
+      return;
+    }
 
-    const detail: WindowSplitterDetail = {
+    const detail: Detail = {
       value,
       min: this.min,
       max: this.max,
@@ -478,35 +369,79 @@ export class WindowSplitter extends HTMLElement {
     });
   }
 
-  private reflectCollapsedAttribute(): void {
-    this.reflectingAttribute = true;
-    if (this.collapsed) {
-      this.setAttribute("collapsed", "");
-    } else {
-      this.removeAttribute("collapsed");
+  private valueFromPointer(event: PointerEvent): number {
+    const { min, max, drag } = this;
+
+    if (!drag) {
+      return this.value;
     }
-    this.reflectingAttribute = false;
+
+    const span = max - min;
+    const client =
+      this.orientation === "vertical" ? event.clientX : event.clientY;
+    const ratio =
+      drag.length > 0
+        ? (client - drag.origin - drag.offset) / drag.length
+        : 0;
+    return clamp(Math.round(min + span * ratio), min, max);
   }
 
-  private reflectDraggingAttribute(on: boolean): void {
-    this.reflectingAttribute = true;
-    if (on) {
-      this.setAttribute("dragging", "");
-    } else {
-      this.removeAttribute("dragging");
+  private handlePointerdown = (event: PointerEvent): void => {
+    if (!this.$separator || this.disabled || event.button !== 0) {
+      return;
     }
-    this.reflectingAttribute = false;
-  }
 
-  private reflectDisabledAttribute(): void {
-    this.reflectingAttribute = true;
-    if (this.disabled) {
-      this.setAttribute("disabled", "");
-    } else if (this.getAttribute("aria-disabled") !== "true") {
-      this.removeAttribute("disabled");
+    this.$separator.focus({ preventScroll: true });
+    event.preventDefault();
+
+    if (this.fixed) {
+      this.toggle();
+      return;
     }
-    this.reflectingAttribute = false;
-  }
+
+    const { left, top, width, height } = this.getBoundingClientRect();
+    const vertical = this.orientation === "vertical";
+    const length = vertical ? width : height;
+    const origin = vertical ? left : top;
+    const client = vertical ? event.clientX : event.clientY;
+
+    this.drag = {
+      length,
+      origin,
+      offset: client - origin - this.ratio * length,
+      id: event.pointerId,
+    };
+    this.setAttribute("dragging", "");
+    this.$separator.setPointerCapture(event.pointerId);
+  };
+
+  private handlePointermove = (event: PointerEvent): void => {
+    if (!this.drag || event.pointerId !== this.drag.id) {
+      return;
+    }
+
+    this.setValue(this.valueFromPointer(event));
+    event.preventDefault();
+  };
+
+  private handlePointerup = (event: PointerEvent): void => {
+    if (!this.drag) {
+      return;
+    }
+
+    if (event.pointerId !== this.drag.id) {
+      return;
+    }
+
+    const { id } = this.drag;
+
+    this.drag = null;
+    this.removeAttribute("dragging");
+
+    if (this.$separator?.hasPointerCapture?.(id)) {
+      this.$separator.releasePointerCapture(id);
+    }
+  };
 }
 
 if (!customElements.get("cinq-windowsplitter")) {

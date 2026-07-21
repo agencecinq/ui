@@ -1,4 +1,10 @@
-import { EVENTS, clamp, dispatchEvent, throttle } from "@agencecinq/utils";
+import {
+  EVENTS,
+  clamp,
+  dispatchEvent,
+  parseNumber,
+  throttle,
+} from "@agencecinq/utils";
 import type { Options, SpinbuttonChangeDetail, Text, Value } from "./types.js";
 
 export type { Options, SpinbuttonChangeDetail, Text, Value } from "./types.js";
@@ -39,17 +45,6 @@ const toggleDisabled = (
   }
 };
 
-const parseIntAttr = (
-  el: HTMLElement,
-  attr: string,
-  fallback: number,
-): number => {
-  const raw = el.getAttribute(attr);
-  if (raw === null) return fallback;
-  const parsed = parseInt(raw, 10);
-  return Number.isNaN(parsed) ? fallback : parsed;
-};
-
 export class Spinbutton extends HTMLElement {
   $input: HTMLInputElement | null = null;
   $increase: HTMLButtonElement | null = null;
@@ -82,16 +77,22 @@ export class Spinbutton extends HTMLElement {
     this.appendChild(this.$liveRegion);
 
     this.text = this.parseText();
-    this.options.step = parseIntAttr(this, "data-spinbutton-step", DEFAULTS.step);
-    this.options.delay = parseIntAttr(this, "data-spinbutton-delay", DEFAULTS.delay);
+    this.options.step = parseNumber(
+      this.getAttribute("data-spinbutton-step"),
+      DEFAULTS.step,
+    );
+    this.options.delay = parseNumber(
+      this.getAttribute("data-spinbutton-delay"),
+      DEFAULTS.delay,
+    );
 
     const min = this.$input.getAttribute("aria-valuemin");
     const max = this.$input.getAttribute("aria-valuemax");
-    const now = parseIntAttr(this.$input, "aria-valuenow", 0);
+    const now = parseNumber(this.$input.getAttribute("aria-valuenow"), 0);
 
     this.value = {
-      min: min === null ? false : parseInt(min, 10),
-      max: max === null ? false : parseInt(max, 10),
+      min: min === null ? false : parseNumber(min, 0),
+      max: max === null ? false : parseNumber(max, 0),
       now,
       text: formatText(now, this.text),
     };
