@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/calendar",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Accessible date / range picker as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",

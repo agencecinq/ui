@@ -1,5 +1,23 @@
 # @agencecinq/docs
 
+## 4.4.4
+
+### Patch Changes
+
+- 1f15fe4: Add `@agencecinq/calendar` with `<cinq-calendar>` Web Component for single-date and range selection (ported from `@19h47/calendar`). Export `CALENDAR_CHANGE` from `@agencecinq/utils`. Add calendar docs page and live playgrounds.
+- Updated dependencies [1f15fe4]
+  - @agencecinq/calendar@1.0.0
+  - @agencecinq/utils@5.2.1
+  - @agencecinq/accordion@1.0.3
+  - @agencecinq/combobox@1.0.3
+  - @agencecinq/disclosure-button@2.0.0
+  - @agencecinq/drawer@5.0.3
+  - @agencecinq/modal@2.0.3
+  - @agencecinq/spinbutton@1.0.4
+  - @agencecinq/switch@2.0.1
+  - @agencecinq/tabs@10.0.3
+  - @agencecinq/windowsplitter@2.0.0
+
 ## 4.4.3
 
 ### Patch Changes
