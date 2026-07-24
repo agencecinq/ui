@@ -18,6 +18,7 @@ export const EVENTS = {
   COMBOBOX_SUBMIT: 'combobox:submit',
   COMBOBOX_EMPTY: 'combobox:empty',
   WINDOWSPLITTER_CHANGE: 'windowsplitter:change',
+  CALENDAR_CHANGE: 'calendar:change',
   TAB_BEFORE_ACTIVATE: 'tab-before-activate',
   TAB_ACTIVATE: 'tab-activate',
   TAB_DELETE: 'tab-delete',

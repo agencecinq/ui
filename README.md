@@ -43,7 +43,7 @@ pnpm dev
 
 ```
 
-Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in every consuming package (`drawer`, `modal`, `tabs`, `spinbutton`, `disclosure-button`, `switch`, `accordion`, `combobox`, `windowsplitter`) automatically.
+Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in every consuming package (`drawer`, `modal`, `tabs`, `spinbutton`, `disclosure-button`, `switch`, `accordion`, `combobox`, `windowsplitter`, `calendar`) automatically.
 
 ### Building
 
@@ -111,6 +111,7 @@ pnpm release
 - `packages/accordion`: `<cinq-accordion>` Web Component for expandable sections (WAI-ARIA accordion pattern).
 - `packages/combobox`: `<cinq-combobox>` Web Component for editable list autocomplete (WAI-ARIA combobox pattern).
 - `packages/windowsplitter`: `<cinq-windowsplitter>` Web Component for resizable panes (WAI-ARIA window splitter pattern).
+- `packages/calendar`: `<cinq-calendar>` Web Component for date / range picking (WAI-ARIA date grid pattern).
 - `apps/`: Apps / themes consuming the packages (e.g. `apps/docs`).
 
 ---

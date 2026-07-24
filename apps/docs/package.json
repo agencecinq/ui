@@ -18,6 +18,7 @@
     "@agencecinq/spinbutton": "workspace:*",
     "@agencecinq/switch": "workspace:*",
     "@agencecinq/accordion": "workspace:*",
+    "@agencecinq/calendar": "workspace:*",
     "@agencecinq/combobox": "workspace:*",
     "@agencecinq/windowsplitter": "workspace:*",
     "@agencecinq/tabs": "workspace:*",

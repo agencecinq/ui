@@ -18,6 +18,7 @@ export declare const EVENTS: {
     COMBOBOX_SUBMIT: string;
     COMBOBOX_EMPTY: string;
     WINDOWSPLITTER_CHANGE: string;
+    CALENDAR_CHANGE: string;
     TAB_BEFORE_ACTIVATE: string;
     TAB_ACTIVATE: string;
     TAB_DELETE: string;
