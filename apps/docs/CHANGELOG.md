@@ -1,5 +1,22 @@
 # @agencecinq/docs
 
+## 4.4.7
+
+### Patch Changes
+
+- Updated dependencies [c65b293]
+  - @agencecinq/utils@5.3.0
+  - @agencecinq/drawer@6.0.1
+  - @agencecinq/modal@3.0.0
+  - @agencecinq/accordion@2.0.0
+  - @agencecinq/calendar@2.0.0
+  - @agencecinq/combobox@1.0.3
+  - @agencecinq/disclosure-button@2.0.0
+  - @agencecinq/spinbutton@1.0.4
+  - @agencecinq/switch@2.0.1
+  - @agencecinq/tabs@10.0.3
+  - @agencecinq/windowsplitter@2.0.0
+
 ## 4.4.6
 
 ### Patch Changes
