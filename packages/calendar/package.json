@@ -1,7 +1,7 @@
 {
   "name": "@agencecinq/calendar",
   "version": "1.0.0",
-  "description": "Accessible date / range picker as a lightweight Web Component.",
+  "description": "Accessible date / range / multi-date picker as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

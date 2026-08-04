@@ -1,6 +1,12 @@
 import { EVENTS, dispatchEvent, parseBoolean, parseNumber } from "@agencecinq/utils";
 import Keyboard from "./keyboard.js";
-import type { ChangeDetail, Current, Options, StateClasses } from "./types.js";
+import type {
+  Detail,
+  Current,
+  Options,
+  Mode,
+  StateClasses,
+} from "./types.js";
 import {
   getDaysInMonth,
   getIntlMonth,
@@ -16,6 +22,17 @@ const stateClassesDefault: StateClasses = {
   range: "range",
   start: "start",
   end: "end",
+};
+
+const MODES = new Set<Mode>(["single", "range", "multiple"]);
+
+const parseMode = (el: HTMLElement): Mode => {
+  const mode = el.getAttribute("mode");
+  if (mode && MODES.has(mode as Mode)) {
+    return mode as Mode;
+  }
+
+  return "single";
 };
 
 const dayButton = (
@@ -51,7 +68,7 @@ const getDefaultLocale = (): string =>
   document.documentElement.getAttribute("lang") || "en";
 
 /**
- * Date / range picker Web Component.
+ * Date / range / multi-date picker Web Component.
  *
  * Markup and CSS are yours — the package fills the grid and handles selection.
  * Follows the WAI-ARIA APG date grid practices.
@@ -63,7 +80,7 @@ export class Calendar extends HTMLElement {
   today: Date = new Date();
   day = "";
   options: Options = {
-    single: true,
+    mode: "single",
     firstDay: 0,
     stateClasses: { ...stateClassesDefault },
     locale: "en",
@@ -83,7 +100,58 @@ export class Calendar extends HTMLElement {
   /** Selected days as `YYYY-MM-DD`. */
   picked: string[] = [];
 
+  private get isMultiple(): boolean {
+    return this.options.mode === "multiple";
+  }
+
+  private get isRange(): boolean {
+    return this.options.mode === "range";
+  }
+
+  private get isSingle(): boolean {
+    return this.options.mode === "single";
+  }
+
   connectedCallback(): void {
+    this.init();
+  }
+
+  disconnectedCallback(): void {
+    this.destroy();
+    this.keyboard = null;
+    this.$body = null;
+    this.$title = null;
+    this.$next = null;
+    this.$previous = null;
+  }
+
+  private readOptions(): Options {
+    const locale =
+      this.getAttribute("locale") ||
+      this.getAttribute("data-locale") ||
+      getDefaultLocale();
+
+    const firstDayAttr = this.getAttribute("first-day");
+
+    return {
+      mode: parseMode(this),
+      firstDay:
+        firstDayAttr != null && firstDayAttr !== ""
+          ? parseNumber(firstDayAttr, getWeekStart(locale))
+          : getWeekStart(locale),
+      stateClasses: { ...stateClassesDefault },
+      locale,
+      buttonClass: this.getAttribute("button-class") || "",
+      deselect: parseBoolean(this.getAttribute("deselect"), false),
+      allowPast: parseBoolean(this.getAttribute("allow-past"), false),
+      name: this.getAttribute("name") || undefined,
+    };
+  }
+
+  /**
+   * Bind markup + listeners. Call {@link destroy} first if already bound.
+   */
+  init(): void {
     const now = new Date();
     this.today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     this.day = toDayString(this.today);
@@ -112,42 +180,7 @@ export class Calendar extends HTMLElement {
     }
 
     this.keyboard = new Keyboard(this);
-    this.init();
-  }
 
-  disconnectedCallback(): void {
-    this.destroy();
-    this.keyboard = null;
-    this.$body = null;
-    this.$title = null;
-    this.$next = null;
-    this.$previous = null;
-  }
-
-  private readOptions(): Options {
-    const locale =
-      this.getAttribute("locale") ||
-      this.getAttribute("data-locale") ||
-      getDefaultLocale();
-
-    const firstDayAttr = this.getAttribute("first-day");
-
-    return {
-      single: parseBoolean(this.getAttribute("single"), true),
-      firstDay:
-        firstDayAttr != null && firstDayAttr !== ""
-          ? parseNumber(firstDayAttr, getWeekStart(locale))
-          : getWeekStart(locale),
-      stateClasses: { ...stateClassesDefault },
-      locale,
-      buttonClass: this.getAttribute("button-class") || "",
-      deselect: parseBoolean(this.getAttribute("deselect"), false),
-      allowPast: parseBoolean(this.getAttribute("allow-past"), false),
-      name: this.getAttribute("name") || undefined,
-    };
-  }
-
-  init(): void {
     try {
       this.picked = JSON.parse(
         this.getAttribute("data-picked-dates") || "[]",
@@ -159,12 +192,10 @@ export class Calendar extends HTMLElement {
     this.render();
     this.addEventListener("click", this.handleClick);
 
-    if (this.$body && this.keyboard) {
-      this.$body.addEventListener("keydown", this.keyboard.handleKeydown, false);
+    this.$body.addEventListener("keydown", this.keyboard.handleKeydown, false);
 
-      if (!this.options.single) {
-        this.$body.addEventListener("mousemove", this.handleMousemove, false);
-      }
+    if (this.isRange) {
+      this.$body.addEventListener("mousemove", this.handleMousemove, false);
     }
   }
 
@@ -197,7 +228,7 @@ export class Calendar extends HTMLElement {
   persistPicked() {
     this.setAttribute("data-picked-dates", JSON.stringify(this.picked));
 
-    const detail: ChangeDetail = {
+    const detail: Detail = {
       values: this.picked,
       name: this.options.name,
     };
@@ -235,7 +266,22 @@ export class Calendar extends HTMLElement {
     const day = $target.getAttribute("data-day") as string;
     this.keyboard?.setFocusDay($target as HTMLButtonElement, { focus: false });
 
-    if (this.options.single) {
+    if (this.isMultiple) {
+      const index = this.picked.indexOf(day);
+
+      if (index >= 0) {
+        this.picked.splice(index, 1);
+        this.setDaySelected($target, false);
+      } else {
+        this.picked.push(day);
+        this.picked.sort();
+        this.setDaySelected($target, true);
+      }
+
+      return this.persistPicked();
+    }
+
+    if (this.isSingle) {
       if (
         $target.classList.contains(this.options.stateClasses.active) &&
         this.options.deselect
@@ -274,7 +320,7 @@ export class Calendar extends HTMLElement {
 
   /** Paint in-between days while choosing the range end (mouse or keyboard). */
   previewRange(to: string) {
-    if (this.options.single || 1 !== this.picked.length || !this.$body) {
+    if (!this.isRange || 1 !== this.picked.length || !this.$body) {
       return;
     }
 
@@ -442,19 +488,21 @@ export class Calendar extends HTMLElement {
           if (isSelected) {
             $button.classList.add(this.options.stateClasses.active);
 
-            if (day === this.picked[0]) {
-              $button.classList.add(this.options.stateClasses.start);
-            }
-            if (
-              this.picked.length > 1 &&
-              day === this.picked[this.picked.length - 1]
-            ) {
-              $button.classList.add(this.options.stateClasses.end);
+            if (this.isRange) {
+              if (day === this.picked[0]) {
+                $button.classList.add(this.options.stateClasses.start);
+              }
+              if (
+                this.picked.length > 1 &&
+                day === this.picked[this.picked.length - 1]
+              ) {
+                $button.classList.add(this.options.stateClasses.end);
+              }
             }
           }
 
           if (
-            !this.options.single &&
+            this.isRange &&
             2 === this.picked.length &&
             isBetween(day, this.picked[0], this.picked[1])
           ) {

@@ -68,13 +68,36 @@ Importing the package registers the custom element. The calendar mounts on
 ### Single date
 
 ```html
-<cinq-calendar single deselect>…</cinq-calendar>
+<cinq-calendar mode="single" deselect>…</cinq-calendar>
 ```
 
 ### Date range
 
 ```html
-<cinq-calendar single="false">…</cinq-calendar>
+<cinq-calendar mode="range">…</cinq-calendar>
+```
+
+### Multiple dates
+
+Toggle discrete days (no range painting). Click again to remove.
+
+```html
+<cinq-calendar mode="multiple" allow-past>…</cinq-calendar>
+```
+
+There is no built-in max. Cap the selection in your app (e.g. after
+`calendar:change`):
+
+```js
+const MAX = 3;
+
+el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
+  if (el.picked.length <= MAX) return;
+
+  el.picked = el.picked.slice(0, MAX);
+  el.persistPicked();
+  el.render();
+});
 ```
 
 ### Locale & week start
@@ -131,8 +154,8 @@ el.renderInner = (inner, date) => {
 | Attribute | Description |
 | --------- | ----------- |
 | `locale` / `data-locale` | BCP 47 locale for title and weekday/month labels |
-| `single` | Single date (`true`, default) vs range (`false`) |
-| `deselect` | Allow clearing the selection in single mode |
+| `mode` | Selection mode: `single` (default), `range`, or `multiple` |
+| `deselect` | Allow clearing the selection in `mode="single"` |
 | `allow-past` | Allow selecting past dates |
 | `first-day` | Week start (`0`=Sun … `6`=Sat); defaults from locale |
 | `button-class` | Extra classes on day buttons |

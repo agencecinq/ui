@@ -1,5 +1,5 @@
-import { default as Panel } from './Panel.js';
-import { AccordionOptions } from './types.js';
+import { Panel } from './Panel.js';
+import { Options } from './types.js';
 /**
  * Accordion Web Component implementing the WAI-ARIA accordion pattern.
  *
@@ -8,9 +8,10 @@ import { AccordionOptions } from './types.js';
 export declare class Accordion extends HTMLElement {
     panels: Panel[];
     current: number;
-    options: AccordionOptions;
+    options: Options;
     connectedCallback(): void;
     disconnectedCallback(): void;
+    init(): void;
     closeAll(): void;
     destroy(): void;
     private handlePanelOpen;

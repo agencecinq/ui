@@ -1,0 +1,313 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-accordion-layout [role='region'] {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .docs-accordion-layout > [data-accordion-panel]:first-child > [data-accordion-header] {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+  }
+
+  .docs-accordion-layout > [data-accordion-panel]:last-child > [data-accordion-header][aria-expanded='false'] {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  .docs-accordion-layout > [data-accordion-panel]:last-child [data-accordion-inner] {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  .docs-accordion-layout-chevron {
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    flex-shrink: 0;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    margin-top: -0.125rem;
+    transition: transform 0.2s ease;
+  }
+
+  .docs-accordion-layout [data-accordion-header][aria-expanded='true'] .docs-accordion-layout-chevron {
+    transform: rotate(-135deg);
+    margin-top: 0.125rem;
+  }
+
+  .docs-accordion-layout [data-accordion-header].focus {
+    outline: 2px solid #111827;
+    outline-offset: -2px;
+  }
+
+  /* List mode (mobile): accordion unbound — every section fully visible */
+  .docs-accordion-layout[data-layout='list'] {
+    border-color: transparent;
+    border-radius: 0;
+  }
+
+  .docs-accordion-layout[data-layout='list'] > * + * {
+    border-top-width: 0;
+  }
+
+  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel] {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+  }
+
+  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel]:last-child {
+    margin-bottom: 0;
+  }
+
+  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel] > [data-accordion-header] {
+    pointer-events: none;
+    cursor: default;
+    border-radius: 0;
+    background: #fff;
+    color: #111827;
+  }
+
+  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel] > [data-accordion-header]:hover {
+    background: #fff;
+  }
+
+  .docs-accordion-layout[data-layout='list'] .docs-accordion-layout-chevron {
+    display: none;
+  }
+
+  .docs-accordion-layout[data-layout='list'] [role='region'] {
+    transition: none;
+  }
+</style>
+
+<section class="rounded-2xl bg-white p-6 shadow not-content" data-demo-root="accordion-layout">
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Responsive layout</h3>
+        <p class="text-sm text-gray-600">
+          Emulate a breakpoint: on “mobile” the accordion is unbound with
+          {' '}<code class="font-mono">destroy()</code> and reads as a stacked list;
+          on “desktop”{' '}<code class="font-mono">init()</code> restores accordion
+          behaviour. In production, drive this with
+          {' '}<code class="font-mono">matchMedia</code>.
+        </p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0" role="group" aria-label="Layout mode">
+        <button
+          type="button"
+          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-40 disabled:pointer-events-none"
+          data-action="desktop"
+          aria-pressed="true"
+        >
+          Desktop
+        </button>
+        <button
+          type="button"
+          class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 disabled:opacity-40 disabled:pointer-events-none"
+          data-action="mobile"
+          aria-pressed="false"
+        >
+          Mobile
+        </button>
+      </div>
+    </div>
+
+    <cinq-accordion
+      class="docs-accordion-layout max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+      data-accordion-hash="false"
+      data-demo="accordion-layout"
+      data-layout="accordion"
+    >
+      <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+        <button
+          type="button"
+          data-accordion-header
+          id="docs-accordion-layout-1-header"
+          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          aria-expanded="true"
+          aria-controls="docs-accordion-layout-1-body"
+        >
+          Ability scores
+          <span class="docs-accordion-layout-chevron" aria-hidden="true"></span>
+        </button>
+        <div
+          id="docs-accordion-layout-1-body"
+          role="region"
+          aria-labelledby="docs-accordion-layout-1-header"
+        >
+          <div
+            data-accordion-inner
+            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+          >
+            <p class="m-0">
+              Roll 3d6 for each ability and assign the results to Strength,
+              Dexterity, Constitution, Intelligence, Wisdom, and Charisma.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div data-accordion-panel data-accordion-open="false">
+        <button
+          type="button"
+          data-accordion-header
+          id="docs-accordion-layout-2-header"
+          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          aria-expanded="false"
+          aria-controls="docs-accordion-layout-2-body"
+        >
+          Class &amp; kit
+          <span class="docs-accordion-layout-chevron" aria-hidden="true"></span>
+        </button>
+        <div
+          id="docs-accordion-layout-2-body"
+          role="region"
+          aria-labelledby="docs-accordion-layout-2-header"
+          hidden
+        >
+          <div
+            data-accordion-inner
+            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+          >
+            <p class="m-0">
+              Check minimum ability scores for the class, then pick a kit for
+              starting gear and specialisation.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div data-accordion-panel data-accordion-open="false">
+        <button
+          type="button"
+          data-accordion-header
+          id="docs-accordion-layout-3-header"
+          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          aria-expanded="false"
+          aria-controls="docs-accordion-layout-3-body"
+        >
+          Alignment
+          <span class="docs-accordion-layout-chevron" aria-hidden="true"></span>
+        </button>
+        <div
+          id="docs-accordion-layout-3-body"
+          role="region"
+          aria-labelledby="docs-accordion-layout-3-header"
+          hidden
+        >
+          <div
+            data-accordion-inner
+            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+          >
+            <p class="m-0">
+              Pick Lawful, Neutral, or Chaotic on the ethical axis, and Good,
+              Neutral, or Evil on the moral axis.
+            </p>
+          </div>
+        </div>
+      </div>
+    </cinq-accordion>
+
+    <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+      Mode&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-gray-900"
+        >Desktop — accordion bound</span
+      >
+    </p>
+  </div>
+</section>
+
+<script>
+  {
+    const root = document.querySelector('[data-demo-root="accordion-layout"]');
+    const accordion = document.querySelector(
+      'cinq-accordion[data-demo="accordion-layout"]',
+    );
+    const status = root?.querySelector('[data-status]');
+    const desktopBtn = root?.querySelector('[data-action="desktop"]');
+    const mobileBtn = root?.querySelector('[data-action="mobile"]');
+
+    /** Expand every panel so the unbound host reads as a stacked list. */
+    const expandAsList = () => {
+      accordion?.querySelectorAll('[data-accordion-panel]').forEach((panel) => {
+        const header = panel.querySelector('[data-accordion-header]');
+        const body = header && document.getElementById(header.getAttribute('aria-controls') || '');
+
+        panel.setAttribute('data-accordion-open', 'true');
+        header?.setAttribute('aria-expanded', 'true');
+        body?.removeAttribute('hidden');
+        body?.style.removeProperty('max-height');
+        body?.style.removeProperty('overflow');
+      });
+    };
+
+    /** Collapse all but the first panel before re-binding as an accordion. */
+    const collapseForAccordion = () => {
+      accordion?.querySelectorAll('[data-accordion-panel]').forEach((panel, index) => {
+        const header = panel.querySelector('[data-accordion-header]');
+        const body = header && document.getElementById(header.getAttribute('aria-controls') || '');
+        const open = index === 0;
+
+        panel.setAttribute('data-accordion-open', String(open));
+        header?.setAttribute('aria-expanded', String(open));
+
+        if (open) {
+          body?.removeAttribute('hidden');
+        } else {
+          body?.setAttribute('hidden', '');
+        }
+
+        body?.style.removeProperty('max-height');
+        body?.style.removeProperty('overflow');
+      });
+    };
+
+    let mode = 'desktop';
+
+    const setMode = (next) => {
+      if (next === mode) return;
+      mode = next;
+
+      const isDesktop = next === 'desktop';
+
+      if (isDesktop) {
+        collapseForAccordion();
+        accordion?.init();
+        accordion?.setAttribute('data-layout', 'accordion');
+        if (status) status.textContent = 'Desktop — accordion bound';
+      } else {
+        accordion?.destroy();
+        expandAsList();
+        accordion?.setAttribute('data-layout', 'list');
+        if (status) status.textContent = 'Mobile — list (destroyed)';
+      }
+
+      desktopBtn?.setAttribute('aria-pressed', String(isDesktop));
+      mobileBtn?.setAttribute('aria-pressed', String(!isDesktop));
+      desktopBtn?.classList.toggle('bg-black', isDesktop);
+      desktopBtn?.classList.toggle('text-white', isDesktop);
+      desktopBtn?.classList.toggle('hover:bg-gray-800', isDesktop);
+      desktopBtn?.classList.toggle('bg-gray-100', !isDesktop);
+      desktopBtn?.classList.toggle('text-gray-800', !isDesktop);
+      desktopBtn?.classList.toggle('hover:bg-gray-200', !isDesktop);
+      mobileBtn?.classList.toggle('bg-black', !isDesktop);
+      mobileBtn?.classList.toggle('text-white', !isDesktop);
+      mobileBtn?.classList.toggle('hover:bg-gray-800', !isDesktop);
+      mobileBtn?.classList.toggle('bg-gray-100', isDesktop);
+      mobileBtn?.classList.toggle('text-gray-800', isDesktop);
+      mobileBtn?.classList.toggle('hover:bg-gray-200', isDesktop);
+    };
+
+    desktopBtn?.addEventListener('click', () => setMode('desktop'));
+    mobileBtn?.addEventListener('click', () => setMode('mobile'));
+  }
+</script>

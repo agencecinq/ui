@@ -95,7 +95,7 @@ Configured via data attributes on `<cinq-accordion>`:
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
 | `data-accordion-multiselectable` | boolean | `false` | Allow multiple panels open at once. |
-| `data-accordion-hash` | boolean | `true` | Open the panel whose region `id` matches the URL hash. |
+| `data-accordion-hash` | boolean | `true` | Open the panel whose region `id` matches the URL hash (`#id` or `#/id`). |
 
 Per panel:
 
@@ -127,11 +127,13 @@ collisions.
 const $accordion = document.querySelector("cinq-accordion");
 
 $accordion.closeAll();
-$accordion.destroy();
+$accordion.destroy(); // unbind
+// …mutate panel DOM…
+$accordion.init(); // re-bind
 ```
 
 Each panel exposes `openPanel(emit?)`, `close(emit?)`, and `toggle()` on the
-internal `Panel` instances via `$accordion.panels`.
+`Panel` instances via `$accordion.panels` (also exported as `Panel`).
 
 ## Events
 

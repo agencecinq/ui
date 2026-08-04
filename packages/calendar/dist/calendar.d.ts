@@ -1,6 +1,6 @@
 import { Current, Options } from './types.js';
 /**
- * Date / range picker Web Component.
+ * Date / range / multi-date picker Web Component.
  *
  * Markup and CSS are yours — the package fills the grid and handles selection.
  * Follows the WAI-ARIA APG date grid practices.
@@ -20,9 +20,15 @@ export declare class Calendar extends HTMLElement {
     $previous: HTMLButtonElement | null;
     /** Selected days as `YYYY-MM-DD`. */
     picked: string[];
+    private get isMultiple();
+    private get isRange();
+    private get isSingle();
     connectedCallback(): void;
     disconnectedCallback(): void;
     private readOptions;
+    /**
+     * Bind markup + listeners. Call {@link destroy} first if already bound.
+     */
     init(): void;
     destroy(): void;
     move(deltaMonths: number, { focus }?: {

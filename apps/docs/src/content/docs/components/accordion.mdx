@@ -4,6 +4,9 @@ description: Accessible WAI-ARIA accordion Web Component (`<cinq-accordion>`) fo
 ---
 
 import AccordionPlayground from "../_components/AccordionPlayground.astro";
+import AccordionDestroyCreate from "../_components/AccordionDestroyCreate.astro";
+import AccordionAddRuntime from "../_components/AccordionAddRuntime.astro";
+import AccordionResponsiveLayout from "../_components/AccordionResponsiveLayout.astro";
 
 An accordion shows and hides sections of content. `<cinq-accordion>` wires up
 header buttons, `aria-expanded` / `aria-controls` relationships, optional height
@@ -158,13 +161,17 @@ Set `data-accordion-hash="false"` on nested hosts to avoid hash collisions.
 
 | Method | Description |
 | ------ | ----------- |
+| `init()` | Binds panels and listeners (also runs on `connectedCallback`). |
+| `destroy()` | Detaches listeners and panel controllers. |
 | `closeAll()` | Closes every panel without emitting events. |
-| `destroy()` | Detaches listeners. |
 
 | Property | Description |
 | -------- | ----------- |
 | `panels` | Internal panel controller instances. |
 | `options` | Resolved `multiselectable` and `hash` options. |
+
+When you mutate the panel DOM at runtime, re-bind with `destroy()` → mutate →
+`init()` (same pattern as tabs).
 
 ## Events
 
@@ -184,3 +191,80 @@ $accordion.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, (event) => {
 ## Examples
 
 <AccordionPlayground />
+
+### Destroy & recreate
+
+```js
+const accordion = document.querySelector("cinq-accordion");
+
+accordion.destroy(); // unbind
+accordion.init(); // re-bind
+```
+
+<AccordionDestroyCreate />
+
+### Responsive layout (list ↔ accordion)
+
+On narrow viewports you may want every section visible as a stacked list; on
+desktop, the same markup becomes an accordion. Toggle with `destroy()` /
+`init()` (here emulated by buttons — production code usually uses
+`matchMedia`).
+
+```js
+const accordion = document.querySelector("cinq-accordion");
+const mq = window.matchMedia("(min-width: 768px)");
+
+const expandAsList = () => {
+  accordion.querySelectorAll("[data-accordion-panel]").forEach((panel) => {
+    const header = panel.querySelector("[data-accordion-header]");
+    const body = document.getElementById(header.getAttribute("aria-controls"));
+    panel.setAttribute("data-accordion-open", "true");
+    header.setAttribute("aria-expanded", "true");
+    body.removeAttribute("hidden");
+  });
+};
+
+const apply = () => {
+  if (mq.matches) {
+    accordion.init();
+  } else {
+    accordion.destroy();
+    expandAsList();
+  }
+};
+
+mq.addEventListener("change", apply);
+apply();
+```
+
+<AccordionResponsiveLayout />
+
+### Add panels at runtime
+
+```js
+const accordion = document.querySelector("cinq-accordion");
+
+accordion.destroy();
+
+accordion.insertAdjacentHTML(
+  "beforeend",
+  `<div data-accordion-panel data-accordion-open="false">
+    <button
+      type="button"
+      data-accordion-header
+      id="cloaker-header"
+      aria-expanded="false"
+      aria-controls="cloaker-body"
+    >
+      Cloaker
+    </button>
+    <div id="cloaker-body" role="region" aria-labelledby="cloaker-header" hidden>
+      <div data-accordion-inner>Hangs from the ceiling like a shadow.</div>
+    </div>
+  </div>`,
+);
+
+accordion.init();
+```
+
+<AccordionAddRuntime />

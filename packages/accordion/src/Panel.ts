@@ -1,5 +1,5 @@
 import { EVENTS, dispatchEvent, parseBoolean } from "@agencecinq/utils";
-import type { AccordionPanelDetail } from "./types.js";
+import type { Detail } from "./types.js";
 import { setActive, setInactive } from "./utils.js";
 
 /**
@@ -7,7 +7,7 @@ import { setActive, setInactive } from "./utils.js";
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
  */
-export default class Panel {
+export class Panel {
   el: HTMLElement;
   $body: HTMLElement | null = null;
   $button: HTMLButtonElement | null = null;
@@ -17,6 +17,9 @@ export default class Panel {
   isOpen = false;
   height = 0;
   transitionDuration = 0;
+
+  private rafId = 0;
+  private timeoutId = 0;
 
   constructor(el: HTMLElement, index: number) {
     this.el = el;
@@ -28,15 +31,22 @@ export default class Panel {
       this.el.querySelector<HTMLButtonElement>("[data-accordion-header]") ||
       this.el.querySelector<HTMLButtonElement>("button");
 
-    if (!this.$button) return;
+    if (!this.$button) {
+      throw new Error("Accordion panel: header button not found");
+    }
 
     // IDL: `ariaControlsElements` reflects `aria-controls` ID references.
     this.$body =
       ((this.$button.ariaControlsElements ?? [])[0] as
         | HTMLElement
-        | undefined) ?? null;
+        | undefined) ??
+      (document.getElementById(
+        this.$button.getAttribute("aria-controls") || "",
+      ) as HTMLElement | null);
 
-    if (!this.$body) return;
+    if (!this.$body) {
+      throw new Error("Accordion panel: aria-controls target not found");
+    }
 
     this.$inner =
       this.$body.querySelector<HTMLElement>("[data-accordion-inner]") ||
@@ -47,11 +57,11 @@ export default class Panel {
     );
     this.isOpen = this.$button.getAttribute("aria-expanded") === "true";
 
-    this.measure();
+    this.resize();
     this.$button.addEventListener("click", this.handleClick);
     this.$button.addEventListener("focus", this.handleFocus);
     this.$button.addEventListener("blur", this.handleBlur);
-    window.addEventListener("resize", this.handleResize);
+    window.addEventListener("resize", this.resize);
   }
 
   get open(): boolean {
@@ -74,15 +84,20 @@ export default class Panel {
     this.el.setAttribute("data-accordion-open", "true");
     this.$body.removeAttribute("hidden");
 
-    this.measure();
+    this.resize();
 
     this.$body.style.setProperty("max-height", "0");
 
-    requestAnimationFrame(() => {
-      this.$body!.style.setProperty("max-height", `${this.height}px`);
+    this.clearAnimation();
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = 0;
+      if (!this.$body) return;
 
-      window.setTimeout(() => {
-        this.$body!.style.removeProperty("max-height");
+      this.$body.style.setProperty("max-height", `${this.height}px`);
+
+      this.timeoutId = window.setTimeout(() => {
+        this.timeoutId = 0;
+        this.$body?.style.removeProperty("max-height");
       }, this.transitionDuration);
     });
 
@@ -106,15 +121,18 @@ export default class Panel {
     this.$button.setAttribute("aria-expanded", "false");
     this.el.setAttribute("data-accordion-open", "false");
 
-    this.measure();
+    this.resize();
     this.$body.style.setProperty("max-height", `${this.height}px`);
 
-    requestAnimationFrame(() => {
-      this.$body!.style.setProperty("max-height", "0");
+    this.clearAnimation();
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = 0;
+      this.$body?.style.setProperty("max-height", "0");
     });
 
-    window.setTimeout(() => {
-      this.$body!.setAttribute("hidden", "");
+    this.timeoutId = window.setTimeout(() => {
+      this.timeoutId = 0;
+      this.$body?.setAttribute("hidden", "");
     }, this.transitionDuration);
 
     setInactive(this.el);
@@ -137,10 +155,12 @@ export default class Panel {
   }
 
   destroy(): void {
+    this.clearAnimation();
+
     this.$button?.removeEventListener("click", this.handleClick);
     this.$button?.removeEventListener("focus", this.handleFocus);
     this.$button?.removeEventListener("blur", this.handleBlur);
-    window.removeEventListener("resize", this.handleResize);
+    window.removeEventListener("resize", this.resize);
 
     if (this.$body) {
       this.$body.style.removeProperty("max-height");
@@ -151,6 +171,18 @@ export default class Panel {
     this.$body = null;
     this.$button = null;
     this.$inner = null;
+  }
+
+  private clearAnimation(): void {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
+    }
+
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = 0;
+    }
   }
 
   private handleClick = (): void => {
@@ -165,11 +197,7 @@ export default class Panel {
     this.$button?.classList.remove("focus");
   };
 
-  private handleResize = (): void => {
-    this.measure();
-  };
-
-  private measure(): void {
+  private resize = (): void => {
     if (!this.$body) return;
 
     this.$body.removeAttribute("hidden");
@@ -188,9 +216,9 @@ export default class Panel {
     } else {
       this.$body.style.removeProperty("max-height");
     }
-  }
+  };
 
-  private get detail(): AccordionPanelDetail {
+  private get detail(): Detail {
     return { el: this.el, index: this.index };
   }
 }

@@ -4,8 +4,11 @@ export interface StateClasses {
     start: string;
     end: string;
 }
+/** Selection behaviour for `<cinq-calendar>`. */
+export type Mode = "single" | "range" | "multiple";
 export interface Options {
-    single?: boolean;
+    /** `single` (default), `range`, or `multiple` (toggle discrete days). */
+    mode: Mode;
     firstDay: number;
     stateClasses: StateClasses;
     locale: string;
@@ -22,7 +25,7 @@ export interface Current {
     /** Navigation day as `YYYY-MM-DD` (may be outside the viewed month until render). */
     day: string | null;
 }
-export interface ChangeDetail {
+export interface Detail {
     values: string[];
     name?: string;
 }

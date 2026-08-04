@@ -1,4 +1,5 @@
 import { Accordion } from "./accordion.js";
+import { Panel } from "./Panel.js";
 
-export { Accordion };
-export type { AccordionOptions, AccordionPanelDetail } from "./types.js";
+export { Accordion, Panel };
+export type { Options, Detail } from "./types.js";

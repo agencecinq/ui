@@ -121,6 +121,48 @@ pnpm release
 1. **Strict ESM**: Always use `import.meta.url` instead of `__dirname` in Node.js scripts (Vite plugins).
 2. **Shared Utils**: If you write a utility function that could be used elsewhere, place it in `@agencecinq/utils`.
 3. **Peer Dependencies**: When adding a dependency to a package, consider if it should be a `peerDependency` to avoid version conflicts in the final consumer project.
+4. **`init` / `destroy` lifecycle** (Web Components): every package host class should expose a public bind/unbind pair (`init` must not call `destroy`) so consumers can tear down and re-bind from outside.
+
+### Host lifecycle: `init` / `destroy`
+
+CINQ UI components mount themselves on connect, but **must** remain controllable from the app:
+
+```ts
+class Example extends HTMLElement {
+  connectedCallback(): void {
+    this.init();
+  }
+
+  disconnectedCallback(): void {
+    this.destroy();
+  }
+
+  /** Bind DOM + listeners. Does not call `destroy()`. */
+  init(): void {
+    // query markup, attach listeners, sync ARIA…
+  }
+
+  /** Unbind listeners / observers. Safe to call from outside the element. */
+  destroy(): void {
+    // removeEventListener, disconnect observers, clear controllers…
+  }
+}
+```
+
+| Method | Who calls it | Role |
+| ------ | ------------ | ---- |
+| `init()` | `connectedCallback`, or the app after a prior `destroy()` | Bind |
+| `destroy()` | `disconnectedCallback`, or the app before re-init / DOM mutation | Unbind |
+
+`init()` and `destroy()` stay **separate**: `init()` must not call `destroy()`. When rebinding after a DOM change, the caller always runs both explicitly:
+
+```js
+el.destroy();
+// mutate light DOM…
+el.init();
+```
+
+Reference implementations: `@agencecinq/tabs`, `@agencecinq/accordion`, `@agencecinq/spinbutton`, `@agencecinq/calendar`.
 
 ---
 

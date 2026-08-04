@@ -1,9 +1,9 @@
 import { EVENTS, keycode, parseBoolean } from "@agencecinq/utils";
-import Panel from "./Panel.js";
-import type { AccordionOptions } from "./types.js";
-import { getURLHash, getAccordionPanels } from "./utils.js";
+import { Panel } from "./Panel.js";
+import type { Detail, Options } from "./types.js";
+import { getURLHash } from "./utils.js";
 
-const DEFAULTS: AccordionOptions = {
+const DEFAULTS: Options = {
   multiselectable: false,
   hash: true,
 };
@@ -16,31 +16,38 @@ const DEFAULTS: AccordionOptions = {
 export class Accordion extends HTMLElement {
   panels: Panel[] = [];
   current = 0;
-  options: AccordionOptions = { ...DEFAULTS };
+  options: Options = { ...DEFAULTS };
 
   connectedCallback(): void {
-    const multiselectable = this.getAttribute("data-accordion-multiselectable");
-    const hash = this.getAttribute("data-accordion-hash");
+    this.init();
+  }
 
+  disconnectedCallback(): void {
+    this.destroy();
+  }
+
+  init(): void {
     this.options = {
-      multiselectable: parseBoolean(multiselectable),
-      hash: parseBoolean(hash, DEFAULTS.hash),
+      multiselectable: parseBoolean(
+        this.getAttribute("data-accordion-multiselectable"),
+      ),
+      hash: parseBoolean(
+        this.getAttribute("data-accordion-hash"),
+        DEFAULTS.hash,
+      ),
     };
 
-    const panelElements = getAccordionPanels(this);
+    this.panels = [
+      ...this.querySelectorAll<HTMLElement>("[data-accordion-panel]"),
+    ]
+      .filter((panel) => panel.closest("cinq-accordion") === this)
+      .map((element, index) => {
+        const panel = new Panel(element, index);
+        panel.init();
+        return panel;
+      });
 
-    this.panels = panelElements.map((element, index) => {
-      const panel = new Panel(element, index);
-      panel.init();
-      return panel;
-    });
-
-    this.panels.forEach((panel, index) => {
-      panel.el.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, () =>
-        this.handlePanelOpen(index),
-      );
-    });
-
+    this.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.handlePanelOpen);
     this.addEventListener("keydown", this.handleKeydown);
 
     if (this.options.hash) {
@@ -49,25 +56,31 @@ export class Accordion extends HTMLElement {
     }
   }
 
-  disconnectedCallback(): void {
-    this.destroy();
-  }
-
   closeAll(): void {
     this.panels.forEach((panel) => panel.close(false));
   }
 
   destroy(): void {
+    this.removeEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.handlePanelOpen);
     this.removeEventListener("keydown", this.handleKeydown);
     window.removeEventListener("hashchange", this.handleHashChange);
+
     this.panels.forEach((panel) => panel.destroy());
     this.panels = [];
   }
 
-  private handlePanelOpen = (index: number): void => {
+  private handlePanelOpen = (event: Event): void => {
+    const { el, index } = (event as CustomEvent<Detail>).detail;
+
+    if (el.closest("cinq-accordion") !== this) {
+      return;
+    }
+
     this.current = index;
 
-    if (this.options.multiselectable) return;
+    if (this.options.multiselectable) {
+      return;
+    }
 
     this.panels.forEach((panel, i) => {
       if (i !== index) {
@@ -78,7 +91,9 @@ export class Accordion extends HTMLElement {
 
   private handleHashChange = (): void => {
     const hash = getURLHash();
-    if (!hash) return;
+    if (!hash) {
+      return;
+    }
 
     this.panels.forEach((panel, index) => {
       if (panel.$body && panel.$body.id === hash) {
@@ -96,21 +111,16 @@ export class Accordion extends HTMLElement {
   };
 
   private handleKeydown = (event: KeyboardEvent): void => {
-    const target = event.target as HTMLElement;
-    const header =
-      target.matches("[data-accordion-header]")
-        ? (target as HTMLButtonElement)
-        : null;
-
-    if (!header) return;
-
-    const panelIndex = this.panels.findIndex(
-      (panel) => panel.$button === header,
+    const target = event.target as Node;
+    const index = this.panels.findIndex(
+      (panel) => panel.$button != null && panel.$button.contains(target),
     );
 
-    if (panelIndex < 0) return;
+    if (index < 0) {
+      return;
+    }
 
-    this.current = panelIndex;
+    this.current = index;
 
     const previous = (): void => {
       this.current =

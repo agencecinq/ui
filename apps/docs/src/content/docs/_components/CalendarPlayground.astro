@@ -213,7 +213,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Date range</h3>
         <p class="text-sm text-gray-600">
-          <code>single="false"</code> — pick a start day, then an end day. Hover (or move focus)
+          <code>mode="range"</code> — pick a start day, then an end day. Hover (or move focus)
           paints the in-between preview. A third click resets the range.
         </p>
       </div>
@@ -222,7 +222,7 @@ import RegisterComponents from './RegisterComponents.astro';
         class="docs-calendar"
         data-calendar-demo="range"
         locale="fr"
-        single="false"
+        mode="range"
         allow-past
         name="range"
       >
@@ -253,6 +253,49 @@ import RegisterComponents from './RegisterComponents.astro';
   <section class="rounded-2xl bg-white p-6 shadow">
     <div class="flex flex-col gap-4">
       <div>
+        <h3 class="text-lg font-semibold text-gray-900">Multiple dates</h3>
+        <p class="text-sm text-gray-600">
+          <code>mode="multiple"</code> — toggle discrete days in and out of the
+          selection. No range painting; click a selected day again to remove it.
+          Cap the count in your app if needed (no built-in max).
+        </p>
+      </div>
+
+      <cinq-calendar
+        class="docs-calendar"
+        data-calendar-demo="multiple"
+        locale="fr"
+        mode="multiple"
+        allow-past
+        name="multiple"
+      >
+        <header>
+          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+          <button
+            type="button"
+            class="js-title"
+            id="docs-calendar-multiple-label"
+            aria-live="polite"
+          ></button>
+          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+        </header>
+        <table role="grid" aria-labelledby="docs-calendar-multiple-label">
+          <thead>
+            <tr class="js-days"></tr>
+          </thead>
+          <tbody class="js-body"></tbody>
+        </table>
+      </cinq-calendar>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="multiple" class="font-medium text-gray-900">Aucune date</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
         <h3 class="text-lg font-semibold text-gray-900">Preselected dates</h3>
         <p class="text-sm text-gray-600">
           Seed the view with <code>data-month</code>, <code>data-year</code>, and&nbsp;<code>data-picked-dates</code>. Here a range covering mid-November 2025.
@@ -263,7 +306,7 @@ import RegisterComponents from './RegisterComponents.astro';
         class="docs-calendar"
         data-calendar-demo="preselected"
         locale="fr"
-        single="false"
+        mode="range"
         allow-past
         data-month="10"
         data-year="2025"
@@ -340,8 +383,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <h3 class="text-lg font-semibold text-gray-900">Locale & week start</h3>
         <p class="text-sm text-gray-600">
           Change the locale — labels update via <code>Intl</code>, and week start
-          follows <code>getWeekStart(locale)</code> unless you override
-          <code>first-day</code>.
+          follows <code>getWeekStart(locale)</code> unless you override <code>first-day</code>.
         </p>
       </div>
 
@@ -468,6 +510,7 @@ import RegisterComponents from './RegisterComponents.astro';
   const emptyLabels = {
     single: 'Aucune date',
     range: 'Aucune date',
+    multiple: 'Aucune date',
     preselected: 'Aucune date',
     future: 'Aucune date',
     locale: 'Aucune date',
@@ -481,9 +524,12 @@ import RegisterComponents from './RegisterComponents.astro';
     el.addEventListener(EVENTS.CALENDAR_CHANGE, (event) => {
       const { values } = event.detail;
       if (!output) return;
-      output.textContent = values.length
-        ? values.join(' → ')
-        : emptyLabels[key] ?? '—';
+      if (!values.length) {
+        output.textContent = emptyLabels[key] ?? '—';
+        return;
+      }
+      output.textContent =
+        key === 'multiple' ? values.join(', ') : values.join(' → ');
     });
   });
 

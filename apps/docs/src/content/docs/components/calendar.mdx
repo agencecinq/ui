@@ -51,14 +51,14 @@ The component upgrades automatically on `connectedCallback`.
 
 ## Examples
 
-Interactive demos below cover single date, range, preselection, future-only,
-locale / week start, and an advanced `renderInner` events calendar.
+Interactive demos below cover single date, range, multiple dates, preselection,
+future-only, locale / week start, and an advanced `renderInner` events calendar.
 
 <CalendarPlayground />
 
 ### Single date
 
-Default mode. Add `deselect` to clear by clicking the selected day again.
+Default `mode="single"`. Add `deselect` to clear by clicking the selected day again.
 
 ```html
 <cinq-calendar locale="fr" deselect allow-past name="arrival">
@@ -68,13 +68,41 @@ Default mode. Add `deselect` to clear by clicking the selected day again.
 
 ### Date range
 
-Set `single="false"`. First click is the start, second is the end; hover or
+Set `mode="range"`. First click is the start, second is the end; hover or
 keyboard focus previews the range. A third click resets.
 
 ```html
-<cinq-calendar locale="fr" single="false" allow-past name="stay">
+<cinq-calendar locale="fr" mode="range" allow-past name="stay">
   <!-- header + table -->
 </cinq-calendar>
+```
+
+### Multiple dates
+
+Set `mode="multiple"`. Each click toggles a day in or out of the selection — no
+range preview.
+
+```html
+<cinq-calendar locale="fr" mode="multiple" allow-past name="availability">
+  <!-- header + table -->
+</cinq-calendar>
+```
+
+The package does not enforce a maximum number of days. That is application
+logic — listen to `calendar:change` and trim `picked` yourself:
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+const MAX = 3;
+
+el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
+  if (el.picked.length <= MAX) return;
+
+  el.picked = el.picked.slice(0, MAX);
+  el.persistPicked();
+  el.render();
+});
 ```
 
 ### Preselected dates
@@ -84,7 +112,7 @@ Seed the viewed month and selection from attributes:
 ```html
 <cinq-calendar
   locale="fr"
-  single="false"
+  mode="range"
   allow-past
   data-month="10"
   data-year="2025"
@@ -162,8 +190,8 @@ el.renderInner = (inner, date) => {
 | Attribute | Description |
 | --------- | ----------- |
 | `locale` / `data-locale` | BCP 47 locale for labels |
-| `single` | Single date (default) vs `single="false"` for range |
-| `deselect` | Allow clearing selection in single mode |
+| `mode` | `single` (default), `range`, or `multiple` |
+| `deselect` | Allow clearing selection in `mode="single"` |
 | `allow-past` | Allow selecting past dates |
 | `first-day` | Week start (`0`=Sun … `6`=Sat) |
 | `button-class` | Extra classes on day buttons |
