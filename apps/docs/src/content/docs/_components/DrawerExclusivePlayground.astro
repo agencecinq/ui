@@ -1,0 +1,139 @@
+---
+import PortalToBody from "./PortalToBody.astro";
+import RegisterComponents from "./RegisterComponents.astro";
+---
+
+<RegisterComponents />
+
+<div class="not-content">
+  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">Exclusive drawers</h3>
+      <p class="text-sm text-gray-600">
+        Opening one drawer closes any other that is already open — each instance
+        listens for <code class="text-xs">drawer-open</code> on <code class="text-xs">document.documentElement</code>.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <cinq-drawer-button class="block">
+        <button
+          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          aria-controls="exclusive-drawer-left"
+          aria-expanded="false"
+        >
+          Open left (notes)
+        </button>
+      </cinq-drawer-button>
+      <cinq-drawer-button class="block">
+        <button
+          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          aria-controls="exclusive-drawer-right"
+          aria-expanded="false"
+        >
+          Open right (bestiary)
+        </button>
+      </cinq-drawer-button>
+    </div>
+
+    <cinq-drawer id="exclusive-drawer-left" class="group">
+      <div
+        data-dom="overlay"
+        class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
+      ></div>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exclusive-drawer-left-title"
+        class="fixed left-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl -translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
+      >
+        <div class="flex h-full flex-col">
+          <header class="flex items-center justify-between border-b px-6 py-4">
+            <h2
+              id="exclusive-drawer-left-title"
+              class="text-lg font-semibold text-gray-900"
+            >
+              Encounter notes
+            </h2>
+            <cinq-drawer-button class="block">
+              <button
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+                aria-controls="exclusive-drawer-left"
+                aria-expanded="false"
+                aria-label="Close notes"
+              >
+                ✕
+              </button>
+            </cinq-drawer-button>
+          </header>
+          <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
+            <p class="text-sm text-gray-600">
+              Party enters from the west corridor. Two trolls wait behind the
+              collapsed arch.
+            </p>
+            <cinq-drawer-button class="block">
+              <button
+                class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+                aria-controls="exclusive-drawer-right"
+                aria-expanded="false"
+              >
+                Open bestiary instead
+              </button>
+            </cinq-drawer-button>
+          </div>
+        </div>
+      </div>
+    </cinq-drawer>
+
+    <cinq-drawer id="exclusive-drawer-right" class="group">
+      <div
+        data-dom="overlay"
+        class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
+      ></div>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exclusive-drawer-right-title"
+        class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
+      >
+        <div class="flex h-full flex-col">
+          <header class="flex items-center justify-between border-b px-6 py-4">
+            <h2
+              id="exclusive-drawer-right-title"
+              class="text-lg font-semibold text-gray-900"
+            >
+              Bestiary
+            </h2>
+            <cinq-drawer-button class="block">
+              <button
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+                aria-controls="exclusive-drawer-right"
+                aria-expanded="false"
+                aria-label="Close bestiary"
+              >
+                ✕
+              </button>
+            </cinq-drawer-button>
+          </header>
+          <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
+            <p class="text-sm text-gray-600">
+              Troll — regenerates unless hit with fire or acid.
+            </p>
+            <cinq-drawer-button class="block">
+              <button
+                class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+                aria-controls="exclusive-drawer-left"
+                aria-expanded="false"
+              >
+                Open notes instead
+              </button>
+            </cinq-drawer-button>
+          </div>
+        </div>
+      </div>
+    </cinq-drawer>
+
+    <PortalToBody selector="#exclusive-drawer-left" />
+    <PortalToBody selector="#exclusive-drawer-right" />
+  </section>
+</div>
