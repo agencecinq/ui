@@ -1,0 +1,118 @@
+---
+import RegisterComponents from "./RegisterComponents.astro";
+---
+
+<RegisterComponents />
+
+<div class="not-content">
+  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">Replace: open next, close current</h3>
+      <p class="text-sm text-gray-600">
+        From the first modal, <strong>Continue</strong> targets both ids
+        (<code class="text-xs">aria-controls="…address …confirm"</code>).
+        Toggle order closes the parent then opens the child — not a stack.
+        Closing confirm returns focus to <strong>Start checkout</strong>.
+      </p>
+    </div>
+
+    <cinq-modal-button class="block">
+      <button
+        type="button"
+        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+        aria-controls="replace-modal-address"
+        aria-pressed="false"
+      >
+        Start checkout
+      </button>
+    </cinq-modal-button>
+
+    <p class="text-xs text-gray-500">
+      Flow: Start checkout → Continue → Cancel/Confirm → focus back on Start checkout.
+    </p>
+
+    <cinq-modal id="replace-modal-address">
+      <dialog
+        class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+      >
+        <div class="flex flex-col gap-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-semibold mb-1">Delivery address</h2>
+              <p class="text-sm text-gray-600">
+                Step 1 of 2. Continue replaces this dialog with the confirmation.
+              </p>
+            </div>
+            <cinq-modal-button class="block">
+              <button
+                type="button"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+                aria-controls="replace-modal-address"
+                aria-pressed="false"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </cinq-modal-button>
+          </div>
+
+          <label class="block">
+            <span class="block text-sm font-medium text-gray-700 mb-1">Street</span>
+            <input
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+              placeholder="12 Goblin Alley"
+            />
+          </label>
+
+          <cinq-modal-button class="block self-end">
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+              aria-controls="replace-modal-address replace-modal-confirm"
+              aria-pressed="false"
+            >
+              Continue
+            </button>
+          </cinq-modal-button>
+        </div>
+      </dialog>
+    </cinq-modal>
+
+    <cinq-modal id="replace-modal-confirm">
+      <dialog
+        class="fixed left-1/2 top-1/2 w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+      >
+        <div class="flex flex-col gap-4">
+          <div>
+            <h2 class="text-xl font-semibold mb-1">Confirm order</h2>
+            <p class="text-sm text-gray-600">
+              Step 2 of 2. The address dialog is closed — only this one is open.
+            </p>
+          </div>
+          <div class="flex justify-end gap-2">
+            <cinq-modal-button class="block">
+              <button
+                type="button"
+                class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+                aria-controls="replace-modal-confirm"
+                aria-pressed="false"
+              >
+                Cancel
+              </button>
+            </cinq-modal-button>
+            <cinq-modal-button class="block">
+              <button
+                type="button"
+                class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+                aria-controls="replace-modal-confirm"
+                aria-pressed="false"
+              >
+                Place order
+              </button>
+            </cinq-modal-button>
+          </div>
+        </div>
+      </dialog>
+    </cinq-modal>
+  </section>
+</div>

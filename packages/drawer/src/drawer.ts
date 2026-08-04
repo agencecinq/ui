@@ -6,6 +6,8 @@ import {
   removeTrapFocus,
   getFocusableElements,
   dispatchEvent,
+  rememberReturnFocus,
+  restoreReturnFocus,
 } from "@agencecinq/utils";
 
 export class Drawer extends HTMLElement {
@@ -86,10 +88,20 @@ export class Drawer extends HTMLElement {
     );
 
     if (this.hasAttribute("open")) {
-      removeTrapFocus(this.trigger);
+      removeTrapFocus();
       enableScroll(false);
       this.style.setProperty("opacity", "0");
       this.style.setProperty("visibility", "hidden");
+
+      // Defer: exclusive multi-toggle closes A then opens B in the same turn.
+      queueMicrotask(() => {
+        const othersOpen = [
+          ...document.querySelectorAll("cinq-drawer[open]"),
+        ].some((drawer) => drawer !== this);
+        if (!othersOpen) {
+          restoreReturnFocus();
+        }
+      });
     }
 
     this.$overlay = null;
@@ -183,6 +195,8 @@ export class Drawer extends HTMLElement {
     this.style.setProperty("opacity", "1");
     this.style.setProperty("visibility", "visible");
 
+    rememberReturnFocus(this.trigger);
+
     dispatchEvent(
       document.documentElement,
       EVENTS.DRAWER_OPEN,
@@ -205,8 +219,16 @@ export class Drawer extends HTMLElement {
       this.onCloseTransitionEnd,
     );
 
-    removeTrapFocus(this.trigger);
+    removeTrapFocus();
     enableScroll(false);
+
+    // Defer so an exclusive open in the same turn (multi `aria-controls`, or
+    // DRAWER_OPEN closing a peer) can set `open` before we decide to restore.
+    queueMicrotask(() => {
+      if (!document.querySelector("cinq-drawer[open]")) {
+        restoreReturnFocus();
+      }
+    });
 
     dispatchEvent(
       document.documentElement,

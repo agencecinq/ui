@@ -4,6 +4,9 @@ const trapFocusHandlers: {
   keydown?: (event: KeyboardEvent) => void;
 } = {};
 
+/** First document focus target for the current overlay session (first wins). */
+let returnFocusElement: HTMLElement | null = null;
+
 function isVisible(el: HTMLElement): boolean {
   return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
@@ -21,27 +24,64 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     'textarea:enabled',
     'object',
     'iframe',
-    '[contenteditable]'
+    '[contenteditable]',
   ].join(',');
 
-  return Array.from(container.querySelectorAll<HTMLElement>(selector))
-    .filter(el => isVisible(el) && el.getAttribute('tabindex') !== '-1');
+  return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
+    (el) => isVisible(el) && el.getAttribute('tabindex') !== '-1',
+  );
 }
 
-function addTrapFocus(container: HTMLElement, elementToFocus: HTMLElement = container): void {
+/**
+ * Stash the element to focus when the overlay session ends.
+ * First call wins so a chain of exclusive overlays keeps the original page control.
+ * Falls back to `document.activeElement` when `element` is omitted/null.
+ */
+function rememberReturnFocus(element?: HTMLElement | null): void {
+  if (returnFocusElement) {
+    return;
+  }
+
+  const candidate =
+    element ??
+    (document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null);
+
+  if (!candidate || candidate === document.body || !candidate.isConnected) {
+    return;
+  }
+
+  returnFocusElement = candidate;
+}
+
+/** Restore and clear the stashed return-focus element. */
+function restoreReturnFocus(): void {
+  returnFocusElement?.focus();
+  returnFocusElement = null;
+}
+
+function addTrapFocus(
+  container: HTMLElement,
+  elementToFocus: HTMLElement = container,
+): void {
   const elements = getFocusableElements(container);
   if (elements.length === 0) return;
 
   const first = elements[0];
   const last = elements[elements.length - 1];
 
+  rememberReturnFocus();
   removeTrapFocus();
 
   trapFocusHandlers.keydown = (event: KeyboardEvent): void => {
     if (event.key !== 'Tab') return;
 
     if (event.shiftKey) {
-      if (document.activeElement === first || document.activeElement === container) {
+      if (
+        document.activeElement === first ||
+        document.activeElement === container
+      ) {
         event.preventDefault();
         last.focus();
       }
@@ -76,4 +116,10 @@ function removeTrapFocus(elementToFocus: HTMLElement | null = null): void {
   }
 }
 
-export { addTrapFocus, removeTrapFocus, getFocusableElements };
+export {
+  addTrapFocus,
+  removeTrapFocus,
+  getFocusableElements,
+  rememberReturnFocus,
+  restoreReturnFocus,
+};

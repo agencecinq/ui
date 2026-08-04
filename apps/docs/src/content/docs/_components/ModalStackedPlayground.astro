@@ -1,0 +1,111 @@
+---
+import RegisterComponents from "./RegisterComponents.astro";
+---
+
+<RegisterComponents />
+
+<div class="not-content">
+  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">Stacked modals (APG)</h3>
+      <p class="text-sm text-gray-600">
+        A modal can open over another. The lower dialog stays open but inert
+        (native <code class="text-xs">showModal()</code> top layer). Closing the top
+        dialog returns focus to the control that opened it — inside the parent
+        modal, not the page.
+      </p>
+    </div>
+
+    <cinq-modal-button class="block">
+      <button
+        type="button"
+        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+        aria-controls="stacked-modal-address"
+        aria-pressed="false"
+      >
+        Add delivery address
+      </button>
+    </cinq-modal-button>
+
+    <p class="text-xs text-gray-500">
+      Red ring = <code>aria-pressed="false"</code>, green = <code>aria-pressed="true"</code>.
+      Flow: open address → verify → close verify (focus on Verify) → close address
+      (focus on Add delivery address).
+    </p>
+
+    <cinq-modal id="stacked-modal-address">
+      <dialog
+        class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+      >
+        <div class="flex flex-col gap-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-semibold mb-1">Add delivery address</h2>
+              <p class="text-sm text-gray-600">
+                Street and city for the next encounter drop.
+              </p>
+            </div>
+            <cinq-modal-button class="block">
+              <button
+                type="button"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+                aria-controls="stacked-modal-address"
+                aria-pressed="false"
+                aria-label="Close address dialog"
+              >
+                ✕
+              </button>
+            </cinq-modal-button>
+          </div>
+
+          <label class="block">
+            <span class="block text-sm font-medium text-gray-700 mb-1">Street</span>
+            <input
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+              placeholder="12 Goblin Alley"
+            />
+          </label>
+
+          <cinq-modal-button class="block">
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+              aria-controls="stacked-modal-verify"
+              aria-pressed="false"
+            >
+              Verify address
+            </button>
+          </cinq-modal-button>
+        </div>
+      </dialog>
+    </cinq-modal>
+
+    <cinq-modal id="stacked-modal-verify">
+      <dialog
+        class="fixed left-1/2 top-1/2 w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+      >
+        <div class="flex flex-col gap-4">
+          <div>
+            <h2 class="text-xl font-semibold mb-1">Verification result</h2>
+            <p class="text-sm text-gray-600">
+              Address looks valid. Close this dialog to return to the form — the
+              address dialog stays open underneath.
+            </p>
+          </div>
+          <div class="flex justify-end">
+            <cinq-modal-button class="block">
+              <button
+                type="button"
+                class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
+                aria-controls="stacked-modal-verify"
+                aria-pressed="false"
+              >
+                OK
+              </button>
+            </cinq-modal-button>
+          </div>
+        </div>
+      </dialog>
+    </cinq-modal>
+  </section>
+</div>

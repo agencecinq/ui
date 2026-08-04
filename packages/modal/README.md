@@ -80,8 +80,8 @@ Event names come from `@agencecinq/utils`:
 | Event          | Emitted by          | Payload (`event.detail`)                                                   | Description                                                                                                                              |
 | -------------- | ------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `modal-toggle` | `cinq-modal-button` | `{ modal: string; trigger: HTMLButtonElement; trap: HTMLElement \| null }` | Requests toggling a modal identified by the button `aria-controls`. One event is dispatched **per id** (space-separated list supported). |
-| `modal-open`   | `cinq-modal`        | `{ modal: string }`                                                       | Dispatched after calling `show()`. Contains the modal `id` so buttons can sync their `aria-pressed` state.                              |
-| `modal-close`  | `cinq-modal`        | `undefined`                                                                | Dispatched after calling `close()`.                                                                                                      |
+| `modal-open`   | `cinq-modal`        | `{ modal: string; trigger: HTMLElement \| null }`                         | Dispatched after `show()`. Buttons sync `aria-pressed` when `detail.modal` matches.                                                     |
+| `modal-close`  | `cinq-modal`        | `{ modal: string }`                                                       | Dispatched after `close()`. Buttons sync `aria-pressed` when `detail.modal` matches.                                                    |
 
 ### Wiring: handle `modal-toggle`
 
@@ -89,11 +89,24 @@ Event names come from `@agencecinq/utils`:
 
 - `detail.modal`: the modal id from the button `aria-controls`
 - `detail.trigger`: the button element
-- `detail.trap`: optional element id from `data-trap` (if you use it)
+- `detail.trap`: optional element from `data-trap` (if you use it)
 
 `cinq-modal` listens to `modal-toggle` by default and toggles itself when `detail.modal` matches its `id` (so `id` is required for event-driven open/close).
 
-> Note: `cinq-modal-button` sets `aria-pressed="true"` on click and resets it to `false` on **any** `EVENTS.MODAL_CLOSE` event (it does not filter by modal id).
+### Background scroll (consumer)
+
+The package does **not** lock document scroll. Native `showModal()` makes the page
+inert but the backdrop can still scroll underneath. Prefer CSS in the theme:
+
+```css
+html:has(dialog[open]:modal) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+```
+
+Or refcount `modal-open` / `modal-close` with `disableScroll` / `enableScroll` from
+`@agencecinq/utils` if the theme already uses those helpers.
 
 ---
 

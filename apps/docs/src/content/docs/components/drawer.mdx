@@ -164,9 +164,9 @@ This copies the package snippet to your theme:
 
 ### Exclusive drawers
 
-Only one drawer stays open at a time. When a drawer fires `drawer-open`, every
-other open instance removes its `open` attribute. Open one panel, then open the
-other from inside it — the first closes.
+Only one drawer stays open at a time. A shared return-focus target remembers the
+page control that started the chain (triggers inside a drawer are ignored). Open
+notes → switch to bestiary → close: focus lands back on **Open left**.
 
 <DrawerExclusivePlayground />
 

@@ -72,12 +72,12 @@ function h(e = 0) {
 	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), o.style.removeProperty("overflow"), o.style.removeProperty("height"), o.style.removeProperty("scroll-padding-top"), t && p(l.x, n);
 }
 //#endregion
-//#region src/focus-trap.ts
-var g = {};
-function _(e) {
+//#region src/focus.ts
+var g = {}, _ = null;
+function v(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function v(e) {
+function y(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -91,13 +91,21 @@ function v(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => _(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => v(e) && e.getAttribute("tabindex") !== "-1");
 }
-function y(e, t = e) {
-	let n = v(e);
+function b(e) {
+	if (_) return;
+	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+	!t || t === document.body || !t.isConnected || (_ = t);
+}
+function x() {
+	_?.focus(), _ = null;
+}
+function S(e, t = e) {
+	let n = y(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	b(), g.keydown = (t) => {
+	b(), C(), g.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
 	}, document.addEventListener("keydown", g.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
@@ -106,10 +114,10 @@ function y(e, t = e) {
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function b(e = null) {
+function C(e = null) {
 	g.keydown && document.removeEventListener("keydown", g.keydown), e && e.focus();
 }
-var x = {
+var w = {
 	BACKSPACE: 8,
 	TAB: 9,
 	ENTER: 13,
@@ -125,6 +133,6 @@ var x = {
 	ARROW_RIGHT: 39,
 	ARROW_DOWN: 40,
 	DELETE: 46
-}, S = (e, t, n) => Math.min(Math.max(e, t), n);
+}, T = (e, t, n) => Math.min(Math.max(e, t), n);
 //#endregion
-export { e as EVENTS, y as addTrapFocus, s as body, d as breakpoints, S as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, v as getFocusableElements, o as html, c as isDebug, x as keycode, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as removeTrapFocus, l as scroll, a as throttle };
+export { e as EVENTS, S as addTrapFocus, s as body, d as breakpoints, T as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, y as getFocusableElements, o as html, c as isDebug, w as keycode, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as rememberReturnFocus, C as removeTrapFocus, x as restoreReturnFocus, l as scroll, a as throttle };

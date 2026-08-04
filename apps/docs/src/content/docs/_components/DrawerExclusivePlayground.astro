@@ -10,8 +10,9 @@ import RegisterComponents from "./RegisterComponents.astro";
     <div>
       <h3 class="text-lg font-semibold text-gray-900">Exclusive drawers</h3>
       <p class="text-sm text-gray-600">
-        Opening one drawer closes any other that is already open — each instance
-        listens for <code class="text-xs">drawer-open</code> on <code class="text-xs">document.documentElement</code>.
+        Opening one drawer closes any other that is already open. Focus return is
+        shared: only a trigger <em>outside</em> any <code class="text-xs">cinq-drawer</code> is
+        remembered, so closing the chain returns to the page button that started it.
       </p>
     </div>
 
@@ -74,12 +75,16 @@ import RegisterComponents from "./RegisterComponents.astro";
             <cinq-drawer-button class="block">
               <button
                 class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
-                aria-controls="exclusive-drawer-right"
+                aria-controls="exclusive-drawer-left exclusive-drawer-right"
                 aria-expanded="false"
               >
-                Open bestiary instead
+                Switch to bestiary
               </button>
             </cinq-drawer-button>
+            <p class="text-xs text-gray-500">
+              This control targets both drawers. Closing the bestiary returns
+              focus to <strong>Open left</strong>, not this button.
+            </p>
           </div>
         </div>
       </div>
@@ -122,10 +127,10 @@ import RegisterComponents from "./RegisterComponents.astro";
             <cinq-drawer-button class="block">
               <button
                 class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
-                aria-controls="exclusive-drawer-left"
+                aria-controls="exclusive-drawer-right exclusive-drawer-left"
                 aria-expanded="false"
               >
-                Open notes instead
+                Switch to notes
               </button>
             </cinq-drawer-button>
           </div>

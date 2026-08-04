@@ -101,7 +101,7 @@ pnpm release
 
 ## Project Structure
 
-- `packages/utils`: Shared logic, event bus, and helpers (`EVENTS`, `clamp`, `throttle`, `focus-trap`, …).
+- `packages/utils`: Shared logic, event bus, and helpers (`EVENTS`, `clamp`, `throttle`, `focus`, …).
 - `packages/drawer`: The Drawer Web Component and its Vite Plugin.
 - `packages/modal`: The Modal Web Components (Modal + ModalButton).
 - `packages/tabs`: The Tabs Web Component (`<cinq-tabs>`) and related utilities.
