@@ -1,5 +1,11 @@
 # @agencecinq/calendar
 
+## 2.0.0
+
+### Major Changes
+
+- 8cb9b80: Replace boolean `single` with `mode="single|range|multiple"` on `<cinq-calendar>`. Document and demo multiple dates in the docs playground.
+
 ## 1.0.0
 
 ### Major Changes

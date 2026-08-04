@@ -1,5 +1,15 @@
 # @agencecinq/docs
 
+## 4.4.5
+
+### Patch Changes
+
+- 8cb9b80: Replace boolean `single` with `mode="single|range|multiple"` on `<cinq-calendar>`. Document and demo multiple dates in the docs playground.
+- Updated dependencies [8cb9b80]
+- Updated dependencies [8cb9b80]
+  - @agencecinq/accordion@2.0.0
+  - @agencecinq/calendar@2.0.0
+
 ## 4.4.4
 
 ### Patch Changes
