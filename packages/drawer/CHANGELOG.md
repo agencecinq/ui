@@ -1,5 +1,11 @@
 # @agencecinq/drawer
 
+## 6.0.0
+
+### Major Changes
+
+- dadcbc8: Drop legacy `cid` (`id` only). Harden drawer lifecycle: trap/scroll on open/close, restore focus to opener, exclusive drawers, `aria-expanded` from events, `ariaControlsElements` only. Docs demos for exclusive and multi-button.
+
 ## 5.0.3
 
 ### Patch Changes
