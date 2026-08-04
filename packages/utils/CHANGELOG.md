@@ -1,5 +1,39 @@
 # @agencecinq/utils
 
+## 5.3.0
+
+### Minor Changes
+
+- c65b293: Shared return-focus helpers in utils; drawer exclusive restore fix; modal APG stack alignment.
+
+  **@agencecinq/utils**
+
+  - Add `rememberReturnFocus` / `restoreReturnFocus` (first-wins overlay session)
+  - Rename internal `focus-trap` module to `focus` (public named exports unchanged)
+
+  **@agencecinq/drawer**
+
+  - Use shared return-focus helpers instead of restoring via `removeTrapFocus(trigger)`
+  - Defer restore on close so exclusive multi-toggle keeps the original page opener
+
+  **@agencecinq/modal** (breaking)
+
+  - Require `id`; expose public `init` / `destroy`
+  - Stacked native `showModal()` (no exclusive auto-close); scroll lock is consumer-owned
+  - `modal-open` / `modal-close` payloads include `modal` id; buttons sync `aria-pressed` by id
+
+## 5.2.1
+
+### Patch Changes
+
+- 1f15fe4: Add `@agencecinq/calendar` with `<cinq-calendar>` Web Component for single-date and range selection (ported from `@19h47/calendar`). Export `CALENDAR_CHANGE` from `@agencecinq/utils`. Add calendar docs page and live playgrounds.
+
+## 5.2.0
+
+### Minor Changes
+
+- ec6a727: Add `parseNumber` and `parseBoolean` helpers alongside `parseList` in a single `parse` module, and use them in combobox, accordion, and spinbutton.
+
 ## 5.1.1
 
 ### Patch Changes

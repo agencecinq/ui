@@ -1,4 +1,4 @@
-import { EVENTS, dispatchEvent } from "@agencecinq/utils";
+import { EVENTS, dispatchEvent, parseBoolean, parseNumber } from "@agencecinq/utils";
 import Props from "./Props.js";
 import Keyboard from "./keyboard.js";
 import type {
@@ -30,23 +30,6 @@ const CONFIG_ATTRIBUTES = [
   "data-combobox-open-on-empty",
   "data-combobox-autoselect",
 ] as const;
-
-const parseBooleanAttr = (el: HTMLElement, attr: string): boolean => {
-  const raw = el.getAttribute(attr);
-  if (raw === null) return false;
-  return raw !== "false" && raw !== "0";
-};
-
-const parseIntAttr = (
-  el: HTMLElement,
-  attr: string,
-  fallback: number,
-): number => {
-  const raw = el.getAttribute(attr);
-  if (raw === null) return fallback;
-  const parsed = parseInt(raw, 10);
-  return Number.isNaN(parsed) ? fallback : parsed;
-};
 
 /**
  * Editable combobox with list autocomplete Web Component.
@@ -387,14 +370,18 @@ export class Combobox extends HTMLElement {
     this.selectMode = selectMode === "custom" ? "custom" : "value";
     this.debounce = Math.max(
       0,
-      parseIntAttr(this, "data-combobox-debounce", 0),
+      parseNumber(this.getAttribute("data-combobox-debounce"), 0),
     );
     this.minLength = Math.max(
       0,
-      parseIntAttr(this, "data-combobox-min-length", 0),
+      parseNumber(this.getAttribute("data-combobox-min-length"), 0),
     );
-    this.openOnEmpty = parseBooleanAttr(this, "data-combobox-open-on-empty");
-    this.autoselect = parseBooleanAttr(this, "data-combobox-autoselect");
+    this.openOnEmpty = parseBoolean(
+      this.getAttribute("data-combobox-open-on-empty"),
+    );
+    this.autoselect = parseBoolean(
+      this.getAttribute("data-combobox-autoselect"),
+    );
   }
 
   private syncDisabled(): void {

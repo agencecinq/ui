@@ -1,8 +1,8 @@
-export type AccordionPanelDetail = {
+export type Detail = {
     el: HTMLElement;
     index: number;
 };
-export type AccordionOptions = {
+export type Options = {
     multiselectable: boolean;
     hash: boolean;
 };

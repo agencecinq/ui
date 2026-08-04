@@ -19,6 +19,7 @@ var e = {
 	COMBOBOX_SUBMIT: "combobox:submit",
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
+	CALENDAR_CHANGE: "calendar:change",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -34,45 +35,49 @@ var e = {
 		detail: n
 	}));
 }, n = (e) => e ? e.trim().split(/\s+/).filter(Boolean) : [], r = (e, t) => {
+	if (e == null || e === "") return t;
+	let n = Number(e);
+	return Number.isFinite(n) ? n : t;
+}, i = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", a = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, i = document.documentElement, { body: a } = document, o = i.hasAttribute("data-debug"), s = {
+}, o = document.documentElement, { body: s } = document, c = o.hasAttribute("data-debug"), l = {
 	y: 0,
 	x: 0
-}, c = {
+}, u = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", r(({ x: e, y: t }) => {
-	c.x = e, c.y = t;
+window.addEventListener("pointermove", a(({ x: e, y: t }) => {
+	u.x = e, u.y = t;
 }, 100), { passive: !0 });
-var l = {
+var d = {
 	lg: window.matchMedia("(width >= 64rem)"),
 	xl: window.matchMedia("(min-width: 1280px)"),
 	"2xl": window.matchMedia("(min-width: 1440px)"),
 	"3xl": window.matchMedia("(min-width: 1920px)")
-}, u = !0, d = (e, t) => {
-	e !== void 0 && (s.x = e), t !== void 0 && (s.y = t), window.scrollTo(s.x, s.y);
+}, f = !0, p = (e, t) => {
+	e !== void 0 && (l.x = e), t !== void 0 && (l.y = t), window.scrollTo(l.x, l.y);
 };
-function f() {
-	let e = i.scrollLeft, t = i.scrollTop, n = a.scrollLeft, r = a.scrollTop;
-	s.x = window.scrollX || e || n, s.y = window.scrollY || t || r || 0, i.style.setProperty("overflow", "hidden"), i.style.setProperty("height", "100%"), i.style.setProperty("scroll-padding-top", "0px"), d(s.x, s.y);
+function m() {
+	let e = o.scrollLeft, t = o.scrollTop, n = s.scrollLeft, r = s.scrollTop;
+	l.x = window.scrollX || e || n, l.y = window.scrollY || t || r || 0, o.style.setProperty("overflow", "hidden"), o.style.setProperty("height", "100%"), o.style.setProperty("scroll-padding-top", "0px"), p(l.x, l.y);
 }
-function p(e = 0) {
-	let t = !0, n = s.y;
-	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), i.style.removeProperty("overflow"), i.style.removeProperty("height"), i.style.removeProperty("scroll-padding-top"), t && d(s.x, n);
+function h(e = 0) {
+	let t = !0, n = l.y;
+	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), o.style.removeProperty("overflow"), o.style.removeProperty("height"), o.style.removeProperty("scroll-padding-top"), t && p(l.x, n);
 }
 //#endregion
-//#region src/focus-trap.ts
-var m = {};
-function h(e) {
+//#region src/focus.ts
+var g = {}, _ = null;
+function v(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function g(e) {
+function y(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -86,25 +91,33 @@ function g(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => h(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => v(e) && e.getAttribute("tabindex") !== "-1");
 }
-function _(e, t = e) {
-	let n = g(e);
+function b(e) {
+	if (_) return;
+	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+	!t || t === document.body || !t.isConnected || (_ = t);
+}
+function x() {
+	_?.focus(), _ = null;
+}
+function S(e, t = e) {
+	let n = y(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	v(), m.keydown = (t) => {
+	b(), C(), g.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", m.keydown), t.focus(), t instanceof HTMLInputElement && [
+	}, document.addEventListener("keydown", g.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
 		"text",
 		"email",
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function v(e = null) {
-	m.keydown && document.removeEventListener("keydown", m.keydown), e && e.focus();
+function C(e = null) {
+	g.keydown && document.removeEventListener("keydown", g.keydown), e && e.focus();
 }
-var y = {
+var w = {
 	BACKSPACE: 8,
 	TAB: 9,
 	ENTER: 13,
@@ -120,6 +133,6 @@ var y = {
 	ARROW_RIGHT: 39,
 	ARROW_DOWN: 40,
 	DELETE: 46
-}, b = (e, t, n) => Math.min(Math.max(e, t), n);
+}, T = (e, t, n) => Math.min(Math.max(e, t), n);
 //#endregion
-export { e as EVENTS, _ as addTrapFocus, a as body, l as breakpoints, b as clamp, f as disableScroll, t as dispatchEvent, p as enableScroll, g as getFocusableElements, i as html, o as isDebug, y as keycode, c as mouse, n as parseList, u as production, v as removeTrapFocus, s as scroll, r as throttle };
+export { e as EVENTS, S as addTrapFocus, s as body, d as breakpoints, T as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, y as getFocusableElements, o as html, c as isDebug, w as keycode, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as rememberReturnFocus, C as removeTrapFocus, x as restoreReturnFocus, l as scroll, a as throttle };

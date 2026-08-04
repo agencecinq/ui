@@ -6,12 +6,14 @@ description: Accessible WAI-ARIA window splitter Web Component (`<cinq-windowspl
 import WindowSplitterPlayground from "../_components/WindowSplitterPlayground.astro";
 
 A window splitter lets users resize a primary pane with a focusable separator.
-`<cinq-windowsplitter>` is the separator itself: it wires pointer drag, keyboard
-steps, collapse / restore, and layout updates (`resize` or `clip`).
+`<cinq-windowsplitter>` is the **layout wrapper** (bounds + CSS custom
+properties). A nested `[role="separator"]` (or `slider`) is the interactive
+control: the component wires pointer drag, keyboard steps, collapse / restore,
+and layout updates (`resize` or `clip`).
 
-Inspired by [`@19h47/windowsplitter`](https://github.com/19h47/19h47-windowsplitter)
-and the
+Follows the
 [WAI-ARIA Authoring Practices window splitter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/).
+Inspired by [`@19h47/windowsplitter`](https://github.com/19h47/19h47-windowsplitter).
 
 ## Install
 
@@ -27,16 +29,20 @@ Import once:
 import "@agencecinq/windowsplitter";
 ```
 
-Then write the separator markup explicitly — the component adds interactivity
-only. Set `role`, `tabindex`, `aria-orientation`, value attributes, labelling,
-and `aria-controls` (primary pane id) in HTML.
+Then wrap panes and a separator — the host owns layout context; ARIA lives on
+the separator.
+
+> **HTML is the source of truth.** The component will not invent missing
+> attributes or warn about missing labels. Set `role`, `tabindex`,
+> `aria-orientation`, value attributes, labelling, and `aria-controls` in HTML.
+> Use an a11y linter (axe, Lighthouse) to catch invalid markup.
 
 ```html
-<div class="panes">
+<cinq-windowsplitter class="panes">
   <div id="toc" class="pane pane--primary" style="width: 30%">
     <strong id="toc-label">Table of Contents</strong>
   </div>
-  <cinq-windowsplitter
+  <div
     role="separator"
     tabindex="0"
     aria-orientation="vertical"
@@ -45,31 +51,33 @@ and `aria-controls` (primary pane id) in HTML.
     aria-valuenow="30"
     aria-controls="toc"
     aria-labelledby="toc-label"
-  ></cinq-windowsplitter>
+  ></div>
   <div class="pane pane--secondary">Content</div>
-</div>
+</cinq-windowsplitter>
 ```
+
+The primary pane is resolved live via
+[`Element.ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)
+on the separator.
 
 `aria-valuemin` / `aria-valuemax` must match the **real** allowed range of the
 primary pane. If the pane cannot fully collapse, set min above `0`.
 
 > **Note on `role`:** the APG documents `role="separator"`. Some screen readers
-> handle a focusable `role="slider"` more reliably. The component does not
-> enforce the role — pick what works for your AT testing.
+> handle a focusable `role="slider"` more reliably. The component accepts either
+> on the nested control — pick what works for your AT testing.
 
 ## Required markup
 
 | Selector / attribute | Required | Role |
 | -------------------- | -------- | ---- |
-| `<cinq-windowsplitter>` | **Yes** | Focusable separator (host). |
-| `role="separator"` (or `slider`) | **Yes** | On the host. |
-| `tabindex="0"` | **Yes** | Include in the tab sequence. |
-| `aria-orientation` | Recommended | `vertical` (default) or `horizontal`. |
-| `aria-valuemin` / `aria-valuemax` / `aria-valuenow` | **Yes** | Size range and current value. |
-| `aria-controls` | **Yes** (for `resize` / `clip`) | Id of the primary pane. |
-| `aria-label` / `aria-labelledby` | **Yes** | Accessible name. |
-
-The bounds container defaults to the host’s `parentElement`.
+| `<cinq-windowsplitter>` | **Yes** | Layout wrapper / bounds container. |
+| Nested `[role="separator"]` or `[role="slider"]` | **Yes** | Focusable control (`$separator`). |
+| `tabindex="0"` | **Yes** | On the separator. |
+| `aria-orientation` | **Yes** | On the separator: `vertical` or `horizontal`. |
+| `aria-valuemin` / `aria-valuemax` / `aria-valuenow` | **Yes** | On the separator. |
+| `aria-controls` | **Yes** (for `resize` / `clip`) | On the separator: id of the primary pane. |
+| `aria-label` / `aria-labelledby` | **Yes** | On the separator. |
 
 ## Options
 
@@ -79,10 +87,9 @@ The bounds container defaults to the host’s `parentElement`.
 | `data-windowsplitter-step` | number | `1` | Arrow key increment |
 | `data-windowsplitter-page` | number | `10` | PageUp / PageDown / Shift+Arrow |
 | `data-windowsplitter-fixed` | boolean | `false` | Enter / pointer toggle only |
-| `disabled` / `aria-disabled` | boolean | `false` | Disable interaction |
-| `formatSize` (property) | `(ctx) => string` | `` `${value}%` `` | CSS size in `resize` mode |
-| `formatValue` (property) | `(value) => string` | `String(value)` | `aria-valuetext` |
-| `container` (property) | `HTMLElement \| null` | `parentElement` | Drag bounds |
+| `disabled` / `aria-disabled` | boolean | `false` | Disable interaction (host) |
+| `formatSize` (property) | `FormatSize` | `` `${value}%` `` | CSS size in `resize` mode |
+| `formatValue` (property) | `FormatValue` | `String(value)` | `aria-valuetext` |
 
 ```js
 const host = document.querySelector("cinq-windowsplitter");
@@ -91,31 +98,45 @@ host.formatSize = ({ offset }) => `${offset}px`;
 host.formatValue = (value) => `${value} %`;
 ```
 
+## API
+
+### Methods
+
+| Method | Description |
+| ------ | ----------- |
+| `setValue(value, trigger?)` | Set `aria-valuenow` on the separator and update layout |
+| `collapse(trigger?)` / `restore(trigger?)` / `toggle(trigger?)` | Collapse helpers (`history` only from `collapse` / Enter) |
+| `sync()` | Re-read ARIA and re-apply layout |
+| `destroy()` | Remove listeners and observers. Called automatically from `disconnectedCallback`. |
+
+`setValue` / `collapse` / `restore` / `toggle` take an optional `trigger` flag
+(default `true`) to control whether `windowsplitter:change` is dispatched.
+
+### Properties
+
+| Property | Description |
+| -------- | ----------- |
+| `$separator` | Focusable separator control |
+| `$primary` | Primary pane from `ariaControlsElements` (live) |
+| `value` / `min` / `max` / `ratio` / `orientation` | Read from separator ARIA |
+| `collapsed` / `disabled` | Derived state |
+| `mode` / `step` / `page` / `fixed` | Options |
+| `formatSize` / `formatValue` | Formatters |
+
 ## Styling hooks
 
 | Hook | When |
 | ---- | ---- |
-| `[collapsed]` | Primary pane at `aria-valuemin` |
-| `[dragging]` | Pointer drag in progress |
+| `[collapsed]` | Primary pane at `aria-valuemin` (host) |
+| `[dragging]` | Pointer drag in progress (host) |
 | `[disabled]` / `[aria-disabled="true"]` | Interaction disabled |
-| `:focus-visible` | Keyboard focus |
-| `--windowsplitter-value` / `--windowsplitter-ratio` / `--windowsplitter-offset` | On the container |
-
-## Methods
-
-| Method | Description |
-| ------ | ----------- |
-| `setValue(value, trigger?)` | Set `aria-valuenow` and update layout |
-| `collapse(trigger?)` / `restore(trigger?)` / `toggle(trigger?)` | Collapse helpers |
-| `sync()` | Re-read ARIA and re-apply layout |
-| `destroy()` | Remove listeners and observers |
-
-Readable state: `value`, `min`, `max`, `ratio`, `collapsed`, `disabled`, `vertical`, `$primary`, `$container`.
+| `:focus-visible` on the separator | Keyboard focus |
+| `--windowsplitter-value` / `--windowsplitter-ratio` / `--windowsplitter-offset` | On the host |
 
 ## Events
 
-Dispatched on the **host** `<cinq-windowsplitter>` (bubble). Constants live on
-`@agencecinq/utils` `EVENTS`:
+Dispatched on the **host** `<cinq-windowsplitter>` (bubble). Prefer constants
+from `@agencecinq/utils` `EVENTS`:
 
 | Event | Constant | Detail | When |
 | ----- | -------- | ------ | ---- |
@@ -134,7 +155,7 @@ $host.addEventListener(EVENTS.WINDOWSPLITTER_CHANGE, ({ detail }) => {
 | Key | Function |
 | --- | -------- |
 | `←` / `→` | Move a **vertical** splitter |
-| `↑` / `↓` | Move a **horizontal** splitter (or adjust vertical value per APG) |
+| `↑` / `↓` | Move a **horizontal** splitter |
 | `Enter` | Collapse / restore |
 | `Home` / `End` | Jump to min / max |
 | `PageUp` / `PageDown` | Step by `page` |

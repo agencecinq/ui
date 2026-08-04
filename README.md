@@ -43,7 +43,7 @@ pnpm dev
 
 ```
 
-Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in every consuming package (`drawer`, `modal`, `tabs`, `spinbutton`, `disclosure-button`, `switch`, `accordion`, `combobox`, `windowsplitter`) automatically.
+Turbo will intelligently run all dev scripts. Thanks to our configuration, local changes in `@agencecinq/utils` will be reflected in every consuming package (`drawer`, `modal`, `tabs`, `spinbutton`, `disclosure-button`, `switch`, `accordion`, `combobox`, `windowsplitter`, `calendar`) automatically.
 
 ### Building
 
@@ -101,7 +101,7 @@ pnpm release
 
 ## Project Structure
 
-- `packages/utils`: Shared logic, event bus, and helpers (`EVENTS`, `clamp`, `throttle`, `focus-trap`, …).
+- `packages/utils`: Shared logic, event bus, and helpers (`EVENTS`, `clamp`, `throttle`, `focus`, …).
 - `packages/drawer`: The Drawer Web Component and its Vite Plugin.
 - `packages/modal`: The Modal Web Components (Modal + ModalButton).
 - `packages/tabs`: The Tabs Web Component (`<cinq-tabs>`) and related utilities.
@@ -111,6 +111,7 @@ pnpm release
 - `packages/accordion`: `<cinq-accordion>` Web Component for expandable sections (WAI-ARIA accordion pattern).
 - `packages/combobox`: `<cinq-combobox>` Web Component for editable list autocomplete (WAI-ARIA combobox pattern).
 - `packages/windowsplitter`: `<cinq-windowsplitter>` Web Component for resizable panes (WAI-ARIA window splitter pattern).
+- `packages/calendar`: `<cinq-calendar>` Web Component for date / range picking (WAI-ARIA date grid pattern).
 - `apps/`: Apps / themes consuming the packages (e.g. `apps/docs`).
 
 ---
@@ -120,6 +121,48 @@ pnpm release
 1. **Strict ESM**: Always use `import.meta.url` instead of `__dirname` in Node.js scripts (Vite plugins).
 2. **Shared Utils**: If you write a utility function that could be used elsewhere, place it in `@agencecinq/utils`.
 3. **Peer Dependencies**: When adding a dependency to a package, consider if it should be a `peerDependency` to avoid version conflicts in the final consumer project.
+4. **`init` / `destroy` lifecycle** (Web Components): every package host class should expose a public bind/unbind pair (`init` must not call `destroy`) so consumers can tear down and re-bind from outside.
+
+### Host lifecycle: `init` / `destroy`
+
+CINQ UI components mount themselves on connect, but **must** remain controllable from the app:
+
+```ts
+class Example extends HTMLElement {
+  connectedCallback(): void {
+    this.init();
+  }
+
+  disconnectedCallback(): void {
+    this.destroy();
+  }
+
+  /** Bind DOM + listeners. Does not call `destroy()`. */
+  init(): void {
+    // query markup, attach listeners, sync ARIA…
+  }
+
+  /** Unbind listeners / observers. Safe to call from outside the element. */
+  destroy(): void {
+    // removeEventListener, disconnect observers, clear controllers…
+  }
+}
+```
+
+| Method | Who calls it | Role |
+| ------ | ------------ | ---- |
+| `init()` | `connectedCallback`, or the app after a prior `destroy()` | Bind |
+| `destroy()` | `disconnectedCallback`, or the app before re-init / DOM mutation | Unbind |
+
+`init()` and `destroy()` stay **separate**: `init()` must not call `destroy()`. When rebinding after a DOM change, the caller always runs both explicitly:
+
+```js
+el.destroy();
+// mutate light DOM…
+el.init();
+```
+
+Reference implementations: `@agencecinq/tabs`, `@agencecinq/accordion`, `@agencecinq/spinbutton`, `@agencecinq/calendar`.
 
 ---
 

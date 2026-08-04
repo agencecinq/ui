@@ -5,6 +5,8 @@ description: Slide-in drawer Web Component (`<cinq-drawer>`).
 
 import PortalToBody from "../_components/PortalToBody.astro";
 import DrawerPlayground from "../_components/DrawerPlayground.astro";
+import DrawerExclusivePlayground from "../_components/DrawerExclusivePlayground.astro";
+import DrawerMultiButtonPlayground from "../_components/DrawerMultiButtonPlayground.astro";
 
 A drawer slides a panel in from the edge of the viewport. `<cinq-drawer>` wraps
 your overlay and panel markup, handles focus trap, scroll lock, and open/close
@@ -36,7 +38,7 @@ matching `aria-controls`. The component adds interactivity only.
   <button aria-controls="demo-drawer">Open drawer</button>
 </cinq-drawer-button>
 
-<cinq-drawer cid="demo-drawer" class="group">
+<cinq-drawer id="demo-drawer" class="group">
   <div data-dom="overlay" class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"></div>
   <div role="dialog" class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform group-[[open]]:translate-x-0">
     <div class="p-8 flex flex-col gap-4">
@@ -59,7 +61,7 @@ matching `aria-controls`. The component adds interactivity only.
 
 | Attribute | Required | Description                                      |
 | --------- | -------- | ------------------------------------------------ |
-| `cid`     | Yes      | Drawer identifier (falls back to `id`).         |
+| `id`      | Yes      | Drawer identifier; must match button `aria-controls`. |
 | `open`    | No       | Reflected state attribute (useful for styling). |
 
 ### Methods
@@ -75,8 +77,8 @@ matching `aria-controls`. The component adds interactivity only.
 | Event           | Dispatched by         | Detail payload                      | Description                                                   |
 | --------------- | --------------------- | ----------------------------------- | ------------------------------------------------------------- |
 | `drawer-toggle` | `cinq-drawer-button`  | `{ drawer, trigger, trap }`        | Emitted on `document.documentElement` to request a toggle.    |
-| `drawer-open`   | `cinq-drawer`         | –                                   | Fired after the drawer has been opened.                       |
-| `drawer-close`  | `cinq-drawer`         | –                                   | Fired after the drawer has been closed.                       |
+| `drawer-open`   | `cinq-drawer`         | `{ drawer, trigger }`              | Fired when a drawer starts opening. Other open drawers close themselves. |
+| `drawer-close`  | `cinq-drawer`         | `{ drawer }`                       | Fired when a drawer starts closing.                                   |
 
 ## Shopify (Liquid snippet)
 
@@ -124,7 +126,7 @@ This copies the package snippet to your theme:
       </button>
     </cinq-drawer-button>
 
-    <cinq-drawer cid="starlight-drawer" class="group">
+    <cinq-drawer id="starlight-drawer" class="group">
       <div
         data-dom="overlay"
         class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
@@ -154,9 +156,26 @@ This copies the package snippet to your theme:
   </div>
 </div>
 
-<PortalToBody selector='cinq-drawer[cid="starlight-drawer"]' />
+<PortalToBody selector="#starlight-drawer" />
 
 ## Playground (live)
 
 <DrawerPlayground />
+
+### Exclusive drawers
+
+Only one drawer stays open at a time. A shared return-focus target remembers the
+page control that started the chain (triggers inside a drawer are ignored). Open
+notes → switch to bestiary → close: focus lands back on **Open left**.
+
+<DrawerExclusivePlayground />
+
+### Multiple buttons, one drawer
+
+Several triggers can share the same `aria-controls` id. Each
+`<cinq-drawer-button>` listens for `drawer-open` / `drawer-close` and updates its
+own `aria-expanded` — open or close from any control and they all stay in sync
+(red ring when collapsed, green when expanded).
+
+<DrawerMultiButtonPlayground />
 

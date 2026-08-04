@@ -1,0 +1,628 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-calendar {
+    max-width: 20rem;
+    font-size: 0.875rem;
+  }
+
+  .docs-calendar header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .docs-calendar header button {
+    appearance: none;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 0.375rem;
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+    font: inherit;
+    color: #111827;
+  }
+
+  .docs-calendar header button:hover {
+    background: #f3f4f6;
+  }
+
+  .docs-calendar .js-title {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .docs-calendar table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .docs-calendar th {
+    padding: 0.35rem 0;
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 0.75rem;
+  }
+
+  .docs-calendar td {
+    padding: 0.125rem;
+    text-align: center;
+  }
+
+  .docs-calendar .js-day {
+    appearance: none;
+    width: 100%;
+    aspect-ratio: 1;
+    border: none;
+    border-radius: 0.375rem;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    color: #111827;
+  }
+
+  .docs-calendar .js-day:hover:not([aria-disabled='true']):not(.active):not([aria-selected='true']):not(.start):not(.end) {
+    background: #f3f4f6;
+  }
+
+  .docs-calendar .js-day[aria-current='date'] {
+    outline: 1px solid #111827;
+    outline-offset: -1px;
+  }
+
+  .docs-calendar .js-day.active,
+  .docs-calendar .js-day[aria-selected='true'] {
+    background: #111827;
+    color: #fff;
+  }
+
+  .docs-calendar .js-day.active:hover,
+  .docs-calendar .js-day[aria-selected='true']:hover,
+  .docs-calendar .js-day.active:focus,
+  .docs-calendar .js-day[aria-selected='true']:focus {
+    background: #111827;
+    color: #fff;
+  }
+
+  .docs-calendar .js-day.range {
+    background: #e5e7eb;
+    border-radius: 0;
+    color: #111827;
+  }
+
+  .docs-calendar .js-day.range:hover:not(.active):not([aria-selected='true']):not(.start):not(.end) {
+    background: #d1d5db;
+  }
+
+  /* Start / end keep the strong selected contrast (range is also applied to them). */
+  .docs-calendar .js-day.start,
+  .docs-calendar .js-day.end {
+    background: #111827;
+    color: #fff;
+    border-radius: 0.375rem 0 0 0.375rem;
+  }
+
+  .docs-calendar .js-day.start:hover,
+  .docs-calendar .js-day.end:hover,
+  .docs-calendar .js-day.start:focus,
+  .docs-calendar .js-day.end:focus {
+    background: #111827;
+    color: #fff;
+  }
+
+  .docs-calendar .js-day.end {
+    border-radius: 0 0.375rem 0.375rem 0;
+  }
+
+  .docs-calendar .js-day.start.end {
+    border-radius: 0.375rem;
+  }
+
+  .docs-calendar .js-day[aria-disabled='true'] {
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .docs-calendar-events .js-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    line-height: 1.1;
+  }
+
+  .docs-calendar-events .js-day time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .docs-calendar-events .js-day[data-has-event]::after {
+    content: '';
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 9999px;
+    background: #111827;
+  }
+
+  .docs-calendar-events .js-day.active[data-has-event]::after,
+  .docs-calendar-events .js-day[aria-selected='true'][data-has-event]::after {
+    background: #fff;
+  }
+
+  .docs-calendar-events .js-day.is-weekend:not(.active):not([aria-selected='true']) {
+    color: #9ca3af;
+  }
+</style>
+
+<div class="not-content flex flex-col gap-10">
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Single date</h3>
+        <p class="text-sm text-gray-600">
+          Locale <code>fr</code>, <code>deselect</code> and <code>allow-past</code>.
+          Click the selected day again to clear. Try the keyboard once a day is focused:
+          arrows, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>Page Up</kbd>/<kbd>Page Down</kbd>.
+        </p>
+      </div>
+
+      <cinq-calendar
+        class="docs-calendar"
+        data-calendar-demo="single"
+        locale="fr"
+        deselect
+        allow-past
+        name="single"
+      >
+        <header>
+          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+          <button
+            type="button"
+            class="js-title"
+            id="docs-calendar-single-label"
+            aria-live="polite"
+          ></button>
+          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+        </header>
+        <table role="grid" aria-labelledby="docs-calendar-single-label">
+          <thead>
+            <tr class="js-days"></tr>
+          </thead>
+          <tbody class="js-body"></tbody>
+        </table>
+      </cinq-calendar>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="single" class="font-medium text-gray-900">Aucune date</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Date range</h3>
+        <p class="text-sm text-gray-600">
+          <code>mode="range"</code> — pick a start day, then an end day. Hover (or move focus)
+          paints the in-between preview. A third click resets the range.
+        </p>
+      </div>
+
+      <cinq-calendar
+        class="docs-calendar"
+        data-calendar-demo="range"
+        locale="fr"
+        mode="range"
+        allow-past
+        name="range"
+      >
+        <header>
+          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+          <button
+            type="button"
+            class="js-title"
+            id="docs-calendar-range-label"
+            aria-live="polite"
+          ></button>
+          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+        </header>
+        <table role="grid" aria-labelledby="docs-calendar-range-label">
+          <thead>
+            <tr class="js-days"></tr>
+          </thead>
+          <tbody class="js-body"></tbody>
+        </table>
+      </cinq-calendar>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="range" class="font-medium text-gray-900">Aucune date</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Multiple dates</h3>
+        <p class="text-sm text-gray-600">
+          <code>mode="multiple"</code> — toggle discrete days in and out of the
+          selection. No range painting; click a selected day again to remove it.
+          Cap the count in your app if needed (no built-in max).
+        </p>
+      </div>
+
+      <cinq-calendar
+        class="docs-calendar"
+        data-calendar-demo="multiple"
+        locale="fr"
+        mode="multiple"
+        allow-past
+        name="multiple"
+      >
+        <header>
+          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+          <button
+            type="button"
+            class="js-title"
+            id="docs-calendar-multiple-label"
+            aria-live="polite"
+          ></button>
+          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+        </header>
+        <table role="grid" aria-labelledby="docs-calendar-multiple-label">
+          <thead>
+            <tr class="js-days"></tr>
+          </thead>
+          <tbody class="js-body"></tbody>
+        </table>
+      </cinq-calendar>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="multiple" class="font-medium text-gray-900">Aucune date</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Preselected dates</h3>
+        <p class="text-sm text-gray-600">
+          Seed the view with <code>data-month</code>, <code>data-year</code>, and&nbsp;<code>data-picked-dates</code>. Here a range covering mid-November 2025.
+        </p>
+      </div>
+
+      <cinq-calendar
+        class="docs-calendar"
+        data-calendar-demo="preselected"
+        locale="fr"
+        mode="range"
+        allow-past
+        data-month="10"
+        data-year="2025"
+        data-picked-dates='["2025-11-10","2025-11-18"]'
+        name="preselected"
+      >
+        <header>
+          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+          <button
+            type="button"
+            class="js-title"
+            id="docs-calendar-preselected-label"
+            aria-live="polite"
+          ></button>
+          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+        </header>
+        <table role="grid" aria-labelledby="docs-calendar-preselected-label">
+          <thead>
+            <tr class="js-days"></tr>
+          </thead>
+          <tbody class="js-body"></tbody>
+        </table>
+      </cinq-calendar>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="preselected" class="font-medium text-gray-900">2025-11-10 → 2025-11-18</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Future only</h3>
+        <p class="text-sm text-gray-600">
+          Without <code>allow-past</code>, days before today are&nbsp;<code>aria-disabled</code>&nbsp;and cannot be selected (still in the keyboard grid).
+        </p>
+      </div>
+
+      <cinq-calendar
+        class="docs-calendar"
+        data-calendar-demo="future"
+        locale="fr"
+        deselect
+        name="future"
+      >
+        <header>
+          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+          <button
+            type="button"
+            class="js-title"
+            id="docs-calendar-future-label"
+            aria-live="polite"
+          ></button>
+          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+        </header>
+        <table role="grid" aria-labelledby="docs-calendar-future-label">
+          <thead>
+            <tr class="js-days"></tr>
+          </thead>
+          <tbody class="js-body"></tbody>
+        </table>
+      </cinq-calendar>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="future" class="font-medium text-gray-900">Aucune date</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Locale & week start</h3>
+        <p class="text-sm text-gray-600">
+          Change the locale — labels update via <code>Intl</code>, and week start
+          follows <code>getWeekStart(locale)</code> unless you override <code>first-day</code>.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="flex flex-col gap-1 text-sm text-gray-700">
+          <span class="text-xs font-medium uppercase tracking-wide text-gray-500">Locale</span>
+          <select
+            data-calendar-locale-select
+            class="rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          >
+            <option value="en">English (en)</option>
+            <option value="fr" selected>Français (fr)</option>
+            <option value="de">Deutsch (de)</option>
+            <option value="es">Español (es)</option>
+            <option value="ja">日本語 (ja)</option>
+            <option value="ar">العربية (ar)</option>
+          </select>
+        </label>
+        <p class="pb-1.5 font-mono text-xs text-gray-500">
+          firstDay&nbsp;=&nbsp;<span data-calendar-first-day>1</span>
+          <span class="text-gray-400">(0=Sun … 6=Sat)</span>
+        </p>
+      </div>
+
+      <cinq-calendar
+        class="docs-calendar"
+        data-calendar-demo="locale"
+        locale="fr"
+        deselect
+        allow-past
+        name="locale"
+      >
+        <header>
+          <button type="button" class="js-previous" aria-label="Previous month">‹</button>
+          <button
+            type="button"
+            class="js-title"
+            id="docs-calendar-locale-label"
+            aria-live="polite"
+          ></button>
+          <button type="button" class="js-next" aria-label="Next month">›</button>
+        </header>
+        <table role="grid" aria-labelledby="docs-calendar-locale-label">
+          <thead>
+            <tr class="js-days"></tr>
+          </thead>
+          <tbody class="js-body"></tbody>
+        </table>
+      </cinq-calendar>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="locale" class="font-medium text-gray-900">Aucune date</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Advanced — event markers</h3>
+        <p class="text-sm text-gray-600">
+          Override <code>renderInner</code> to wrap each day in <code>&lt;time&gt;</code>,
+          mark weekends, and paint dots on days that have events. Only event days are
+          selectable — others get <code>aria-disabled</code>.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <cinq-calendar
+          class="docs-calendar docs-calendar-events"
+          data-calendar-demo="events"
+          locale="fr"
+          deselect
+          allow-past
+          name="events"
+        >
+          <header>
+            <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+            <button
+              type="button"
+              class="js-title"
+              id="docs-calendar-events-label"
+              aria-live="polite"
+            ></button>
+            <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          </header>
+          <table role="grid" aria-labelledby="docs-calendar-events-label">
+            <thead>
+              <tr class="js-days"></tr>
+            </thead>
+            <tbody class="js-body"></tbody>
+          </table>
+        </cinq-calendar>
+
+        <aside
+          class="min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700"
+          data-calendar-event-panel
+          aria-live="polite"
+        >
+          <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Événement</p>
+          <p class="mt-1 font-medium text-gray-900" data-calendar-event-title>
+            Sélectionnez un jour marqué
+          </p>
+          <p class="mt-1 font-mono text-xs text-gray-500" data-calendar-event-date></p>
+          <ul class="mt-3 space-y-1 text-xs text-gray-500">
+            <li>• Point = jour avec événement</li>
+            <li>• Week-ends en gris</li>
+            <li>• Jours sans événement désactivés</li>
+          </ul>
+        </aside>
+      </div>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="events" class="font-medium text-gray-900">Aucune date</span>
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>
+  import { EVENTS } from '@agencecinq/utils';
+  import { getWeekStart, toDayString } from '@agencecinq/calendar';
+
+  const emptyLabels = {
+    single: 'Aucune date',
+    range: 'Aucune date',
+    multiple: 'Aucune date',
+    preselected: 'Aucune date',
+    future: 'Aucune date',
+    locale: 'Aucune date',
+    events: 'Aucune date',
+  };
+
+  document.querySelectorAll('[data-calendar-demo]').forEach((el) => {
+    const key = el.getAttribute('data-calendar-demo');
+    const output = document.querySelector(`[data-calendar-output="${key}"]`);
+
+    el.addEventListener(EVENTS.CALENDAR_CHANGE, (event) => {
+      const { values } = event.detail;
+      if (!output) return;
+      if (!values.length) {
+        output.textContent = emptyLabels[key] ?? '—';
+        return;
+      }
+      output.textContent =
+        key === 'multiple' ? values.join(', ') : values.join(' → ');
+    });
+  });
+
+  const localeCalendar = document.querySelector('[data-calendar-demo="locale"]');
+  const localeSelect = document.querySelector('[data-calendar-locale-select]');
+  const firstDayOutput = document.querySelector('[data-calendar-first-day]');
+
+  const applyLocale = (locale) => {
+    if (!localeCalendar) return;
+
+    const firstDay = getWeekStart(locale);
+    localeCalendar.options.locale = locale;
+    localeCalendar.options.firstDay = firstDay;
+    localeCalendar.setAttribute('locale', locale);
+    localeCalendar.removeAttribute('first-day');
+    localeCalendar.render();
+
+    if (firstDayOutput) {
+      firstDayOutput.textContent = String(firstDay);
+    }
+  };
+
+  localeSelect?.addEventListener('change', (event) => {
+    applyLocale(event.target.value);
+  });
+
+  if (localeSelect) {
+    applyLocale(localeSelect.value);
+  }
+
+  const eventsCalendar = document.querySelector('[data-calendar-demo="events"]');
+  const eventTitle = document.querySelector('[data-calendar-event-title]');
+  const eventDate = document.querySelector('[data-calendar-event-date]');
+
+  const dayOffset = (offset) => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + offset);
+    return date;
+  };
+
+  const events = {
+    [toDayString(dayOffset(1))]: 'Kick-off projet',
+    [toDayString(dayOffset(3))]: 'Revue design',
+    [toDayString(dayOffset(8))]: 'Atelier accessibilité',
+    [toDayString(dayOffset(12))]: 'Livraison sprint',
+  };
+
+  if (eventsCalendar) {
+    eventsCalendar.renderInner = (inner, date) => {
+      const button = inner.querySelector('.js-day');
+      if (!button) return;
+
+      const day = toDayString(date);
+      const weekday = date.getDay();
+      const hasEvent = Boolean(events[day]);
+      const label = date.getDate();
+
+      button.innerHTML = `<time datetime="${day}">${label}</time>`;
+
+      if (weekday === 0 || weekday === 6) {
+        button.classList.add('is-weekend');
+      }
+
+      if (hasEvent) {
+        button.dataset.hasEvent = '';
+        button.title = events[day];
+      } else {
+        button.setAttribute('aria-disabled', 'true');
+        button.removeAttribute('aria-selected');
+        button.classList.remove('active', 'start', 'end', 'range');
+      }
+    };
+
+    eventsCalendar.addEventListener(EVENTS.CALENDAR_CHANGE, (event) => {
+      const day = event.detail.values[0];
+      if (!eventTitle || !eventDate) return;
+
+      if (!day || !events[day]) {
+        eventTitle.textContent = 'Sélectionnez un jour marqué';
+        eventDate.textContent = '';
+        return;
+      }
+
+      eventTitle.textContent = events[day];
+      eventDate.textContent = new Date(`${day}T12:00:00`).toLocaleDateString('fr', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    });
+
+    eventsCalendar.render();
+  }
+</script>

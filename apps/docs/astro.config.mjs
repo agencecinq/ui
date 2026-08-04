@@ -29,6 +29,7 @@ export default defineConfig({
             { label: 'Accordion', slug: 'components/accordion' },
             { label: 'Combobox', slug: 'components/combobox' },
             { label: 'Window Splitter', slug: 'components/windowsplitter' },
+            { label: 'Calendar', slug: 'components/calendar' },
           ],
         },
       ],

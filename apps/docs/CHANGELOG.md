@@ -1,5 +1,75 @@
 # @agencecinq/docs
 
+## 4.4.7
+
+### Patch Changes
+
+- Updated dependencies [c65b293]
+  - @agencecinq/utils@5.3.0
+  - @agencecinq/drawer@6.0.1
+  - @agencecinq/modal@3.0.0
+  - @agencecinq/accordion@2.0.0
+  - @agencecinq/calendar@2.0.0
+  - @agencecinq/combobox@1.0.3
+  - @agencecinq/disclosure-button@2.0.0
+  - @agencecinq/spinbutton@1.0.4
+  - @agencecinq/switch@2.0.1
+  - @agencecinq/tabs@10.0.3
+  - @agencecinq/windowsplitter@2.0.0
+
+## 4.4.6
+
+### Patch Changes
+
+- dadcbc8: Drop legacy `cid` (`id` only). Harden drawer lifecycle: trap/scroll on open/close, restore focus to opener, exclusive drawers, `aria-expanded` from events, `ariaControlsElements` only. Docs demos for exclusive and multi-button.
+- Updated dependencies [dadcbc8]
+  - @agencecinq/drawer@6.0.0
+
+## 4.4.5
+
+### Patch Changes
+
+- 8cb9b80: Replace boolean `single` with `mode="single|range|multiple"` on `<cinq-calendar>`. Document and demo multiple dates in the docs playground.
+- Updated dependencies [8cb9b80]
+- Updated dependencies [8cb9b80]
+  - @agencecinq/accordion@2.0.0
+  - @agencecinq/calendar@2.0.0
+
+## 4.4.4
+
+### Patch Changes
+
+- 1f15fe4: Add `@agencecinq/calendar` with `<cinq-calendar>` Web Component for single-date and range selection (ported from `@19h47/calendar`). Export `CALENDAR_CHANGE` from `@agencecinq/utils`. Add calendar docs page and live playgrounds.
+- Updated dependencies [1f15fe4]
+  - @agencecinq/calendar@1.0.0
+  - @agencecinq/utils@5.2.1
+  - @agencecinq/accordion@1.0.3
+  - @agencecinq/combobox@1.0.3
+  - @agencecinq/disclosure-button@2.0.0
+  - @agencecinq/drawer@5.0.3
+  - @agencecinq/modal@2.0.3
+  - @agencecinq/spinbutton@1.0.4
+  - @agencecinq/switch@2.0.1
+  - @agencecinq/tabs@10.0.3
+  - @agencecinq/windowsplitter@2.0.0
+
+## 4.4.3
+
+### Patch Changes
+
+- Updated dependencies [ec6a727]
+- Updated dependencies [ec6a727]
+  - @agencecinq/utils@5.2.0
+  - @agencecinq/combobox@1.0.3
+  - @agencecinq/accordion@1.0.3
+  - @agencecinq/spinbutton@1.0.4
+  - @agencecinq/windowsplitter@2.0.0
+  - @agencecinq/disclosure-button@2.0.0
+  - @agencecinq/drawer@5.0.3
+  - @agencecinq/modal@2.0.3
+  - @agencecinq/switch@2.0.1
+  - @agencecinq/tabs@10.0.3
+
 ## 4.4.2
 
 ### Patch Changes

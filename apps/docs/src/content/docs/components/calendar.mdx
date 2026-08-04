@@ -1,0 +1,244 @@
+---
+title: Calendar
+description: Accessible date / range picker Web Component (`<cinq-calendar>`).
+---
+
+import CalendarPlayground from "../_components/CalendarPlayground.astro";
+
+A lightweight date / range picker. Markup and CSS are yours — the package fills
+the grid and handles selection. `<cinq-calendar>` follows the
+[WAI-ARIA Authoring Practices date picker grid](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/).
+
+Inspired by [`@19h47/calendar`](https://github.com/19h47/19h47-calendar).
+
+## Install
+
+```bash
+pnpm add @agencecinq/calendar
+```
+
+## Usage
+
+Import once:
+
+```js
+import "@agencecinq/calendar";
+```
+
+Then write the grid markup. The host `<cinq-calendar>` fills weekday headers and
+day cells, and wires selection + keyboard navigation.
+
+> **HTML is the source of truth.** The component does not invent missing ARIA
+> attributes — provide `role="grid"`, labels, and live regions yourself.
+
+```html
+<cinq-calendar locale="fr" deselect>
+  <header>
+    <button type="button" class="js-previous" aria-label="Previous month">Previous</button>
+    <button type="button" class="js-title" id="calendar-label" aria-live="polite"></button>
+    <button type="button" class="js-next" aria-label="Next month">Next</button>
+  </header>
+  <table role="grid" aria-labelledby="calendar-label">
+    <thead>
+      <tr class="js-days"></tr>
+    </thead>
+    <tbody class="js-body"></tbody>
+  </table>
+</cinq-calendar>
+```
+
+The component upgrades automatically on `connectedCallback`.
+
+## Examples
+
+Interactive demos below cover single date, range, multiple dates, preselection,
+future-only, locale / week start, and an advanced `renderInner` events calendar.
+
+<CalendarPlayground />
+
+### Single date
+
+Default `mode="single"`. Add `deselect` to clear by clicking the selected day again.
+
+```html
+<cinq-calendar locale="fr" deselect allow-past name="arrival">
+  <!-- header + table -->
+</cinq-calendar>
+```
+
+### Date range
+
+Set `mode="range"`. First click is the start, second is the end; hover or
+keyboard focus previews the range. A third click resets.
+
+```html
+<cinq-calendar locale="fr" mode="range" allow-past name="stay">
+  <!-- header + table -->
+</cinq-calendar>
+```
+
+### Multiple dates
+
+Set `mode="multiple"`. Each click toggles a day in or out of the selection — no
+range preview.
+
+```html
+<cinq-calendar locale="fr" mode="multiple" allow-past name="availability">
+  <!-- header + table -->
+</cinq-calendar>
+```
+
+The package does not enforce a maximum number of days. That is application
+logic — listen to `calendar:change` and trim `picked` yourself:
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+const MAX = 3;
+
+el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
+  if (el.picked.length <= MAX) return;
+
+  el.picked = el.picked.slice(0, MAX);
+  el.persistPicked();
+  el.render();
+});
+```
+
+### Preselected dates
+
+Seed the viewed month and selection from attributes:
+
+```html
+<cinq-calendar
+  locale="fr"
+  mode="range"
+  allow-past
+  data-month="10"
+  data-year="2025"
+  data-picked-dates='["2025-11-10","2025-11-18"]'
+>
+  <!-- header + table -->
+</cinq-calendar>
+```
+
+### Future only
+
+Omit `allow-past` (default). Past days stay in the grid with
+`aria-disabled="true"` and cannot be selected.
+
+```html
+<cinq-calendar locale="fr" deselect>
+  <!-- header + table -->
+</cinq-calendar>
+```
+
+### Locale & week start
+
+`locale` drives labels via `Intl`. Week start follows the locale; override with
+`first-day` (`0`=Sun … `6`=Sat). Use the select in the playground to try
+`en`, `fr`, `de`, `es`, `ja`, and `ar`.
+
+```html
+<!-- French → week starts Monday -->
+<cinq-calendar locale="fr">…</cinq-calendar>
+
+<!-- English labels, force Monday -->
+<cinq-calendar locale="en" first-day="1">…</cinq-calendar>
+```
+
+Update at runtime:
+
+```js
+import { getWeekStart } from "@agencecinq/calendar";
+
+const el = document.querySelector("cinq-calendar");
+el.options.locale = "ja";
+el.options.firstDay = getWeekStart("ja");
+el.render();
+```
+
+### Cell hook
+
+Override `renderInner` to enrich each day cell. Keep `.js-day` and `data-day`.
+The playground **Advanced — event markers** example uses it to add `<time>`,
+weekend styling, event dots, and to disable days without events.
+
+```js
+el.renderInner = (inner, date) => {
+  const button = inner.querySelector(".js-day");
+  if (!button) return;
+
+  button.classList.add("MyDay");
+  button.innerHTML = `<time datetime="${date.toISOString().slice(0, 10)}">${date.getDate()}</time>`;
+};
+```
+
+## Required markup
+
+| Selector | Required | Role |
+| -------- | -------- | ---- |
+| `<cinq-calendar>` | **Yes** | Host element |
+| `.js-body` | **Yes** | Day cells container (`tbody`) |
+| `.js-days` | **Yes** | Weekday headers row |
+| `.js-previous` / `.js-next` | Optional | Month navigation |
+| `.js-title` | Optional | Month / year label (click = next month) |
+| `.js-day` | Generated | Day button |
+
+## Attributes
+
+| Attribute | Description |
+| --------- | ----------- |
+| `locale` / `data-locale` | BCP 47 locale for labels |
+| `mode` | `single` (default), `range`, or `multiple` |
+| `deselect` | Allow clearing selection in `mode="single"` |
+| `allow-past` | Allow selecting past dates |
+| `first-day` | Week start (`0`=Sun … `6`=Sat) |
+| `button-class` | Extra classes on day buttons |
+| `name` | Forwarded in change event detail |
+| `data-month` / `data-year` | Initial view (`month` is `0`–`11`) |
+| `data-picked-dates` | JSON array of preselected `YYYY-MM-DD` days |
+
+## Events
+
+| Event | Constant | Detail |
+| ----- | -------- | ------ |
+| `calendar:change` | `CALENDAR_CHANGE` | `{ values: string[], name?: string }` |
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+document.querySelector("cinq-calendar")?.addEventListener(
+  EVENTS.CALENDAR_CHANGE,
+  ({ detail }) => console.log(detail.values, detail.name),
+);
+```
+
+## Keyboard
+
+| Key | Action |
+| --- | ------ |
+| Arrow keys | Move by day / week |
+| Home / End | First / last day of the week |
+| Page Up / Page Down | Previous / next month |
+| Shift + Page Up / Down | Previous / next year |
+| Enter / Space | Select the focused day |
+
+## API
+
+| Method / property | Description |
+| ----------------- | ----------- |
+| `options` | Runtime options object |
+| `picked` | Selected days as `YYYY-MM-DD` |
+| `current` | Viewed `{ month, year, day }` |
+| `render()` | Rebuild the grid |
+| `move(deltaMonths)` | Navigate by months |
+| `destroy()` | Detach listeners and clear the grid |
+| `renderInner(inner, date)` | Per-cell hook (override) |
+
+Exported helpers: `getWeekStart`, `toDayString`, `fromDayString`.
+
+## Acknowledgments
+
+- [`@19h47/calendar`](https://github.com/19h47/19h47-calendar)
+- [WAI-ARIA APG — Date Picker Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/)

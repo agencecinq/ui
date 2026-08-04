@@ -19,6 +19,7 @@ var e = {
 	COMBOBOX_SUBMIT: "combobox:submit",
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
+	CALENDAR_CHANGE: "calendar:change",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -49,72 +50,118 @@ var a = {
 window.addEventListener("pointermove", n(({ x: e, y: t }) => {
 	a.x = e, a.y = t;
 }, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+function o(e) {
+	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
+}
+function s(e) {
+	if (!e) return [];
+	let t = [
+		"summary",
+		"a[href]",
+		"button:enabled",
+		"[tabindex]:not([tabindex^=\"-\"])",
+		"input:not([type=hidden]):enabled",
+		"select:enabled",
+		"textarea:enabled",
+		"object",
+		"iframe",
+		"[contenteditable]"
+	].join(",");
+	return Array.from(e.querySelectorAll(t)).filter((e) => o(e) && e.getAttribute("tabindex") !== "-1");
+}
 //#endregion
 //#region src/modal.ts
-var o = class extends HTMLElement {
+var c = class extends HTMLElement {
+	trigger = null;
 	$modal = null;
 	handleClick = (e) => {
 		e.target === e.currentTarget && this.close();
 	};
 	handleModalToggle = (e) => {
-		let { modal: t } = e.detail;
-		t === this.id && (this.$modal?.open ? this.close() : this.show());
+		let { modal: t, trigger: n } = e.detail;
+		if (t === this.id) {
+			if (this.$modal?.open) {
+				this.close();
+				return;
+			}
+			n && (this.trigger = n), this.show();
+		}
 	};
 	constructor() {
 		super();
 	}
 	connectedCallback() {
-		if (this.$modal = this.querySelector("[data-dialog]") || this.querySelector("dialog"), !this.$modal) throw Error("Modal: No dialog found");
-		this.$modal.addEventListener("click", this.handleClick), document.documentElement.addEventListener(e.MODAL_TOGGLE, this.handleModalToggle);
+		this.init();
 	}
 	disconnectedCallback() {
-		this.$modal && this.$modal.removeEventListener("click", this.handleClick), document.documentElement.removeEventListener(e.MODAL_TOGGLE, this.handleModalToggle), this.$modal = null;
+		this.destroy(), this.$modal = null;
+	}
+	init() {
+		if (this.$modal = this.querySelector("[data-dialog]") || this.querySelector("dialog"), !this.$modal) throw Error("Modal: No dialog found");
+		if (!this.id) throw Error("Modal: id attribute is required");
+		this.$modal.addEventListener("click", this.handleClick), document.documentElement.addEventListener(e.MODAL_TOGGLE, this.handleModalToggle);
+	}
+	destroy() {
+		this.$modal && (this.$modal.removeEventListener("click", this.handleClick), this.$modal.open && this.$modal.close()), document.documentElement.removeEventListener(e.MODAL_TOGGLE, this.handleModalToggle);
 	}
 	close = () => {
-		this.$modal && (this.$modal.close(), t(document.documentElement, e.MODAL_CLOSE, void 0, {
+		this.$modal?.open && (this.$modal.close(), t(document.documentElement, e.MODAL_CLOSE, { modal: this.id }, {
 			bubbles: !1,
 			cancelable: !1
 		}));
 	};
 	show = () => {
-		this.$modal && (this.$modal.showModal(), t(document.documentElement, e.MODAL_OPEN, { modal: this.id }, {
+		if (!this.$modal || this.$modal.open) return;
+		this.$modal.showModal(), t(document.documentElement, e.MODAL_OPEN, {
+			modal: this.id,
+			trigger: this.trigger
+		}, {
 			bubbles: !1,
 			cancelable: !1
-		}));
+		});
+		let n = s(this.$modal);
+		n.length > 0 && n[0].focus();
 	};
 };
-customElements.get("cinq-modal") || customElements.define("cinq-modal", o);
+customElements.get("cinq-modal") || customElements.define("cinq-modal", c);
 //#endregion
 //#region src/modal-button.ts
-var s = class extends HTMLElement {
+var l = class extends HTMLElement {
 	$button = null;
 	controls = [];
-	handleModalClose = () => this.$button?.setAttribute("aria-pressed", "false");
+	handleModalClose = (e) => {
+		this.$button && this.controls.includes(e.detail.modal) && this.$button.setAttribute("aria-pressed", "false");
+	};
 	handleModalOpen = (e) => {
-		let { modal: t } = e.detail;
-		this.$button && this.controls.includes(t) && this.$button.setAttribute("aria-pressed", "true");
+		this.$button && this.controls.includes(e.detail.modal) && this.$button.setAttribute("aria-pressed", "true");
 	};
 	connectedCallback() {
+		this.init();
+	}
+	disconnectedCallback() {
+		this.destroy(), this.$button = null, this.controls = [];
+	}
+	init() {
 		if (this.$button = this.querySelector("[data-button]") || this.querySelector("button"), !this.$button) throw Error("ModalButton: No button found");
 		this.controls = (this.$button.ariaControlsElements ?? []).map((e) => e.id), this.$button.addEventListener("click", this.show), document.documentElement.addEventListener(e.MODAL_CLOSE, this.handleModalClose), document.documentElement.addEventListener(e.MODAL_OPEN, this.handleModalOpen);
 	}
-	disconnectedCallback() {
-		this.$button && this.$button.removeEventListener("click", this.show), document.documentElement.removeEventListener(e.MODAL_CLOSE, this.handleModalClose), document.documentElement.removeEventListener(e.MODAL_OPEN, this.handleModalOpen), this.$button = null, this.controls = [];
+	destroy() {
+		this.$button && this.$button.removeEventListener("click", this.show), document.documentElement.removeEventListener(e.MODAL_CLOSE, this.handleModalClose), document.documentElement.removeEventListener(e.MODAL_OPEN, this.handleModalOpen);
 	}
 	show = () => {
-		this.$button && (this.$button.setAttribute("aria-pressed", "true"), this.controls.forEach((n) => {
-			let r = {
+		this.$button && this.controls.forEach((n) => {
+			let r = this.$button?.getAttribute("data-trap"), i = {
 				trigger: this.$button,
-				trap: document.getElementById(`${this.$button?.getAttribute("data-trap")}`),
+				trap: r ? document.getElementById(r) : null,
 				modal: n
 			};
-			t(document.documentElement, e.MODAL_TOGGLE, r, {
+			t(document.documentElement, e.MODAL_TOGGLE, i, {
 				bubbles: !1,
 				cancelable: !1
 			});
-		}));
+		});
 	};
 };
-customElements.get("cinq-modal-button") || customElements.define("cinq-modal-button", s);
+customElements.get("cinq-modal-button") || customElements.define("cinq-modal-button", l);
 //#endregion
-export { o as Modal, s as ModalButton };
+export { c as Modal, l as ModalButton };

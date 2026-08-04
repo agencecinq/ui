@@ -15,7 +15,6 @@ A high-performance, accessible, and lightweight Web Component for creating Drawe
 
 ```bash
 pnpm add @agencecinq/drawer
-
 ```
 
 ---
@@ -39,7 +38,7 @@ export default defineConfig({
 
 ### 2. Import the Component
 
-In your main JavaScript entry point (e.g., `theme.ts` or `main.js`):
+In your main JavaScript entry point (e.g. `theme.ts` or `main.js`):
 
 ```javascript
 import '@agencecinq/drawer';
@@ -50,13 +49,12 @@ import '@agencecinq/drawer';
 Once the plugin has copied the snippet, you can render it in your layout or sections:
 
 ```liquid
-{% render 'cinq-drawer.html', 
-   id: 'cart-drawer', 
-   title: 'Your Shopping Cart',
-   content: '<p>Your cart is empty.</p>' 
+{% render 'cinq-drawer.html',
+   id: 'cart-drawer',
+   content: '<p>Your cart is empty.</p>'
 %}
 
-<cinq-drawer-button target="cart-drawer">
+<cinq-drawer-button>
   <button aria-controls="cart-drawer" aria-expanded="false">
     View Cart
   </button>
@@ -71,29 +69,40 @@ Once the plugin has copied the snippet, you can render it in your layout or sect
 
 | Attribute | Description                                                 | Required |
 | --------- | ----------------------------------------------------------- | -------- |
-| `cid`     | Unique identifier for the drawer instance.                  | Yes      |
-| `opened`  | Reflects the current state. Can be used for styling in CSS. | No       |
+| `id`      | Unique identifier for the drawer instance.                  | Yes      |
+| `open`    | Reflects the current state. Can be used for styling in CSS. | No       |
 
 ### Methods
-
-Interact with the element instance directly:
 
 ```javascript
 const $drawer = document.querySelector('cinq-drawer#cart-drawer');
 
 $drawer.open();
 $drawer.close();
-$drawer.toggle();
+$drawer.toggle({ trigger: null, trap: null });
+$drawer.destroy(); // unbind
+$drawer.init(); // re-bind
 ```
+
+When you mutate the drawer DOM at runtime, re-bind with `destroy()` → mutate → `init()`.
 
 ### Events
 
-The drawer communicates via the `@agencecinq/utils` event bus to ensure synchronization across the entire theme.
+Use constants from `@agencecinq/utils` (`EVENTS.DRAWER_*`). Events are dispatched on `document.documentElement`.
 
-| Event               | Action.       | Description                          |
-| ------------------- | ------------- | ------------------------------------ |
-| `drawerOpen`        | Listen / Emit | Opens a specific drawer via its cID. |
-| `drawerClose`       | Listen / Emit | Closes any currently opened drawer.  |
+| Event | Constant | Detail | Description |
+| ----- | -------- | ------ | ----------- |
+| `drawer-toggle` | `DRAWER_TOGGLE` | `{ drawer, trigger, trap }` | Request open/close from a button |
+| `drawer-open` | `DRAWER_OPEN` | `{ drawer, trigger? }` | Drawer opened (also closes other open drawers) |
+| `drawer-close` | `DRAWER_CLOSE` | `{ drawer }` | Drawer closed |
+
+```js
+import { EVENTS } from '@agencecinq/utils';
+
+document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
+  console.log(event.detail.drawer);
+});
+```
 
 ---
 
@@ -106,19 +115,15 @@ If you are working inside the CINQ monorepo:
 pnpm build
 ```
 
-
 2. **Add a version change**:
 ```bash
 pnpm change
 ```
 
-
 3. **Publish to NPM**:
 ```bash
 pnpm release
 ```
-
-
 
 ## License
 

@@ -4,6 +4,8 @@ description: Native `<dialog>` modal Web Component (`<cinq-modal>`).
 ---
 
 import ModalPlayground from "../_components/ModalPlayground.astro";
+import ModalStackedPlayground from "../_components/ModalStackedPlayground.astro";
+import ModalReplacePlayground from "../_components/ModalReplacePlayground.astro";
 
 A modal presents content in a layer above the page. `<cinq-modal>` wraps a native
 `<dialog>` element, wires `showModal()` / `close()`, focus management, and
@@ -111,8 +113,53 @@ Copy‑paste starter markup:
 | Event           | Dispatched by         | Detail payload                         | Description                                                   |
 | --------------- | --------------------- | -------------------------------------- | ------------------------------------------------------------- |
 | `modal-toggle`  | `cinq-modal-button`   | `{ modal, trigger, trap }`            | Emitted on `document.documentElement` to request a toggle.    |
-| `modal-open`    | `cinq-modal`          | `{ modal }`                            | Fired after the modal has been opened.                        |
-| `modal-close`   | `cinq-modal`          | –                                      | Fired after the modal has been closed.                        |
+| `modal-open`    | `cinq-modal`          | `{ modal, trigger }`               | Fired after the modal has been opened. Multiple modals may stack.     |
+| `modal-close`   | `cinq-modal`          | `{ modal }`                        | Fired after the modal has been closed.                                |
+
+## Background scroll
+
+**Not handled by the package.** Native `showModal()` makes the page inert (no
+focus / pointer outside the dialog) but does **not** lock document scroll. A
+wheel over the backdrop can still move the page underneath.
+
+That lock is a **document / theme** concern (layout, scrollbar gutter, iOS
+quirks), so the consumer owns it — same idea as styling the backdrop.
+
+### Preferred: CSS
+
+```css
+html:has(dialog[open]:modal) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+```
+
+Works with stacked modals: as long as any modal dialog is open, scroll stays
+locked.
+
+### Alternative: events + `@agencecinq/utils`
+
+If you need the shared `disableScroll` / `enableScroll` helpers (e.g. Shopify
+theme already using them), listen on `document.documentElement` and **refcount**
+open modals so closing the top of a stack does not unlock too early:
+
+```js
+import { EVENTS, disableScroll, enableScroll } from "@agencecinq/utils";
+
+let openCount = 0;
+
+document.documentElement.addEventListener(EVENTS.MODAL_OPEN, () => {
+  if (openCount === 0) disableScroll();
+  openCount += 1;
+});
+
+document.documentElement.addEventListener(EVENTS.MODAL_CLOSE, () => {
+  openCount = Math.max(0, openCount - 1);
+  if (openCount === 0) enableScroll(false);
+});
+```
+
+Keep the dialog content scrollable when it overflows; only lock the page behind.
 
 ## Interactive example
 
@@ -157,3 +204,21 @@ Copy‑paste starter markup:
 ## Playground (live)
 
 <ModalPlayground />
+
+### Stacked modals (W3C APG)
+
+Following the [Dialog (Modal) pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/):
+a dialog may open over another; content underneath is inert. Closing the top
+dialog returns focus to its invoker (e.g. **Verify address** inside the parent).
+Closing the parent returns focus to **Add delivery address** on the page.
+
+<ModalStackedPlayground />
+
+### Replace: open next, close current
+
+Not a stack: **Continue** lists both ids (`parent` then `child` in
+`aria-controls`). The parent closes, then the child opens. Closing the child
+returns focus to **Start checkout** on the page (native restore after the parent
+already returned focus there).
+
+<ModalReplacePlayground />

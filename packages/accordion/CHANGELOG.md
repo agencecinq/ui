@@ -1,5 +1,17 @@
 # @agencecinq/accordion
 
+## 2.0.0
+
+### Major Changes
+
+- 8cb9b80: Breaking: rename public types to `Options` / `Detail` and export `Panel`. Fix URL hash matching for `#id` (and `#/id`). Cancel panel animation timers on destroy. Delegate panel-open handling on the host.
+
+## 1.0.3
+
+### Patch Changes
+
+- ec6a727: Add `parseNumber` and `parseBoolean` helpers alongside `parseList` in a single `parse` module, and use them in combobox, accordion, and spinbutton.
+
 ## 1.0.2
 
 ### Patch Changes

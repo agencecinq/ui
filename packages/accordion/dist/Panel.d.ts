@@ -3,7 +3,7 @@
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
  */
-export default class Panel {
+export declare class Panel {
     el: HTMLElement;
     $body: HTMLElement | null;
     $button: HTMLButtonElement | null;
@@ -13,6 +13,8 @@ export default class Panel {
     isOpen: boolean;
     height: number;
     transitionDuration: number;
+    private rafId;
+    private timeoutId;
     constructor(el: HTMLElement, index: number);
     init(): void;
     get open(): boolean;
@@ -21,11 +23,11 @@ export default class Panel {
     toggle(): boolean;
     focus(): void;
     destroy(): void;
+    private clearAnimation;
     private handleClick;
     private handleFocus;
     private handleBlur;
-    private handleResize;
-    private measure;
+    private resize;
     private get detail();
 }
 //# sourceMappingURL=Panel.d.ts.map

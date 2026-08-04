@@ -129,16 +129,13 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="m-0 text-lg font-semibold text-gray-900">One button, multiple targets</h3>
           <p class="m-0 text-sm text-gray-600">
             <code>aria-controls</code> is an ID reference list — one trigger can open every listed
-            region. Each region can be dismissed on its own, then <code>update()</code> keeps
-            <code>aria-expanded</code> honest.
+            region. Each region can be dismissed on its own, then <code>update()</code> keeps <code>aria-expanded</code> honest.
           </p>
           <p
             class="m-0 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-950"
             role="note"
           >
-            <strong>Note:</strong> multi-target is valid ARIA (see MDN’s
-            <code>ariaControlsElements</code> example). Here <code>aria-expanded</code> is
-            <code>true</code> while at least one region is visible; a click closes if any remains open.
+            <strong>Note:</strong> multi-target is valid ARIA (see MDN’s <code>ariaControlsElements</code> example). Here <code>aria-expanded</code> is <code>true</code> while at least one region is visible; a click closes if any remains open.
           </p>
         </div>
 
@@ -334,8 +331,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Cancellable events</h3>
           <p class="text-sm text-gray-600">
-            Open and close events fire <em>before</em> the state changes. Call
-            <code>event.preventDefault()</code> to abort — useful for confirmations or gating access.
+            Open and close events fire <em>before</em> the state changes. Call <code>event.preventDefault()</code> to abort — useful for confirmations or gating access.
           </p>
         </div>
 

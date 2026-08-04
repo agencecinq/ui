@@ -1,0 +1,260 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-accordion-add [role='region'] {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .docs-accordion-add > [data-accordion-panel]:first-child > [data-accordion-header] {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+  }
+
+  .docs-accordion-add > [data-accordion-panel]:last-child > [data-accordion-header][aria-expanded='false'] {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  .docs-accordion-add > [data-accordion-panel]:last-child [data-accordion-inner] {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  .docs-accordion-add-chevron {
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    flex-shrink: 0;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    margin-top: -0.125rem;
+    transition: transform 0.2s ease;
+  }
+
+  .docs-accordion-add [data-accordion-header][aria-expanded='true'] .docs-accordion-add-chevron {
+    transform: rotate(-135deg);
+    margin-top: 0.125rem;
+  }
+
+  .docs-accordion-add [data-accordion-header].focus {
+    outline: 2px solid #111827;
+    outline-offset: -2px;
+  }
+</style>
+
+<section class="rounded-2xl bg-white p-6 shadow not-content" data-demo-root="accordion-add">
+  <div class="flex flex-col gap-4">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">Add panels at runtime</h3>
+      <p class="text-sm text-gray-600">
+        The pattern is: <code class="font-mono">destroy()</code> → mutate DOM →
+        <code class="font-mono">init()</code>.
+      </p>
+    </div>
+
+    <div class="grid gap-3 sm:grid-cols-2 max-w-xl">
+      <label class="block">
+        <span class="mb-1 block text-sm font-medium text-gray-700">Label</span>
+        <input
+          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          type="text"
+          placeholder="E.g. Cloaker"
+          data-input="label"
+        />
+      </label>
+      <label class="block">
+        <span class="mb-1 block text-sm font-medium text-gray-700">Content</span>
+        <input
+          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          type="text"
+          placeholder="E.g. Hangs from the ceiling…"
+          data-input="content"
+        />
+      </label>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        data-action="add"
+      >
+        Add
+      </button>
+      <button
+        type="button"
+        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+        data-action="destroy"
+      >
+        Destroy
+      </button>
+      <button
+        type="button"
+        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+        data-action="create"
+      >
+        Create
+      </button>
+    </div>
+
+    <cinq-accordion
+      class="docs-accordion-add max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+      data-accordion-hash="false"
+      data-demo="accordion-add"
+    >
+      <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+        <button
+          type="button"
+          data-accordion-header
+          id="docs-accordion-add-galeb-header"
+          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          aria-expanded="true"
+          aria-controls="docs-accordion-add-galeb-body"
+        >
+          Galeb Duhr
+          <span class="docs-accordion-add-chevron" aria-hidden="true"></span>
+        </button>
+        <div
+          id="docs-accordion-add-galeb-body"
+          role="region"
+          aria-labelledby="docs-accordion-add-galeb-header"
+        >
+          <div
+            data-accordion-inner
+            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+          >
+            <p class="m-0">
+              The galeb duhr is a curious boulder-like creature with appendages that act as hands and
+              feet.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div data-accordion-panel data-accordion-open="false">
+        <button
+          type="button"
+          data-accordion-header
+          id="docs-accordion-add-troll-header"
+          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          aria-expanded="false"
+          aria-controls="docs-accordion-add-troll-body"
+        >
+          Troll
+          <span class="docs-accordion-add-chevron" aria-hidden="true"></span>
+        </button>
+        <div
+          id="docs-accordion-add-troll-body"
+          role="region"
+          aria-labelledby="docs-accordion-add-troll-header"
+          hidden
+        >
+          <div
+            data-accordion-inner
+            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+          >
+            <p class="m-0">
+              Trolls are horrid carnivores found in all climes, from arctic wastelands to tropical
+              jungles.
+            </p>
+          </div>
+        </div>
+      </div>
+    </cinq-accordion>
+  </div>
+</section>
+
+<script>
+  const slugify = (input) =>
+    input
+      .toLowerCase()
+      .trim()
+      .replace(/['"]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+  const escapeHtml = (value) =>
+    value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+  const headerClass =
+    'flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800';
+
+  const innerClass =
+    'border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700';
+
+  {
+    const root = document.querySelector('[data-demo-root="accordion-add"]');
+    const accordion = document.querySelector('cinq-accordion[data-demo="accordion-add"]');
+    const labelInput = root?.querySelector('[data-input="label"]');
+    const contentInput = root?.querySelector('[data-input="content"]');
+
+    root?.querySelector('[data-action="destroy"]')?.addEventListener('click', () => {
+      accordion?.destroy();
+    });
+
+    root?.querySelector('[data-action="create"]')?.addEventListener('click', () => {
+      accordion?.init();
+    });
+
+    root?.querySelector('[data-action="add"]')?.addEventListener('click', () => {
+      if (!(accordion && labelInput && contentInput)) return;
+
+      const label = labelInput.value.trim();
+      const content = contentInput.value.trim();
+      if (!label || !content) return;
+
+      const slug = slugify(label) || `panel-${Date.now()}`;
+      const headerId = `docs-accordion-add-${slug}-header`;
+      const bodyId = `docs-accordion-add-${slug}-body`;
+
+      if (document.getElementById(headerId)) {
+        labelInput.focus();
+        return;
+      }
+
+      accordion.destroy();
+
+      accordion.insertAdjacentHTML(
+        'beforeend',
+        `<div data-accordion-panel data-accordion-open="false">
+          <button
+            type="button"
+            data-accordion-header
+            id="${headerId}"
+            class="${headerClass}"
+            aria-expanded="false"
+            aria-controls="${bodyId}"
+          >
+            ${escapeHtml(label)}
+            <span class="docs-accordion-add-chevron" aria-hidden="true"></span>
+          </button>
+          <div
+            id="${bodyId}"
+            role="region"
+            aria-labelledby="${headerId}"
+            hidden
+          >
+            <div data-accordion-inner class="${innerClass}">
+              <p class="m-0">${escapeHtml(content)}</p>
+            </div>
+          </div>
+        </div>`,
+      );
+
+      accordion.init();
+      labelInput.value = '';
+      contentInput.value = '';
+      labelInput.focus();
+    });
+  }
+</script>

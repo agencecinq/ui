@@ -1,0 +1,1 @@
+{"version":3,"file":"keyboard.d.ts","sourceRoot":"","sources":["../src/keyboard.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,qBAAqB,CAAC;AAE1D;;;;;;GAMG;AACH,MAAM,CAAC,OAAO,OAAO,QAAQ;IACf,OAAO,CAAC,QAAQ,CAAC,IAAI;gBAAJ,IAAI,EAAE,cAAc;IAEjD,MAAM,GAAI,OAAO,aAAa,KAAG,IAAI,CAqEnC;CACH"}

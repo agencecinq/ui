@@ -33,7 +33,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <span class="font-semibold" data-cart-count>3 creatures</span>
     </div>
 
-    <cinq-drawer cid="bestiary-drawer-demo" class="group">
+    <cinq-drawer id="bestiary-drawer-demo" class="group">
       <div
         data-dom="overlay"
         class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
@@ -101,6 +101,6 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </cinq-drawer>
 
-    <PortalToBody selector='cinq-drawer[cid="bestiary-drawer-demo"]' />
+    <PortalToBody selector="#bestiary-drawer-demo" />
   </section>
 </div>
