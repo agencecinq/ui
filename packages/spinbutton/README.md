@@ -203,9 +203,8 @@ $spinbutton.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
 });
 ```
 
-Unlike switch activate/deactivate events, `spinbutton-change` is a throttled
-notification fired after the value is committed to the DOM. Calling
-`event.preventDefault()` does not revert the value.
+`spinbutton-change` is a throttled notification fired after the value is
+committed to the DOM. Calling `event.preventDefault()` does not revert the value.
 
 ## Build setup
 

@@ -361,6 +361,7 @@ import RegisterComponents from './RegisterComponents.astro';
                 name="decrease"
                 tabindex="-1"
                 aria-label="Decrease (min 0)"
+                disabled
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 −
@@ -403,10 +404,10 @@ import RegisterComponents from './RegisterComponents.astro';
               </button>
               <input
                 type="number"
-                value="0"
+                value="10"
                 aria-labelledby="bounds-max-label"
                 aria-valuemax="10"
-                aria-valuenow="0"
+                aria-valuenow="10"
                 class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
               />
               <button
@@ -414,6 +415,7 @@ import RegisterComponents from './RegisterComponents.astro';
                 name="increase"
                 tabindex="-1"
                 aria-label="Increase (max 10)"
+                disabled
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 +
