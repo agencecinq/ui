@@ -1,10 +1,6 @@
-export interface Text {
-  single: string;
-  plural: string;
-}
+export type FormatValue = (value: number) => string;
 
 export interface Options {
-  text?: Text;
   step: number;
   delay: number;
 }
@@ -13,9 +9,8 @@ export interface Value {
   min: number | false;
   max: number | false;
   now: number;
-  text: string;
 }
 
-export interface SpinbuttonChangeDetail {
+export interface Detail {
   value: number;
 }

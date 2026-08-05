@@ -5,10 +5,9 @@
 
 > Accessible, WAI-ARIA spinbutton as a lightweight Web Component.
 
-A spinbutton restricts its value to a set or range of discrete values. It
+A spinbutton restricts its value to a set or range of discrete values. `<cinq-spinbutton>`
 provides an accessible, keyboard-navigable interface for numerical input that
-maintains value constraints, supports internationalization through custom text
-labels, and emits events when values change.
+maintains value constraints, and dispatches events when values change.
 
 Implementation follows the
 [WAI-ARIA Authoring Practices spinbutton pattern](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/).
@@ -26,7 +25,7 @@ pnpm add @agencecinq/spinbutton
 
 ```html
 <cinq-spinbutton>
-  <button data-spinbutton-action="decrease" type="button" aria-label="Decrease" tabindex="-1">
+  <button name="decrease" type="button" aria-label="Decrease" tabindex="-1">
     −
   </button>
 
@@ -39,9 +38,12 @@ pnpm add @agencecinq/spinbutton
     value="1"
   />
 
-  <button data-spinbutton-action="increase" type="button" aria-label="Increase" tabindex="-1">
+  <button name="increase" type="button" aria-label="Increase" tabindex="-1">
     +
   </button>
+
+  <!-- Optional: announce changes while the input stays focused -->
+  <div aria-live="polite" aria-atomic="true" class="sr-only"></div>
 </cinq-spinbutton>
 ```
 
@@ -49,128 +51,163 @@ pnpm add @agencecinq/spinbutton
 import "@agencecinq/spinbutton";
 ```
 
-#### Why nothing needs to be initialized
-
 Importing `@agencecinq/spinbutton` registers the Web Component in the
 **Custom Elements Registry** (`customElements.define('cinq-spinbutton', Spinbutton)`).
-The browser then automatically upgrades every existing `<cinq-spinbutton>` in
-the DOM, calling `connectedCallback()`, which in turn calls `init()`.
-You don't need `new Spinbutton(...)` or to call `init()` manually.
+The browser upgrades every existing `<cinq-spinbutton>` in the DOM automatically.
+No manual `init()` call required.
 
-### Required DOM
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Use an a11y linter
+> (axe-core, Lighthouse) to catch invalid markup.
 
-| Selector                              | Required | Role                                                                     |
-| ------------------------------------- | -------- | ------------------------------------------------------------------------ |
-| `<cinq-spinbutton>`                   | Yes      | Wrapper component, controls the inner `<input>`. Carries no ARIA state.  |
-| `[data-spinbutton-input]` ‖ `input`   | **Yes**  | The focusable element. Hosts `role="spinbutton"` and ARIA value state.   |
-| `[data-spinbutton-action="increase"]` | Optional | Click to increase by `step`. Auto-disabled at the max.                   |
-| `[data-spinbutton-action="decrease"]` | Optional | Click to decrease by `step`. Auto-disabled at the min.                   |
+Use `input type="number"` (implicit `role="spinbutton"`) or set `role="spinbutton"`
+explicitly on `input type="text"`.
 
-The component appends a visually hidden `<div aria-live="polite" aria-atomic="true">`
-to announce value changes to screen readers. The hiding styles are applied
-inline so the component stays self-contained — **no `.sr-only` utility class
-required from the consumer**.
+### Required markup
 
-### ARIA semantics live on the `<input>`
+| Attribute / element | Required | Role |
+| ------------------- | -------- | ---- |
+| `<cinq-spinbutton>` | **Yes** | Wrapper component, controls the inner input. Carries no ARIA state. |
+| `<input>` | **Yes** | The focusable element. One input per host. Hosts `role="spinbutton"` and ARIA value state. |
+| `button[name="increase"]` | Optional | Click to increase by step. Auto-disabled at the max. |
+| `button[name="decrease"]` | Optional | Click to decrease by step. Auto-disabled at the min. |
+| `[aria-live]` | Optional | Live region mirrored when `formatValue` is set. One per host. Style/hide in your CSS. |
 
-Per APG, all ARIA state of a spinbutton lives on the focusable element — i.e.
-your `<input>`. The component reads `aria-valuemin/max/now` from it at mount
-and writes `aria-valuenow`, `aria-valuetext`, and `aria-invalid` to it as the
-state changes. The host `<cinq-spinbutton>` carries no ARIA state.
+The component writes `aria-valuenow` and `value` on the input. Set `aria-valuetext`
+in the markup yourself, or assign `formatValue` to keep it in sync (and optionally
+mirror into `[aria-live]`). Without `formatValue`, the component does not touch
+`aria-valuetext`.
 
-**HTML is the source of truth**: the component does not auto-set `role`,
-auto-migrate attributes, or warn about missing labels. Use a proper a11y linter
-(axe-core, Lighthouse, eslint-plugin-jsx-a11y) to catch invalid markup.
+Per the [APG spinbutton pattern](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/),
+all ARIA state lives on the focusable `<input>`. The host carries no ARIA state.
 
-Practical implications:
+### Markup variants
 
-- If you use `<input type="number">`, the implicit ARIA role is already
-  `spinbutton` — nothing to add.
-- If you use `<input type="text">`, set `role="spinbutton"` explicitly on it.
-- The accessible name **must** come from `aria-label`, `aria-labelledby`,
-  a wrapping `<label>`, or a `<label for="…">`. There is no fallback.
+| Variant | Markup |
+| ------- | ------ |
+| Number input | `input type="number"` (implicit `role="spinbutton"`) |
+| Text input | `input type="text"` + `role="spinbutton"` |
+| Visible label | `aria-labelledby` referencing external text |
+| Compact | `aria-label` on the `<input>` |
+| Input only | `<input>` without + / − buttons |
+| `formatValue` | `(value) => string` for `aria-valuetext` (+ optional `[aria-live]`) |
 
-### Buttons remain out of the tab sequence
+See the [interactive docs](https://agencecinq.github.io/ui/components/spinbutton/) for live examples of each variant.
 
-The `+` / `−` buttons must not be in the tab order — they are operated via the
-keyboard arrows of the input itself (per the APG pattern). Always set
+### `formatValue` and plural rules
+
+Assign `formatValue` in JS. Use `Intl.PluralRules` (or your i18n library) for
+locale-aware pluralisation (English: one/other; Polish: one/few/many/other;
+Arabic: up to six categories):
+
+```js
+const labels = { one: "level", other: "levels" };
+const pluralRules = new Intl.PluralRules("en");
+
+host.formatValue = (value) => {
+  const unit = labels[pluralRules.select(value)] ?? labels.other;
+  return `${value} ${unit}`;
+};
+```
+
+### Buttons out of the tab sequence
+
+The + / − buttons must not be in the tab order. They are operated via the
+keyboard arrows of the `<input>` itself (per the APG pattern). Always set
 `tabindex="-1"` on them, and provide an `aria-label` so screen-reader users
 who do reach them via swipe gestures still get a meaningful name.
 
-## Options
+### API
 
-Configured via **data attributes** on the host:
+| Attribute | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| `data-spinbutton-step` | number | `1` | Increment used by buttons and arrow keys. |
+| `data-spinbutton-delay` | number | `100` | Minimum interval (ms) between `spinbutton-change` dispatches during rapid value changes. DOM updates are not throttled. |
 
-| Attribute                | Type   | Default | Description                                                          |
-| ------------------------ | ------ | ------- | -------------------------------------------------------------------- |
-| `data-spinbutton-step`   | number | `1`     | Increment used by buttons and arrow keys.                            |
-| `data-spinbutton-delay`  | number | `20`    | Throttle (ms) before the `spinbutton-change` event is dispatched.    |
-| `data-spinbutton-text`   | JSON   | -       | `{"single":"item","plural":"items"}` — appended to `aria-valuetext`. |
+| Property | Description |
+| -------- | ----------- |
+| `formatValue` | Optional formatter for `aria-valuetext` and the optional `[aria-live]` child. |
 
-```html
-<cinq-spinbutton
-  data-spinbutton-step="5"
-  data-spinbutton-text='{"single":"barrel","plural":"barrels"}'
->
-  <input
-    type="number"
-    aria-label="Barrels"
-    aria-valuemin="5"
-    aria-valuemax="50"
-    aria-valuenow="5"
-  />
-  …
-</cinq-spinbutton>
-```
+| Method | Description |
+| ------ | ----------- |
+| `init()` | Binds markup + listeners. Call `destroy()` first if already bound. |
+| `setValue(value, emit?)` | Sets the current value. Clamped to min/max. |
+| `setMin(value, emit?)` | Updates `aria-valuemin` and re-clamps the current value. |
+| `setMax(value, emit?)` | Updates `aria-valuemax` and re-clamps the current value. |
+| `increase()` | Adds step to the current value. |
+| `decrease()` | Subtracts step from the current value. |
+| `destroy()` | Detaches listeners. |
 
-## Keyboard support
+| Property | Description |
+| -------- | ----------- |
+| `$input` | The inner `<input>`. |
+| `$increase` | The optional increase `<button>`. |
+| `$decrease` | The optional decrease `<button>`. |
+| `$live` | The optional `[aria-live]` element. |
+
+### Keyboard support
 
 Strictly the keys defined by the
 [APG pattern](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/#keyboardinteraction).
 Other keys (Arrow Left/Right, Backspace, Delete, printable characters) are left
 to the browser so the user can freely edit the input's text.
 
-| Key         | Function                                          |
-| ----------- | ------------------------------------------------- |
-| Arrow Up    | Increase value by `step`.                         |
-| Arrow Down  | Decrease value by `step`.                         |
-| Page Up     | Increase value by `step × 5` (optional per APG).  |
-| Page Down   | Decrease value by `step × 5` (optional per APG).  |
-| Home        | Jump to `aria-valuemin` (when defined).           |
-| End         | Jump to `aria-valuemax` (when defined).           |
+| Key | Function |
+| --- | -------- |
+| Arrow Up | Increase value by step. |
+| Arrow Down | Decrease value by step. |
+| Page Up | Increase value by step × 5 (optional per APG). |
+| Page Down | Decrease value by step × 5 (optional per APG). |
+| Home | Jump to `aria-valuemin` (when defined). |
+| End | Jump to `aria-valuemax` (when defined). |
 
-## Events
+Typed values commit on `change` (blur / Enter), not on every keystroke. Out-of-range
+entries set `aria-invalid="true"` on the input, then clamp to the nearest bound.
 
-| Event               | Cancelable | Detail              | Description                          |
-| ------------------- | ---------- | ------------------- | ------------------------------------ |
-| `spinbutton-change` | Yes        | `{ value: number }` | Throttled value change notification. |
-
-The event is dispatched on `<cinq-spinbutton>` and bubbles. The typed value is
-committed on `change` (blur / Enter), not on every keystroke, so the user can
-freely type intermediate values that fall outside the bounds.
+### Programmatic API
 
 ```js
 const $spinbutton = document.querySelector("cinq-spinbutton");
 
-$spinbutton?.addEventListener("spinbutton-change", (event) => {
+$spinbutton.setMin(10);
+$spinbutton.setMax(200);
+$spinbutton.setValue(50);
+$spinbutton.increase();
+$spinbutton.decrease();
+```
+
+`setValue()`, `setMin()`, and `setMax()` accept an optional `emit` argument (default
+`true`). Pass `false` to update state without dispatching an event.
+
+Call `destroy()` when removing the element from the DOM to detach listeners.
+After mutating light DOM (e.g. swapping the input), call `destroy()` then
+`init()`:
+
+```js
+$spinbutton.destroy();
+// mutate light DOM…
+$spinbutton.init();
+```
+
+## Events
+
+| Event | Cancelable | Detail | Description |
+| ----- | ---------- | ------ | ----------- |
+| `spinbutton-change` | Yes | value: number | Throttled notification when the value changes (see `data-spinbutton-delay`). |
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+$spinbutton.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
   console.log(event.detail.value);
 });
 ```
 
-## Programmatic API
+Unlike switch activate/deactivate events, `spinbutton-change` is a throttled
+notification fired after the value is committed to the DOM. Calling
+`event.preventDefault()` does not revert the value.
 
-```js
-const $spinbutton = document.querySelector("cinq-spinbutton");
-
-$spinbutton.setMin(10);     // Updates min, re-clamps current value
-$spinbutton.setMax(200);    // Updates max, re-clamps current value
-$spinbutton.setValue(50);   // Sets current value (emits by default)
-$spinbutton.increase();     // +step
-$spinbutton.decrease();     // -step
-$spinbutton.destroy();      // Removes listeners + live region
-```
-
-## Build Setup
+## Build setup
 
 ```bash
 pnpm -C packages/spinbutton build
@@ -179,4 +216,4 @@ pnpm -C packages/spinbutton build
 ## Acknowledgments
 
 - [Spinbutton Pattern (WAI-ARIA Practices)](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/)
-- [`@19h47/spinbutton`](https://github.com/19h47/19h47-spinbutton/) — original implementation
+- [`@19h47/spinbutton`](https://github.com/19h47/19h47-spinbutton/): original implementation

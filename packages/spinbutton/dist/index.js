@@ -19,6 +19,7 @@ var e = {
 	COMBOBOX_SUBMIT: "combobox:submit",
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
+	CALENDAR_CHANGE: "calendar:change",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -45,91 +46,63 @@ var e = {
 		r = e, n ||= setTimeout(i, t);
 	};
 }, i = document.documentElement, { body: a } = document;
-i.hasAttribute("data-debug");
-var o = {
-	x: 0,
-	y: 0
-};
-window.addEventListener("pointermove", r(({ x: e, y: t }) => {
-	o.x = e, o.y = t;
-}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var s = (e, t, n) => Math.min(Math.max(e, t), n), c = {
+i.hasAttribute("data-debug"), window.addEventListener("pointermove", r(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+var o = (e, t, n) => Math.min(Math.max(e, t), n), s = {
 	step: 1,
-	delay: 20
-}, l = {
-	position: "absolute",
-	width: "1px",
-	height: "1px",
-	padding: "0",
-	margin: "-1px",
-	overflow: "hidden",
-	clip: "rect(0, 0, 0, 0)",
-	whiteSpace: "nowrap",
-	border: "0"
-}, u = (e, t) => t ? `${e} ${e <= 1 ? t.single : t.plural}` : e.toString(), d = (e, t, n) => {
-	!e || n === !1 || (t === n ? e.setAttribute("disabled", "true") : e.removeAttribute("disabled"));
-}, f = class extends HTMLElement {
+	delay: 100
+}, c = class extends HTMLElement {
 	$input = null;
 	$increase = null;
 	$decrease = null;
-	$liveRegion = null;
-	options = { ...c };
+	$live = null;
+	options = { ...s };
 	value = {
 		min: !1,
 		max: !1,
-		now: 0,
-		text: "0"
+		now: 0
 	};
-	text;
-	throttledEmit = null;
+	#e;
+	#t = () => {};
+	get formatValue() {
+		return this.#e;
+	}
+	set formatValue(e) {
+		if (this.#e = e, !this.$input || !e) return;
+		let t = e(this.value.now);
+		this.$input.setAttribute("aria-valuetext", t), this.$live && (this.$live.textContent = t);
+	}
 	connectedCallback() {
-		if (this.$input = this.querySelector("[data-spinbutton-input]") || this.querySelector("input"), !this.$input) return;
-		this.$increase = this.querySelector("[data-spinbutton-action=\"increase\"]"), this.$decrease = this.querySelector("[data-spinbutton-action=\"decrease\"]"), this.$liveRegion = document.createElement("div"), this.$liveRegion.setAttribute("aria-live", "polite"), this.$liveRegion.setAttribute("aria-atomic", "true"), Object.assign(this.$liveRegion.style, l), this.appendChild(this.$liveRegion), this.text = this.parseText(), this.options.step = n(this.getAttribute("data-spinbutton-step"), c.step), this.options.delay = n(this.getAttribute("data-spinbutton-delay"), c.delay);
-		let e = this.$input.getAttribute("aria-valuemin"), t = this.$input.getAttribute("aria-valuemax"), r = n(this.$input.getAttribute("aria-valuenow"), 0);
-		this.value = {
-			min: e !== null && n(e, 0),
-			max: t !== null && n(t, 0),
-			now: r,
-			text: u(r, this.text)
-		}, this.init();
+		this.init();
 	}
 	disconnectedCallback() {
-		this.destroy();
-	}
-	parseText() {
-		let e = this.getAttribute("data-spinbutton-text");
-		if (e) try {
-			let t = JSON.parse(e);
-			if (typeof t.single == "string" && typeof t.plural == "string") return {
-				single: t.single,
-				plural: t.plural
-			};
-		} catch {}
+		this.destroy(), this.$input = null, this.$increase = null, this.$decrease = null, this.$live = null;
 	}
 	init() {
-		this.setValue(this.value.now, !1), this.initEvents();
+		if (this.$input = this.querySelector("input"), !this.$input) throw Error("Spinbutton must have an input element");
+		this.$increase = this.querySelector("button[name=\"increase\"]"), this.$decrease = this.querySelector("button[name=\"decrease\"]"), this.$live = this.querySelector("[aria-live]"), this.options.step = n(this.getAttribute("data-spinbutton-step"), s.step), this.options.delay = n(this.getAttribute("data-spinbutton-delay"), s.delay);
+		let i = this.$input.getAttribute("aria-valuemin"), a = this.$input.getAttribute("aria-valuemax"), o = n(this.$input.getAttribute("aria-valuenow"), 0);
+		this.value = {
+			min: i !== null && n(i, 0),
+			max: a !== null && n(a, 0),
+			now: o
+		}, this.$input.addEventListener("keydown", this.#r), this.$input.addEventListener("change", this.#n), this.$increase?.addEventListener("click", this.increase), this.$decrease?.addEventListener("click", this.decrease), this.#t = r(() => {
+			t(this, e.SPINBUTTON_CHANGE, { value: this.value.now });
+		}, this.options.delay);
 	}
-	initEvents() {
-		this.$input?.addEventListener("keydown", this.handleKeydown), this.$input?.addEventListener("change", this.handleInputChange), this.$increase?.addEventListener("click", this.increase), this.$decrease?.addEventListener("click", this.decrease);
-	}
-	handleInputChange = (e) => {
-		let t = e.target, n = parseInt(t.value, 10);
-		this.setValue(Number.isNaN(n) ? this.value.now : n);
+	#n = (e) => {
+		let t = e.target;
+		this.setValue(n(t.value, this.value.now));
 	};
-	handleKeydown = (e) => {
-		let t = e.key || e.code, { step: n } = this.options, r = {
-			ArrowUp: () => this.setValue(this.value.now + n),
-			ArrowDown: () => this.setValue(this.value.now - n),
-			PageUp: () => this.setValue(this.value.now + n * 5),
-			PageDown: () => this.setValue(this.value.now - n * 5),
-			Home: () => {
-				this.value.min !== !1 && this.setValue(this.value.min);
-			},
-			End: () => {
-				this.value.max !== !1 && this.setValue(this.value.max);
-			}
-		}[t];
-		r && (e.preventDefault(), r());
+	#r = (e) => {
+		let { step: t } = this.options, n = {
+			ArrowUp: () => this.setValue(this.value.now + t),
+			ArrowDown: () => this.setValue(this.value.now - t),
+			PageUp: () => this.setValue(this.value.now + t * 5),
+			PageDown: () => this.setValue(this.value.now - t * 5),
+			Home: () => this.value.min !== !1 && this.setValue(this.value.min),
+			End: () => this.value.max !== !1 && this.setValue(this.value.max)
+		}[e.key];
+		n && (e.preventDefault(), n());
 	};
 	decrease = () => {
 		this.setValue(this.value.now - this.options.step);
@@ -145,19 +118,17 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = {
 	}
 	setValue(e, t = !0) {
 		if (!this.$input) return;
-		let n = Number.isNaN(e) ? this.value.now : e, r = this.value.min === !1 ? -(2 ** 53 - 1) : this.value.min, i = this.value.max === !1 ? 2 ** 53 - 1 : this.value.max;
-		n < r || n > i ? this.$input.setAttribute("aria-invalid", "true") : this.$input.removeAttribute("aria-invalid"), this.value.now = s(n, r, i), this.value.text = u(this.value.now, this.text), d(this.$increase, this.value.now, this.value.max), d(this.$decrease, this.value.now, this.value.min), this.$input.setAttribute("aria-valuenow", this.value.now.toString()), this.$input.setAttribute("aria-valuetext", this.value.text), this.$input.value = this.value.now.toString(), this.$input.setAttribute("value", this.value.now.toString()), this.$liveRegion && (this.$liveRegion.textContent = this.value.text), t && this.emitChange();
-	}
-	emitChange() {
-		(this.throttledEmit ??= r(() => {
-			let n = { value: this.value.now };
-			t(this, e.SPINBUTTON_CHANGE, n);
-		}, this.options.delay))();
+		let n = this.value.min === !1 ? -(2 ** 53 - 1) : this.value.min, r = this.value.max === !1 ? 2 ** 53 - 1 : this.value.max;
+		if (e < n || e > r ? this.$input.setAttribute("aria-invalid", "true") : this.$input.removeAttribute("aria-invalid"), this.value.now = o(e, n, r), this.$increase?.toggleAttribute("disabled", this.value.max !== !1 && this.value.now === this.value.max), this.$decrease?.toggleAttribute("disabled", this.value.min !== !1 && this.value.min === this.value.now), this.$input.setAttribute("aria-valuenow", this.value.now.toString()), this.$input.value = this.value.now.toString(), this.$input.setAttribute("value", this.value.now.toString()), this.#e) {
+			let e = this.#e(this.value.now);
+			this.$input.setAttribute("aria-valuetext", e), this.$live && (this.$live.textContent = e);
+		}
+		t && this.#t();
 	}
 	destroy() {
-		this.$input?.removeEventListener("keydown", this.handleKeydown), this.$input?.removeEventListener("change", this.handleInputChange), this.$increase?.removeEventListener("click", this.increase), this.$decrease?.removeEventListener("click", this.decrease), this.$liveRegion && this.contains(this.$liveRegion) && this.removeChild(this.$liveRegion), this.$liveRegion = null, this.throttledEmit = null;
+		this.$input?.removeEventListener("keydown", this.#r), this.$input?.removeEventListener("change", this.#n), this.$increase?.removeEventListener("click", this.increase), this.$decrease?.removeEventListener("click", this.decrease), this.#t = () => {};
 	}
 };
-customElements.get("cinq-spinbutton") || customElements.define("cinq-spinbutton", f);
+customElements.get("cinq-spinbutton") || customElements.define("cinq-spinbutton", c);
 //#endregion
-export { f as Spinbutton };
+export { c as Spinbutton };
