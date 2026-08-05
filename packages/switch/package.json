@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/switch",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Accessible, WAI-ARIA switch as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",
