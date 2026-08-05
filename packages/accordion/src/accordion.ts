@@ -1,4 +1,4 @@
-import { EVENTS, keycode, parseBoolean } from "@agencecinq/utils";
+import { EVENTS, parseBoolean } from "@agencecinq/utils";
 import { Panel } from "./Panel.js";
 import type { Detail, Options } from "./types.js";
 import { getURLHash } from "./utils.js";
@@ -148,16 +148,16 @@ export class Accordion extends HTMLElement {
       event.preventDefault();
     };
 
-    const handlers: Record<number, () => void> = {
-      [keycode.ARROW_UP]: previous,
-      [keycode.ARROW_DOWN]: next,
-      [keycode.ARROW_LEFT]: previous,
-      [keycode.ARROW_RIGHT]: next,
-      [keycode.HOME]: first,
-      [keycode.END]: last,
+    const handlers: Record<string, () => void> = {
+      ArrowUp: previous,
+      ArrowDown: next,
+      ArrowLeft: previous,
+      ArrowRight: next,
+      Home: first,
+      End: last,
     };
 
-    handlers[event.keyCode]?.();
+    handlers[event.key]?.();
   };
 }
 

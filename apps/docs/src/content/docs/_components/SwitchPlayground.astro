@@ -23,7 +23,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-switch:hover,
-  .docs-switch.focus {
+  .docs-switch:focus-visible {
     background-color: #f3f4f6;
     outline-color: #111827;
   }
@@ -35,7 +35,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-switch[aria-disabled='true']:hover,
-  .docs-switch[aria-disabled='true'].focus {
+  .docs-switch[aria-disabled='true']:focus-visible {
     background-color: transparent;
     outline-color: transparent;
   }
@@ -172,9 +172,9 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-switch-minimal[aria-checked='true']:hover,
-  .docs-switch-minimal[aria-checked='true'].focus,
+  .docs-switch-minimal[aria-checked='true']:focus-visible,
   .docs-switch-minimal[checked]:hover,
-  .docs-switch-minimal[checked].focus {
+  .docs-switch-minimal[checked]:focus-visible {
     background-color: #1f2937;
     outline-color: #111827;
   }
@@ -408,7 +408,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Form helper input</h3>
           <p class="text-sm text-gray-600">
-            Use <code>[data-switch-input]</code> when several checkboxes live inside the host. Keep
+            Optional hidden <code>&lt;input&gt;</code> for form submission (one per host). Keep
             it hidden from assistive tech — the host is the switch.
           </p>
         </div>
@@ -424,7 +424,6 @@ import RegisterComponents from './RegisterComponents.astro';
           <div hidden>
             <input
               type="checkbox"
-              data-switch-input
               name="newsletter"
               tabindex="-1"
               aria-hidden="true"

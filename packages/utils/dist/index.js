@@ -117,22 +117,8 @@ function S(e, t = e) {
 function C(e = null) {
 	g.keydown && document.removeEventListener("keydown", g.keydown), e && e.focus();
 }
-var w = {
-	BACKSPACE: 8,
-	TAB: 9,
-	ENTER: 13,
-	SHIFT: 16,
-	ESCAPE: 27,
-	SPACE: 32,
-	PAGE_UP: 33,
-	PAGE_DOWN: 34,
-	END: 35,
-	HOME: 36,
-	ARROW_LEFT: 37,
-	ARROW_UP: 38,
-	ARROW_RIGHT: 39,
-	ARROW_DOWN: 40,
-	DELETE: 46
-}, T = (e, t, n) => Math.min(Math.max(e, t), n);
 //#endregion
-export { e as EVENTS, S as addTrapFocus, s as body, d as breakpoints, T as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, y as getFocusableElements, o as html, c as isDebug, w as keycode, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as rememberReturnFocus, C as removeTrapFocus, x as restoreReturnFocus, l as scroll, a as throttle };
+//#region src/clamp.ts
+var w = (e, t, n) => Math.min(Math.max(e, t), n);
+//#endregion
+export { e as EVENTS, S as addTrapFocus, s as body, d as breakpoints, w as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, y as getFocusableElements, o as html, c as isDebug, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as rememberReturnFocus, C as removeTrapFocus, x as restoreReturnFocus, l as scroll, a as throttle };

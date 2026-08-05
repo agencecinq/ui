@@ -6,9 +6,12 @@
 export declare class Switch extends HTMLElement {
     static observedAttributes: string[];
     $input: HTMLInputElement | null;
-    private reflectingAttribute;
     connectedCallback(): void;
     disconnectedCallback(): void;
+    /**
+     * Bind markup + listeners. Call {@link destroy} first if already bound.
+     */
+    init(): void;
     attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void;
     get checked(): boolean;
     get disabled(): boolean;
@@ -18,10 +21,7 @@ export declare class Switch extends HTMLElement {
     destroy(): void;
     private handleClick;
     private handleKeydown;
-    private handleFocus;
-    private handleBlur;
     private get detail();
-    private syncInput;
-    private reflectCheckedAttribute;
+    private update;
 }
 //# sourceMappingURL=switch.d.ts.map

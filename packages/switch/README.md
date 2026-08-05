@@ -69,11 +69,8 @@ no manual `init()` call required.
 | `role="switch"` | **Yes** | Identifies the control as a switch. |
 | `aria-checked` | **Yes** | Current on/off state (`"true"` or `"false"`). |
 | `tabindex="0"` | **Yes** | Makes the switch keyboard-focusable (use `-1` when disabled). |
-| Hidden `input[type="checkbox"]` | Optional | Form helper only — not the switch. Keep it in a `hidden` container, with `tabindex="-1"` and `aria-hidden="true"`. |
+| Hidden `<input>` | Optional | Form helper only — not the switch. One input in the host. Keep it in a `hidden` container, with `tabindex="-1"` and `aria-hidden="true"`. |
 | `aria-hidden="true"` on On/Off text | Recommended | Decorative state labels must not appear in the accessible name ([APG](https://www.w3.org/WAI/ARIA/apg/patterns/switch/)). |
-
-Use `[data-switch-input]` instead of `input[type="checkbox"]` when you need a
-more specific selector.
 
 The switch **label must not change** when its state changes — update decorative
 On/Off text only if it is marked `aria-hidden="true"`.
@@ -94,7 +91,7 @@ group label ([APG](https://www.w3.org/WAI/ARIA/apg/patterns/switch/)).
 | `aria-describedby` | Points to static help text |
 | Minimal | Host + label only — no slider, no checkbox |
 | Pre-checked | `aria-checked="true"` (+ optional `checked` for CSS) |
-| Form helper | `[data-switch-input]` or `input[type="checkbox"]` in `<div hidden>` |
+| Form helper | Hidden `<input>` in `<div hidden>` |
 | Disabled | `disabled` + `aria-disabled` + `tabindex="-1"`, or `aria-disabled` alone |
 
 See the [interactive docs](https://agencecinq.github.io/ui/components/switch/) for live examples of each variant.
@@ -108,6 +105,7 @@ See the [interactive docs](https://agencecinq.github.io/ui/components/switch/) f
 
 | Method | Description |
 | ------ | ----------- |
+| `init()` | Binds markup + listeners. Call `destroy()` first if already bound. |
 | `activate(emit?)` | Turns the switch on. |
 | `deactivate(emit?)` | Turns the switch off. |
 | `toggle()` | Toggles on/off. |
@@ -121,10 +119,10 @@ See the [interactive docs](https://agencecinq.github.io/ui/components/switch/) f
 | `Space` | Toggles between on and off when focused. |
 | `Enter` | Toggles between on and off when focused (optional per [APG](https://www.w3.org/WAI/ARIA/apg/patterns/switch/)). |
 
-On `focus` / `blur`, a `.focus` class is toggled on the host:
+Style focus with native pseudo-classes:
 
 ```css
-cinq-switch.focus {
+cinq-switch:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
@@ -144,6 +142,14 @@ $switch.toggle();
 `true`). Pass `false` to update state without dispatching an event.
 
 Call `destroy()` when removing the element from the DOM to detach listeners.
+After mutating light DOM (e.g. swapping the hidden input), call `destroy()` then
+`init()`:
+
+```js
+$switch.destroy();
+// mutate light DOM…
+$switch.init();
+```
 
 ## Events
 

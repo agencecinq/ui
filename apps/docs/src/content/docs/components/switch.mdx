@@ -70,11 +70,8 @@ initialization is needed.
 | `aria-checked` | **Yes** | Current on/off state (`"true"` or `"false"`). |
 | `tabindex="0"` | **Yes** | Makes the switch keyboard-focusable (use `-1` when disabled). |
 | Accessible name | **Yes** | Via `aria-label`, `aria-labelledby`, or visible label text. |
-| Hidden `input[type="checkbox"]` | Optional | Form helper only — not the switch. Keep it in a `hidden` container with `tabindex="-1"` and `aria-hidden="true"`. |
+| Hidden `<input>` | Optional | Form helper only — not the switch. One input in the host. Keep it in a `hidden` container with `tabindex="-1"` and `aria-hidden="true"`. |
 | `aria-hidden="true"` on On/Off text | Recommended | Decorative state labels must not appear in the accessible name. |
-
-Use `[data-switch-input]` instead of `input[type="checkbox"]` when you need a
-more specific selector.
 
 Per the [APG switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/),
 the switch **label must not change** when its state changes. Style On/Off
@@ -95,7 +92,7 @@ The playground below covers every supported markup pattern:
 | `aria-describedby` | Extra static help text announced with the switch. |
 | Minimal | No slider, no checkbox — UI-only toggle outside a form. |
 | Pre-checked | `aria-checked="true"` (+ optional `checked` for initial CSS). |
-| Form helper | Hidden `input[type="checkbox"]` or `[data-switch-input]` for submission. |
+| Form helper | Hidden `<input>` for form submission. |
 | Switch group | `<fieldset>` / `<legend>` wrapping several switches. |
 | Disabled | `disabled` + `aria-disabled` + `tabindex="-1"`, or `aria-disabled` alone. |
 
@@ -203,7 +200,7 @@ first toggle. The component reflects `checked` automatically after state changes
 </fieldset>
 ```
 
-### `[data-switch-input]`
+### Form helper input
 
 ```html
 <cinq-switch role="switch" aria-checked="false" tabindex="0">
@@ -212,7 +209,6 @@ first toggle. The component reflects `checked` automatically after state changes
   <div hidden>
     <input
       type="checkbox"
-      data-switch-input
       name="newsletter"
       tabindex="-1"
       aria-hidden="true"
@@ -241,11 +237,10 @@ The component does not check this — rely on axe-core / Lighthouse / your CI.
 | `Space` | Toggles between on and off when focused. |
 | `Enter` | Toggles between on and off when focused (optional per APG). |
 
-On `focus` / `blur`, a `.focus` class is toggled on the host so you can style
-the focused state without relying solely on `:focus`:
+Style focus with native pseudo-classes:
 
 ```css
-cinq-switch.focus {
+cinq-switch:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
@@ -264,6 +259,7 @@ cinq-switch.focus {
 
 | Method | Description |
 | ------ | ----------- |
+| `init()` | Binds markup + listeners. Call `destroy()` first if already bound. |
 | `activate(emit?)` | Turns the switch on. Dispatches an event by default. |
 | `deactivate(emit?)` | Turns the switch off. Dispatches an event by default. |
 | `toggle()` | Toggles on/off. Returns `false` if disabled or a cancelable event was aborted. |
@@ -315,6 +311,14 @@ $switch.activate();
 $switch.deactivate();
 $switch.toggle();
 $switch.destroy();
+```
+
+After mutating light DOM, call `destroy()` then `init()`:
+
+```js
+$switch.destroy();
+// mutate light DOM…
+$switch.init();
 ```
 
 `activate()` and `deactivate()` accept an optional `emit` flag (default `true`).

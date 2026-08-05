@@ -1,3 +1,3 @@
-export type SwitchDetail = {
+export type Detail = {
   el: HTMLElement;
 };

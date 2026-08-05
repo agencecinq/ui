@@ -1,5 +1,5 @@
-import { EVENTS, dispatchEvent, keycode } from "@agencecinq/utils";
-import type { SwitchDetail } from "./types.js";
+import { EVENTS, dispatchEvent } from "@agencecinq/utils";
+import type { Detail } from "./types.js";
 
 /**
  * Switch Web Component implementing the WAI-ARIA switch pattern.
@@ -11,22 +11,24 @@ export class Switch extends HTMLElement {
 
   $input: HTMLInputElement | null = null;
 
-  private reflectingAttribute = false;
-
   connectedCallback(): void {
-    this.$input =
-      this.querySelector<HTMLInputElement>("[data-switch-input]") ||
-      this.querySelector<HTMLInputElement>('input[type="checkbox"]');
-
-    this.addEventListener("click", this.handleClick);
-    this.addEventListener("keydown", this.handleKeydown);
-    this.addEventListener("focus", this.handleFocus);
-    this.addEventListener("blur", this.handleBlur);
+    this.init();
   }
 
   disconnectedCallback(): void {
     this.destroy();
     this.$input = null;
+  }
+
+  /**
+   * Bind markup + listeners. Call {@link destroy} first if already bound.
+   */
+  init(): void {
+    this.$input = this.querySelector<HTMLInputElement>("input");
+
+    this.addEventListener("click", this.handleClick);
+    this.addEventListener("keydown", this.handleKeydown);
+    this.update();
   }
 
   attributeChangedCallback(
@@ -35,7 +37,7 @@ export class Switch extends HTMLElement {
     newValue: string | null,
   ): void {
     if (name === "disabled") {
-      this.syncInput();
+      this.update();
 
       if (newValue !== null && this.matches(":focus")) {
         this.blur();
@@ -44,18 +46,16 @@ export class Switch extends HTMLElement {
       return;
     }
 
-    if (name !== "checked" || this.reflectingAttribute) {
+    if (name !== "checked") {
       return;
     }
 
-    const isChecked = this.getAttribute("aria-checked") === "true";
-
-    if (newValue !== null && !isChecked) {
+    if (newValue !== null && !this.checked) {
       this.activate();
       return;
     }
 
-    if (newValue === null && isChecked) {
+    if (newValue === null && this.checked) {
       this.deactivate();
     }
   }
@@ -72,7 +72,9 @@ export class Switch extends HTMLElement {
   }
 
   toggle(): boolean {
-    if (this.disabled) return false;
+    if (this.disabled) {
+      return false;
+    }
 
     if (this.checked) {
       return this.deactivate();
@@ -89,8 +91,8 @@ export class Switch extends HTMLElement {
     }
 
     this.setAttribute("aria-checked", "true");
-    this.syncInput();
-    this.reflectCheckedAttribute();
+    this.update();
+    this.setAttribute("checked", "");
     return true;
   }
 
@@ -102,32 +104,35 @@ export class Switch extends HTMLElement {
     }
 
     this.setAttribute("aria-checked", "false");
-    this.syncInput();
-    this.reflectCheckedAttribute();
+    this.update();
+    this.removeAttribute("checked");
+
     return true;
   }
 
   destroy(): void {
     this.removeEventListener("click", this.handleClick);
     this.removeEventListener("keydown", this.handleKeydown);
-    this.removeEventListener("focus", this.handleFocus);
-    this.removeEventListener("blur", this.handleBlur);
   }
 
   private handleClick = (event: MouseEvent): void => {
-    if (this.disabled) return;
+    if (this.disabled) {
+      return;
+    }
 
-    // Keyboard activation (Space / Enter) is handled in handleKeydown.
-    // Ignore the synthesized click (detail === 0) to avoid double toggling.
-    if (event.detail === 0) return;
+    if (event.detail === 0) {
+      return;
+    }
 
     this.toggle();
   };
 
   private handleKeydown = (event: KeyboardEvent): void => {
-    if (this.disabled) return;
+    if (this.disabled) {
+      return;
+    }
 
-    if (event.keyCode !== keycode.SPACE && event.keyCode !== keycode.ENTER) {
+    if (event.key !== " " && event.key !== "Enter") {
       return;
     }
 
@@ -135,50 +140,20 @@ export class Switch extends HTMLElement {
     this.toggle();
   };
 
-  private handleFocus = (): void => {
-    this.classList.add("focus");
-  };
-
-  private handleBlur = (): void => {
-    this.classList.remove("focus");
-  };
-
-  private get detail(): SwitchDetail {
+  private get detail(): Detail {
     return { el: this };
   }
 
-  private syncInput(): void {
-    if (!this.$input) return;
-
-    const checked = this.checked;
-
-    this.$input.checked = checked;
-
-    if (checked) {
-      this.$input.setAttribute("checked", "");
-    } else {
-      this.$input.removeAttribute("checked");
+  private update(): void {
+    if (!this.$input) {
+      return;
     }
+
+    this.$input.checked = this.checked;
+    this.$input.toggleAttribute("checked", this.checked);
 
     this.$input.disabled = this.disabled;
-
-    if (this.disabled) {
-      this.$input.setAttribute("disabled", "");
-    } else {
-      this.$input.removeAttribute("disabled");
-    }
-  }
-
-  private reflectCheckedAttribute(): void {
-    this.reflectingAttribute = true;
-
-    if (this.getAttribute("aria-checked") === "true") {
-      this.setAttribute("checked", "");
-    } else {
-      this.removeAttribute("checked");
-    }
-
-    this.reflectingAttribute = false;
+    this.$input.toggleAttribute("disabled", this.disabled);
   }
 }
 

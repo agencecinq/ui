@@ -42,35 +42,14 @@ var e = {
 		r = e, n ||= setTimeout(i, t);
 	};
 }, i = document.documentElement, { body: a } = document;
-i.hasAttribute("data-debug");
-var o = {
-	x: 0,
-	y: 0
-};
-window.addEventListener("pointermove", r(({ x: e, y: t }) => {
-	o.x = e, o.y = t;
-}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var s = {
-	BACKSPACE: 8,
-	TAB: 9,
-	ENTER: 13,
-	SHIFT: 16,
-	ESCAPE: 27,
-	SPACE: 32,
-	PAGE_UP: 33,
-	PAGE_DOWN: 34,
-	END: 35,
-	HOME: 36,
-	ARROW_LEFT: 37,
-	ARROW_UP: 38,
-	ARROW_RIGHT: 39,
-	ARROW_DOWN: 40,
-	DELETE: 46
-}, c = (e) => {
+i.hasAttribute("data-debug"), window.addEventListener("pointermove", r(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+//#endregion
+//#region src/utils.ts
+var o = (e) => {
 	e.classList.remove("is-active");
-}, l = (e) => {
+}, s = (e) => {
 	e.classList.add("is-active");
-}, u = () => decodeURIComponent(document.location.hash.replace(/^#\/?/, "")), d = class {
+}, c = () => decodeURIComponent(document.location.hash.replace(/^#\/?/, "")), l = class {
 	el;
 	$body = null;
 	$button = null;
@@ -98,14 +77,14 @@ var s = {
 			this.rafId = 0, this.$body && (this.$body.style.setProperty("max-height", `${this.height}px`), this.timeoutId = window.setTimeout(() => {
 				this.timeoutId = 0, this.$body?.style.removeProperty("max-height");
 			}, this.transitionDuration));
-		}), l(this.el), this.isOpen = !0, !0);
+		}), s(this.el), this.isOpen = !0, !0);
 	}
 	close(n = !0) {
 		return !this.$button || !this.$body || !this.open || n && !t(this.el, e.ACCORDION_PANEL_CLOSE, this.detail) ? !1 : (this.$button.setAttribute("aria-expanded", "false"), this.el.setAttribute("data-accordion-open", "false"), this.resize(), this.$body.style.setProperty("max-height", `${this.height}px`), this.clearAnimation(), this.rafId = requestAnimationFrame(() => {
 			this.rafId = 0, this.$body?.style.setProperty("max-height", "0");
 		}), this.timeoutId = window.setTimeout(() => {
 			this.timeoutId = 0, this.$body?.setAttribute("hidden", "");
-		}, this.transitionDuration), c(this.el), this.isOpen = !1, !0);
+		}, this.transitionDuration), o(this.el), this.isOpen = !1, !0);
 	}
 	toggle() {
 		return !this.isDeselect && this.open ? !1 : this.open ? this.close() : this.openPanel();
@@ -114,7 +93,7 @@ var s = {
 		this.$button?.focus();
 	}
 	destroy() {
-		this.clearAnimation(), this.$button?.removeEventListener("click", this.handleClick), this.$button?.removeEventListener("focus", this.handleFocus), this.$button?.removeEventListener("blur", this.handleBlur), window.removeEventListener("resize", this.resize), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), c(this.el), this.$body = null, this.$button = null, this.$inner = null;
+		this.clearAnimation(), this.$button?.removeEventListener("click", this.handleClick), this.$button?.removeEventListener("focus", this.handleFocus), this.$button?.removeEventListener("blur", this.handleBlur), window.removeEventListener("resize", this.resize), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), o(this.el), this.$body = null, this.$button = null, this.$inner = null;
 	}
 	clearAnimation() {
 		this.rafId &&= (cancelAnimationFrame(this.rafId), 0), this.timeoutId &&= (clearTimeout(this.timeoutId), 0);
@@ -140,13 +119,13 @@ var s = {
 			index: this.index
 		};
 	}
-}, f = {
+}, u = {
 	multiselectable: !1,
 	hash: !0
-}, p = class extends HTMLElement {
+}, d = class extends HTMLElement {
 	panels = [];
 	current = 0;
-	options = { ...f };
+	options = { ...u };
 	connectedCallback() {
 		this.init();
 	}
@@ -156,9 +135,9 @@ var s = {
 	init() {
 		this.options = {
 			multiselectable: n(this.getAttribute("data-accordion-multiselectable")),
-			hash: n(this.getAttribute("data-accordion-hash"), f.hash)
+			hash: n(this.getAttribute("data-accordion-hash"), u.hash)
 		}, this.panels = [...this.querySelectorAll("[data-accordion-panel]")].filter((e) => e.closest("cinq-accordion") === this).map((e, t) => {
-			let n = new d(e, t);
+			let n = new l(e, t);
 			return n.init(), n;
 		}), this.addEventListener(e.ACCORDION_PANEL_OPEN, this.handlePanelOpen), this.addEventListener("keydown", this.handleKeydown), this.options.hash && (window.addEventListener("hashchange", this.handleHashChange), this.handleHashChange());
 	}
@@ -175,7 +154,7 @@ var s = {
 		}));
 	};
 	handleHashChange = () => {
-		let e = u();
+		let e = c();
 		e && this.panels.forEach((t, n) => {
 			t.$body && t.$body.id === e && (this.current = n, this.panels.forEach((e, t) => {
 				t !== n && e.close(!1);
@@ -190,21 +169,21 @@ var s = {
 			this.current = this.current - 1 < 0 ? this.panels.length - 1 : this.current - 1, this.panels[this.current]?.focus(), e.preventDefault();
 		}, i = () => {
 			this.current = this.current + 1 > this.panels.length - 1 ? 0 : this.current + 1, this.panels[this.current]?.focus(), e.preventDefault();
-		}, a = () => {
-			this.current = 0, this.panels[0]?.focus(), e.preventDefault();
-		}, o = () => {
-			this.current = this.panels.length - 1, this.panels[this.current]?.focus(), e.preventDefault();
 		};
 		({
-			[s.ARROW_UP]: r,
-			[s.ARROW_DOWN]: i,
-			[s.ARROW_LEFT]: r,
-			[s.ARROW_RIGHT]: i,
-			[s.HOME]: a,
-			[s.END]: o
-		})[e.keyCode]?.();
+			ArrowUp: r,
+			ArrowDown: i,
+			ArrowLeft: r,
+			ArrowRight: i,
+			Home: () => {
+				this.current = 0, this.panels[0]?.focus(), e.preventDefault();
+			},
+			End: () => {
+				this.current = this.panels.length - 1, this.panels[this.current]?.focus(), e.preventDefault();
+			}
+		})[e.key]?.();
 	};
 };
-customElements.get("cinq-accordion") || customElements.define("cinq-accordion", p);
+customElements.get("cinq-accordion") || customElements.define("cinq-accordion", d);
 //#endregion
-export { p as Accordion, d as Panel };
+export { d as Accordion, l as Panel };

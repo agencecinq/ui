@@ -19,6 +19,7 @@ var e = {
 	COMBOBOX_SUBMIT: "combobox:submit",
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
+	CALENDAR_CHANGE: "calendar:change",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -41,52 +42,33 @@ var e = {
 		r = e, n ||= setTimeout(i, t);
 	};
 }, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug");
-var a = {
-	x: 0,
-	y: 0
-};
-window.addEventListener("pointermove", n(({ x: e, y: t }) => {
-	a.x = e, a.y = t;
-}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var o = {
-	BACKSPACE: 8,
-	TAB: 9,
-	ENTER: 13,
-	SHIFT: 16,
-	ESCAPE: 27,
-	SPACE: 32,
-	PAGE_UP: 33,
-	PAGE_DOWN: 34,
-	END: 35,
-	HOME: 36,
-	ARROW_LEFT: 37,
-	ARROW_UP: 38,
-	ARROW_RIGHT: 39,
-	ARROW_DOWN: 40,
-	DELETE: 46
-}, s = class extends HTMLElement {
+r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+//#endregion
+//#region src/switch.ts
+var a = class extends HTMLElement {
 	static observedAttributes = ["checked", "disabled"];
 	$input = null;
-	reflectingAttribute = !1;
 	connectedCallback() {
-		this.$input = this.querySelector("[data-switch-input]") || this.querySelector("input[type=\"checkbox\"]"), this.addEventListener("click", this.handleClick), this.addEventListener("keydown", this.handleKeydown), this.addEventListener("focus", this.handleFocus), this.addEventListener("blur", this.handleBlur);
+		this.init();
 	}
 	disconnectedCallback() {
 		this.destroy(), this.$input = null;
 	}
+	init() {
+		this.$input = this.querySelector("input"), this.addEventListener("click", this.handleClick), this.addEventListener("keydown", this.handleKeydown), this.update();
+	}
 	attributeChangedCallback(e, t, n) {
 		if (e === "disabled") {
-			this.syncInput(), n !== null && this.matches(":focus") && this.blur();
+			this.update(), n !== null && this.matches(":focus") && this.blur();
 			return;
 		}
-		if (e !== "checked" || this.reflectingAttribute) return;
-		let r = this.getAttribute("aria-checked") === "true";
-		if (n !== null && !r) {
-			this.activate();
-			return;
+		if (e === "checked") {
+			if (n !== null && !this.checked) {
+				this.activate();
+				return;
+			}
+			n === null && this.checked && this.deactivate();
 		}
-		n === null && r && this.deactivate();
 	}
 	get checked() {
 		return this.getAttribute("aria-checked") === "true";
@@ -98,38 +80,27 @@ var o = {
 		return this.disabled ? !1 : this.checked ? this.deactivate() : this.activate();
 	}
 	activate(n = !0) {
-		return this.disabled || this.checked || n && !t(this, e.SWITCH_ACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "true"), this.syncInput(), this.reflectCheckedAttribute(), !0);
+		return this.disabled || this.checked || n && !t(this, e.SWITCH_ACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "true"), this.update(), this.setAttribute("checked", ""), !0);
 	}
 	deactivate(n = !0) {
-		return this.disabled || !this.checked || n && !t(this, e.SWITCH_DEACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "false"), this.syncInput(), this.reflectCheckedAttribute(), !0);
+		return this.disabled || !this.checked || n && !t(this, e.SWITCH_DEACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "false"), this.update(), this.removeAttribute("checked"), !0);
 	}
 	destroy() {
-		this.removeEventListener("click", this.handleClick), this.removeEventListener("keydown", this.handleKeydown), this.removeEventListener("focus", this.handleFocus), this.removeEventListener("blur", this.handleBlur);
+		this.removeEventListener("click", this.handleClick), this.removeEventListener("keydown", this.handleKeydown);
 	}
 	handleClick = (e) => {
 		this.disabled || e.detail !== 0 && this.toggle();
 	};
 	handleKeydown = (e) => {
-		this.disabled || e.keyCode !== o.SPACE && e.keyCode !== o.ENTER || (e.preventDefault(), this.toggle());
-	};
-	handleFocus = () => {
-		this.classList.add("focus");
-	};
-	handleBlur = () => {
-		this.classList.remove("focus");
+		this.disabled || (e.key === " " || e.key === "Enter") && (e.preventDefault(), this.toggle());
 	};
 	get detail() {
 		return { el: this };
 	}
-	syncInput() {
-		if (!this.$input) return;
-		let e = this.checked;
-		this.$input.checked = e, e ? this.$input.setAttribute("checked", "") : this.$input.removeAttribute("checked"), this.$input.disabled = this.disabled, this.disabled ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled");
-	}
-	reflectCheckedAttribute() {
-		this.reflectingAttribute = !0, this.getAttribute("aria-checked") === "true" ? this.setAttribute("checked", "") : this.removeAttribute("checked"), this.reflectingAttribute = !1;
+	update() {
+		this.$input && (this.$input.checked = this.checked, this.$input.toggleAttribute("checked", this.checked), this.$input.disabled = this.disabled, this.$input.toggleAttribute("disabled", this.disabled));
 	}
 };
-customElements.get("cinq-switch") || customElements.define("cinq-switch", s);
+customElements.get("cinq-switch") || customElements.define("cinq-switch", a);
 //#endregion
-export { s as Switch };
+export { a as Switch };

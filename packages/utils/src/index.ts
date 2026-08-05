@@ -5,5 +5,4 @@ export * from './scroll.js';
 export * from './throttle.js';
 export * from './environment.js';
 export * from './focus.js';
-export * from './keycode.js';
 export * from './clamp.js';
