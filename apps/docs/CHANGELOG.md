@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.10
+
+### Patch Changes
+
+- Updated dependencies [2b95ef7]
+  - @agencecinq/spinbutton@2.0.0
+
 ## 4.4.9
 
 ### Patch Changes
