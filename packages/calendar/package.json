@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@agencecinq/utils": "workspace:*",
-    "vite": "^8.1.4",
+    "vite": "^8.2.0",
     "vite-plugin-dts": "^5.0.3"
   },
   "publishConfig": {

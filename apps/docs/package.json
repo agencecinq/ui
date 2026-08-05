@@ -12,23 +12,23 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@agencecinq/accordion": "workspace:*",
+    "@agencecinq/calendar": "workspace:*",
+    "@agencecinq/combobox": "workspace:*",
     "@agencecinq/disclosure-button": "workspace:*",
     "@agencecinq/drawer": "workspace:*",
     "@agencecinq/modal": "workspace:*",
     "@agencecinq/spinbutton": "workspace:*",
     "@agencecinq/switch": "workspace:*",
-    "@agencecinq/accordion": "workspace:*",
-    "@agencecinq/calendar": "workspace:*",
-    "@agencecinq/combobox": "workspace:*",
-    "@agencecinq/windowsplitter": "workspace:*",
     "@agencecinq/tabs": "workspace:*",
     "@agencecinq/utils": "workspace:*",
+    "@agencecinq/windowsplitter": "workspace:*",
     "@astrojs/sitemap": "^3.7.3",
-    "@astrojs/starlight": "^0.41.3",
-    "@tailwindcss/vite": "^4.3.2",
-    "astro": "^7.1.0",
+    "@astrojs/starlight": "^0.41.6",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.1.6",
     "sharp": "^0.35.3",
     "stream-replace-string": "^2.0.0",
-    "tailwindcss": "^4.3.2"
+    "tailwindcss": "^4.3.3"
   }
 }
