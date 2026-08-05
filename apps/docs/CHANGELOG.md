@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.8
+
+### Patch Changes
+
+- Updated dependencies [852229a]
+  - @agencecinq/disclosure-button@3.0.0
+
 ## 4.4.7
 
 ### Patch Changes

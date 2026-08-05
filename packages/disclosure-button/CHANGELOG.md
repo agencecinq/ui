@@ -1,5 +1,15 @@
 # @agencecinq/disclosure-button
 
+## 3.0.0
+
+### Major Changes
+
+- 852229a: Drop JS `.focus` class; rename event detail `el` → `$button`; document `init`/`destroy`.
+
+  - Remove `focus` / `blur` listeners (style with `:focus-visible`)
+  - Event detail field `el` renamed to `$button` (breaking)
+  - Document `init` / `destroy`, `ariaControlsElements` browser support, destroy→re-init
+
 ## 2.0.0
 
 ### Major Changes
