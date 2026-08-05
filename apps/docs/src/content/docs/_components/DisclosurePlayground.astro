@@ -90,7 +90,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Read more / Read less</h3>
           <p class="text-sm text-gray-600">
-            A short excerpt stays visible; the rest lives in a hidden region. Style the trigger as an
+            A short excerpt stays visible. The rest lives in a hidden region. Style the trigger as an
             inline text control and swap the label on open/close.
           </p>
         </div>
@@ -135,7 +135,7 @@ import RegisterComponents from './RegisterComponents.astro';
             class="m-0 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-950"
             role="note"
           >
-            <strong>Note:</strong> multi-target is valid ARIA (see MDN’s <code>ariaControlsElements</code> example). Here <code>aria-expanded</code> is <code>true</code> while at least one region is visible; a click closes if any remains open.
+            <strong>Note:</strong> multi-target is valid ARIA (see MDN’s <code>ariaControlsElements</code> example). Here <code>aria-expanded</code> is <code>true</code> while at least one region is visible. A click closes if any remains open.
           </p>
         </div>
 
@@ -223,7 +223,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <p class="text-sm text-gray-600">
             Several triggers can share the same <code>aria-controls</code> ID. Listen to the
             open/close events and keep each trigger’s <code>aria-expanded</code> in sync yourself —
-            use <code>event.detail.open</code> and <code>event.detail.el</code>.
+            use <code>event.detail.open</code> and <code>event.detail.$button</code>.
           </p>
         </div>
 
@@ -273,7 +273,7 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Programmatic open &amp; close</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Programmatic open &amp. close</h3>
           <p class="text-sm text-gray-600">
             Call <code>open()</code> or <code>close()</code> on the host element — from an external
             control, a dismiss button inside the region, or your own routing logic.
@@ -464,10 +464,13 @@ import RegisterComponents from './RegisterComponents.astro';
     const syncSharedTriggers = (event: Event) => {
       if (!(event instanceof CustomEvent)) return;
 
-      const { el, open } = event.detail as { el: HTMLElement; open: boolean };
+      const { $button, open } = event.detail as {
+        $button: HTMLElement;
+        open: boolean;
+      };
 
       triggers.forEach((trigger) => {
-        if (trigger !== el) {
+        if (trigger !== $button) {
           trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
         }
       });

@@ -28,7 +28,7 @@ Import once:
 import "@agencecinq/disclosure-button";
 ```
 
-Then write the markup — the component only adds interactivity.
+Then write the markup: the component only adds interactivity.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
 > auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
@@ -50,9 +50,10 @@ Then write the markup — the component only adds interactivity.
 </div>
 ```
 
-Controlled regions live **outside** the host — typically siblings elsewhere in the
+Controlled regions live **outside** the host, typically siblings elsewhere in the
 document, referenced by `aria-controls`. They are resolved at connect time via
-[`Element.ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements).
+[`Element.ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)
+(Chrome 119+, Firefox 119+, Safari 17.4+).
 
 ## Required markup
 
@@ -63,7 +64,7 @@ document, referenced by `aria-controls`. They are resolved at connect time via
 | `aria-controls` | **Yes** | Space-separated ID(s) of the controlled region(s). |
 | `hidden` | **Yes** | On each controlled region when collapsed. |
 
-The component toggles the native `hidden` attribute. Layout is yours — for example:
+The component toggles the native `hidden` attribute. Layout is yours. For example:
 
 ```css
 .foo[hidden] {
@@ -81,14 +82,23 @@ The component toggles the native `hidden` attribute. Layout is yours — for exa
 
 | Method | Description |
 | ------ | ----------- |
+| `init()` | Binds markup + listeners. Call `destroy()` first if already bound. |
+| `destroy()` | Removes listeners. Called automatically from `disconnectedCallback`. |
 | `open(emit?)` | Shows every controlled element. Dispatches an event by default. |
 | `close(emit?)` | Hides every controlled element. Dispatches an event by default. |
-| `toggle()` | Closes if **any** controlled element is visible; otherwise opens all. Returns `false` if a cancelable event was aborted. |
+| `toggle()` | Closes if **any** controlled element is visible. Otherwise opens all. Returns `false` if a cancelable event was aborted. |
 | `update()` | Syncs `aria-expanded` from the DOM (e.g. after an external dismiss). |
-| `destroy()` | Removes listeners. Called automatically from `disconnectedCallback`. |
 
 `open()` / `close()` take an optional `emit` flag (default `true`). Pass `false`
 to change state without dispatching an event.
+
+After mutating the light DOM while the host stays mounted:
+
+```js
+$host.destroy();
+// mutate button / aria-controls…
+$host.init();
+```
 
 ### Properties
 
@@ -107,7 +117,7 @@ When `aria-controls` lists several IDs:
 
 ### Styling
 
-There is no mirrored state attribute on the host — style the trigger:
+There is no mirrored state attribute on the host. Style the trigger:
 
 ```css
 cinq-disclosure-button button[aria-expanded="true"] {
@@ -120,10 +130,10 @@ cinq-disclosure-button:has([aria-expanded="true"]) {
 }
 ```
 
-On `focus` / `blur`, a `.focus` class is toggled on the trigger:
+Style focus with native pseudo-classes:
 
 ```css
-cinq-disclosure-button button.focus {
+cinq-disclosure-button button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
@@ -133,8 +143,8 @@ cinq-disclosure-button button.focus {
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `disclosure-button:open` | Yes | `{ ids, elements, el, open: true }` | Fired on the trigger **before** open. Cancel to abort. |
-| `disclosure-button:close` | Yes | `{ ids, elements, el, open: false }` | Fired on the trigger **before** close. Cancel to abort. |
+| `disclosure-button:open` | Yes | `{ ids, elements, $button, open: true }` | Fired on the trigger **before** open. Cancel to abort. |
+| `disclosure-button:close` | Yes | `{ ids, elements, $button, open: false }` | Fired on the trigger **before** close. Cancel to abort. |
 
 Events bubble through `<cinq-disclosure-button>`. Prefer the constants from
 `@agencecinq/utils`:
@@ -159,20 +169,20 @@ $host.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
 | ----- | ------- |
 | `ids` | IDs of the resolved controlled elements. |
 | `elements` | Those DOM nodes. |
-| `el` | The trigger that started the action. |
-| `open` | Intended state (`true` / `false`) — use this rather than reading `hidden` yet (events fire before the DOM mutates). |
+| `$button` | The trigger that started the action. |
+| `open` | Intended state (`true` / `false`). Use this rather than reading `hidden` yet (events fire before the DOM mutates). |
 
 ## Keyboard & focus
 
 The trigger must be a native `<button type="button">`. Enter and Space activate it
-through the browser; the component listens for `click`.
+through the browser. The component listens for `click`.
 
 | Key | Function |
 | --- | -------- |
 | `Enter` | Toggle (native button behaviour). |
 | `Space` | Toggle (native button behaviour). |
 
-Focus stays on the trigger when opening or closing — matching the
+Focus stays on the trigger when opening or closing, matching the
 [APG disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/).
 Once open, users can tab into focusable content inside the region. While
 collapsed, `hidden` keeps that content out of the tab order and accessibility tree.
@@ -205,7 +215,7 @@ Keep a short excerpt in the flow and hide the rest:
 ```html
 <article>
   <p>
-    The ruined keep broods over the moors — a crumbling fortress built for siege
+    The ruined keep broods over the moors, a crumbling fortress built for siege
     and betrayal.
   </p>
 
@@ -233,7 +243,7 @@ Keep a short excerpt in the flow and hide the rest:
 
 `aria-controls` is an
 [ID reference list](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-controls)
-— one control may reference several elements (see the
+: one control may reference several elements (see the
 [`ariaControlsElements` MDN example](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)).
 
 ```html
@@ -294,9 +304,9 @@ const triggers = [
 ];
 
 const sync = (event) => {
-  const { el, open } = event.detail;
+  const { $button, open } = event.detail;
   triggers.forEach((trigger) => {
-    if (trigger !== el) trigger.setAttribute("aria-expanded", String(open));
+    if (trigger !== $button) trigger.setAttribute("aria-expanded", String(open));
   });
 };
 

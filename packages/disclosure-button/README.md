@@ -53,7 +53,8 @@ import "@agencecinq/disclosure-button";
 
 Importing the package registers the custom element. Controlled regions live
 **outside** the host and are resolved via
-[`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements).
+[`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)
+(Chrome 119+, Firefox 119+, Safari 17.4+).
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
 > auto-migrate attributes, or warn about missing labels. Use an a11y linter
@@ -72,11 +73,20 @@ Importing the package registers the custom element. Controlled regions live
 
 | Method | Description |
 | ------ | ----------- |
+| `init()` | Binds markup + listeners. Call `destroy()` first if already bound. |
+| `destroy()` | Removes listeners. Safe while the host stays mounted. |
 | `open(emit?)` | Shows every controlled element. |
 | `close(emit?)` | Hides every controlled element. |
-| `toggle()` | Closes if any controlled element is visible; otherwise opens all. |
+| `toggle()` | Closes if any controlled element is visible. Otherwise opens all. |
 | `update()` | Syncs `aria-expanded` from the DOM (e.g. after an external dismiss). |
-| `destroy()` | Removes listeners. |
+
+After mutating the light DOM while the host stays mounted:
+
+```js
+$host.destroy();
+// mutate button / aria-controls…
+$host.init();
+```
 
 | Property | Description |
 | -------- | ----------- |
@@ -87,7 +97,7 @@ Importing the package registers the custom element. Controlled regions live
 `open()` / `close()` accept an optional `emit` flag (default `true`).
 
 When several regions are controlled: `aria-expanded` is `true` while **at least
-one** is visible; a trigger click closes all if any remain open.
+one** is visible. A trigger click closes all if any remain open.
 
 Style via the trigger, e.g. `button[aria-expanded="true"]` or
 `cinq-disclosure-button:has([aria-expanded="true"])`.
@@ -95,14 +105,14 @@ Style via the trigger, e.g. `button[aria-expanded="true"]` or
 ### Keyboard & focus
 
 The trigger must be a native `<button type="button">`. Enter and Space activate
-it through the browser; the component listens for `click`. Focus stays on the
+it through the browser. The component listens for `click`. Focus stays on the
 trigger when opening or closing. While collapsed, `hidden` keeps the region out
 of the tab order and accessibility tree.
 
-On `focus` / `blur`, a `.focus` class is toggled on the trigger:
+Style focus with native pseudo-classes:
 
 ```css
-cinq-disclosure-button button.focus {
+cinq-disclosure-button button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
@@ -110,7 +120,7 @@ cinq-disclosure-button button.focus {
 
 ### One button, multiple targets
 
-`aria-controls` is an ID reference list — one control may reference several
+`aria-controls` is an ID reference list: one control may reference several
 elements (see the [`ariaControlsElements` MDN example](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)).
 After a partial dismiss (`region.hidden = true`), call `update()` so
 `aria-expanded` stays honest.
@@ -119,7 +129,7 @@ After a partial dismiss (`region.hidden = true`), call `update()` so
 
 Several triggers can share the same ID. Use one `<cinq-disclosure-button>` per
 trigger and sync sibling `aria-expanded` yourself from `event.detail.open` /
-`event.detail.el`.
+`event.detail.$button`.
 
 ### Programmatic API
 
@@ -146,8 +156,8 @@ $dismissButton.addEventListener("click", () => {
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `disclosure-button:open` | Yes | `{ ids, elements, el, open: true }` | Fired on the trigger before open. Cancel to abort. |
-| `disclosure-button:close` | Yes | `{ ids, elements, el, open: false }` | Fired on the trigger before close. Cancel to abort. |
+| `disclosure-button:open` | Yes | `{ ids, elements, $button, open: true }` | Fired on the trigger before open. Cancel to abort. |
+| `disclosure-button:close` | Yes | `{ ids, elements, $button, open: false }` | Fired on the trigger before close. Cancel to abort. |
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
@@ -159,8 +169,8 @@ $host.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, (event) => {
 });
 ```
 
-`event.detail` carries `{ ids, elements, el, open }`. Events fire **before** the
-DOM mutates — use `detail.open` rather than reading `hidden` yet.
+`event.detail` carries `{ ids, elements, $button, open }`. Events fire **before** the
+DOM mutates: use `detail.open` rather than reading `hidden` yet.
 
 ### Updating the button label
 
@@ -190,6 +200,6 @@ pnpm -C packages/disclosure-button build
 ## Acknowledgments
 
 - [Disclosure Pattern (WAI-ARIA Practices)](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/)
-- [`@19h47/disclosure-button`](https://github.com/19h47/19h47-disclosure-button/) — original implementation
+- [`@19h47/disclosure-button`](https://github.com/19h47/19h47-disclosure-button/): original implementation
 
 See the [interactive docs](https://agencecinq.github.io/ui/components/disclosure-button/) for live examples.

@@ -19,6 +19,7 @@ var e = {
 	COMBOBOX_SUBMIT: "combobox:submit",
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
+	CALENDAR_CHANGE: "calendar:change",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -55,11 +56,14 @@ var { DISCLOSURE_BUTTON_OPEN: o, DISCLOSURE_BUTTON_CLOSE: s } = e, c = class ext
 	$button = null;
 	elements = [];
 	connectedCallback() {
-		if (this.$button = this.querySelector("button"), !this.$button) throw Error("DisclosureButton: button element not found");
-		this.elements = this.$button.ariaControlsElements ?? [], this.$button.addEventListener("click", this.handleClick), this.$button.addEventListener("focus", this.handleFocus), this.$button.addEventListener("blur", this.handleBlur);
+		this.init();
 	}
 	disconnectedCallback() {
 		this.destroy(), this.$button = null, this.elements = [];
+	}
+	init() {
+		if (this.$button = this.querySelector("button"), !this.$button) throw Error("DisclosureButton: button element not found");
+		this.elements = this.$button.ariaControlsElements ?? [], this.$button.addEventListener("click", this.handleClick);
 	}
 	get expanded() {
 		return this.$button?.getAttribute("aria-expanded") === "true";
@@ -87,22 +91,16 @@ var { DISCLOSURE_BUTTON_OPEN: o, DISCLOSURE_BUTTON_CLOSE: s } = e, c = class ext
 		this.$button && this.$button.setAttribute("aria-expanded", this.visibleElements.length > 0 ? "true" : "false");
 	}
 	destroy() {
-		this.$button && (this.$button.removeEventListener("click", this.handleClick), this.$button.removeEventListener("focus", this.handleFocus), this.$button.removeEventListener("blur", this.handleBlur));
+		this.$button && this.$button.removeEventListener("click", this.handleClick);
 	}
 	handleClick = () => {
 		this.toggle();
-	};
-	handleFocus = () => {
-		this.$button?.classList.add("focus");
-	};
-	handleBlur = () => {
-		this.$button?.classList.remove("focus");
 	};
 	detail(e) {
 		return {
 			ids: this.elements.map((e) => e.id),
 			elements: this.elements,
-			el: this.$button,
+			$button: this.$button,
 			open: e
 		};
 	}

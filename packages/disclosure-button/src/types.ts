@@ -3,7 +3,8 @@ export interface Detail {
   ids: string[];
   /** Controlled elements resolved from the DOM at connect time via `ariaControlsElements`. */
   elements: HTMLElement[];
-  el: HTMLElement;
+  /** Trigger button (`$button` on the host). */
+  $button: HTMLButtonElement;
   /**
    * Intended open state for this transition.
    * Events fire before the DOM mutates, so listeners should use this rather than
