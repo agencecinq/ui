@@ -291,6 +291,39 @@ host.addEventListener("mousemove", (event) => {
 })
 ```
 
+### Before / after comparison
+
+Use [`<cinq-windowsplitter>`](../components/windowsplitter/) in `clip` mode to
+compare a sharp `<img>` with a fixed blocky `<cinq-pixelate>` layer. The
+separator clips the pixelated pane; drag or keyboard to reveal the original.
+
+```html
+<cinq-windowsplitter data-windowsplitter-mode="clip" role="region" aria-label="Photo comparison">
+  <div class="comparison__after">
+    <img src="photo.jpg" crossorigin="anonymous" alt="" aria-hidden="true" />
+  </div>
+  <div id="comparison-before" class="comparison__before">
+    <cinq-pixelate pixel="40">
+      <img src="photo.jpg" crossorigin="anonymous" alt="Coastal cliffs" />
+      <canvas role="img" aria-label="Pixelated coastal cliffs"></canvas>
+    </cinq-pixelate>
+  </div>
+  <div
+    role="separator"
+    tabindex="0"
+    aria-orientation="vertical"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="50"
+    aria-controls="comparison-before"
+    aria-label="Reveal original photo"
+  ></div>
+</cinq-windowsplitter>
+```
+
+Stack both layers with `position: absolute; inset: 0`. Style the separator
+handle like a comparison slider.
+
 ### Animated toggle (`requestAnimationFrame`)
 
 Plain `<button>` for the trigger, not a CINQ component. Only
@@ -429,8 +462,9 @@ on the modal dialog.
 
 Photos from [Lorem Picsum](https://picsum.photos/) (`crossorigin="anonymous"` required for canvas).
 
-Most demos only use `<cinq-pixelate>` plus native controls. **In a modal** and
-**In a drawer** also use [`cinq-modal`](../components/modal/),
+Most demos only use `<cinq-pixelate>` plus native controls. **Before / after
+comparison** also uses [`cinq-windowsplitter`](../components/windowsplitter/).
+**In a modal** and **In a drawer** also use [`cinq-modal`](../components/modal/),
 [`cinq-modal-button`](../components/modal/), [`cinq-drawer`](../components/drawer/), and
 [`cinq-drawer-button`](../components/drawer/). **Animated toggle** uses a plain
 `<button>`, not a CINQ component.
