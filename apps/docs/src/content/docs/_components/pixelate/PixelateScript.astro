@@ -1,7 +1,6 @@
 ---
 ---
 <script>
-  import type { Pixelate } from '@agencecinq/pixelate';
   import type { DisclosureButton } from '@agencecinq/disclosure-button';
   import { PIXEL_MAX, PIXEL_MIN } from '@agencecinq/pixelate';
   import { EVENTS } from '@agencecinq/utils';
@@ -20,7 +19,7 @@
   }
 
   function asPixelate(element) {
-    return element instanceof HTMLElement ? /** @type {Pixelate} */ (element) : null;
+    return element instanceof HTMLElement ? element : null;
   }
 
   function setPixel(host, pixel) {

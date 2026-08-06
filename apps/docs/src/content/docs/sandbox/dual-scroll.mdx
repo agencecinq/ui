@@ -112,11 +112,9 @@ keep the effect without inertia. The component does not read that media query.
 
 ## API
 
-| | |
-|---|---|
-| Attribute | `spring` — easing factor (`0.01`–`1`, default `0.1`) |
-| Methods | `init()`, `destroy()`, `sync()` |
-| CSS variable | `--dual-scroll-pane-height` — host height in px (set by `sync()`) |
+- **`spring`** — easing factor (`0.01`–`1`, default `0.1`)
+- **Methods** — `init()`, `destroy()`, `sync()`
+- **CSS variable** — `--dual-scroll-pane-height` (host height in px, set by `sync()`)
 
 Use `init()` / `destroy()` if you need to pause the effect without removing the
 element. `sync()` re-measures after DOM or size changes.

@@ -121,9 +121,7 @@ a sharp result). No second canvas is required.
 
 ## Attributes
 
-| Attribute | Default | Description |
-| --- | --- | --- |
-| `pixel` | `256` | Block size in CSS pixels. `0` is sharp. Clamped to `0` to `256`. |
+- **`pixel`** (default `256`) — block size in CSS pixels. `0` is sharp. Clamped to `0`–`256`.
 
 ## Programmatic API
 
@@ -249,7 +247,7 @@ Drive `pixel` from a bounded numeric control — more accessible than a bare ran
 input:
 
 ```html
-<cinq-spinbutton>
+<cinq-spinbutton data-spinbutton-step="32">
   <button type="button" name="decrease" tabindex="-1" aria-label="Decrease">
     −
   </button>
@@ -258,16 +256,16 @@ input:
     aria-label="Pixel size"
     aria-valuemin="0"
     aria-valuemax="256"
-    aria-valuenow="180"
+    aria-valuenow="160"
     aria-controls="pixelate-demo"
-    value="180"
+    value="160"
   />
   <button type="button" name="increase" tabindex="-1" aria-label="Increase">
     +
   </button>
 </cinq-spinbutton>
 
-<cinq-pixelate id="pixelate-demo" pixel="180">
+<cinq-pixelate id="pixelate-demo" pixel="160">
   <!-- img + canvas -->
 </cinq-pixelate>
 ```

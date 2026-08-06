@@ -7,6 +7,7 @@ import { sliderImage } from './images';
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <cinq-spinbutton
       id="docs-pixelate-spinbutton"
+      data-spinbutton-step="32"
       class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
     >
       <button
@@ -21,11 +22,11 @@ import { sliderImage } from './images';
 
       <input
         type="number"
-        value="180"
+        value="160"
         aria-label="Pixel size"
         aria-valuemin="0"
         aria-valuemax="256"
-        aria-valuenow="180"
+        aria-valuenow="160"
         aria-controls="docs-pixelate-spinbutton-demo"
         class="w-16 bg-transparent text-center font-mono text-base focus:outline-none"
       />
@@ -44,7 +45,7 @@ import { sliderImage } from './images';
     <p class="text-sm text-gray-600">
       <code>pixel</code>:{' '}
       <span id="docs-pixelate-spinbutton-value" class="font-mono font-medium text-gray-900">
-        180
+        160
       </span>
     </p>
   </div>
@@ -52,7 +53,7 @@ import { sliderImage } from './images';
   <cinq-pixelate
     id="docs-pixelate-spinbutton-demo"
     class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
-    pixel="180"
+    pixel="160"
   >
     <img
       src={sliderImage}
