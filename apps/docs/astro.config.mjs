@@ -32,6 +32,13 @@ export default defineConfig({
             { label: 'Calendar', slug: 'components/calendar' },
           ],
         },
+        {
+          label: 'Sandbox',
+          items: [
+            { label: 'Overview', slug: 'sandbox' },
+            { label: 'Pixelate', slug: 'sandbox/pixelate' },
+          ],
+        },
       ],
     }),
   ],

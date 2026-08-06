@@ -1,0 +1,1237 @@
+---
+import RegisterComponents from '../_components/RegisterComponents.astro';
+import PortalToBody from '../_components/PortalToBody.astro';
+
+const scrollImage = 'https://picsum.photos/seed/cinq-pixelate-scroll/960/540';
+const sliderImage = 'https://picsum.photos/seed/cinq-pixelate-slider/960/540';
+const hoverImage = 'https://picsum.photos/seed/cinq-pixelate-hover/960/540';
+const loadImage = 'https://picsum.photos/seed/cinq-pixelate-load/960/540';
+const pointerImage = 'https://picsum.photos/seed/cinq-pixelate-pointer/960/540';
+const ioImage = 'https://picsum.photos/seed/cinq-pixelate-io/960/540';
+const animateImage = 'https://picsum.photos/seed/cinq-pixelate-animate/960/540';
+const resizeImage = 'https://picsum.photos/seed/cinq-pixelate-resize/960/540';
+const modalImage = 'https://picsum.photos/seed/cinq-pixelate-modal/960/540';
+const drawerImage = 'https://picsum.photos/seed/cinq-pixelate-drawer/960/540';
+const gridImages = [
+  'https://picsum.photos/seed/cinq-pixelate-grid-a/640/360',
+  'https://picsum.photos/seed/cinq-pixelate-grid-b/640/360',
+  'https://picsum.photos/seed/cinq-pixelate-grid-c/640/360',
+];
+const sequenceImages = [
+  'https://picsum.photos/seed/cinq-pixelate-seq-a/960/540',
+  'https://picsum.photos/seed/cinq-pixelate-seq-b/960/540',
+  'https://picsum.photos/seed/cinq-pixelate-seq-c/960/540',
+];
+---
+
+<RegisterComponents />
+
+<style is:global>
+  cinq-pixelate {
+    display: block;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  cinq-pixelate img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  cinq-pixelate canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    image-rendering: pixelated;
+  }
+
+  cinq-pixelate[sharp] canvas {
+    image-rendering: auto;
+  }
+
+  [data-pixelate-card]:focus-within {
+    outline: 2px solid #6366f1;
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    cinq-pixelate img {
+      opacity: 1;
+    }
+
+    cinq-pixelate canvas {
+      display: none;
+    }
+  }
+
+  #docs-pixelate-modal dialog[open] {
+    opacity: 1;
+    transition:
+      opacity 700ms cubic-bezier(0.4, 0, 0.2, 1),
+      overlay 700ms allow-discrete;
+  }
+
+  #docs-pixelate-modal dialog[open].is-closing {
+    opacity: 0;
+  }
+
+  #docs-pixelate-modal dialog[open]::backdrop {
+    background-color: rgb(0 0 0 / 50%);
+    transition: background-color 700ms allow-discrete;
+  }
+
+  #docs-pixelate-modal dialog[open].is-closing::backdrop {
+    background-color: rgb(0 0 0 / 0%);
+  }
+
+  @starting-style {
+    #docs-pixelate-modal dialog[open] {
+      opacity: 0;
+    }
+
+    #docs-pixelate-modal dialog[open]::backdrop {
+      background-color: rgb(0 0 0 / 0%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #docs-pixelate-modal dialog[open],
+    #docs-pixelate-modal dialog[open]::backdrop {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="not-content flex flex-col gap-10">
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Scroll reveal</h3>
+        <p class="text-sm text-gray-600">
+          Tie <code>pixel</code> to scroll or visibility. Same effect, two drivers: a scroll
+          listener for a custom scrub curve, or <code>IntersectionObserver</code> when you
+          prefer the browser’s visibility ratio.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-4 rounded-xl border border-gray-200 p-5">
+        <div>
+          <h4 class="text-base font-semibold text-gray-900">Scroll scrub</h4>
+          <p class="text-sm text-gray-600">
+            A <code>scroll</code> listener reads <code>getBoundingClientRect()</code> and maps
+            position to <code>pixel</code>. Continuous while scrolling. Here the reveal finishes
+            when the host top crosses 40&nbsp;% of the viewport — before the photo is fully on
+            screen.
+          </p>
+        </div>
+
+        <div
+          class="flex min-h-[40vh] items-end rounded-xl bg-gradient-to-b from-slate-900 to-indigo-950 p-6 text-indigo-100"
+        >
+          <p class="text-sm text-indigo-200">Keep scrolling…</p>
+        </div>
+
+        <div class="h-[25vh]" aria-hidden="true"></div>
+
+        <cinq-pixelate
+          id="docs-pixelate-scroll"
+          class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+          pixel="256"
+        >
+          <img
+            src={scrollImage}
+            crossorigin="anonymous"
+            alt="Mountain landscape"
+            width="960"
+            height="540"
+          />
+          <canvas role="img" aria-label="Mountain landscape"></canvas>
+        </cinq-pixelate>
+
+        <p class="text-sm text-gray-600">
+          Scroll progress:{' '}
+          <span id="docs-pixelate-scroll-progress" class="font-mono font-medium text-gray-900">
+            0.00
+          </span>
+          {' · '}
+          <code>pixel</code>:{' '}
+          <span id="docs-pixelate-scroll-value" class="font-mono font-medium text-gray-900">
+            256
+          </span>
+        </p>
+
+        <div class="h-[30vh]" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex flex-col gap-4 rounded-xl border border-gray-200 p-5">
+        <div>
+          <h4 class="text-base font-semibold text-gray-900">Visibility ratio</h4>
+          <p class="text-sm text-gray-600">
+            <code>IntersectionObserver</code> maps <code>intersectionRatio</code> to{' '}
+            <code>pixel</code>. No scroll listener — updates only when visibility changes. Sharp
+            only once the host is fully in view (<code>ratio = 1</code>).
+          </p>
+        </div>
+
+        <div class="h-[30vh]" aria-hidden="true"></div>
+
+        <cinq-pixelate
+          id="docs-pixelate-io"
+          class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+          pixel="256"
+        >
+          <img
+            src={ioImage}
+            crossorigin="anonymous"
+            alt="Snowy peaks"
+            width="960"
+            height="540"
+          />
+          <canvas role="img" aria-label="Snowy peaks"></canvas>
+        </cinq-pixelate>
+
+        <p class="text-sm text-gray-600">
+          Intersection ratio:{' '}
+          <span id="docs-pixelate-io-value" class="font-mono font-medium text-gray-900">
+            0.00
+          </span>
+          {' · '}
+          <code>pixel</code>:{' '}
+          <span id="docs-pixelate-io-pixel" class="font-mono font-medium text-gray-900">
+            256
+          </span>
+        </p>
+
+        <div class="h-[20vh]" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex flex-col gap-4 rounded-xl border border-gray-200 p-5">
+        <div>
+          <h4 class="text-base font-semibold text-gray-900">Staggered scroll scrub</h4>
+          <p class="text-sm text-gray-600">
+            Same scroll-scrub technique with per-host offsets — useful for stacked galleries or
+            editorial sequences.
+          </p>
+        </div>
+
+        <div class="h-[20vh]" aria-hidden="true"></div>
+
+        <div class="mx-auto flex max-w-3xl flex-col gap-8">
+          {
+            sequenceImages.map((src, index) => (
+              <cinq-pixelate
+                id={`docs-pixelate-seq-${index}`}
+                class="overflow-hidden rounded-2xl shadow-lg"
+                data-pixelate-sequence
+                data-sequence-index={index}
+                pixel="256"
+              >
+                <img
+                  src={src}
+                  crossorigin="anonymous"
+                  alt={`Sequence photo ${index + 1}`}
+                  width="960"
+                  height="540"
+                />
+                <canvas role="img" aria-label={`Sequence photo ${index + 1}`} />
+              </cinq-pixelate>
+            ))
+          }
+        </div>
+
+        <div class="h-[25vh]" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Range input</h3>
+        <p class="text-sm text-gray-600">
+          Same component, controlled by a slider. Photo from{' '}
+          <a href="https://picsum.photos/" class="underline">Lorem Picsum</a>.
+        </p>
+      </div>
+
+      <label class="flex flex-col gap-2 text-sm text-gray-700">
+        <span>
+          <code>pixel</code> (<code>0</code> sharp → <code>256</code> blocky):{' '}
+          <span id="docs-pixelate-slider-value" class="font-mono font-medium text-gray-900">
+            180
+          </span>
+        </span>
+        <input
+          id="docs-pixelate-slider"
+          type="range"
+          min="0"
+          max="256"
+          value="180"
+          aria-controls="docs-pixelate-slider-demo"
+          class="w-full max-w-md"
+        />
+      </label>
+
+      <cinq-pixelate
+        id="docs-pixelate-slider-demo"
+        class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+        pixel="180"
+      >
+        <img
+          src={sliderImage}
+          crossorigin="anonymous"
+          alt="Coastal cliffs"
+          width="960"
+          height="540"
+        />
+        <canvas role="img" aria-label="Coastal cliffs"></canvas>
+      </cinq-pixelate>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Hover reveal</h3>
+        <p class="text-sm text-gray-600">
+          Portfolio-style card: blocky by default, smooth reveal on hover or keyboard
+          focus.
+        </p>
+      </div>
+
+      <div
+        id="docs-pixelate-hover-card"
+        data-pixelate-card
+        class="mx-auto max-w-sm cursor-pointer overflow-hidden rounded-2xl shadow-lg"
+        tabindex="0"
+      >
+        <cinq-pixelate id="docs-pixelate-hover" pixel="48">
+          <img
+            src={hoverImage}
+            crossorigin="anonymous"
+            alt="Forest path"
+            width="960"
+            height="540"
+          />
+          <canvas role="img" aria-label="Forest path"></canvas>
+        </cinq-pixelate>
+        <p class="bg-white px-4 py-3 text-sm font-medium text-gray-900">Hover or focus me</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Load reveal</h3>
+        <p class="text-sm text-gray-600">
+          Starts fully pixelated, then animates to sharp once the image has loaded.
+        </p>
+      </div>
+
+      <cinq-pixelate
+        id="docs-pixelate-load"
+        class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+        pixel="256"
+      >
+        <img
+          src={loadImage}
+          crossorigin="anonymous"
+          alt="Desert dunes"
+          width="960"
+          height="540"
+        />
+        <canvas role="img" aria-label="Desert dunes"></canvas>
+      </cinq-pixelate>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Pointer position</h3>
+        <p class="text-sm text-gray-600">
+          Move the cursor horizontally: left is sharp, right is blocky. The last{' '}
+          <code>pixel</code> value stays when the pointer leaves — like a horizontal scrub.
+        </p>
+      </div>
+
+      <cinq-pixelate
+        id="docs-pixelate-pointer"
+        class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+        pixel="256"
+      >
+        <img
+          src={pointerImage}
+          crossorigin="anonymous"
+          alt="City skyline at night"
+          width="960"
+          height="540"
+        />
+        <canvas role="img" aria-label="City skyline at night"></canvas>
+      </cinq-pixelate>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Animated toggle</h3>
+          <p class="text-sm text-gray-600">
+            Click toggles between blocky and sharp. <code>requestAnimationFrame</code> interpolates{' '}
+            <code>pixel</code>. Animation lives in your app, not the component. Plain{' '}
+            <code>&lt;button&gt;</code> — not a CINQ component.
+          </p>
+        </div>
+        <button
+          id="docs-pixelate-animate-btn"
+          type="button"
+          class="shrink-0 rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+        >
+          Reveal photo
+        </button>
+      </div>
+
+      <cinq-pixelate
+        id="docs-pixelate-animate"
+        class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+        pixel="256"
+      >
+        <img
+          src={animateImage}
+          crossorigin="anonymous"
+          alt="Autumn trees"
+          width="960"
+          height="540"
+        />
+        <canvas role="img" aria-label="Autumn trees"></canvas>
+      </cinq-pixelate>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Synchronized grid</h3>
+        <p class="text-sm text-gray-600">
+          One slider drives three hosts. A single controller, multiple instances.
+        </p>
+      </div>
+
+      <label class="flex flex-col gap-2 text-sm text-gray-700">
+        <span>
+          Shared <code>pixel</code>:{' '}
+          <span id="docs-pixelate-grid-value" class="font-mono font-medium text-gray-900">
+            120
+          </span>
+        </span>
+        <input
+          id="docs-pixelate-grid-slider"
+          type="range"
+          min="0"
+          max="256"
+          value="120"
+          class="w-full max-w-md"
+        />
+      </label>
+
+      <div class="grid gap-4 sm:grid-cols-3">
+        {
+          gridImages.map((src, index) => (
+            <cinq-pixelate
+              id={`docs-pixelate-grid-${index}`}
+              class="overflow-hidden rounded-xl shadow"
+              data-pixelate-grid
+              pixel="120"
+            >
+              <img
+                src={src}
+                crossorigin="anonymous"
+                alt={`Grid photo ${index + 1}`}
+                width="640"
+                height="360"
+              />
+              <canvas role="img" aria-label={`Grid photo ${index + 1}`} />
+            </cinq-pixelate>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Layout resize</h3>
+          <p class="text-sm text-gray-600">
+            Toggle container width. The internal <code>ResizeObserver</code> resizes the buffer.
+            Call <code>sync()</code> after abrupt layout changes if needed.
+          </p>
+        </div>
+        <div class="flex shrink-0 gap-2">
+          <button
+            id="docs-pixelate-resize-wide"
+            type="button"
+            class="rounded-lg bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+          >
+            Wide
+          </button>
+          <button
+            id="docs-pixelate-resize-narrow"
+            type="button"
+            class="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
+          >
+            Narrow
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="docs-pixelate-resize-shell"
+        class="mx-auto w-full max-w-3xl transition-[max-width] duration-300"
+      >
+        <cinq-pixelate
+          id="docs-pixelate-resize"
+          class="overflow-hidden rounded-2xl shadow-lg"
+          pixel="32"
+        >
+          <img
+            src={resizeImage}
+            crossorigin="anonymous"
+            alt="Lake reflection"
+            width="960"
+            height="540"
+          />
+          <canvas role="img" aria-label="Lake reflection" />
+        </cinq-pixelate>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">In a modal</h3>
+          <p class="text-sm text-gray-600">
+            Uses <code>cinq-modal</code> and <code>cinq-modal-button</code>. Reveal on{' '}
+            <code>modal-open</code>. On close (button, backdrop, or Escape), intercept before the
+            dialog closes, pixelate and fade out, then call <code>close()</code>.
+          </p>
+        </div>
+        <cinq-modal-button class="block shrink-0">
+          <button
+            type="button"
+            class="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+            aria-controls="docs-pixelate-modal"
+            aria-pressed="false"
+          >
+            Open photo
+          </button>
+        </cinq-modal-button>
+      </div>
+
+      <cinq-modal id="docs-pixelate-modal">
+        <dialog
+          class="fixed left-1/2 top-1/2 w-[min(92vw,40rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white p-0 opacity-0 shadow-2xl"
+        >
+          <cinq-pixelate
+            id="docs-pixelate-modal-host"
+            pixel="256"
+          >
+            <img
+              src={modalImage}
+              crossorigin="anonymous"
+              alt="Northern lights"
+              width="960"
+              height="540"
+            />
+            <canvas role="img" aria-label="Northern lights" />
+          </cinq-pixelate>
+          <div class="flex justify-end border-t border-gray-100 p-4">
+            <cinq-modal-button class="block">
+              <button
+                type="button"
+                class="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200"
+                aria-controls="docs-pixelate-modal"
+                aria-pressed="false"
+              >
+                Close
+              </button>
+            </cinq-modal-button>
+          </div>
+        </dialog>
+      </cinq-modal>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">In a drawer</h3>
+          <p class="text-sm text-gray-600">
+            Uses <code>cinq-drawer</code> and <code>cinq-drawer-button</code>. Same pattern with{' '}
+            <code>drawer-open</code> / <code>drawer-toggle</code>: reveal on open, pixelate on
+            close (button or backdrop).
+          </p>
+        </div>
+        <cinq-drawer-button class="block shrink-0">
+          <button
+            type="button"
+            class="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+            aria-controls="docs-pixelate-drawer"
+            aria-expanded="false"
+          >
+            Open drawer
+          </button>
+        </cinq-drawer-button>
+      </div>
+
+      <cinq-drawer id="docs-pixelate-drawer" class="group">
+        <div
+          data-dom="overlay"
+          class="pointer-events-none fixed inset-0 z-[2147483646] bg-black/50 opacity-0 transition-opacity group-[[open]]:pointer-events-auto group-[[open]]:opacity-100"
+        />
+        <div
+          role="dialog"
+          aria-label="Photo drawer"
+          class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md translate-x-full bg-white shadow-2xl transition-transform duration-300 group-[[open]]:translate-x-0"
+        >
+          <div class="flex h-full flex-col">
+            <header class="flex items-center justify-between border-b px-4 py-3">
+              <h2 class="text-base font-semibold text-gray-900">Gallery</h2>
+              <cinq-drawer-button class="block">
+                <button
+                  type="button"
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+                  aria-controls="docs-pixelate-drawer"
+                  aria-expanded="false"
+                >
+                  ✕
+                </button>
+              </cinq-drawer-button>
+            </header>
+            <div class="flex-1 overflow-y-auto p-4">
+              <cinq-pixelate
+                id="docs-pixelate-drawer-host"
+                class="overflow-hidden rounded-xl shadow"
+                pixel="256"
+              >
+                <img
+                  src={drawerImage}
+                  crossorigin="anonymous"
+                  alt="Misty valley"
+                  width="960"
+                  height="540"
+                />
+                <canvas role="img" aria-label="Misty valley" />
+              </cinq-pixelate>
+            </div>
+          </div>
+        </div>
+      </cinq-drawer>
+
+      <PortalToBody selector="#docs-pixelate-drawer" />
+    </div>
+  </section>
+</div>
+
+<script>
+  import type { Pixelate } from '@agencecinq/pixelate';
+  import { PIXEL_MAX, PIXEL_MIN } from '@agencecinq/pixelate';
+  import { EVENTS } from '@agencecinq/utils';
+
+  const SCROLL_END = 0.4;
+  const HOVER_PIXEL = 48;
+  const HOVER_ANIMATE_MS = 450;
+  const ANIMATE_MS = 700;
+  const LOAD_ANIMATE_MS = 900;
+  const SEQUENCE_STAGGER = 0.12;
+  const animationTokens = new WeakMap();
+
+  function asPixelate(element) {
+    return element instanceof HTMLElement ? /** @type {Pixelate} */ (element) : null;
+  }
+
+  function setPixel(host, pixel) {
+    if (!(host instanceof HTMLElement)) {
+      return;
+    }
+
+    const value = Math.round(
+      Math.min(PIXEL_MAX, Math.max(PIXEL_MIN, pixel)),
+    );
+
+    host.setAttribute('pixel', String(value));
+    asPixelate(host)?.sync();
+  }
+
+  function readPixel(host) {
+    if (!(host instanceof HTMLElement)) {
+      return PIXEL_MAX;
+    }
+
+    return Number(host.getAttribute('pixel') ?? PIXEL_MAX);
+  }
+
+  function isSharp(host) {
+    return readPixel(host) <= 1;
+  }
+
+  function syncAnimateBtnLabel(host, button) {
+    if (!(host instanceof HTMLElement) || !(button instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    button.textContent = isSharp(host) ? 'Pixelate' : 'Reveal photo';
+  }
+
+  function viewportProgress(element) {
+    const { top, bottom } = element.getBoundingClientRect();
+    const height = window.innerHeight;
+
+    if (bottom <= 0 || top <= height * SCROLL_END) {
+      return 1;
+    }
+
+    if (top >= height) {
+      return 0;
+    }
+
+    return 1 - (top - height * SCROLL_END) / (height - height * SCROLL_END);
+  }
+
+  function pixelFromProgress(progress) {
+    return Math.round(PIXEL_MAX - progress * (PIXEL_MAX - PIXEL_MIN));
+  }
+
+  function sequenceProgress(element, index) {
+    const { top, bottom } = element.getBoundingClientRect();
+    const height = window.innerHeight;
+    const start = index * SEQUENCE_STAGGER;
+    const end = start + 0.45;
+
+    if (bottom <= 0 || top <= height * (1 - end)) {
+      return 1;
+    }
+
+    if (top >= height * (1 - start)) {
+      return 0;
+    }
+
+    const range = height * (end - start);
+    const traveled = height * (1 - start) - top;
+
+    return Math.min(1, Math.max(0, traveled / range));
+  }
+
+  function wait(ms) {
+    return new Promise((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+  }
+
+  function waitForOverlayFade(element, duration) {
+    if (!(element instanceof HTMLElement)) {
+      return wait(duration);
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return wait(0);
+    }
+
+    return new Promise((resolve) => {
+      const timeout = window.setTimeout(() => {
+        element.removeEventListener('transitionend', onTransitionEnd);
+        resolve(undefined);
+      }, duration + 50);
+
+      function onTransitionEnd(event) {
+        if (event.target !== element) {
+          return;
+        }
+
+        window.clearTimeout(timeout);
+        element.removeEventListener('transitionend', onTransitionEnd);
+        resolve(undefined);
+      }
+
+      element.addEventListener('transitionend', onTransitionEnd);
+    });
+  }
+
+  function animatePixel(host, from, to, duration) {
+    if (!(host instanceof HTMLElement)) {
+      return Promise.resolve();
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setPixel(host, to);
+      return Promise.resolve();
+    }
+
+    const token = Symbol();
+    animationTokens.set(host, token);
+    const start = performance.now();
+
+    return new Promise((resolve) => {
+      function frame(now) {
+        if (animationTokens.get(host) !== token) {
+          resolve(undefined);
+          return;
+        }
+
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - (1 - t) ** 3;
+        setPixel(host, from + (to - from) * eased);
+
+        if (t < 1) {
+          requestAnimationFrame(frame);
+          return;
+        }
+
+        resolve(undefined);
+      }
+
+      requestAnimationFrame(frame);
+    });
+  }
+
+  function bindPixelatePlayground() {
+    const scrollHost = document.querySelector('#docs-pixelate-scroll');
+    const scrollProgress = document.querySelector('#docs-pixelate-scroll-progress');
+    const scrollValue = document.querySelector('#docs-pixelate-scroll-value');
+    const slider = document.querySelector('#docs-pixelate-slider');
+    const sliderHost = document.querySelector('#docs-pixelate-slider-demo');
+    const sliderValue = document.querySelector('#docs-pixelate-slider-value');
+    const hoverCard = document.querySelector('#docs-pixelate-hover-card');
+    const hoverHost = document.querySelector('#docs-pixelate-hover');
+    const loadHost = document.querySelector('#docs-pixelate-load');
+    const pointerHost = document.querySelector('#docs-pixelate-pointer');
+    const ioHost = document.querySelector('#docs-pixelate-io');
+    const ioValue = document.querySelector('#docs-pixelate-io-value');
+    const ioPixel = document.querySelector('#docs-pixelate-io-pixel');
+    const animateBtn = document.querySelector('#docs-pixelate-animate-btn');
+    const animateHost = document.querySelector('#docs-pixelate-animate');
+    const gridSlider = document.querySelector('#docs-pixelate-grid-slider');
+    const gridValue = document.querySelector('#docs-pixelate-grid-value');
+    const gridHosts = document.querySelectorAll('[data-pixelate-grid]');
+    const resizeShell = document.querySelector('#docs-pixelate-resize-shell');
+    const resizeHost = document.querySelector('#docs-pixelate-resize');
+    const resizeWide = document.querySelector('#docs-pixelate-resize-wide');
+    const resizeNarrow = document.querySelector('#docs-pixelate-resize-narrow');
+    const sequenceHosts = document.querySelectorAll('[data-pixelate-sequence]');
+    const modalHost = document.querySelector('#docs-pixelate-modal-host');
+    const drawerHost = document.querySelector('#docs-pixelate-drawer-host');
+
+    function bindOverlayReveal(host, toggleEvent, openEvent, closeEvent, overlayId) {
+      if (!(host instanceof HTMLElement)) {
+        return;
+      }
+
+      let closing = false;
+
+      function overlayElement() {
+        return document.getElementById(overlayId);
+      }
+
+      function isOverlayOpen() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement)) {
+          return false;
+        }
+
+        if (element.tagName === 'CINQ-MODAL') {
+          const dialog = element.querySelector('dialog');
+
+          return Boolean(dialog?.open);
+        }
+
+        if (element.tagName === 'CINQ-DRAWER') {
+          return element.hasAttribute('open');
+        }
+
+        return false;
+      }
+
+      function modalDialog() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement) || element.tagName !== 'CINQ-MODAL') {
+          return null;
+        }
+
+        const dialog = element.querySelector('dialog');
+
+        return dialog instanceof HTMLDialogElement ? dialog : null;
+      }
+
+      function closeOverlay() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement)) {
+          return;
+        }
+
+        if (
+          element.tagName === 'CINQ-MODAL' &&
+          'close' in element &&
+          typeof element.close === 'function'
+        ) {
+          const dialog = modalDialog();
+          dialog?.classList.remove('is-closing');
+          element.close();
+          return;
+        }
+
+        if (element.tagName === 'CINQ-DRAWER') {
+          element.removeAttribute('open');
+        }
+      }
+
+      function runCloseAnimation() {
+        if (closing || !isOverlayOpen()) {
+          return Promise.resolve();
+        }
+
+        closing = true;
+        const dialog = modalDialog();
+        const from = readPixel(host);
+        const pixelAnimation = animatePixel(host, from, PIXEL_MAX, ANIMATE_MS);
+
+        if (dialog) {
+          dialog.classList.remove('is-closing');
+          void dialog.offsetWidth;
+          dialog.classList.add('is-closing');
+        }
+
+        const overlayAnimation = dialog
+          ? waitForOverlayFade(dialog, ANIMATE_MS)
+          : Promise.resolve();
+
+        return Promise.all([pixelAnimation, overlayAnimation])
+          .finally(() => {
+            closing = false;
+          })
+          .then(() => {
+            closeOverlay();
+          });
+      }
+
+      function requestClose(event) {
+        if (event) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+
+        void runCloseAnimation();
+      }
+
+      document.documentElement.addEventListener(
+        toggleEvent,
+        (event) => {
+          if (!(event instanceof CustomEvent)) {
+            return;
+          }
+
+          const detail = event.detail;
+
+          if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+            return;
+          }
+
+          if (!isOverlayOpen()) {
+            return;
+          }
+
+          requestClose(event);
+        },
+        { capture: true },
+      );
+
+      const overlay = overlayElement();
+
+      if (overlay instanceof HTMLElement && overlay.tagName === 'CINQ-MODAL') {
+        const dialog = overlay.querySelector('dialog');
+
+        dialog?.addEventListener('cancel', (event) => {
+          if (!isOverlayOpen()) {
+            return;
+          }
+
+          requestClose(event);
+        });
+
+        dialog?.addEventListener(
+          'click',
+          (event) => {
+            if (event.target !== event.currentTarget || !isOverlayOpen()) {
+              return;
+            }
+
+            requestClose(event);
+          },
+          { capture: true },
+        );
+      }
+
+      if (overlay instanceof HTMLElement && overlay.tagName === 'CINQ-DRAWER') {
+        const backdrop = overlay.querySelector('[data-dom="overlay"]');
+
+        backdrop?.addEventListener(
+          'click',
+          (event) => {
+            if (!isOverlayOpen()) {
+              return;
+            }
+
+            requestClose(event);
+          },
+          { capture: true },
+        );
+      }
+
+      document.documentElement.addEventListener(openEvent, (event) => {
+        if (!(event instanceof CustomEvent)) {
+          return;
+        }
+
+        const detail = event.detail;
+
+        if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+          return;
+        }
+
+        modalDialog()?.classList.remove('is-closing');
+        setPixel(host, PIXEL_MAX);
+        requestAnimationFrame(() => {
+          animatePixel(host, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
+        });
+      });
+
+      document.documentElement.addEventListener(closeEvent, (event) => {
+        if (!(event instanceof CustomEvent)) {
+          return;
+        }
+
+        const detail = event.detail;
+
+        if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+          return;
+        }
+
+        setPixel(host, PIXEL_MAX);
+      });
+    }
+
+    bindOverlayReveal(
+      modalHost,
+      EVENTS.MODAL_TOGGLE,
+      EVENTS.MODAL_OPEN,
+      EVENTS.MODAL_CLOSE,
+      'docs-pixelate-modal',
+    );
+    bindOverlayReveal(
+      drawerHost,
+      EVENTS.DRAWER_TOGGLE,
+      EVENTS.DRAWER_OPEN,
+      EVENTS.DRAWER_CLOSE,
+      'docs-pixelate-drawer',
+    );
+
+    function syncScrollPixelate() {
+      if (!(scrollHost instanceof HTMLElement)) {
+        return;
+      }
+
+      const progress = viewportProgress(scrollHost);
+      const pixel = pixelFromProgress(progress);
+      setPixel(scrollHost, pixel);
+
+      if (scrollProgress) {
+        scrollProgress.textContent = progress.toFixed(2);
+      }
+
+      if (scrollValue) {
+        scrollValue.textContent = String(pixel);
+      }
+    }
+
+    function syncSliderPixelate() {
+      if (!(sliderHost instanceof HTMLElement) || !(slider instanceof HTMLInputElement)) {
+        return;
+      }
+
+      setPixel(sliderHost, Number(slider.value));
+
+      if (sliderValue) {
+        sliderValue.textContent = slider.value;
+      }
+    }
+
+    function syncGridPixelate() {
+      if (!(gridSlider instanceof HTMLInputElement)) {
+        return;
+      }
+
+      const pixel = Number(gridSlider.value);
+
+      gridHosts.forEach((host) => setPixel(host, pixel));
+
+      if (gridValue) {
+        gridValue.textContent = gridSlider.value;
+      }
+    }
+
+    function syncSequencePixelate() {
+      sequenceHosts.forEach((host) => {
+        if (!(host instanceof HTMLElement)) {
+          return;
+        }
+
+        const index = Number(host.dataset.sequenceIndex ?? 0);
+        setPixel(host, pixelFromProgress(sequenceProgress(host, index)));
+      });
+    }
+
+    function bindLoadReveal() {
+      if (!(loadHost instanceof HTMLElement)) {
+        return;
+      }
+
+      const img = loadHost.querySelector('img');
+
+      function reveal() {
+        animatePixel(loadHost, PIXEL_MAX, PIXEL_MIN, LOAD_ANIMATE_MS);
+      }
+
+      if (img instanceof HTMLImageElement && img.complete) {
+        reveal();
+        return;
+      }
+
+      img?.addEventListener('load', reveal, { once: true });
+    }
+
+    window.addEventListener('scroll', syncScrollPixelate, { passive: true });
+    window.addEventListener('resize', syncScrollPixelate, { passive: true });
+    syncScrollPixelate();
+
+    slider?.addEventListener('input', syncSliderPixelate);
+    slider?.addEventListener('change', syncSliderPixelate);
+    syncSliderPixelate();
+
+    hoverCard?.addEventListener('mouseenter', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), PIXEL_MIN, HOVER_ANIMATE_MS);
+      }
+    });
+    hoverCard?.addEventListener('mouseleave', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), HOVER_PIXEL, HOVER_ANIMATE_MS);
+      }
+    });
+    hoverCard?.addEventListener('focusin', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), PIXEL_MIN, HOVER_ANIMATE_MS);
+      }
+    });
+    hoverCard?.addEventListener('focusout', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), HOVER_PIXEL, HOVER_ANIMATE_MS);
+      }
+    });
+
+    bindLoadReveal();
+
+    pointerHost?.addEventListener('mousemove', (event) => {
+      if (!(pointerHost instanceof HTMLElement) || !(event instanceof MouseEvent)) {
+        return;
+      }
+
+      const rect = pointerHost.getBoundingClientRect();
+      const ratio = (event.clientX - rect.left) / rect.width;
+      setPixel(pointerHost, (1 - ratio) * PIXEL_MAX);
+    });
+
+    if (ioHost instanceof HTMLElement && 'IntersectionObserver' in window) {
+      const thresholds = Array.from({ length: 21 }, (_, index) => index / 20);
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!(entry.target instanceof HTMLElement)) {
+              continue;
+            }
+
+            const ratio = entry.intersectionRatio;
+            const pixel = Math.round((1 - ratio) * PIXEL_MAX);
+            setPixel(entry.target, pixel);
+
+            if (ioValue) {
+              ioValue.textContent = ratio.toFixed(2);
+            }
+
+            if (ioPixel) {
+              ioPixel.textContent = String(pixel);
+            }
+          }
+        },
+        { threshold: thresholds },
+      );
+
+      observer.observe(ioHost);
+    }
+
+    animateBtn?.addEventListener('click', () => {
+      if (!(animateHost instanceof HTMLElement) || !(animateBtn instanceof HTMLButtonElement)) {
+        return;
+      }
+
+      const from = readPixel(animateHost);
+      const to = isSharp(animateHost) ? PIXEL_MAX : PIXEL_MIN;
+
+      void animatePixel(animateHost, from, to, ANIMATE_MS).then(() => {
+        syncAnimateBtnLabel(animateHost, animateBtn);
+      });
+    });
+
+    syncAnimateBtnLabel(animateHost, animateBtn);
+
+    gridSlider?.addEventListener('input', syncGridPixelate);
+    gridSlider?.addEventListener('change', syncGridPixelate);
+    syncGridPixelate();
+
+    resizeWide?.addEventListener('click', () => {
+      resizeShell?.classList.remove('max-w-md');
+      resizeShell?.classList.add('max-w-3xl');
+      requestAnimationFrame(() => asPixelate(resizeHost)?.sync());
+    });
+    resizeNarrow?.addEventListener('click', () => {
+      resizeShell?.classList.remove('max-w-3xl');
+      resizeShell?.classList.add('max-w-md');
+      requestAnimationFrame(() => asPixelate(resizeHost)?.sync());
+    });
+
+    window.addEventListener('scroll', syncSequencePixelate, { passive: true });
+    window.addEventListener('resize', syncSequencePixelate, { passive: true });
+    syncSequencePixelate();
+  }
+
+  customElements.whenDefined('cinq-pixelate').then(bindPixelatePlayground);
+</script>

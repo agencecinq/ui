@@ -1,0 +1,38 @@
+{
+  "name": "@agencecinq/pixelate",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Canvas pixelation for wrapped images — drive block size via the pixel attribute (sandbox).",
+  "type": "module",
+  "license": "MIT",
+  "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agencecinq/ui.git",
+    "directory": "packages/pixelate"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "@agencecinq/utils": "*"
+  },
+  "devDependencies": {
+    "@agencecinq/utils": "workspace:*",
+    "vite": "^8.2.0",
+    "vite-plugin-dts": "^5.0.3"
+  }
+}

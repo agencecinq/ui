@@ -61,17 +61,27 @@ import RegisterComponents from './_components/RegisterComponents.astro';
   </Card>
 </CardGrid>
 
+## Sandbox
+
+<CardGrid stagger>
+  <Card title="Pixelate" icon="rocket">
+    Attribute-driven canvas reveal: drive `pixel` from scroll or a slider.
+
+    [Try the sandbox](sandbox/)
+  </Card>
+</CardGrid>
+
 ## Philosophy
 
 - **Web Components first**: import once, drop the markup, the browser instantiates it.
-- **HTML is the source of truth**: you write the markup — native `<dialog>`, `<input>`, `role="tab"`, `aria-expanded`, and the rest. Each package wires interactivity to that DOM; it extends HTML, it does not generate structure or silently replace semantics.
+- **HTML is the source of truth**: you write the markup (native `<dialog>`, `<input>`, `role="tab"`, `aria-expanded`, and the rest). Each package wires interactivity to that DOM; it extends HTML, it does not generate structure or silently replace semantics.
 - **Event-driven**: integrate with your app by listening to events and dispatching intents.
 - **WAI‑ARIA aligned**: keyboard navigation and ARIA states follow APG patterns.
 
 ## Conventions
 
-- **`$` prefix**: a property or local named with a leading `$` (e.g. `$button`, `$input`) holds a DOM node — an `HTMLElement` (or a more specific subtype such as `HTMLButtonElement`). Plain names are reserved for values, IDs, and non-DOM state.
+- **`$` prefix**: a property or local named with a leading `$` (e.g. `$button`, `$input`) holds a DOM node: an `HTMLElement` (or a more specific subtype such as `HTMLButtonElement`). Plain names are reserved for values, IDs, and non-DOM state.
 
-Interactive examples use **AD&D 2nd Edition** flavour — ability scores, spell slots, bestiary entries, and dungeon delves — so demos read like a campaign sheet rather than a generic web app.
+Interactive examples use **AD&D 2nd Edition** flavour: ability scores, spell slots, bestiary entries, and dungeon delves, so demos read like a campaign sheet rather than a generic web app.
 
 <RegisterComponents />

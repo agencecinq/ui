@@ -1,0 +1,452 @@
+---
+title: Pixelate
+description: Attribute-driven canvas pixelation for wrapped images (sandbox).
+---
+
+import PixelatePlayground from '../_components/PixelatePlayground.astro';
+
+:::note[Sandbox]
+Experimental demo, not published on npm. API may change or move.
+:::
+
+`<cinq-pixelate>` wraps an `<img>` and a sibling `<canvas>`. It reads
+`pixel` (`0` to `256`) and renders the image at that block size.
+**Scroll, sliders, and animations stay in your app.** The component only
+reflects the attribute.
+
+`0` is sharp. Higher values are blockier (`256` is the coarsest).
+
+## Markup
+
+```html
+<cinq-pixelate pixel="256">
+  <img
+    src="https://picsum.photos/seed/picsum/960/540"
+    crossorigin="anonymous"
+    alt="Mountain landscape"
+    width="960"
+    height="540"
+  />
+  <canvas role="img" aria-label="Mountain landscape"></canvas>
+</cinq-pixelate>
+```
+
+Layout and stacking are your responsibility. Give the host a size (e.g. `aspect-ratio`). Stack `<img>` and `<canvas>` with
+the same `inset: 0` box. Keep the image at `opacity: 0` (source only). Use
+`object-fit: cover` on the `<img>` for the reduced-motion fallback (canvas crop is always centered cover).
+
+```css
+cinq-pixelate {
+  display: block;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+}
+
+cinq-pixelate img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+cinq-pixelate canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  image-rendering: pixelated;
+}
+
+cinq-pixelate[sharp] canvas {
+  image-rendering: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  cinq-pixelate img {
+    opacity: 1;
+  }
+
+  cinq-pixelate canvas {
+    display: none;
+  }
+}
+```
+
+When `prefers-reduced-motion: reduce` is set, hide the canvas and show the
+`<img>` in your CSS. The component does not read that media query. Motion
+preferences stay in the stylesheet alongside layout.
+
+## Rendering
+
+The pixelation effect splits work between JS and CSS:
+
+1. **JS** reads the `<img>` and crops with centered **cover**, then draws into the `<canvas>` bitmap.
+2. **CSS** upscales that bitmap to the host size.
+
+When `pixel` is above `1`, the canvas buffer is **smaller** than the display
+box (one bitmap pixel ≈ one block). Stretch it with `width` / `height: 100%`
+and blocky upscale via `image-rendering: pixelated` on the canvas:
+
+```css
+cinq-pixelate canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+cinq-pixelate[sharp] canvas {
+  image-rendering: auto;
+}
+```
+
+At `0` or `1`, the buffer matches the display size (× `devicePixelRatio`
+for a sharp result). The host gets a reflected `sharp` attribute in that case.
+Use it in CSS to switch `image-rendering` to `auto`.
+
+No second canvas or offscreen blit is required: CSS handles the upscale.
+
+## Attributes
+
+| Attribute | Default | Description |
+| --- | --- | --- |
+| `pixel` | `256` | Block size in CSS pixels. `0` is sharp. Clamped to `0` to `256`. |
+| `sharp` | — | Reflected when `pixel` is `0` or `1`. Hook for CSS (e.g. `image-rendering: auto`). |
+
+## Scroll reveal
+
+Map scroll or visibility to `pixel`. Both patterns appear in the live playground
+under **Scroll reveal** — same effect, different drivers.
+
+### Scroll scrub
+
+Use a scroll listener when you want a **custom curve** tied to scroll position.
+`getBoundingClientRect()` gives continuous updates while the user scrolls. Tune
+when the reveal finishes (here: when the host top crosses 40 % of the viewport):
+
+```js
+import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
+
+const host = document.querySelector("cinq-pixelate")
+const end = 0.4 // finish revealing when top crosses 40% of viewport height
+
+function viewportProgress(element) {
+  const { top, bottom } = element.getBoundingClientRect()
+  const height = window.innerHeight
+
+  if (bottom <= 0 || top <= height * end) return 1
+  if (top >= height) return 0
+
+  return 1 - (top - height * end) / (height - height * end)
+}
+
+window.addEventListener(
+  "scroll",
+  () => {
+    const progress = viewportProgress(host)
+    const pixel = Math.round(
+      PIXEL_MAX - progress * (PIXEL_MAX - PIXEL_MIN),
+    )
+    host.setAttribute("pixel", String(pixel))
+    host.sync()
+  },
+  { passive: true },
+)
+```
+
+### Visibility ratio
+
+Use `IntersectionObserver` when you prefer the browser’s **visibility ratio** —
+no scroll listener, updates only when intersection changes. Sharp when the host
+is fully in view (`intersectionRatio === 1`):
+
+```js
+import { PIXEL_MAX } from "@agencecinq/pixelate"
+
+const observer = new IntersectionObserver(
+  ([entry]) => {
+    host.setAttribute(
+      "pixel",
+      String(Math.round((1 - entry.intersectionRatio) * PIXEL_MAX)),
+    )
+    host.sync()
+  },
+  { threshold: [0, 0.25, 0.5, 0.75, 1] },
+)
+
+observer.observe(host)
+```
+
+### Staggered scroll scrub
+
+Same scroll-scrub helper with per-host offsets — for stacked galleries or
+editorial sequences. See the playground’s third block in **Scroll reveal**.
+
+## Drive from a range input
+
+```html
+<label>
+  Pixel size
+  <input
+    type="range"
+    min="0"
+    max="256"
+    value="256"
+    aria-controls="pixelate-demo"
+  />
+</label>
+
+<cinq-pixelate id="pixelate-demo" pixel="256">
+  <!-- img + canvas -->
+</cinq-pixelate>
+```
+
+```js
+const host = document.querySelector("#pixelate-demo")
+const slider = document.querySelector('input[aria-controls="pixelate-demo"]')
+
+slider.addEventListener("input", () => {
+  host.setAttribute("pixel", slider.value)
+  host.sync()
+})
+```
+
+## More patterns
+
+The live playground below includes every example. Snippets for each driver.
+When a demo uses other CINQ UI components, it is noted. Everything else (buttons,
+sliders, scroll listeners) is plain HTML or your app code.
+
+### Hover reveal
+
+Animate `pixel` on enter/leave so the reveal feels smooth (easing lives in your app):
+
+```js
+const host = document.querySelector("cinq-pixelate")
+const card = host.closest("[data-pixelate-card]")
+const HOVER_PIXEL = 48
+const HOVER_MS = 450
+
+function readPixel(host) {
+  return Number(host.getAttribute("pixel") ?? 256)
+}
+
+function animatePixel(host, from, to, duration) {
+  const start = performance.now()
+
+  function frame(now) {
+    const t = Math.min(1, (now - start) / duration)
+    const eased = 1 - (1 - t) ** 3
+    host.setAttribute("pixel", String(Math.round(from + (to - from) * eased)))
+    host.sync()
+    if (t < 1) requestAnimationFrame(frame)
+  }
+
+  requestAnimationFrame(frame)
+}
+
+card.addEventListener("mouseenter", () => {
+  animatePixel(host, readPixel(host), 0, HOVER_MS)
+})
+card.addEventListener("mouseleave", () => {
+  animatePixel(host, readPixel(host), HOVER_PIXEL, HOVER_MS)
+})
+```
+
+### Load reveal
+
+```js
+const host = document.querySelector("cinq-pixelate")
+const img = host.querySelector("img")
+
+function reveal() {
+  animatePixel(host, 256, 0, 900) // your rAF helper
+}
+
+if (img.complete) reveal()
+else img.addEventListener("load", reveal, { once: true })
+```
+
+### Pointer position
+
+Horizontal scrub: map cursor position to `pixel`. The value persists when the
+pointer leaves the host.
+
+```js
+host.addEventListener("mousemove", (event) => {
+  const { left, width } = host.getBoundingClientRect()
+  const ratio = (event.clientX - left) / width
+  host.setAttribute("pixel", String(Math.round((1 - ratio) * 256)))
+  host.sync()
+})
+```
+
+### Animated toggle (`requestAnimationFrame`)
+
+Plain `<button>` for the trigger — not a CINQ component. Only
+`<cinq-pixelate>` is from this sandbox.
+
+Click alternates between blocky and sharp. Animation stays in your app. The component only
+reflects `pixel`:
+
+```js
+function readPixel(host) {
+  return Number(host.getAttribute("pixel") ?? 256)
+}
+
+function isSharp(host) {
+  return readPixel(host) <= 1
+}
+
+function animatePixel(host, from, to, duration) {
+  const start = performance.now()
+
+  return new Promise((resolve) => {
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration)
+      const eased = 1 - (1 - t) ** 3
+      host.setAttribute("pixel", String(Math.round(from + (to - from) * eased)))
+      host.sync()
+      if (t < 1) requestAnimationFrame(frame)
+      else resolve()
+    }
+
+    requestAnimationFrame(frame)
+  })
+}
+
+button.addEventListener("click", async () => {
+  const from = readPixel(host)
+  const to = isSharp(host) ? 256 : 0
+  await animatePixel(host, from, to, 700)
+  button.textContent = isSharp(host) ? "Pixelate" : "Reveal photo"
+})
+```
+
+### Multiple hosts, one controller
+
+```js
+const hosts = document.querySelectorAll("[data-pixelate-grid]")
+
+slider.addEventListener("input", () => {
+  hosts.forEach((host) => {
+    host.setAttribute("pixel", slider.value)
+    host.sync()
+  })
+})
+```
+
+### Layout resize
+
+The component observes host size. After abrupt layout changes, call `sync()`:
+
+```js
+shell.classList.toggle("max-w-md")
+requestAnimationFrame(() => host.sync())
+```
+
+### Modal or drawer
+
+**CINQ UI:** [`cinq-modal`](../components/modal/) and [`cinq-modal-button`](../components/modal/),
+or [`cinq-drawer`](../components/drawer/) and [`cinq-drawer-button`](../components/drawer/) for
+markup and open/close.
+
+**Open** — listen for `modal-open` / `drawer-open`, then reveal:
+
+```js
+import { EVENTS } from "@agencecinq/utils"
+
+document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
+  if (event.detail.modal !== "photo-modal") return
+  host.setAttribute("pixel", "256")
+  host.sync()
+  animatePixel(host, 256, 0, 700)
+})
+```
+
+**Close** — `modal-close` / `drawer-close` fire after the overlay is already gone, so
+animate before close. Intercept `modal-toggle` / `drawer-toggle` in capture when the overlay
+is open (same for backdrop click on the dialog, `cancel` on Escape, or drawer overlay),
+pixelate, fade the dialog and backdrop out, then call `close()` (modal) or
+`removeAttribute("open")` (drawer):
+
+```js
+import { EVENTS } from "@agencecinq/utils"
+
+const modal = document.getElementById("photo-modal")
+const dialog = modal.querySelector("dialog")
+
+function runCloseAnimation() {
+  dialog.classList.add("is-closing")
+
+  return Promise.all([
+    animatePixel(host, readPixel(host), 256, 700),
+    waitForOverlayFade(dialog, 700),
+  ]).then(() => {
+    dialog.classList.remove("is-closing")
+    modal.close()
+  })
+}
+
+document.documentElement.addEventListener(
+  EVENTS.MODAL_TOGGLE,
+  (event) => {
+    if (event.detail.modal !== "photo-modal") return
+    if (!dialog?.open) return
+
+    event.stopImmediatePropagation()
+    void runCloseAnimation()
+  },
+  { capture: true },
+)
+
+dialog.addEventListener("cancel", (event) => {
+  if (!dialog.open) return
+  event.preventDefault()
+  void runCloseAnimation()
+})
+```
+
+Pair `is-closing` with CSS transitions on the dialog and `::backdrop` (700 ms, same
+duration as the pixel animation). `modal-close` / `drawer-close` reset `pixel` to `256`
+for the next open.
+
+## Live demos
+
+Photos from [Lorem Picsum](https://picsum.photos/) (`crossorigin="anonymous"` required for canvas).
+
+Most demos only use `<cinq-pixelate>` plus native controls. **In a modal** and
+**In a drawer** also use [`cinq-modal`](../components/modal/),
+[`cinq-modal-button`](../components/modal/), [`cinq-drawer`](../components/drawer/), and
+[`cinq-drawer-button`](../components/drawer/). **Animated toggle** uses a plain
+`<button>`, not a CINQ component.
+
+<PixelatePlayground />
+
+## CORS
+
+Cross-origin images must be served with CORS headers and use
+`crossorigin="anonymous"` on the `<img>`, or the canvas stays tainted.
+[Lorem Picsum](https://picsum.photos/) works with this attribute in demos.
+
+## Programmatic API
+
+```js
+const host = document.querySelector("cinq-pixelate")
+
+host.init()
+host.setAttribute("pixel", "32")
+host.sync() // redraw after layout changes
+host.destroy()
+```
+
+Public DOM refs: `$img`, `$canvas`.
+
+Constants: `PIXEL_MIN` (`0`), `PIXEL_MAX` (`256`).

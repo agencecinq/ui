@@ -32,6 +32,9 @@ importers:
       '@agencecinq/combobox':
         specifier: workspace:*
         version: link:../../packages/combobox
+      '@agencecinq/pixelate':
+        specifier: workspace:*
+        version: link:../../packages/pixelate
       '@agencecinq/disclosure-button':
         specifier: workspace:*
         version: link:../../packages/disclosure-button
@@ -103,6 +106,18 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.55.2(@types/node@26.1.2))(esbuild@0.28.1)(rolldown@1.2.2)(rollup@4.56.0)(typescript@7.0.2)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0))
 
   packages/combobox:
+    devDependencies:
+      '@agencecinq/utils':
+        specifier: workspace:*
+        version: link:../utils
+      vite:
+        specifier: ^8.2.0
+        version: 8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)
+      vite-plugin-dts:
+        specifier: ^5.0.3
+        version: 5.0.3(@microsoft/api-extractor@7.55.2(@types/node@26.1.2))(esbuild@0.28.1)(rolldown@1.2.2)(rollup@4.56.0)(typescript@7.0.2)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0))
+
+  packages/pixelate:
     devDependencies:
       '@agencecinq/utils':
         specifier: workspace:*
