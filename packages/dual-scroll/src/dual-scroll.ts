@@ -14,7 +14,6 @@ export class DualScroll extends HTMLElement {
   #left: HTMLElement | null = null;
   #right: HTMLElement | null = null;
   #resizeObserver: ResizeObserver | null = null;
-  #motionQuery: MediaQueryList | null = null;
   #rafId = 0;
   #active = false;
   #touchActive = false;
@@ -71,10 +70,6 @@ export class DualScroll extends HTMLElement {
     window.removeEventListener("touchcancel", this.#handleTouchEnd);
   };
 
-  #handleMotionChange = (): void => {
-    this.sync();
-  };
-
   connectedCallback(): void {
     this.init();
   }
@@ -122,9 +117,6 @@ export class DualScroll extends HTMLElement {
       passive: true,
     });
 
-    this.#motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    this.#motionQuery.addEventListener("change", this.#handleMotionChange);
-
     this.#resizeObserver = new ResizeObserver(() => this.sync());
     this.#resizeObserver.observe(this);
 
@@ -150,9 +142,6 @@ export class DualScroll extends HTMLElement {
     window.removeEventListener("wheel", this.#handleWindowWheel);
     this.removeEventListener("touchstart", this.#handleTouchStart);
     this.#handleTouchEnd();
-
-    this.#motionQuery?.removeEventListener("change", this.#handleMotionChange);
-    this.#motionQuery = null;
 
     this.#resizeObserver.disconnect();
     this.#resizeObserver = null;
@@ -181,10 +170,6 @@ export class DualScroll extends HTMLElement {
       this.#scrollTarget = height;
       this.#scrollValue = height;
       this.#didInitialScroll = true;
-    }
-
-    if (this.#reducedMotion()) {
-      this.#scrollValue = this.#scrollTarget;
     }
 
     this.#applyTransforms();
@@ -217,19 +202,11 @@ export class DualScroll extends HTMLElement {
   }
 
   #spring(): number {
-    if (this.#reducedMotion()) {
-      return SPRING_MAX;
-    }
-
     return clamp(
       parseNumber(this.getAttribute("spring"), SPRING_DEFAULT),
       SPRING_MIN,
       SPRING_MAX,
     );
-  }
-
-  #reducedMotion(): boolean {
-    return this.#motionQuery?.matches ?? false;
   }
 
   #applyScrollDelta(delta: number): void {
@@ -240,11 +217,6 @@ export class DualScroll extends HTMLElement {
     this.#scrollTarget = Math.round(
       clamp(this.#scrollTarget + delta * -1, 0, this.#scrollBottom),
     );
-
-    if (this.#reducedMotion()) {
-      this.#scrollValue = this.#scrollTarget;
-      this.#applyTransforms();
-    }
   }
 
   #containsPoint(x: number, y: number): boolean {

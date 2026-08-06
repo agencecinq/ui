@@ -61,8 +61,25 @@ Each pane should match the host height. The component sets
 Column positioning (start off-screen, move on scroll) is also yours — see the
 demos below.
 
-**Reduced motion**: when `prefers-reduced-motion: reduce` is active, spring
-snaps instantly (no inertia).
+```css
+.dual-scroll-fallback {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  cinq-dual-scroll {
+    display: none;
+  }
+
+  .dual-scroll-fallback {
+    display: block;
+  }
+}
+```
+
+When `prefers-reduced-motion: reduce` is set, hide `<cinq-dual-scroll>` and show
+a linear `.dual-scroll-fallback` in CSS — or set `spring="1"` yourself if you
+keep the effect without inertia. The component does not read that media query.
 
 ## Basic
 

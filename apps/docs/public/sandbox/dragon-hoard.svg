@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Illustration of a dragon hoard">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#sky)"/>
+  <ellipse cx="480" cy="430" rx="360" ry="70" fill="#0f172a" opacity="0.55"/>
+  <path d="M120 420 Q260 300 420 360 T760 340 L820 420 Z" fill="url(#gold)"/>
+  <circle cx="300" cy="360" r="28" fill="#fbbf24"/>
+  <circle cx="520" cy="330" r="36" fill="#fcd34d"/>
+  <circle cx="680" cy="350" r="22" fill="#f59e0b"/>
+  <path d="M640 180 C700 120 780 140 760 220 C740 300 660 320 620 260 Z" fill="#7f1d1d"/>
+  <path d="M620 260 C580 320 500 300 520 220 C540 140 600 120 640 180 Z" fill="#991b1b"/>
+  <path d="M560 210 L540 170 L590 190 Z" fill="#450a0a"/>
+  <circle cx="610" cy="200" r="10" fill="#fef08a"/>
+  <circle cx="608" cy="198" r="4" fill="#1e293b"/>
+  <text x="48" y="72" fill="#fde68a" font-family="Georgia, serif" font-size="42">Dragon Hoard</text>
+  <text x="52" y="108" fill="#c4b5fd" font-family="Georgia, serif" font-size="22">Scroll to reveal the treasure</text>
+</svg>
