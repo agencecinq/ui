@@ -37,6 +37,7 @@ export default defineConfig({
           items: [
             { label: 'Overview', slug: 'sandbox' },
             { label: 'Pixelate', slug: 'sandbox/pixelate' },
+            { label: 'Dual scroll', slug: 'sandbox/dual-scroll' },
           ],
         },
       ],

@@ -1,7 +1,7 @@
 /**
- * Wraps an `<img>` and sibling `<canvas>`. Reads `pixel` (`0`–`256`).
- * At `0` the image is sharp; higher values increase block size.
- * Canvas crop is always centered `cover`.
+ * Wraps an `<img>` and sibling `<canvas>`.
+ * Reads `pixel` (`0`–`256`): sharp at `0`–`1`, larger blocks above.
+ * Crop is centered `cover`.
  */
 export declare class Pixelate extends HTMLElement {
     #private;

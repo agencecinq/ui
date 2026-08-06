@@ -1,0 +1,741 @@
+---
+---
+<script>
+  import type { Pixelate } from '@agencecinq/pixelate';
+  import type { DisclosureButton } from '@agencecinq/disclosure-button';
+  import { PIXEL_MAX, PIXEL_MIN } from '@agencecinq/pixelate';
+  import { EVENTS } from '@agencecinq/utils';
+
+  const SCROLL_END = 0.4;
+  const HOVER_PIXEL = 48;
+  const COMPARISON_PIXEL = 40;
+  const HOVER_ANIMATE_MS = 450;
+  const ANIMATE_MS = 700;
+  const LOAD_ANIMATE_MS = 900;
+  const SEQUENCE_STAGGER = 0.12;
+  const animationTokens = new WeakMap();
+
+  function ease(t) {
+    return 1 - (1 - t) ** 3;
+  }
+
+  function asPixelate(element) {
+    return element instanceof HTMLElement ? /** @type {Pixelate} */ (element) : null;
+  }
+
+  function setPixel(host, pixel) {
+    if (!(host instanceof HTMLElement)) {
+      return;
+    }
+
+    const value = Math.round(
+      Math.min(PIXEL_MAX, Math.max(PIXEL_MIN, pixel)),
+    );
+
+    host.setAttribute('pixel', String(value));
+    asPixelate(host)?.sync();
+  }
+
+  function readPixel(host) {
+    if (!(host instanceof HTMLElement)) {
+      return PIXEL_MAX;
+    }
+
+    return Number(host.getAttribute('pixel') ?? PIXEL_MAX);
+  }
+
+  function viewportProgress(element) {
+    const { top, bottom } = element.getBoundingClientRect();
+    const height = window.innerHeight;
+
+    if (bottom <= 0 || top <= height * SCROLL_END) {
+      return 1;
+    }
+
+    if (top >= height) {
+      return 0;
+    }
+
+    return 1 - (top - height * SCROLL_END) / (height - height * SCROLL_END);
+  }
+
+  function pixelFromProgress(progress) {
+    return Math.round(PIXEL_MAX - progress * (PIXEL_MAX - PIXEL_MIN));
+  }
+
+  function sequenceProgress(element, index) {
+    const { top, bottom } = element.getBoundingClientRect();
+    const height = window.innerHeight;
+    const start = index * SEQUENCE_STAGGER;
+    const end = start + 0.45;
+
+    if (bottom <= 0 || top <= height * (1 - end)) {
+      return 1;
+    }
+
+    if (top >= height * (1 - start)) {
+      return 0;
+    }
+
+    const range = height * (end - start);
+    const traveled = height * (1 - start) - top;
+
+    return Math.min(1, Math.max(0, traveled / range));
+  }
+
+  function wait(ms) {
+    return new Promise((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+  }
+
+  function waitForOverlayFade(element, duration) {
+    if (!(element instanceof HTMLElement)) {
+      return wait(duration);
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return wait(0);
+    }
+
+    return new Promise((resolve) => {
+      const timeout = window.setTimeout(() => {
+        element.removeEventListener('transitionend', onTransitionEnd);
+        resolve(undefined);
+      }, duration + 50);
+
+      function onTransitionEnd(event) {
+        if (event.target !== element) {
+          return;
+        }
+
+        window.clearTimeout(timeout);
+        element.removeEventListener('transitionend', onTransitionEnd);
+        resolve(undefined);
+      }
+
+      element.addEventListener('transitionend', onTransitionEnd);
+    });
+  }
+
+  function animatePixel(host, from, to, duration) {
+    if (!(host instanceof HTMLElement)) {
+      return Promise.resolve();
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setPixel(host, to);
+      return Promise.resolve();
+    }
+
+    const token = Symbol();
+    animationTokens.set(host, token);
+    const start = performance.now();
+
+    return new Promise((resolve) => {
+      function frame(now) {
+        if (animationTokens.get(host) !== token) {
+          resolve(undefined);
+          return;
+        }
+
+        const t = Math.min(1, (now - start) / duration);
+        setPixel(host, from + (to - from) * ease(t));
+
+        if (t < 1) {
+          requestAnimationFrame(frame);
+          return;
+        }
+
+        resolve(undefined);
+      }
+
+      requestAnimationFrame(frame);
+    });
+  }
+
+  function bindPixelatePlayground() {
+    const scrollHost = document.querySelector('#docs-pixelate-scroll');
+    const scrollProgress = document.querySelector('#docs-pixelate-scroll-progress');
+    const scrollValue = document.querySelector('#docs-pixelate-scroll-value');
+    const spinbutton = document.querySelector('#docs-pixelate-spinbutton');
+    const spinbuttonHost = document.querySelector('#docs-pixelate-spinbutton-demo');
+    const spinbuttonValue = document.querySelector('#docs-pixelate-spinbutton-value');
+    const switchControl = document.querySelector('#docs-pixelate-switch');
+    const switchHost = document.querySelector('#docs-pixelate-switch-demo');
+    const disclosureControl = document.querySelector(
+      '#docs-pixelate-disclosure-button',
+    ) as DisclosureButton | null;
+    const disclosureTrigger = document.querySelector('#docs-pixelate-disclosure-trigger');
+    const disclosureHost = document.querySelector('#docs-pixelate-disclosure');
+    const disclosureLabels = { closed: 'View photo', open: 'Hide photo' };
+    let disclosureClosing = false;
+    const hoverCard = document.querySelector('#docs-pixelate-hover-card');
+    const hoverHost = document.querySelector('#docs-pixelate-hover');
+    const loadHost = document.querySelector('#docs-pixelate-load');
+    const pointerHost = document.querySelector('#docs-pixelate-pointer');
+    const ioHost = document.querySelector('#docs-pixelate-io');
+    const ioValue = document.querySelector('#docs-pixelate-io-value');
+    const ioPixel = document.querySelector('#docs-pixelate-io-pixel');
+    const gridSlider = document.querySelector('#docs-pixelate-grid-slider');
+    const gridValue = document.querySelector('#docs-pixelate-grid-value');
+    const gridHosts = document.querySelectorAll('[data-pixelate-grid]');
+    const resizeShell = document.querySelector('#docs-pixelate-resize-shell');
+    const resizeHost = document.querySelector('#docs-pixelate-resize');
+    const resizeWide = document.querySelector('#docs-pixelate-resize-wide');
+    const resizeNarrow = document.querySelector('#docs-pixelate-resize-narrow');
+    const sequenceHosts = document.querySelectorAll('[data-pixelate-sequence]');
+    const modalHost = document.querySelector('#docs-pixelate-modal-host');
+    const drawerHost = document.querySelector('#docs-pixelate-drawer-host');
+
+    function bindOverlayReveal(host, toggleEvent, openEvent, closeEvent, overlayId) {
+      if (!(host instanceof HTMLElement)) {
+        return;
+      }
+
+      let closing = false;
+
+      function overlayElement() {
+        return document.getElementById(overlayId);
+      }
+
+      function isOverlayOpen() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement)) {
+          return false;
+        }
+
+        if (element.tagName === 'CINQ-MODAL') {
+          const dialog = element.querySelector('dialog');
+
+          return Boolean(dialog?.open);
+        }
+
+        if (element.tagName === 'CINQ-DRAWER') {
+          return element.hasAttribute('open');
+        }
+
+        return false;
+      }
+
+      function modalDialog() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement) || element.tagName !== 'CINQ-MODAL') {
+          return null;
+        }
+
+        const dialog = element.querySelector('dialog');
+
+        return dialog instanceof HTMLDialogElement ? dialog : null;
+      }
+
+      function drawerElement() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement) || element.tagName !== 'CINQ-DRAWER') {
+          return null;
+        }
+
+        return element;
+      }
+
+      function beginCloseTransition() {
+        const dialog = modalDialog();
+        const drawer = drawerElement();
+
+        if (dialog) {
+          dialog.classList.remove('is-closing');
+          void dialog.offsetWidth;
+          dialog.classList.add('is-closing');
+          return dialog;
+        }
+
+        if (drawer) {
+          drawer.classList.remove('is-closing', 'is-opening');
+          void drawer.offsetWidth;
+          drawer.classList.add('is-closing');
+
+          const panel = drawer.querySelector('[role="dialog"]');
+
+          return panel instanceof HTMLElement ? panel : drawer;
+        }
+
+        return null;
+      }
+
+      function closeOverlay() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement)) {
+          return;
+        }
+
+        if (
+          element.tagName === 'CINQ-MODAL' &&
+          'close' in element &&
+          typeof element.close === 'function'
+        ) {
+          modalDialog()?.classList.remove('is-closing');
+          element.close();
+          return;
+        }
+
+        if (element.tagName === 'CINQ-DRAWER') {
+          element.classList.remove('is-closing', 'is-opening');
+          element.removeAttribute('open');
+        }
+      }
+
+      function runOpenAnimation(event) {
+        const drawer = drawerElement();
+
+        if (!drawer || isOverlayOpen()) {
+          return;
+        }
+
+        if (event instanceof CustomEvent) {
+          const detail = event.detail;
+
+          if (detail?.trigger) {
+            drawer.trigger = detail.trigger;
+          }
+
+          drawer.trap = detail?.trap || drawer;
+        }
+
+        drawer.classList.remove('is-closing');
+        drawer.classList.add('is-opening');
+        drawer.setAttribute('open', '');
+
+        const panel = drawer.querySelector('[role="dialog"]');
+        void (panel ?? drawer).offsetWidth;
+
+        setPixel(host, PIXEL_MAX);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            drawer.classList.remove('is-opening');
+            animatePixel(host, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
+          });
+        });
+      }
+
+      function runCloseAnimation() {
+        if (closing || !isOverlayOpen()) {
+          return Promise.resolve();
+        }
+
+        closing = true;
+        const from = readPixel(host);
+        const pixelAnimation = animatePixel(host, from, PIXEL_MAX, ANIMATE_MS);
+        const fadeTarget = beginCloseTransition();
+        const overlayAnimation = fadeTarget
+          ? waitForOverlayFade(fadeTarget, ANIMATE_MS)
+          : Promise.resolve();
+
+        return Promise.all([pixelAnimation, overlayAnimation])
+          .finally(() => {
+            closing = false;
+          })
+          .then(() => {
+            closeOverlay();
+          });
+      }
+
+      function requestClose(event) {
+        if (event) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+
+        void runCloseAnimation();
+      }
+
+      document.documentElement.addEventListener(
+        toggleEvent,
+        (event) => {
+          if (!(event instanceof CustomEvent)) {
+            return;
+          }
+
+          const detail = event.detail;
+
+          if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+            return;
+          }
+
+          if (!isOverlayOpen()) {
+            if (drawerElement() && detail?.drawer === overlayId) {
+              event.stopImmediatePropagation();
+              runOpenAnimation(event);
+            }
+
+            return;
+          }
+
+          requestClose(event);
+        },
+        { capture: true },
+      );
+
+      const overlay = overlayElement();
+
+      if (overlay instanceof HTMLElement && overlay.tagName === 'CINQ-MODAL') {
+        const dialog = overlay.querySelector('dialog');
+
+        dialog?.addEventListener('cancel', (event) => {
+          if (!isOverlayOpen()) {
+            return;
+          }
+
+          requestClose(event);
+        });
+
+        dialog?.addEventListener(
+          'click',
+          (event) => {
+            if (event.target !== event.currentTarget || !isOverlayOpen()) {
+              return;
+            }
+
+            requestClose(event);
+          },
+          { capture: true },
+        );
+      }
+
+      if (overlay instanceof HTMLElement && overlay.tagName === 'CINQ-DRAWER') {
+        const backdrop = overlay.querySelector('[data-dom="overlay"]');
+
+        backdrop?.addEventListener(
+          'click',
+          (event) => {
+            if (!isOverlayOpen()) {
+              return;
+            }
+
+            requestClose(event);
+          },
+          { capture: true },
+        );
+
+        document.documentElement.addEventListener(
+          'keyup',
+          (event) => {
+            if (!(event instanceof KeyboardEvent) || event.key !== 'Escape') {
+              return;
+            }
+
+            if (!isOverlayOpen()) {
+              return;
+            }
+
+            requestClose(event);
+          },
+          { capture: true },
+        );
+      }
+
+      document.documentElement.addEventListener(openEvent, (event) => {
+        if (!(event instanceof CustomEvent)) {
+          return;
+        }
+
+        const detail = event.detail;
+
+        if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+          return;
+        }
+
+        if (detail?.drawer === overlayId && drawerElement()) {
+          return;
+        }
+
+        modalDialog()?.classList.remove('is-closing');
+        setPixel(host, PIXEL_MAX);
+        requestAnimationFrame(() => {
+          animatePixel(host, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
+        });
+      });
+
+      document.documentElement.addEventListener(closeEvent, (event) => {
+        if (!(event instanceof CustomEvent)) {
+          return;
+        }
+
+        const detail = event.detail;
+
+        if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+          return;
+        }
+
+        setPixel(host, PIXEL_MAX);
+      });
+    }
+
+    bindOverlayReveal(
+      modalHost,
+      EVENTS.MODAL_TOGGLE,
+      EVENTS.MODAL_OPEN,
+      EVENTS.MODAL_CLOSE,
+      'docs-pixelate-modal',
+    );
+    bindOverlayReveal(
+      drawerHost,
+      EVENTS.DRAWER_TOGGLE,
+      EVENTS.DRAWER_OPEN,
+      EVENTS.DRAWER_CLOSE,
+      'docs-pixelate-drawer',
+    );
+
+    function syncScrollPixelate() {
+      if (!(scrollHost instanceof HTMLElement)) {
+        return;
+      }
+
+      const progress = viewportProgress(scrollHost);
+      const pixel = pixelFromProgress(progress);
+      setPixel(scrollHost, pixel);
+
+      if (scrollProgress) {
+        scrollProgress.textContent = progress.toFixed(2);
+      }
+
+      if (scrollValue) {
+        scrollValue.textContent = String(pixel);
+      }
+    }
+
+    function syncSpinbuttonPixelate(value) {
+      if (!(spinbuttonHost instanceof HTMLElement)) {
+        return;
+      }
+
+      setPixel(spinbuttonHost, value);
+
+      if (spinbuttonValue) {
+        spinbuttonValue.textContent = String(Math.round(value));
+      }
+    }
+
+    function syncGridPixelate() {
+      if (!(gridSlider instanceof HTMLInputElement)) {
+        return;
+      }
+
+      const pixel = Number(gridSlider.value);
+
+      gridHosts.forEach((host) => setPixel(host, pixel));
+
+      if (gridValue) {
+        gridValue.textContent = gridSlider.value;
+      }
+    }
+
+    function syncSequencePixelate() {
+      sequenceHosts.forEach((host) => {
+        if (!(host instanceof HTMLElement)) {
+          return;
+        }
+
+        const index = Number(host.dataset.sequenceIndex ?? 0);
+        setPixel(host, pixelFromProgress(sequenceProgress(host, index)));
+      });
+    }
+
+    function bindLoadReveal() {
+      if (!(loadHost instanceof HTMLElement)) {
+        return;
+      }
+
+      const img = loadHost.querySelector('img');
+
+      function reveal() {
+        animatePixel(loadHost, PIXEL_MAX, PIXEL_MIN, LOAD_ANIMATE_MS);
+      }
+
+      if (img instanceof HTMLImageElement && img.complete) {
+        reveal();
+        return;
+      }
+
+      img?.addEventListener('load', reveal, { once: true });
+    }
+
+    window.addEventListener('scroll', syncScrollPixelate, { passive: true });
+    window.addEventListener('resize', syncScrollPixelate, { passive: true });
+    syncScrollPixelate();
+
+    spinbutton?.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
+      if (!(event instanceof CustomEvent)) {
+        return;
+      }
+
+      const value = event.detail?.value;
+
+      if (typeof value !== 'number') {
+        return;
+      }
+
+      syncSpinbuttonPixelate(value);
+    });
+
+    if (spinbutton instanceof HTMLElement) {
+      const input = spinbutton.querySelector('input');
+
+      if (input instanceof HTMLInputElement) {
+        syncSpinbuttonPixelate(Number(input.value));
+      }
+    }
+
+    switchControl?.addEventListener(EVENTS.SWITCH_ACTIVATE, () => {
+      if (!(switchHost instanceof HTMLElement)) {
+        return;
+      }
+
+      void animatePixel(switchHost, readPixel(switchHost), PIXEL_MIN, ANIMATE_MS);
+    });
+
+    switchControl?.addEventListener(EVENTS.SWITCH_DEACTIVATE, () => {
+      if (!(switchHost instanceof HTMLElement)) {
+        return;
+      }
+
+      void animatePixel(switchHost, readPixel(switchHost), PIXEL_MAX, ANIMATE_MS);
+    });
+
+    disclosureTrigger?.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      if (!(disclosureTrigger instanceof HTMLButtonElement)) {
+        return;
+      }
+
+      disclosureTrigger.textContent = disclosureLabels.open;
+
+      if (!(disclosureHost instanceof HTMLElement)) {
+        return;
+      }
+
+      setPixel(disclosureHost, PIXEL_MAX);
+
+      requestAnimationFrame(() => {
+        animatePixel(disclosureHost, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
+      });
+    });
+
+    disclosureTrigger?.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, (event) => {
+      if (
+        disclosureClosing ||
+        !(disclosureHost instanceof HTMLElement) ||
+        !(disclosureTrigger instanceof HTMLButtonElement) ||
+        !disclosureControl
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      disclosureClosing = true;
+
+      void animatePixel(
+        disclosureHost,
+        readPixel(disclosureHost),
+        PIXEL_MAX,
+        ANIMATE_MS,
+      ).then(() => {
+        disclosureControl.close(false);
+        disclosureTrigger.textContent = disclosureLabels.closed;
+        disclosureClosing = false;
+      });
+    });
+
+    hoverCard?.addEventListener('mouseenter', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), PIXEL_MIN, HOVER_ANIMATE_MS);
+      }
+    });
+    hoverCard?.addEventListener('mouseleave', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), HOVER_PIXEL, HOVER_ANIMATE_MS);
+      }
+    });
+    hoverCard?.addEventListener('focusin', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), PIXEL_MIN, HOVER_ANIMATE_MS);
+      }
+    });
+    hoverCard?.addEventListener('focusout', () => {
+      if (hoverHost instanceof HTMLElement) {
+        animatePixel(hoverHost, readPixel(hoverHost), HOVER_PIXEL, HOVER_ANIMATE_MS);
+      }
+    });
+
+    bindLoadReveal();
+
+    const splitterPixelate = document.querySelector('#docs-pixelate-splitter-pixelate');
+
+    if (splitterPixelate instanceof HTMLElement) {
+      setPixel(splitterPixelate, COMPARISON_PIXEL);
+    }
+
+    pointerHost?.addEventListener('mousemove', (event) => {
+      if (!(pointerHost instanceof HTMLElement) || !(event instanceof MouseEvent)) {
+        return;
+      }
+
+      const rect = pointerHost.getBoundingClientRect();
+      const ratio = (event.clientX - rect.left) / rect.width;
+      setPixel(pointerHost, (1 - ratio) * PIXEL_MAX);
+    });
+
+    if (ioHost instanceof HTMLElement && 'IntersectionObserver' in window) {
+      const thresholds = Array.from({ length: 21 }, (_, index) => index / 20);
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!(entry.target instanceof HTMLElement)) {
+              continue;
+            }
+
+            const ratio = entry.intersectionRatio;
+            const pixel = Math.round((1 - ratio) * PIXEL_MAX);
+            setPixel(entry.target, pixel);
+
+            if (ioValue) {
+              ioValue.textContent = ratio.toFixed(2);
+            }
+
+            if (ioPixel) {
+              ioPixel.textContent = String(pixel);
+            }
+          }
+        },
+        { threshold: thresholds },
+      );
+
+      observer.observe(ioHost);
+    }
+
+    gridSlider?.addEventListener('input', syncGridPixelate);
+    gridSlider?.addEventListener('change', syncGridPixelate);
+    syncGridPixelate();
+
+    resizeWide?.addEventListener('click', () => {
+      resizeShell?.classList.remove('max-w-md');
+      resizeShell?.classList.add('max-w-3xl');
+      requestAnimationFrame(() => asPixelate(resizeHost)?.sync());
+    });
+    resizeNarrow?.addEventListener('click', () => {
+      resizeShell?.classList.remove('max-w-3xl');
+      resizeShell?.classList.add('max-w-md');
+      requestAnimationFrame(() => asPixelate(resizeHost)?.sync());
+    });
+
+    window.addEventListener('scroll', syncSequencePixelate, { passive: true });
+    window.addEventListener('resize', syncSequencePixelate, { passive: true });
+    syncSequencePixelate();
+  }
+
+  customElements.whenDefined('cinq-pixelate').then(bindPixelatePlayground);
+</script>

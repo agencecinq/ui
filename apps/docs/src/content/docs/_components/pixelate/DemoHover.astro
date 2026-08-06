@@ -1,0 +1,25 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import { hoverImage } from './images';
+---
+
+<PixelateDemoFrame>
+  <div
+    id="docs-pixelate-hover-card"
+    data-pixelate-card
+    class="mx-auto max-w-sm cursor-pointer overflow-hidden rounded-2xl shadow-lg"
+    tabindex="0"
+  >
+    <cinq-pixelate id="docs-pixelate-hover" pixel="48">
+      <img
+        src={hoverImage}
+        crossorigin="anonymous"
+        alt="Forest path"
+        width="960"
+        height="540"
+      />
+      <canvas role="img" aria-label="Forest path"></canvas>
+    </cinq-pixelate>
+    <p class="bg-white px-4 py-3 text-sm font-medium text-gray-900">Hover or focus me</p>
+  </div>
+</PixelateDemoFrame>

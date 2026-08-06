@@ -1,0 +1,35 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import { hoverImage } from './images';
+---
+
+<PixelateDemoFrame>
+  <cinq-disclosure-button id="docs-pixelate-disclosure-button">
+    <button
+      type="button"
+      id="docs-pixelate-disclosure-trigger"
+      class="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+      aria-expanded="false"
+      aria-controls="docs-pixelate-disclosure-region"
+    >
+      View photo
+    </button>
+  </cinq-disclosure-button>
+
+  <div id="docs-pixelate-disclosure-region" hidden>
+    <cinq-pixelate
+      id="docs-pixelate-disclosure"
+      class="overflow-hidden rounded-2xl shadow-lg"
+      pixel="256"
+    >
+      <img
+        src={hoverImage}
+        crossorigin="anonymous"
+        alt="Forest path"
+        width="960"
+        height="540"
+      />
+      <canvas role="img" aria-label="Forest path"></canvas>
+    </cinq-pixelate>
+  </div>
+</PixelateDemoFrame>

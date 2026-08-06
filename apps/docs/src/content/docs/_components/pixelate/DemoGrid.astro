@@ -1,0 +1,45 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import { gridImages } from './images';
+---
+
+<PixelateDemoFrame>
+  <label class="flex flex-col gap-2 text-sm text-gray-700">
+    <span>
+      Shared <code>pixel</code>:{' '}
+      <span id="docs-pixelate-grid-value" class="font-mono font-medium text-gray-900">
+        120
+      </span>
+    </span>
+    <input
+      id="docs-pixelate-grid-slider"
+      type="range"
+      min="0"
+      max="256"
+      value="120"
+      class="w-full max-w-md"
+    />
+  </label>
+
+  <div class="grid gap-4 sm:grid-cols-3">
+    {
+      gridImages.map((src, index) => (
+        <cinq-pixelate
+          id={`docs-pixelate-grid-${index}`}
+          class="overflow-hidden rounded-xl shadow"
+          data-pixelate-grid
+          pixel="120"
+        >
+          <img
+            src={src}
+            crossorigin="anonymous"
+            alt={`Grid photo ${index + 1}`}
+            width="640"
+            height="360"
+          />
+          <canvas role="img" aria-label={`Grid photo ${index + 1}`} />
+        </cinq-pixelate>
+      ))
+    }
+  </div>
+</PixelateDemoFrame>

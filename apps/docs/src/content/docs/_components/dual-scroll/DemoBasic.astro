@@ -1,0 +1,30 @@
+---
+import { leftImages, rightImages } from "./images.ts";
+---
+<div class="not-content my-6 flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow">
+  <p class="text-sm text-gray-600 m-0">
+    Hover the zone, then scroll — the page won't move. Right column goes down, left goes up.
+  </p>
+  <cinq-dual-scroll spring="0.1">
+    <div class="dual-scroll__columns">
+      <div data-scroll-column="left">
+        {
+          leftImages.map((src) => (
+            <div class="dual-scroll__pane">
+              <img src={src} width="640" height="480" alt="" />
+            </div>
+          ))
+        }
+      </div>
+      <div data-scroll-column="right">
+        {
+          rightImages.map((src) => (
+            <div class="dual-scroll__pane">
+              <img src={src} width="640" height="480" alt="" />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </cinq-dual-scroll>
+</div>

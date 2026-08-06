@@ -1,0 +1,66 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import PortalToBody from '../PortalToBody.astro';
+import { drawerImage } from './images';
+---
+
+<PixelateDemoFrame>
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <p class="text-sm text-gray-600">
+      Uses <code>cinq-drawer</code> and <code>cinq-drawer-button</code>.
+    </p>
+    <cinq-drawer-button class="block shrink-0">
+      <button
+        type="button"
+        class="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+        aria-controls="docs-pixelate-drawer"
+        aria-expanded="false"
+      >
+        Open drawer
+      </button>
+    </cinq-drawer-button>
+  </div>
+
+  <cinq-drawer id="docs-pixelate-drawer">
+    <div data-dom="overlay" class="fixed inset-0 z-[2147483646] bg-black/50"></div>
+    <div
+      role="dialog"
+      aria-label="Photo drawer"
+      class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl"
+    >
+      <div class="flex h-full flex-col">
+        <header class="flex items-center justify-between border-b px-4 py-3">
+          <h2 class="text-base font-semibold text-gray-900">Gallery</h2>
+          <cinq-drawer-button class="block">
+            <button
+              type="button"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+              aria-controls="docs-pixelate-drawer"
+              aria-expanded="false"
+            >
+              ✕
+            </button>
+          </cinq-drawer-button>
+        </header>
+        <div class="flex-1 overflow-y-auto p-4">
+          <cinq-pixelate
+            id="docs-pixelate-drawer-host"
+            class="overflow-hidden rounded-xl shadow"
+            pixel="256"
+          >
+            <img
+              src={drawerImage}
+              crossorigin="anonymous"
+              alt="Misty valley"
+              width="960"
+              height="540"
+            />
+            <canvas role="img" aria-label="Misty valley" />
+          </cinq-pixelate>
+        </div>
+      </div>
+    </div>
+  </cinq-drawer>
+
+  <PortalToBody selector="#docs-pixelate-drawer" />
+</PixelateDemoFrame>

@@ -1,0 +1,21 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import { loadImage } from './images';
+---
+
+<PixelateDemoFrame>
+  <cinq-pixelate
+    id="docs-pixelate-load"
+    class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+    pixel="256"
+  >
+    <img
+      src={loadImage}
+      crossorigin="anonymous"
+      alt="Desert dunes"
+      width="960"
+      height="540"
+    />
+    <canvas role="img" aria-label="Desert dunes"></canvas>
+  </cinq-pixelate>
+</PixelateDemoFrame>

@@ -1,0 +1,33 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import { sequenceImages } from './images';
+---
+
+<PixelateDemoFrame>
+  <div class="h-[20vh]" aria-hidden="true"></div>
+
+  <div class="mx-auto flex max-w-3xl flex-col gap-8">
+    {
+      sequenceImages.map((src, index) => (
+        <cinq-pixelate
+          id={`docs-pixelate-seq-${index}`}
+          class="overflow-hidden rounded-2xl shadow-lg"
+          data-pixelate-sequence
+          data-sequence-index={index}
+          pixel="256"
+        >
+          <img
+            src={src}
+            crossorigin="anonymous"
+            alt={`Sequence photo ${index + 1}`}
+            width="960"
+            height="540"
+          />
+          <canvas role="img" aria-label={`Sequence photo ${index + 1}`} />
+        </cinq-pixelate>
+      ))
+    }
+  </div>
+
+  <div class="h-[25vh]" aria-hidden="true"></div>
+</PixelateDemoFrame>

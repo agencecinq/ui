@@ -1,0 +1,105 @@
+---
+title: Dual scroll
+description: Two columns, one inverted scroll inside a sized host zone (sandbox).
+---
+
+import RegisterComponents from '../_components/RegisterComponents.astro';
+import DualScrollStyles from '../_components/dual-scroll/DualScrollStyles.astro';
+import DemoBasic from '../_components/dual-scroll/DemoBasic.astro';
+import DemoSpring from '../_components/dual-scroll/DemoSpring.astro';
+
+<RegisterComponents />
+<DualScrollStyles />
+
+:::note[Sandbox]
+Experimental demo, not published on npm. API may change or move.
+:::
+
+`<cinq-dual-scroll>` drives two columns with inverted scroll and spring easing.
+**Layout, pane content, and zone height stay in your markup and CSS** — the
+component listens for wheel/touch inside the host and updates column transforms.
+
+Inspired by [scroll-you-fools](https://github.com/19h47/scroll-you-fools), scoped
+to a zone instead of hijacking the full page.
+
+## Markup
+
+Two columns, identified by `data-scroll-column`. Stack one pane per “step” inside
+each column (same count on both sides works best).
+
+```html
+<cinq-dual-scroll spring="0.1" style="height: 70vh; overflow: hidden;">
+  <div class="dual-scroll__columns">
+    <div data-scroll-column="left">
+      <div class="dual-scroll__pane"><!-- pane --></div>
+      <div class="dual-scroll__pane"><!-- pane --></div>
+    </div>
+    <div data-scroll-column="right">
+      <div class="dual-scroll__pane"><!-- pane --></div>
+      <div class="dual-scroll__pane"><!-- pane --></div>
+    </div>
+  </div>
+</cinq-dual-scroll>
+```
+
+**Zone height** is your responsibility: set an explicit height on
+`<cinq-dual-scroll>` (e.g. `70vh`, `100%` of a parent, or `100vh` for
+full-page). The host needs `overflow: hidden`.
+
+Hover the zone before scrolling — wheel input is captured when the pointer
+is over the host, so the Starlight page doesn't scroll instead.
+
+Each pane should match the host height. The component sets
+`--dual-scroll-pane-height` on sync so panes can use:
+
+```css
+.dual-scroll__pane {
+  height: var(--dual-scroll-pane-height, 100%);
+}
+```
+
+Column positioning (start off-screen, move on scroll) is also yours — see the
+demos below.
+
+**Reduced motion**: when `prefers-reduced-motion: reduce` is active, spring
+snaps instantly (no inertia).
+
+## Basic
+
+<DemoBasic />
+
+```html
+<cinq-dual-scroll spring="0.1">
+  <!-- columns + panes -->
+</cinq-dual-scroll>
+```
+
+## Spring
+
+`spring` is `0.01`–`1` (default `0.1`). Lower = more inertia, `1` = instant.
+
+<DemoSpring spring="0.04" label="spring=&quot;0.04&quot; — slow, floaty" />
+
+<DemoSpring spring="0.35" label="spring=&quot;0.35&quot; — snappy" />
+
+```html
+<cinq-dual-scroll spring="0.04">…</cinq-dual-scroll>
+<cinq-dual-scroll spring="0.35">…</cinq-dual-scroll>
+```
+
+## API
+
+| | |
+|---|---|
+| Attribute | `spring` — easing factor (`0.01`–`1`, default `0.1`) |
+| Methods | `init()`, `destroy()`, `sync()` |
+| CSS variable | `--dual-scroll-pane-height` — host height in px (set by `sync()`) |
+
+Use `init()` / `destroy()` if you need to pause the effect without removing the
+element. `sync()` re-measures after DOM or size changes.
+
+## Editorial use
+
+This pattern is **decorative / editorial** — it is not a replacement for normal
+page scroll or accessible reading flow. Prefer a linear fallback or skip link when
+the content must be reachable without wheel gestures inside a fixed zone.

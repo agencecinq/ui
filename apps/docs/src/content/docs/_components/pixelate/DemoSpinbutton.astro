@@ -1,0 +1,66 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import { sliderImage } from './images';
+---
+
+<PixelateDemoFrame>
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <cinq-spinbutton
+      id="docs-pixelate-spinbutton"
+      class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+    >
+      <button
+        type="button"
+        name="decrease"
+        tabindex="-1"
+        aria-label="Decrease pixel size"
+        class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        −
+      </button>
+
+      <input
+        type="number"
+        value="180"
+        aria-label="Pixel size"
+        aria-valuemin="0"
+        aria-valuemax="256"
+        aria-valuenow="180"
+        aria-controls="docs-pixelate-spinbutton-demo"
+        class="w-16 bg-transparent text-center font-mono text-base focus:outline-none"
+      />
+
+      <button
+        type="button"
+        name="increase"
+        tabindex="-1"
+        aria-label="Increase pixel size"
+        class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        +
+      </button>
+    </cinq-spinbutton>
+
+    <p class="text-sm text-gray-600">
+      <code>pixel</code>:{' '}
+      <span id="docs-pixelate-spinbutton-value" class="font-mono font-medium text-gray-900">
+        180
+      </span>
+    </p>
+  </div>
+
+  <cinq-pixelate
+    id="docs-pixelate-spinbutton-demo"
+    class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+    pixel="180"
+  >
+    <img
+      src={sliderImage}
+      crossorigin="anonymous"
+      alt="Coastal cliffs"
+      width="960"
+      height="540"
+    />
+    <canvas role="img" aria-label="Coastal cliffs"></canvas>
+  </cinq-pixelate>
+</PixelateDemoFrame>

@@ -1,0 +1,39 @@
+---
+import PixelateDemoFrame from './PixelateDemoFrame.astro';
+import { scrollImage } from './images';
+---
+
+<PixelateDemoFrame>
+  <p class="text-sm text-gray-600">Scroll the page to scrub the reveal.</p>
+
+  <div class="h-[40vh]" aria-hidden="true"></div>
+
+  <cinq-pixelate
+    id="docs-pixelate-scroll"
+    class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
+    pixel="256"
+  >
+    <img
+      src={scrollImage}
+      crossorigin="anonymous"
+      alt="Mountain landscape"
+      width="960"
+      height="540"
+    />
+    <canvas role="img" aria-label="Mountain landscape"></canvas>
+  </cinq-pixelate>
+
+  <p class="text-sm text-gray-600">
+    Scroll progress:{' '}
+    <span id="docs-pixelate-scroll-progress" class="font-mono font-medium text-gray-900">
+      0.00
+    </span>
+    {' · '}
+    <code>pixel</code>:{' '}
+    <span id="docs-pixelate-scroll-value" class="font-mono font-medium text-gray-900">
+      256
+    </span>
+  </p>
+
+  <div class="h-[30vh]" aria-hidden="true"></div>
+</PixelateDemoFrame>

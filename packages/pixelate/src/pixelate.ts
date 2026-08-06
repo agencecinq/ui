@@ -2,9 +2,9 @@ import { clamp, parseNumber } from "@agencecinq/utils";
 import { PIXEL_MAX, PIXEL_MIN } from "./types.js";
 
 /**
- * Wraps an `<img>` and sibling `<canvas>`. Reads `pixel` (`0`–`256`).
- * At `0` the image is sharp; higher values increase block size.
- * Canvas crop is always centered `cover`.
+ * Wraps an `<img>` and sibling `<canvas>`.
+ * Reads `pixel` (`0`–`256`): sharp at `0`–`1`, larger blocks above.
+ * Crop is centered `cover`.
  */
 export class Pixelate extends HTMLElement {
   static observedAttributes = ["pixel"];
@@ -15,11 +15,7 @@ export class Pixelate extends HTMLElement {
   #context: CanvasRenderingContext2D | null = null;
   #resizeObserver: ResizeObserver | null = null;
   #rafId = 0;
-
-  #handleLoad = (): void => {
-    this.#resize();
-    this.sync();
-  };
+  #handleLoad = this.sync.bind(this);
 
   connectedCallback(): void {
     this.init();
@@ -37,6 +33,7 @@ export class Pixelate extends HTMLElement {
     _oldValue: string | null,
     _newValue: string | null,
   ): void {
+    // Ignore until init has wired the observer
     if (name === "pixel" && this.#resizeObserver) {
       this.sync();
     }
@@ -67,13 +64,10 @@ export class Pixelate extends HTMLElement {
     this.$img.addEventListener("load", this.#handleLoad);
 
     if (this.$img.complete) {
-      this.#handleLoad();
+      this.sync();
     }
 
-    this.#resizeObserver = new ResizeObserver(() => {
-      this.#resize();
-      this.sync();
-    });
+    this.#resizeObserver = new ResizeObserver(() => this.sync());
     this.#resizeObserver.observe(this.$canvas);
 
     this.sync();
@@ -98,6 +92,7 @@ export class Pixelate extends HTMLElement {
       return;
     }
 
+    // Coalesce resize and load bursts into one draw
     this.#rafId = requestAnimationFrame(() => {
       this.#rafId = 0;
       this.#draw();
@@ -113,7 +108,7 @@ export class Pixelate extends HTMLElement {
     this.#rafId = 0;
   }
 
-  #pixelSize(): number {
+  #pixel(): number {
     return clamp(
       parseNumber(this.getAttribute("pixel"), PIXEL_MAX),
       PIXEL_MIN,
@@ -131,65 +126,11 @@ export class Pixelate extends HTMLElement {
     return { width: canvas.clientWidth, height: canvas.clientHeight };
   }
 
-  #resize(): void {
-    if (!this.$canvas || !this.$img) {
-      return;
-    }
-
-    const { width, height } = this.#layout();
-
-    if (width === 0 || height === 0) {
-      return;
-    }
-
-    const pixelSize = this.#pixelSize();
-    const context = this.#context;
-
-    if (pixelSize <= 1) {
-      const dpr = window.devicePixelRatio || 1;
-      const bufferWidth = Math.round(width * dpr);
-      const bufferHeight = Math.round(height * dpr);
-
-      if (
-        this.$canvas.width !== bufferWidth ||
-        this.$canvas.height !== bufferHeight
-      ) {
-        this.$canvas.width = bufferWidth;
-        this.$canvas.height = bufferHeight;
-      }
-
-      context?.setTransform(dpr, 0, 0, dpr, 0, 0);
-    } else {
-      const sampleWidth = Math.max(1, Math.ceil(width / pixelSize));
-      const sampleHeight = Math.max(1, Math.ceil(height / pixelSize));
-
-      if (
-        this.$canvas.width !== sampleWidth ||
-        this.$canvas.height !== sampleHeight
-      ) {
-        this.$canvas.width = sampleWidth;
-        this.$canvas.height = sampleHeight;
-      }
-
-      context?.setTransform(1, 0, 0, 1, 0, 0);
-    }
-
-    this.#syncSharpAttribute(pixelSize);
-  }
-
-  #syncSharpAttribute(pixelSize: number): void {
-    if (pixelSize <= 1) {
-      this.setAttribute("sharp", "");
-      return;
-    }
-
-    this.removeAttribute("sharp");
-  }
-
   #sourceRect(
     width: number,
     height: number,
   ): { sx: number; sy: number; sw: number; sh: number } {
+    // Source rect for a cover crop centered in the canvas box
     const img = this.$img!;
     const iw = img.naturalWidth;
     const ih = img.naturalHeight;
@@ -207,8 +148,39 @@ export class Pixelate extends HTMLElement {
     };
   }
 
+  #reset(
+    width: number,
+    height: number,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+  ): void {
+    // Sharp image: hi-DPR buffer, smoothing on
+    const canvas = this.$canvas!;
+    const img = this.$img!;
+    const context = this.#context!;
+    const dpr = window.devicePixelRatio || 1;
+    const bufferWidth = Math.round(width * dpr);
+    const bufferHeight = Math.round(height * dpr);
+
+    if (canvas.width !== bufferWidth || canvas.height !== bufferHeight) {
+      canvas.width = bufferWidth;
+      canvas.height = bufferHeight;
+    }
+
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.clearRect(0, 0, width, height);
+    context.imageSmoothingEnabled = true;
+    context.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
+  }
+
   #draw(): void {
-    if (!this.$canvas || !this.$img || !this.#context || !this.$img.complete) {
+    const canvas = this.$canvas;
+    const img = this.$img;
+    const context = this.#context;
+
+    if (!canvas || !img || !context || !img.complete) {
       return;
     }
 
@@ -218,26 +190,24 @@ export class Pixelate extends HTMLElement {
       return;
     }
 
-    this.#resize();
+    const pixel = this.#pixel();
+    const { sx, sy, sw, sh } = this.#sourceRect(width, height);
 
-    const pixelSize = this.#pixelSize();
-    const context = this.#context;
-    const img = this.$img;
-
-    if (pixelSize <= 1) {
-      context.clearRect(0, 0, width, height);
-
-      const { sx, sy, sw, sh } = this.#sourceRect(width, height);
-
-      context.imageSmoothingEnabled = true;
-      context.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
+    if (pixel <= 1) {
+      this.#reset(width, height, sx, sy, sw, sh);
       return;
     }
 
-    const sampleWidth = Math.max(1, Math.ceil(width / pixelSize));
-    const sampleHeight = Math.max(1, Math.ceil(height / pixelSize));
-    const { sx, sy, sw, sh } = this.#sourceRect(width, height);
+    // Tiny offscreen buffer, upscaled by the canvas element via CSS
+    const sampleWidth = Math.max(1, Math.ceil(width / pixel));
+    const sampleHeight = Math.max(1, Math.ceil(height / pixel));
 
+    if (canvas.width !== sampleWidth || canvas.height !== sampleHeight) {
+      canvas.width = sampleWidth;
+      canvas.height = sampleHeight;
+    }
+
+    context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, sampleWidth, sampleHeight);
     context.imageSmoothingEnabled = false;
     context.drawImage(

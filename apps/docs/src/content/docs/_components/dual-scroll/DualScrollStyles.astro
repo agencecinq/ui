@@ -1,0 +1,46 @@
+---
+---
+<style is:global>
+  cinq-dual-scroll {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: min(70vh, 640px);
+  }
+
+  .dual-scroll__columns {
+    position: absolute;
+    inset: 0;
+  }
+
+  [data-scroll-column] {
+    position: absolute;
+    width: 50%;
+  }
+
+  [data-scroll-column="left"] {
+    top: 100%;
+    left: 0;
+  }
+
+  [data-scroll-column="right"] {
+    bottom: 100%;
+    right: 0;
+  }
+
+  .dual-scroll__pane {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--dual-scroll-pane-height, 100%);
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .dual-scroll__pane img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.75rem;
+  }
+</style>
