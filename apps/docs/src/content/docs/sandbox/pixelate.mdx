@@ -118,12 +118,12 @@ No second canvas or offscreen blit is required: CSS handles the upscale.
 | Attribute | Default | Description |
 | --- | --- | --- |
 | `pixel` | `256` | Block size in CSS pixels. `0` is sharp. Clamped to `0` to `256`. |
-| `sharp` | — | Reflected when `pixel` is `0` or `1`. Hook for CSS (e.g. `image-rendering: auto`). |
+| `sharp` | - | Reflected when `pixel` is `0` or `1`. Hook for CSS (e.g. `image-rendering: auto`). |
 
 ## Scroll reveal
 
 Map scroll or visibility to `pixel`. Both patterns appear in the live playground
-under **Scroll reveal** — same effect, different drivers.
+under **Scroll reveal**: same effect, different drivers.
 
 ### Scroll scrub
 
@@ -163,8 +163,8 @@ window.addEventListener(
 
 ### Visibility ratio
 
-Use `IntersectionObserver` when you prefer the browser’s **visibility ratio** —
-no scroll listener, updates only when intersection changes. Sharp when the host
+Use `IntersectionObserver` when you prefer the browser’s **visibility ratio**.
+No scroll listener, updates only when intersection changes. Sharp when the host
 is fully in view (`intersectionRatio === 1`):
 
 ```js
@@ -186,7 +186,7 @@ observer.observe(host)
 
 ### Staggered scroll scrub
 
-Same scroll-scrub helper with per-host offsets — for stacked galleries or
+Same scroll-scrub helper with per-host offsets, for stacked galleries or
 editorial sequences. See the playground’s third block in **Scroll reveal**.
 
 ## Drive from a range input
@@ -238,13 +238,16 @@ function readPixel(host) {
   return Number(host.getAttribute("pixel") ?? 256)
 }
 
+function ease(t) {
+  return 1 - (1 - t) ** 3
+}
+
 function animatePixel(host, from, to, duration) {
   const start = performance.now()
 
   function frame(now) {
     const t = Math.min(1, (now - start) / duration)
-    const eased = 1 - (1 - t) ** 3
-    host.setAttribute("pixel", String(Math.round(from + (to - from) * eased)))
+    host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
     host.sync()
     if (t < 1) requestAnimationFrame(frame)
   }
@@ -290,7 +293,7 @@ host.addEventListener("mousemove", (event) => {
 
 ### Animated toggle (`requestAnimationFrame`)
 
-Plain `<button>` for the trigger — not a CINQ component. Only
+Plain `<button>` for the trigger, not a CINQ component. Only
 `<cinq-pixelate>` is from this sandbox.
 
 Click alternates between blocky and sharp. Animation stays in your app. The component only
@@ -305,14 +308,17 @@ function isSharp(host) {
   return readPixel(host) <= 1
 }
 
+function ease(t) {
+  return 1 - (1 - t) ** 3
+}
+
 function animatePixel(host, from, to, duration) {
   const start = performance.now()
 
   return new Promise((resolve) => {
     function frame(now) {
       const t = Math.min(1, (now - start) / duration)
-      const eased = 1 - (1 - t) ** 3
-      host.setAttribute("pixel", String(Math.round(from + (to - from) * eased)))
+      host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
       host.sync()
       if (t < 1) requestAnimationFrame(frame)
       else resolve()
@@ -358,7 +364,7 @@ requestAnimationFrame(() => host.sync())
 or [`cinq-drawer`](../components/drawer/) and [`cinq-drawer-button`](../components/drawer/) for
 markup and open/close.
 
-**Open** — listen for `modal-open` / `drawer-open`, then reveal:
+**Open**: listen for `modal-open` / `drawer-open`, then reveal:
 
 ```js
 import { EVENTS } from "@agencecinq/utils"
@@ -371,11 +377,11 @@ document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
 })
 ```
 
-**Close** — `modal-close` / `drawer-close` fire after the overlay is already gone, so
+**Close**: `modal-close` / `drawer-close` fire after the overlay is already gone, so
 animate before close. Intercept `modal-toggle` / `drawer-toggle` in capture when the overlay
-is open (same for backdrop click on the dialog, `cancel` on Escape, or drawer overlay),
-pixelate, fade the dialog and backdrop out, then call `close()` (modal) or
-`removeAttribute("open")` (drawer):
+is open (same for backdrop click on the dialog, `cancel` on Escape, drawer overlay, or
+Escape on the drawer), pixelate, run the overlay exit transition, then call `close()`
+(modal) or `removeAttribute("open")` (drawer):
 
 ```js
 import { EVENTS } from "@agencecinq/utils"
@@ -414,9 +420,10 @@ dialog.addEventListener("cancel", (event) => {
 })
 ```
 
-Pair `is-closing` with CSS transitions on the dialog and `::backdrop` (700 ms, same
-duration as the pixel animation). `modal-close` / `drawer-close` reset `pixel` to `256`
-for the next open.
+Pair `is-opening` / `is-closing` with CSS transitions (700 ms, same duration as the
+pixel animation): panel slide and overlay fade on the drawer, opacity and `::backdrop`
+on the modal dialog.
+`modal-close` / `drawer-close` reset `pixel` to `256` for the next open.
 
 ## Live demos
 

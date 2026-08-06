@@ -14,7 +14,7 @@ export class Pixelate extends HTMLElement {
 
   #context: CanvasRenderingContext2D | null = null;
   #resizeObserver: ResizeObserver | null = null;
-  #drawScheduled = false;
+  #rafId = 0;
 
   #handleLoad = (): void => {
     this.#resize();
@@ -88,20 +88,29 @@ export class Pixelate extends HTMLElement {
     this.$img?.removeEventListener("load", this.#handleLoad);
     this.#resizeObserver.disconnect();
     this.#resizeObserver = null;
+    this.#cancel();
     this.#context = null;
   }
 
   /** Re-read `pixel` and redraw. */
   sync(): void {
-    if (this.#drawScheduled) {
+    if (this.#rafId) {
       return;
     }
 
-    this.#drawScheduled = true;
-    requestAnimationFrame(() => {
-      this.#drawScheduled = false;
+    this.#rafId = requestAnimationFrame(() => {
+      this.#rafId = 0;
       this.#draw();
     });
+  }
+
+  #cancel(): void {
+    if (!this.#rafId) {
+      return;
+    }
+
+    cancelAnimationFrame(this.#rafId);
+    this.#rafId = 0;
   }
 
   #pixelSize(): number {

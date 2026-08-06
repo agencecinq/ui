@@ -111,6 +111,44 @@ const sequenceImages = [
       transition: none;
     }
   }
+
+  #docs-pixelate-drawer [data-dom="overlay"] {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #docs-pixelate-drawer[open] [data-dom="overlay"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #docs-pixelate-drawer [role="dialog"] {
+    transform: translateX(100%);
+    transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #docs-pixelate-drawer[open] [role="dialog"] {
+    transform: translateX(0);
+  }
+
+  #docs-pixelate-drawer.is-opening[open] [data-dom="overlay"],
+  #docs-pixelate-drawer.is-closing[open] [data-dom="overlay"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #docs-pixelate-drawer.is-opening[open] [role="dialog"],
+  #docs-pixelate-drawer.is-closing[open] [role="dialog"] {
+    transform: translateX(100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #docs-pixelate-drawer [data-dom="overlay"],
+    #docs-pixelate-drawer [role="dialog"] {
+      transition: none;
+    }
+  }
 </style>
 
 <div class="not-content flex flex-col gap-10">
@@ -131,7 +169,7 @@ const sequenceImages = [
           <p class="text-sm text-gray-600">
             A <code>scroll</code> listener reads <code>getBoundingClientRect()</code> and maps
             position to <code>pixel</code>. Continuous while scrolling. Here the reveal finishes
-            when the host top crosses 40&nbsp;% of the viewport — before the photo is fully on
+            when the host top crosses 40&nbsp;% of the viewport, before the photo is fully on
             screen.
           </p>
         </div>
@@ -179,7 +217,7 @@ const sequenceImages = [
           <h4 class="text-base font-semibold text-gray-900">Visibility ratio</h4>
           <p class="text-sm text-gray-600">
             <code>IntersectionObserver</code> maps <code>intersectionRatio</code> to{' '}
-            <code>pixel</code>. No scroll listener — updates only when visibility changes. Sharp
+            <code>pixel</code>. No scroll listener. Updates only when visibility changes. Sharp
             only once the host is fully in view (<code>ratio = 1</code>).
           </p>
         </div>
@@ -220,7 +258,7 @@ const sequenceImages = [
         <div>
           <h4 class="text-base font-semibold text-gray-900">Staggered scroll scrub</h4>
           <p class="text-sm text-gray-600">
-            Same scroll-scrub technique with per-host offsets — useful for stacked galleries or
+            Same scroll-scrub technique with per-host offsets, useful for stacked galleries or
             editorial sequences.
           </p>
         </div>
@@ -363,7 +401,7 @@ const sequenceImages = [
         <h3 class="text-lg font-semibold text-gray-900">Pointer position</h3>
         <p class="text-sm text-gray-600">
           Move the cursor horizontally: left is sharp, right is blocky. The last{' '}
-          <code>pixel</code> value stays when the pointer leaves — like a horizontal scrub.
+          <code>pixel</code> value stays when the pointer leaves, like a horizontal scrub.
         </p>
       </div>
 
@@ -392,7 +430,7 @@ const sequenceImages = [
           <p class="text-sm text-gray-600">
             Click toggles between blocky and sharp. <code>requestAnimationFrame</code> interpolates{' '}
             <code>pixel</code>. Animation lives in your app, not the component. Plain{' '}
-            <code>&lt;button&gt;</code> — not a CINQ component.
+            <code>&lt;button&gt;</code>, not a CINQ component.
           </p>
         </div>
         <button
@@ -584,9 +622,9 @@ const sequenceImages = [
         <div>
           <h3 class="text-lg font-semibold text-gray-900">In a drawer</h3>
           <p class="text-sm text-gray-600">
-            Uses <code>cinq-drawer</code> and <code>cinq-drawer-button</code>. Same pattern with{' '}
-            <code>drawer-open</code> / <code>drawer-toggle</code>: reveal on open, pixelate on
-            close (button or backdrop).
+            Uses <code>cinq-drawer</code> and <code>cinq-drawer-button</code>. Slide and pixel
+            reveal run together on open; pixelate and slide-out together on close (button,
+            backdrop, or Escape).
           </p>
         </div>
         <cinq-drawer-button class="block shrink-0">
@@ -601,15 +639,15 @@ const sequenceImages = [
         </cinq-drawer-button>
       </div>
 
-      <cinq-drawer id="docs-pixelate-drawer" class="group">
+      <cinq-drawer id="docs-pixelate-drawer">
         <div
           data-dom="overlay"
-          class="pointer-events-none fixed inset-0 z-[2147483646] bg-black/50 opacity-0 transition-opacity group-[[open]]:pointer-events-auto group-[[open]]:opacity-100"
+          class="fixed inset-0 z-[2147483646] bg-black/50"
         />
         <div
           role="dialog"
           aria-label="Photo drawer"
-          class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md translate-x-full bg-white shadow-2xl transition-transform duration-300 group-[[open]]:translate-x-0"
+          class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl"
         >
           <div class="flex h-full flex-col">
             <header class="flex items-center justify-between border-b px-4 py-3">
@@ -662,6 +700,10 @@ const sequenceImages = [
   const LOAD_ANIMATE_MS = 900;
   const SEQUENCE_STAGGER = 0.12;
   const animationTokens = new WeakMap();
+
+  function ease(t) {
+    return 1 - (1 - t) ** 3;
+  }
 
   function asPixelate(element) {
     return element instanceof HTMLElement ? /** @type {Pixelate} */ (element) : null;
@@ -796,8 +838,7 @@ const sequenceImages = [
         }
 
         const t = Math.min(1, (now - start) / duration);
-        const eased = 1 - (1 - t) ** 3;
-        setPixel(host, from + (to - from) * eased);
+        setPixel(host, from + (to - from) * ease(t));
 
         if (t < 1) {
           requestAnimationFrame(frame);
@@ -881,6 +922,40 @@ const sequenceImages = [
         return dialog instanceof HTMLDialogElement ? dialog : null;
       }
 
+      function drawerElement() {
+        const element = overlayElement();
+
+        if (!(element instanceof HTMLElement) || element.tagName !== 'CINQ-DRAWER') {
+          return null;
+        }
+
+        return element;
+      }
+
+      function beginCloseTransition() {
+        const dialog = modalDialog();
+        const drawer = drawerElement();
+
+        if (dialog) {
+          dialog.classList.remove('is-closing');
+          void dialog.offsetWidth;
+          dialog.classList.add('is-closing');
+          return dialog;
+        }
+
+        if (drawer) {
+          drawer.classList.remove('is-closing', 'is-opening');
+          void drawer.offsetWidth;
+          drawer.classList.add('is-closing');
+
+          const panel = drawer.querySelector('[role="dialog"]');
+
+          return panel instanceof HTMLElement ? panel : drawer;
+        }
+
+        return null;
+      }
+
       function closeOverlay() {
         const element = overlayElement();
 
@@ -893,15 +968,49 @@ const sequenceImages = [
           'close' in element &&
           typeof element.close === 'function'
         ) {
-          const dialog = modalDialog();
-          dialog?.classList.remove('is-closing');
+          modalDialog()?.classList.remove('is-closing');
           element.close();
           return;
         }
 
         if (element.tagName === 'CINQ-DRAWER') {
+          element.classList.remove('is-closing', 'is-opening');
           element.removeAttribute('open');
         }
+      }
+
+      function runOpenAnimation(event) {
+        const drawer = drawerElement();
+
+        if (!drawer || isOverlayOpen()) {
+          return;
+        }
+
+        if (event instanceof CustomEvent) {
+          const detail = event.detail;
+
+          if (detail?.trigger) {
+            drawer.trigger = detail.trigger;
+          }
+
+          drawer.trap = detail?.trap || drawer;
+        }
+
+        drawer.classList.remove('is-closing');
+        drawer.classList.add('is-opening');
+        drawer.setAttribute('open', '');
+
+        const panel = drawer.querySelector('[role="dialog"]');
+        void (panel ?? drawer).offsetWidth;
+
+        setPixel(host, PIXEL_MAX);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            drawer.classList.remove('is-opening');
+            animatePixel(host, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
+          });
+        });
       }
 
       function runCloseAnimation() {
@@ -910,18 +1019,11 @@ const sequenceImages = [
         }
 
         closing = true;
-        const dialog = modalDialog();
         const from = readPixel(host);
         const pixelAnimation = animatePixel(host, from, PIXEL_MAX, ANIMATE_MS);
-
-        if (dialog) {
-          dialog.classList.remove('is-closing');
-          void dialog.offsetWidth;
-          dialog.classList.add('is-closing');
-        }
-
-        const overlayAnimation = dialog
-          ? waitForOverlayFade(dialog, ANIMATE_MS)
+        const fadeTarget = beginCloseTransition();
+        const overlayAnimation = fadeTarget
+          ? waitForOverlayFade(fadeTarget, ANIMATE_MS)
           : Promise.resolve();
 
         return Promise.all([pixelAnimation, overlayAnimation])
@@ -956,6 +1058,11 @@ const sequenceImages = [
           }
 
           if (!isOverlayOpen()) {
+            if (drawerElement() && detail?.drawer === overlayId) {
+              event.stopImmediatePropagation();
+              runOpenAnimation(event);
+            }
+
             return;
           }
 
@@ -1004,6 +1111,22 @@ const sequenceImages = [
           },
           { capture: true },
         );
+
+        document.documentElement.addEventListener(
+          'keyup',
+          (event) => {
+            if (!(event instanceof KeyboardEvent) || event.key !== 'Escape') {
+              return;
+            }
+
+            if (!isOverlayOpen()) {
+              return;
+            }
+
+            requestClose(event);
+          },
+          { capture: true },
+        );
       }
 
       document.documentElement.addEventListener(openEvent, (event) => {
@@ -1014,6 +1137,10 @@ const sequenceImages = [
         const detail = event.detail;
 
         if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+          return;
+        }
+
+        if (detail?.drawer === overlayId && drawerElement()) {
           return;
         }
 

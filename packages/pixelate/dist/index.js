@@ -18,9 +18,9 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 	$canvas = null;
 	#e = null;
 	#t = null;
-	#n = !1;
+	#n = 0;
 	#r = () => {
-		this.#o(), this.sync();
+		this.#s(), this.sync();
 	};
 	connectedCallback() {
 		this.init();
@@ -36,22 +36,25 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 			if (this.$img = this.querySelector("img"), !this.$img) throw Error("Pixelate must contain an img element");
 			if (this.$canvas = this.querySelector("canvas"), !this.$canvas) throw Error("Pixelate must contain a canvas element");
 			this.#e = this.$canvas.getContext("2d"), this.$img.addEventListener("load", this.#r), this.$img.complete && this.#r(), this.#t = new ResizeObserver(() => {
-				this.#o(), this.sync();
+				this.#s(), this.sync();
 			}), this.#t.observe(this.$canvas), this.sync();
 		}
 	}
 	destroy() {
-		this.#t && (this.$img?.removeEventListener("load", this.#r), this.#t.disconnect(), this.#t = null, this.#e = null);
+		this.#t && (this.$img?.removeEventListener("load", this.#r), this.#t.disconnect(), this.#t = null, this.#i(), this.#e = null);
 	}
 	sync() {
-		this.#n || (this.#n = !0, requestAnimationFrame(() => {
-			this.#n = !1, this.#l();
-		}));
+		this.#n ||= requestAnimationFrame(() => {
+			this.#n = 0, this.#u();
+		});
 	}
 	#i() {
-		return i(e(this.getAttribute("pixel"), 256), 0, 256);
+		this.#n &&= (cancelAnimationFrame(this.#n), 0);
 	}
 	#a() {
+		return i(e(this.getAttribute("pixel"), 256), 0, 256);
+	}
+	#o() {
 		let e = this.$canvas;
 		return e ? {
 			width: e.clientWidth,
@@ -61,11 +64,11 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 			height: 0
 		};
 	}
-	#o() {
+	#s() {
 		if (!this.$canvas || !this.$img) return;
-		let { width: e, height: t } = this.#a();
+		let { width: e, height: t } = this.#o();
 		if (e === 0 || t === 0) return;
-		let n = this.#i(), r = this.#e;
+		let n = this.#a(), r = this.#e;
 		if (n <= 1) {
 			let n = window.devicePixelRatio || 1, i = Math.round(e * n), a = Math.round(t * n);
 			(this.$canvas.width !== i || this.$canvas.height !== a) && (this.$canvas.width = i, this.$canvas.height = a), r?.setTransform(n, 0, 0, n, 0, 0);
@@ -73,16 +76,16 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 			let i = Math.max(1, Math.ceil(e / n)), a = Math.max(1, Math.ceil(t / n));
 			(this.$canvas.width !== i || this.$canvas.height !== a) && (this.$canvas.width = i, this.$canvas.height = a), r?.setTransform(1, 0, 0, 1, 0, 0);
 		}
-		this.#s(n);
+		this.#c(n);
 	}
-	#s(e) {
+	#c(e) {
 		if (e <= 1) {
 			this.setAttribute("sharp", "");
 			return;
 		}
 		this.removeAttribute("sharp");
 	}
-	#c(e, t) {
+	#l(e, t) {
 		let n = this.$img, r = n.naturalWidth, i = n.naturalHeight, a = Math.max(e / r, t / i), o = r * a, s = i * a, c = (e - o) / 2, l = (t - s) / 2;
 		return {
 			sx: Math.max(0, -c / a),
@@ -91,19 +94,19 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 			sh: t / a
 		};
 	}
-	#l() {
+	#u() {
 		if (!this.$canvas || !this.$img || !this.#e || !this.$img.complete) return;
-		let { width: e, height: t } = this.#a();
+		let { width: e, height: t } = this.#o();
 		if (e === 0 || t === 0) return;
-		this.#o();
-		let n = this.#i(), r = this.#e, i = this.$img;
+		this.#s();
+		let n = this.#a(), r = this.#e, i = this.$img;
 		if (n <= 1) {
 			r.clearRect(0, 0, e, t);
-			let { sx: n, sy: a, sw: o, sh: s } = this.#c(e, t);
+			let { sx: n, sy: a, sw: o, sh: s } = this.#l(e, t);
 			r.imageSmoothingEnabled = !0, r.drawImage(i, n, a, o, s, 0, 0, e, t);
 			return;
 		}
-		let a = Math.max(1, Math.ceil(e / n)), o = Math.max(1, Math.ceil(t / n)), { sx: s, sy: c, sw: l, sh: u } = this.#c(e, t);
+		let a = Math.max(1, Math.ceil(e / n)), o = Math.max(1, Math.ceil(t / n)), { sx: s, sy: c, sw: l, sh: u } = this.#l(e, t);
 		r.clearRect(0, 0, a, o), r.imageSmoothingEnabled = !1, r.drawImage(i, s, c, l, u, 0, 0, a, o);
 	}
 };
