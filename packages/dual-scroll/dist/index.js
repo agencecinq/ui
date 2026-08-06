@@ -29,7 +29,9 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = .01, o = 1, s = .1, c = "[
 		this.#y(e.clientX, e.clientY) && (e.preventDefault(), this.#v(e.deltaY));
 	};
 	#f = (e) => {
-		e.touches.length === 1 && (this.#a = !0, this.#s = e.touches[0].clientY, window.addEventListener("touchmove", this.#p, { passive: !1 }), window.addEventListener("touchend", this.#m, { passive: !0 }), window.addEventListener("touchcancel", this.#m, { passive: !0 }));
+		if (e.touches.length !== 1) return;
+		let t = e.touches[0];
+		this.#y(t.clientX, t.clientY) && (this.#a = !0, this.#s = t.clientY, e.preventDefault());
 	};
 	#p = (e) => {
 		if (!this.#a || e.touches.length !== 1) return;
@@ -37,7 +39,7 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = .01, o = 1, s = .1, c = "[
 		this.#s = e.touches[0].clientY, e.preventDefault(), this.#v(t);
 	};
 	#m = () => {
-		this.#a = !1, window.removeEventListener("touchmove", this.#p), window.removeEventListener("touchend", this.#m), window.removeEventListener("touchcancel", this.#m);
+		this.#a = !1;
 	};
 	connectedCallback() {
 		this.init();
@@ -51,11 +53,20 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = .01, o = 1, s = .1, c = "[
 	init() {
 		if (!this.#n) {
 			if (this.#e = this.querySelector(c), this.#t = this.querySelector(l), !this.#e || !this.#t) throw Error("DualScroll requires [data-scroll-column=\"left\"] and [data-scroll-column=\"right\"]");
-			this.#i = !0, window.addEventListener("wheel", this.#d, { passive: !1 }), this.addEventListener("touchstart", this.#f, { passive: !0 }), this.#n = new ResizeObserver(() => this.sync()), this.#n.observe(this), this.sync(), this.#r = requestAnimationFrame(this.#h);
+			this.#i = !0, window.addEventListener("wheel", this.#d, { passive: !1 }), this.addEventListener("touchstart", this.#f, { passive: !1 }), document.addEventListener("touchmove", this.#p, {
+				passive: !1,
+				capture: !0
+			}), document.addEventListener("touchend", this.#m, {
+				passive: !0,
+				capture: !0
+			}), document.addEventListener("touchcancel", this.#m, {
+				passive: !0,
+				capture: !0
+			}), this.#n = new ResizeObserver(() => this.sync()), this.#n.observe(this), this.sync(), this.#r = requestAnimationFrame(this.#h);
 		}
 	}
 	destroy() {
-		this.#n &&= (this.#i = !1, this.#a = !1, this.#o = !1, this.#r &&= (cancelAnimationFrame(this.#r), 0), window.removeEventListener("wheel", this.#d), this.removeEventListener("touchstart", this.#f), this.#m(), this.#n.disconnect(), null);
+		this.#n &&= (this.#i = !1, this.#a = !1, this.#o = !1, this.#r &&= (cancelAnimationFrame(this.#r), 0), window.removeEventListener("wheel", this.#d), this.removeEventListener("touchstart", this.#f), document.removeEventListener("touchmove", this.#p, { capture: !0 }), document.removeEventListener("touchend", this.#m, { capture: !0 }), document.removeEventListener("touchcancel", this.#m, { capture: !0 }), this.#a = !1, this.#n.disconnect(), null);
 	}
 	sync() {
 		let e = this.clientHeight;

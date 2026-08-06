@@ -479,8 +479,9 @@ The component observes host size via `ResizeObserver`. After abrupt layout
 changes, call `sync()`:
 
 ```js
-shell.classList.toggle("max-w-md")
-requestAnimationFrame(() => host.sync())
+shell.classList.toggle("w-[58%]")
+shell.classList.toggle("w-full")
+requestAnimationFrame(() => requestAnimationFrame(() => host.sync()))
 ```
 
 <DemoResize />

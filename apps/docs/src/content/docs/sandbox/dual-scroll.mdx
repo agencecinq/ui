@@ -44,15 +44,21 @@ each column (same count on both sides works best).
 
 **Zone height** is your responsibility: set an explicit height on
 `<cinq-dual-scroll>` (e.g. `70vh`, `100%` of a parent, or `100vh` for
-full-page). The host needs `overflow: hidden`.
+full-page). The host needs `overflow: hidden` and `touch-action: none` so
+mobile swipes stay in the zone instead of scrolling the page.
 
-Hover the zone before scrolling — wheel input is captured when the pointer
-is over the host, so the Starlight page doesn't scroll instead.
+Wheel input is captured when the pointer is over the host (desktop). Touch
+input starts inside the host (mobile).
 
 Each pane should match the host height. The component sets
 `--dual-scroll-pane-height` on sync so panes can use:
 
 ```css
+cinq-dual-scroll {
+  overflow: hidden;
+  touch-action: none;
+}
+
 .dual-scroll__pane {
   height: var(--dual-scroll-pane-height, 100%);
 }

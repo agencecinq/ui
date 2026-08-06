@@ -38,20 +38,18 @@ export class DualScroll extends HTMLElement {
       return;
     }
 
+    const touch = event.touches[0];
+
+    if (!this.#containsPoint(touch.clientX, touch.clientY)) {
+      return;
+    }
+
     this.#touchActive = true;
-    this.#touchStartY = event.touches[0].clientY;
-    window.addEventListener("touchmove", this.#handleWindowTouchMove, {
-      passive: false,
-    });
-    window.addEventListener("touchend", this.#handleTouchEnd, {
-      passive: true,
-    });
-    window.addEventListener("touchcancel", this.#handleTouchEnd, {
-      passive: true,
-    });
+    this.#touchStartY = touch.clientY;
+    event.preventDefault();
   };
 
-  #handleWindowTouchMove = (event: TouchEvent): void => {
+  #handleDocumentTouchMove = (event: TouchEvent): void => {
     if (!this.#touchActive || event.touches.length !== 1) {
       return;
     }
@@ -63,11 +61,8 @@ export class DualScroll extends HTMLElement {
     this.#applyScrollDelta(delta);
   };
 
-  #handleTouchEnd = (): void => {
+  #handleDocumentTouchEnd = (): void => {
     this.#touchActive = false;
-    window.removeEventListener("touchmove", this.#handleWindowTouchMove);
-    window.removeEventListener("touchend", this.#handleTouchEnd);
-    window.removeEventListener("touchcancel", this.#handleTouchEnd);
   };
 
   connectedCallback(): void {
@@ -114,7 +109,19 @@ export class DualScroll extends HTMLElement {
       passive: false,
     });
     this.addEventListener("touchstart", this.#handleTouchStart, {
+      passive: false,
+    });
+    document.addEventListener("touchmove", this.#handleDocumentTouchMove, {
+      passive: false,
+      capture: true,
+    });
+    document.addEventListener("touchend", this.#handleDocumentTouchEnd, {
       passive: true,
+      capture: true,
+    });
+    document.addEventListener("touchcancel", this.#handleDocumentTouchEnd, {
+      passive: true,
+      capture: true,
     });
 
     this.#resizeObserver = new ResizeObserver(() => this.sync());
@@ -141,7 +148,16 @@ export class DualScroll extends HTMLElement {
 
     window.removeEventListener("wheel", this.#handleWindowWheel);
     this.removeEventListener("touchstart", this.#handleTouchStart);
-    this.#handleTouchEnd();
+    document.removeEventListener("touchmove", this.#handleDocumentTouchMove, {
+      capture: true,
+    });
+    document.removeEventListener("touchend", this.#handleDocumentTouchEnd, {
+      capture: true,
+    });
+    document.removeEventListener("touchcancel", this.#handleDocumentTouchEnd, {
+      capture: true,
+    });
+    this.#touchActive = false;
 
     this.#resizeObserver.disconnect();
     this.#resizeObserver = null;

@@ -721,15 +721,21 @@
     gridSlider?.addEventListener('change', syncGridPixelate);
     syncGridPixelate();
 
+    const syncResizePixelate = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => asPixelate(resizeHost)?.sync());
+      });
+    };
+
     resizeWide?.addEventListener('click', () => {
-      resizeShell?.classList.remove('max-w-md');
-      resizeShell?.classList.add('max-w-3xl');
-      requestAnimationFrame(() => asPixelate(resizeHost)?.sync());
+      resizeShell?.classList.remove('w-[58%]');
+      resizeShell?.classList.add('w-full');
+      syncResizePixelate();
     });
     resizeNarrow?.addEventListener('click', () => {
-      resizeShell?.classList.remove('max-w-3xl');
-      resizeShell?.classList.add('max-w-md');
-      requestAnimationFrame(() => asPixelate(resizeHost)?.sync());
+      resizeShell?.classList.remove('w-full');
+      resizeShell?.classList.add('w-[58%]');
+      syncResizePixelate();
     });
 
     window.addEventListener('scroll', syncSequencePixelate, { passive: true });
