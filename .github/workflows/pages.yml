@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -21,16 +21,22 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm --dir apps/docs build
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: apps/docs/dist
 
