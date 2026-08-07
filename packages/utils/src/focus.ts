@@ -61,6 +61,25 @@ function restoreReturnFocus(): void {
   returnFocusElement = null;
 }
 
+/**
+ * Restore stashed focus after the current turn, unless something else already
+ * claimed it (another overlay, third-party popup, etc.). Still restores when
+ * focus is on `document.body` or inside `closingHost`.
+ */
+function scheduleRestoreReturnFocus(closingHost?: HTMLElement | null): void {
+  queueMicrotask(() => {
+    const active = document.activeElement;
+
+    if (active instanceof HTMLElement && active !== document.body) {
+      if (!closingHost?.contains(active)) {
+        return;
+      }
+    }
+
+    restoreReturnFocus();
+  });
+}
+
 function addTrapFocus(
   container: HTMLElement,
   elementToFocus: HTMLElement = container,
@@ -122,4 +141,5 @@ export {
   getFocusableElements,
   rememberReturnFocus,
   restoreReturnFocus,
+  scheduleRestoreReturnFocus,
 };

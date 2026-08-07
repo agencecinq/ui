@@ -19,6 +19,7 @@ var e = {
 	COMBOBOX_SUBMIT: "combobox:submit",
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
+	CALENDAR_CHANGE: "calendar:change",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -45,17 +46,10 @@ var e = {
 		r = e, n ||= setTimeout(i, t);
 	};
 }, a = document.documentElement, { body: o } = document;
-a.hasAttribute("data-debug");
-var s = {
-	x: 0,
-	y: 0
-};
-window.addEventListener("pointermove", i(({ x: e, y: t }) => {
-	s.x = e, s.y = t;
-}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+a.hasAttribute("data-debug"), window.addEventListener("pointermove", i(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
 //#region src/Props.ts
-var c = class {
+var s = class {
 	id;
 	role;
 	"aria-posinset";
@@ -68,44 +62,41 @@ var c = class {
 		let e = this;
 		return Object.keys(this).reduce((t, n) => `${t} ${n}="${e[n]}"`, "");
 	}
-}, l = class {
-	host;
+}, c = class {
+	#e;
 	constructor(e) {
-		this.host = e;
+		this.#e = e;
 	}
 	handle = (e) => {
 		let { key: t, ctrlKey: n, shiftKey: r } = e;
 		if (!(n || r)) switch (t) {
 			case "Enter":
-				this.onEnter(e);
+				this.#t(e);
 				break;
 			case "ArrowDown":
-				this.onArrowDown(e);
+				this.#n(e);
 				break;
 			case "ArrowUp":
-				this.onArrowUp(e);
+				this.#r(e);
 				break;
 			case "Escape":
-				this.onEscape(e);
+				this.#i(e);
 				break;
 			case "Tab":
-				this.onTab();
+				this.#a();
 				break;
 			case "Home":
-				this.onHome(e);
+				this.#o(e);
 				break;
 			case "End":
-				this.onEnd(e);
+				this.#s(e);
 				break;
 			case "ArrowLeft":
-			case "ArrowRight":
-				this.host.blurOption();
-				break;
-			default: break;
+			case "ArrowRight": this.#e.blurOption();
 		}
 	};
-	onEnter(e) {
-		let { host: t } = this;
+	#t(e) {
+		let t = this.#e;
 		if (t.focused) {
 			e.preventDefault(), t.select();
 			return;
@@ -115,9 +106,9 @@ var c = class {
 			clear: !1
 		});
 	}
-	async onArrowDown(e) {
+	async #n(e) {
 		e.preventDefault();
-		let { host: t } = this;
+		let t = this.#e;
 		if (!await t.ensureOpen()) return;
 		let { altKey: n } = e;
 		if (n) {
@@ -125,11 +116,11 @@ var c = class {
 			return;
 		}
 		let { length: r } = t.options;
-		t.focused ? t.index = t.index + 1 > r - 1 ? 0 : t.index + 1 : t.index = 0, t.refresh(t.index);
+		t.index = t.focused ? t.index + 1 > r - 1 ? 0 : t.index + 1 : 0, t.refresh(t.index);
 	}
-	async onArrowUp(e) {
+	async #r(e) {
 		e.preventDefault();
-		let { host: t } = this;
+		let t = this.#e;
 		if (!await t.ensureOpen()) return;
 		let { altKey: n } = e;
 		if (n) {
@@ -137,51 +128,51 @@ var c = class {
 			return;
 		}
 		let { length: r } = t.options;
-		t.focused ? t.index = 0 > t.index - 1 ? r - 1 : t.index - 1 : t.index = r - 1, t.refresh(t.index);
+		t.index = t.focused ? 0 > t.index - 1 ? r - 1 : t.index - 1 : r - 1, t.refresh(t.index);
 	}
-	onEscape(e) {
+	#i(e) {
 		e.preventDefault();
-		let { host: t } = this;
+		let t = this.#e;
 		if (t.expanded) {
 			t.hide({ force: !0 });
 			return;
 		}
 		t.write(t.input, ""), t.value = "";
 	}
-	onTab() {
-		let { host: e } = this;
+	#a() {
+		let e = this.#e;
 		if (e.focused) {
 			e.select();
 			return;
 		}
 		e.hide({ force: !0 });
 	}
-	onHome(e) {
-		let { host: t } = this;
+	#o(e) {
+		let t = this.#e;
 		t.focused && (e.preventDefault(), t.blurOption(), t.input.setSelectionRange(0, 0));
 	}
-	onEnd(e) {
-		let { host: t } = this;
+	#s(e) {
+		let t = this.#e;
 		if (!t.focused) return;
 		e.preventDefault(), t.blurOption();
 		let { length: n } = t.input.value;
 		t.input.setSelectionRange(n, n);
 	}
-}, u = (e, t) => {
+}, l = (e, t) => {
 	e.value = t;
-}, d = (e, t) => `<li${t}>${e}</li>`, f = [
+}, u = (e, t) => `<li${t}>${e}</li>`, d = [
 	"data-combobox-mode",
 	"data-combobox-select-mode",
 	"data-combobox-debounce",
 	"data-combobox-min-length",
 	"data-combobox-open-on-empty",
 	"data-combobox-autoselect"
-], p = class extends HTMLElement {
+], f = class extends HTMLElement {
 	static observedAttributes = [
 		"value",
 		"disabled",
 		"expanded",
-		...f
+		...d
 	];
 	$input = null;
 	$listbox = null;
@@ -196,32 +187,32 @@ var c = class {
 	debounce = 0;
 	minLength = 0;
 	openOnEmpty = !1;
-	write = u;
+	write = l;
 	onSelect = null;
-	_value = "";
-	_expanded = !1;
-	_search = null;
-	_render = d;
-	searchId = 0;
-	debounceTimer = null;
-	abortController = null;
-	keyboard = null;
-	bound = !1;
-	reflectingAttribute = !1;
+	#e = "";
+	#t = !1;
+	#n = null;
+	#r = u;
+	#i = 0;
+	#a = null;
+	#o = null;
+	#s = null;
+	#c = !1;
+	#l = !1;
 	connectedCallback() {
-		this.$input = this.querySelector("[role=\"combobox\"]") || this.querySelector("input"), this.$listbox = this.querySelector("[role=\"listbox\"]") || this.querySelector("[data-combobox-listbox]"), this.$button = this.querySelector("[data-combobox-button]") || null, this.mount();
+		this.init();
 	}
 	disconnectedCallback() {
 		this.destroy(), this.$input = null, this.$listbox = null, this.$button = null;
 	}
 	attributeChangedCallback(e, t, n) {
-		if (!(this.reflectingAttribute || t === n)) {
+		if (!(this.#l || t === n)) {
 			if (e === "value") {
 				this.setValue(n ?? "", { reflect: !1 });
 				return;
 			}
 			if (e === "disabled") {
-				this.syncDisabled();
+				this.#f();
 				return;
 			}
 			if (e === "expanded") {
@@ -230,36 +221,36 @@ var c = class {
 				});
 				return;
 			}
-			f.includes(e) && this.syncOptionsFromAttributes();
+			d.includes(e) && this.#d();
 		}
 	}
 	get value() {
-		return this._value;
+		return this.#e;
 	}
 	set value(e) {
 		this.setValue(e);
 	}
 	get expanded() {
-		return this._expanded;
+		return this.#t;
 	}
 	get disabled() {
 		return this.hasAttribute("disabled") || this.getAttribute("aria-disabled") === "true";
 	}
 	setValue(e, { reflect: t = !0 } = {}) {
 		let n = e ?? "";
-		this._value = n, this.$input && this.$input.value !== n && this.write(this.$input, n), t && this.reflectValueAttribute();
+		this.#e = n, this.$input && this.$input.value !== n && this.write(this.$input, n), t && this.#V();
 	}
 	get search() {
-		return this._search;
+		return this.#n;
 	}
 	set search(e) {
-		this._search = e, this.bound || this.mount();
+		this.#n = e, this.#c || this.init();
 	}
 	get render() {
-		return this._render;
+		return this.#r;
 	}
 	set render(e) {
-		this._render = e;
+		this.#r = e;
 	}
 	get input() {
 		if (!this.$input) throw Error("cinq-combobox: input is not ready");
@@ -268,40 +259,40 @@ var c = class {
 	get focused() {
 		return -1 < this.index;
 	}
-	get listbox() {
+	get #u() {
 		if (!this.$listbox) throw Error("cinq-combobox: listbox is not ready");
 		return this.$listbox;
 	}
 	show() {
-		!this.$input || !this.$listbox || this.disabled || (this.listbox.removeAttribute("hidden"), this.setExpanded(!0));
+		!this.$input || !this.$listbox || this.disabled || (this.#u.removeAttribute("hidden"), this.#M(!0));
 	}
 	hide({ force: e = !1, clear: t = !0 } = {}) {
-		if (!this.$input || !this.$listbox || !e && !this._expanded) return;
+		if (!this.$input || !this.$listbox || !e && !this.#t) return;
 		let n = this.options[this.index];
 		if (this.autoselect && n && this.selectMode === "value") {
 			let { value: e } = n;
 			this.setValue(e);
 		}
-		this.index = -1, t ? this.clear() : this.options.forEach(({ element: e }) => {
+		this.index = -1, t ? this.#R() : this.options.forEach(({ element: e }) => {
 			e.setAttribute("aria-selected", "false");
-		}), this.clearActiveDescendant(), this.listbox.setAttribute("hidden", ""), this.setExpanded(!1);
+		}), this.#k(), this.#u.setAttribute("hidden", ""), this.#M(!1);
 	}
 	select = () => {
 		if (!this.$input || !this.$listbox || this.disabled) return;
-		let t = this.options[this.index] ?? null, n = this.detail(t, this.index);
+		let t = this.options[this.index] ?? null, n = this.#N(t, this.index);
 		if (t && this.selectMode === "value") {
 			let { value: e } = t;
 			this.setValue(e);
 		}
-		this.onSelect?.(n), this.emit(e.COMBOBOX_SUBMIT, n), this.hide({ force: !0 });
+		this.onSelect?.(n), this.#A(e.COMBOBOX_SUBMIT, n), this.hide({ force: !0 });
 	};
 	destroy() {
-		this.searchId += 1, this.clearDebounce(), this.abort(), this.bound && this.$input && this.$listbox && this.keyboard && (this.$input.removeEventListener("input", this.onInput), this.$input.removeEventListener("keydown", this.keyboard.handle), this.$input.removeEventListener("click", this.onInputClick), this.$input.removeEventListener("focus", this.onFocus), this.$input.removeEventListener("blur", this.onBlur), this.$listbox.removeEventListener("mousedown", this.onListboxMousedown), this.$listbox.removeEventListener("click", this.onListboxClick), this.$button?.removeEventListener("mousedown", this.onButtonMousedown), this.$button?.removeEventListener("click", this.onButtonClick), document.removeEventListener("click", this.onDocumentClick)), this.keyboard = null, this.bound = !1;
+		this.#i += 1, this.#z(), this.#B(), this.#c && this.$input && this.$listbox && this.#s && (this.$input.removeEventListener("input", this.#v), this.$input.removeEventListener("keydown", this.#s.handle), this.$input.removeEventListener("click", this.#y), this.$input.removeEventListener("focus", this.#C), this.$input.removeEventListener("blur", this.#w), this.$listbox.removeEventListener("mousedown", this.#_), this.$listbox.removeEventListener("click", this.#S), this.$button?.removeEventListener("mousedown", this.#b), this.$button?.removeEventListener("click", this.#x), document.removeEventListener("click", this.#g)), this.#s = null, this.#c = !1;
 	}
 	blurOption() {
 		if (!(!this.$input || !this.$listbox)) {
 			if (!this.focused) {
-				this.clearActiveDescendant();
+				this.#k();
 				return;
 			}
 			this.index = -1, this.refresh(this.index);
@@ -309,9 +300,9 @@ var c = class {
 	}
 	refresh(t) {
 		if (!this.$input || !this.$listbox) return;
-		this.sync(t), this.active(t);
+		this.#D(t), this.#O(t);
 		let { options: n, value: r } = this;
-		this.emit(e.COMBOBOX_UPDATE, {
+		this.#A(e.COMBOBOX_UPDATE, {
 			options: n,
 			index: t,
 			value: r
@@ -319,28 +310,28 @@ var c = class {
 	}
 	async ensureOpen() {
 		if (!this.$input || !this.$listbox || this.disabled) return !1;
-		if (this._expanded && 0 < this.options.length) return !0;
+		if (this.#t && 0 < this.options.length) return !0;
 		let { value: e } = this.input;
-		return await this.run(e, { openWhenEmpty: !0 }), this._expanded && 0 < this.options.length;
+		return await this.#F(e, { openWhenEmpty: !0 }), this.#t && 0 < this.options.length;
 	}
-	mount() {
-		if (this.destroy(), !this.isConnected || !this.$input || !this.$listbox || !this._search) return;
-		this.syncOptionsFromAttributes(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list", this.$button ||= this.resolveButton();
+	init() {
+		if (this.$input = this.querySelector("[role=\"combobox\"]") || this.querySelector("input"), this.$listbox = this.querySelector("[role=\"listbox\"]") || this.querySelector("[data-combobox-listbox]"), this.$button = this.querySelector("[data-combobox-button]") || null, !this.isConnected || !this.$input || !this.$listbox || !this.#n) return;
+		this.#d(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list", this.$button ||= this.#p();
 		let e = this.getAttribute("value");
-		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.syncDisabled(), this.keyboard = new l(this), this.sync(-1), this.hide({
+		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new c(this), this.#D(-1), this.hide({
 			force: !0,
 			clear: !1
-		}), this.bind(), this.bound = !0;
+		}), this.#m(), this.#c = !0;
 	}
-	syncOptionsFromAttributes() {
+	#d() {
 		let e = this.getAttribute("data-combobox-mode") ?? "managed", t = this.getAttribute("data-combobox-select-mode") ?? "value";
 		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, n(this.getAttribute("data-combobox-debounce"), 0)), this.minLength = Math.max(0, n(this.getAttribute("data-combobox-min-length"), 0)), this.openOnEmpty = r(this.getAttribute("data-combobox-open-on-empty")), this.autoselect = r(this.getAttribute("data-combobox-autoselect"));
 	}
-	syncDisabled() {
+	#f() {
 		let e = this.disabled;
-		this.$input && (this.$input.disabled = e, e ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled")), this.$button && (this.$button.disabled = e, e ? this.$button.setAttribute("disabled", "") : this.$button.removeAttribute("disabled")), e && this._expanded && this.hide({ force: !0 });
+		this.$input && (this.$input.disabled = e, e ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled")), this.$button && (this.$button.disabled = e, e ? this.$button.setAttribute("disabled", "") : this.$button.removeAttribute("disabled")), e && this.#t && this.hide({ force: !0 });
 	}
-	resolveButton() {
+	#p() {
 		let e = this.$listbox;
 		if (!e) return null;
 		for (let t of [this, document]) {
@@ -349,67 +340,67 @@ var c = class {
 		}
 		return null;
 	}
-	bind() {
-		!this.$input || !this.$listbox || !this.keyboard || (this.$input.addEventListener("input", this.onInput), this.$input.addEventListener("keydown", this.keyboard.handle), this.$input.addEventListener("click", this.onInputClick), this.$input.addEventListener("focus", this.onFocus), this.$input.addEventListener("blur", this.onBlur), this.$listbox.addEventListener("mousedown", this.onListboxMousedown), this.$listbox.addEventListener("click", this.onListboxClick), this.$button && (this.$button.addEventListener("mousedown", this.onButtonMousedown), this.$button.addEventListener("click", this.onButtonClick)), document.addEventListener("click", this.onDocumentClick));
+	#m() {
+		!this.$input || !this.$listbox || !this.#s || (this.$input.addEventListener("input", this.#v), this.$input.addEventListener("keydown", this.#s.handle), this.$input.addEventListener("click", this.#y), this.$input.addEventListener("focus", this.#C), this.$input.addEventListener("blur", this.#w), this.$listbox.addEventListener("mousedown", this.#_), this.$listbox.addEventListener("click", this.#S), this.$button && (this.$button.addEventListener("mousedown", this.#b), this.$button.addEventListener("click", this.#x)), document.addEventListener("click", this.#g));
 	}
-	isTarget(e) {
+	#h(e) {
 		return e instanceof Node ? this.$input === e || !!this.$input?.contains(e) || this.$listbox === e || !!this.$listbox?.contains(e) || this.$button === e || !!this.$button?.contains(e) : !1;
 	}
-	onDocumentClick = ({ target: e }) => {
-		this.isTarget(e) || this.hide({ force: !0 });
+	#g = ({ target: e }) => {
+		this.#h(e) || this.hide({ force: !0 });
 	};
-	onListboxMousedown = (e) => {
+	#_ = (e) => {
 		e.preventDefault();
 	};
-	onInput = ({ target: e }) => {
+	#v = ({ target: e }) => {
 		if (!(e instanceof HTMLInputElement) || this.disabled) return;
 		let { value: t } = e;
-		this.setValue(t), this.blurOption(), this.schedule(t);
+		this.setValue(t), this.blurOption(), this.#P(t);
 	};
-	onInputClick = (e) => {
-		this.disabled || (e.stopPropagation(), this.toggle());
+	#y = (e) => {
+		this.disabled || (e.stopPropagation(), this.#T());
 	};
-	onButtonMousedown = (e) => {
+	#b = (e) => {
 		e.preventDefault();
 	};
-	onButtonClick = (e) => {
-		this.disabled || (e.preventDefault(), e.stopPropagation(), this.toggle().then(() => {
+	#x = (e) => {
+		this.disabled || (e.preventDefault(), e.stopPropagation(), this.#T().then(() => {
 			this.$input?.focus();
 		}));
 	};
-	onListboxClick = ({ target: e }) => {
+	#S = ({ target: e }) => {
 		if (this.disabled || !(e instanceof Element) || !this.$listbox) return;
 		let t = e.closest("[role=\"option\"]");
 		if (!t || !this.$listbox.contains(t)) return;
 		let n = this.options.findIndex(({ element: e }) => e === t);
-		0 > n && (this.sync(-1), n = this.options.findIndex(({ element: e }) => e === t), 0 > n) || (this.index = n, this.select());
+		0 > n && (this.#D(-1), n = this.options.findIndex(({ element: e }) => e === t), 0 > n) || (this.index = n, this.select());
 	};
-	onFocus = ({ target: e }) => {
+	#C = ({ target: e }) => {
 		if (!(e instanceof HTMLInputElement)) return;
 		let { value: t } = e;
 		this.setValue(t), this.blurOption();
 	};
-	onBlur = ({ relatedTarget: e }) => {
-		this.isTarget(e);
+	#w = ({ relatedTarget: e }) => {
+		this.#h(e);
 	};
-	async toggle() {
+	async #T() {
 		if (!this.disabled) {
-			if (this._expanded) {
+			if (this.#t) {
 				this.hide({ force: !0 });
 				return;
 			}
 			await this.ensureOpen() && this.blurOption();
 		}
 	}
-	build(e, t) {
-		this.listbox.innerHTML = "";
-		let { length: n } = t, { id: r } = this.listbox;
+	#E(e, t) {
+		this.#u.innerHTML = "";
+		let { length: n } = t, { id: r } = this.#u;
 		t.forEach((t, i) => {
-			let a = new c(i, e, r, n);
-			this.listbox.insertAdjacentHTML("beforeend", this._render(t, a));
-		}), this.sync(e);
+			let a = new s(i, e, r, n);
+			this.#u.insertAdjacentHTML("beforeend", this.#r(t, a));
+		}), this.#D(e);
 	}
-	sync(e) {
+	#D(e) {
 		if (!this.$listbox) return;
 		let t = [...this.$listbox.querySelectorAll("[role=\"option\"]")];
 		this.options = t.map((t, n) => {
@@ -423,7 +414,7 @@ var c = class {
 			};
 		});
 	}
-	active(e) {
+	#O(e) {
 		if (-1 < e && this.options[e]) {
 			let { id: t, element: n } = this.options[e];
 			if (t) {
@@ -431,25 +422,25 @@ var c = class {
 				return;
 			}
 		}
-		this.clearActiveDescendant();
+		this.#k();
 	}
-	clearActiveDescendant() {
+	#k() {
 		this.$input?.removeAttribute("aria-activedescendant");
 	}
-	emit(e, n) {
+	#A(e, n) {
 		t(this, e, n, { cancelable: !1 });
 	}
-	setLoading(e) {
+	#j(e) {
 		if (this.loading = e, e) {
-			this.$listbox?.setAttribute("aria-busy", "true"), this.reflectBusyAttribute(!0);
+			this.$listbox?.setAttribute("aria-busy", "true"), this.#U(!0);
 			return;
 		}
-		this.$listbox?.removeAttribute("aria-busy"), this.reflectBusyAttribute(!1);
+		this.$listbox?.removeAttribute("aria-busy"), this.#U(!1);
 	}
-	setExpanded(e) {
-		this._expanded = e, this.$input && this.$input.setAttribute("aria-expanded", e ? "true" : "false"), this.$button?.setAttribute("aria-expanded", e ? "true" : "false"), this.reflectExpandedAttribute();
+	#M(e) {
+		this.#t = e, this.$input && this.$input.setAttribute("aria-expanded", e ? "true" : "false"), this.$button?.setAttribute("aria-expanded", e ? "true" : "false"), this.#H();
 	}
-	detail(e, t) {
+	#N(e, t) {
 		let { value: n = "" } = e ?? {};
 		return {
 			option: e,
@@ -457,36 +448,36 @@ var c = class {
 			value: n
 		};
 	}
-	schedule(t) {
+	#P(t) {
 		if (!this.disabled) {
-			if (this.clearDebounce(), t.trim().length < this.minLength) {
-				this.abort(), this.searchId += 1, this.clear(), this.emit(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 });
+			if (this.#z(), t.trim().length < this.minLength) {
+				this.#B(), this.#i += 1, this.#R(), this.#A(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 });
 				return;
 			}
 			if (0 < this.debounce) {
-				this.debounceTimer = setTimeout(() => {
-					this.debounceTimer = null, this.run(t);
+				this.#a = setTimeout(() => {
+					this.#a = null, this.#F(t);
 				}, this.debounce);
 				return;
 			}
-			this.run(t);
+			this.#F(t);
 		}
 	}
-	async run(t, { openWhenEmpty: n = !1 } = {}) {
-		if (!this._search || this.disabled) return;
-		this.abort(), this.abortController = new AbortController();
-		let r = ++this.searchId, { signal: i } = this.abortController;
-		this.emit(e.COMBOBOX_LOADING), this.setLoading(!0);
+	async #F(t, { openWhenEmpty: n = !1 } = {}) {
+		if (!this.#n || this.disabled) return;
+		this.#B(), this.#o = new AbortController();
+		let r = ++this.#i, { signal: i } = this.#o;
+		this.#A(e.COMBOBOX_LOADING), this.#j(!0);
 		let a;
 		try {
-			a = await this._search(t, { signal: i });
+			a = await this.#n(t, { signal: i });
 		} catch (e) {
-			if (i.aborted || r !== this.searchId) return;
-			throw this.setLoading(!1), e;
+			if (i.aborted || r !== this.#i) return;
+			throw this.#j(!1), e;
 		}
-		if (r === this.searchId) {
-			if (this.apply(a), this.emit(e.COMBOBOX_LOADED), this.setLoading(!1), this.options.length === 0) {
-				if (this.emit(e.COMBOBOX_EMPTY, { value: t }), this.openOnEmpty) {
+		if (r === this.#i) {
+			if (this.#I(a), this.#A(e.COMBOBOX_LOADED), this.#j(!1), this.options.length === 0) {
+				if (this.#A(e.COMBOBOX_EMPTY, { value: t }), this.openOnEmpty) {
 					this.show();
 					return;
 				}
@@ -503,66 +494,66 @@ var c = class {
 			this.index = this.autoselect ? 0 : -1, this.refresh(this.index), this.show();
 		}
 	}
-	apply(e) {
+	#I(e) {
 		if (Array.isArray(e)) {
 			if (e.length === 0) {
-				this.clear({ clearDom: this.mode === "managed" });
+				this.#R({ clearDom: this.mode === "managed" });
 				return;
 			}
 			if (typeof e[0] == "string") {
-				this.build(-1, e);
+				this.#E(-1, e);
 				return;
 			}
-			this.replace(e);
+			this.#L(e);
 			return;
 		}
 		let { html: t, options: n } = e;
 		if (t != null && this.mode === "external") {
-			this.listbox.innerHTML = t, this.sync(-1);
+			this.#u.innerHTML = t, this.#D(-1);
 			return;
 		}
 		if (n) {
 			if (n.length === 0) {
-				this.clear({ clearDom: !0 });
+				this.#R({ clearDom: !0 });
 				return;
 			}
 			if (typeof n[0] == "string") {
-				this.build(-1, n);
+				this.#E(-1, n);
 				return;
 			}
-			this.replace(n);
+			this.#L(n);
 			return;
 		}
 		if (this.mode === "external") {
-			this.sync(-1);
+			this.#D(-1);
 			return;
 		}
-		this.clear({ clearDom: !0 });
+		this.#R({ clearDom: !0 });
 	}
-	replace(e) {
-		this.listbox.innerHTML = "", e.forEach((e) => {
-			this.listbox.appendChild(e);
-		}), this.sync(-1);
+	#L(e) {
+		this.#u.innerHTML = "", e.forEach((e) => {
+			this.#u.appendChild(e);
+		}), this.#D(-1);
 	}
-	clear({ clearDom: e = !0 } = {}) {
+	#R({ clearDom: e = !0 } = {}) {
 		this.options = [], this.index = -1, e && this.$listbox && (this.$listbox.innerHTML = "");
 	}
-	clearDebounce() {
-		this.debounceTimer &&= (clearTimeout(this.debounceTimer), null);
+	#z() {
+		this.#a &&= (clearTimeout(this.#a), null);
 	}
-	abort() {
-		this.abortController?.abort(), this.abortController = null;
+	#B() {
+		this.#o?.abort(), this.#o = null;
 	}
-	reflectValueAttribute() {
-		this.reflectingAttribute = !0, this._value ? this.setAttribute("value", this._value) : this.removeAttribute("value"), this.reflectingAttribute = !1;
+	#V() {
+		this.#l = !0, this.#e ? this.setAttribute("value", this.#e) : this.removeAttribute("value"), this.#l = !1;
 	}
-	reflectExpandedAttribute() {
-		this.reflectingAttribute = !0, this._expanded ? this.setAttribute("expanded", "") : this.removeAttribute("expanded"), this.reflectingAttribute = !1;
+	#H() {
+		this.#l = !0, this.#t ? this.setAttribute("expanded", "") : this.removeAttribute("expanded"), this.#l = !1;
 	}
-	reflectBusyAttribute(e) {
-		this.reflectingAttribute = !0, e ? this.setAttribute("busy", "") : this.removeAttribute("busy"), this.reflectingAttribute = !1;
+	#U(e) {
+		this.#l = !0, e ? this.setAttribute("busy", "") : this.removeAttribute("busy"), this.#l = !1;
 	}
 };
-customElements.get("cinq-combobox") || customElements.define("cinq-combobox", p);
+customElements.get("cinq-combobox") || customElements.define("cinq-combobox", f);
 //#endregion
-export { p as Combobox, c as Props };
+export { f as Combobox, s as Props };

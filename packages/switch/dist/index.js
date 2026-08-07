@@ -55,11 +55,11 @@ var a = class extends HTMLElement {
 		this.destroy(), this.$input = null;
 	}
 	init() {
-		this.$input = this.querySelector("input"), this.addEventListener("click", this.handleClick), this.addEventListener("keydown", this.handleKeydown), this.update();
+		this.$input = this.querySelector("input"), this.addEventListener("click", this.#e), this.addEventListener("keydown", this.#t), this.#r();
 	}
 	attributeChangedCallback(e, t, n) {
 		if (e === "disabled") {
-			this.update(), n !== null && this.matches(":focus") && this.blur();
+			this.#r(), n !== null && this.matches(":focus") && this.blur();
 			return;
 		}
 		if (e === "checked") {
@@ -80,24 +80,24 @@ var a = class extends HTMLElement {
 		return this.disabled ? !1 : this.checked ? this.deactivate() : this.activate();
 	}
 	activate(n = !0) {
-		return this.disabled || this.checked || n && !t(this, e.SWITCH_ACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "true"), this.update(), this.setAttribute("checked", ""), !0);
+		return this.disabled || this.checked || n && !t(this, e.SWITCH_ACTIVATE, this.#n) ? !1 : (this.setAttribute("aria-checked", "true"), this.#r(), this.setAttribute("checked", ""), !0);
 	}
 	deactivate(n = !0) {
-		return this.disabled || !this.checked || n && !t(this, e.SWITCH_DEACTIVATE, this.detail) ? !1 : (this.setAttribute("aria-checked", "false"), this.update(), this.removeAttribute("checked"), !0);
+		return this.disabled || !this.checked || n && !t(this, e.SWITCH_DEACTIVATE, this.#n) ? !1 : (this.setAttribute("aria-checked", "false"), this.#r(), this.removeAttribute("checked"), !0);
 	}
 	destroy() {
-		this.removeEventListener("click", this.handleClick), this.removeEventListener("keydown", this.handleKeydown);
+		this.removeEventListener("click", this.#e), this.removeEventListener("keydown", this.#t);
 	}
-	handleClick = (e) => {
+	#e = (e) => {
 		this.disabled || e.detail !== 0 && this.toggle();
 	};
-	handleKeydown = (e) => {
+	#t = (e) => {
 		this.disabled || (e.key === " " || e.key === "Enter") && (e.preventDefault(), this.toggle());
 	};
-	get detail() {
+	get #n() {
 		return { el: this };
 	}
-	update() {
+	#r() {
 		this.$input && (this.$input.checked = this.checked, this.$input.toggleAttribute("checked", this.checked), this.$input.disabled = this.disabled, this.$input.toggleAttribute("disabled", this.disabled));
 	}
 };

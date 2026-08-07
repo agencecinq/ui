@@ -62,6 +62,13 @@ An `id` is required if you want it to react to `modal-toggle` events from `cinq-
 </cinq-modal>
 ```
 
+### Attributes
+
+| Attribute | Required | Description |
+| --------- | -------- | ----------- |
+| `id`      | Yes      | Modal identifier; must match button `aria-controls`. |
+| `open`    | No       | Reflected state attribute (useful for styling). |
+
 ### Methods
 
 Interact with the element instance directly:
@@ -69,19 +76,54 @@ Interact with the element instance directly:
 ```js
 const $modal = document.querySelector("cinq-modal#my-modal");
 
-$modal.show();
-$modal.close();
+$modal.show(); // returns false if already open, aborted, or deferred
+$modal.close(); // returns false if already closed, aborted, or deferred
 ```
 
 ### Events
 
-Event names come from `@agencecinq/utils`:
+Event names come from `@agencecinq/utils` on `document.documentElement`:
 
-| Event          | Emitted by          | Payload (`event.detail`)                                                   | Description                                                                                                                              |
-| -------------- | ------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `modal-toggle` | `cinq-modal-button` | `{ modal: string; trigger: HTMLButtonElement; trap: HTMLElement \| null }` | Requests toggling a modal identified by the button `aria-controls`. One event is dispatched **per id** (space-separated list supported). |
-| `modal-open`   | `cinq-modal`        | `{ modal: string; trigger: HTMLElement \| null }`                         | Dispatched after `show()`. Buttons sync `aria-pressed` when `detail.modal` matches.                                                     |
-| `modal-close`  | `cinq-modal`        | `{ modal: string }`                                                       | Dispatched after `close()`. Buttons sync `aria-pressed` when `detail.modal` matches.                                                    |
+| Event | Constant | Cancelable | Detail | Description |
+| ----- | -------- | ---------- | ------ | ----------- |
+| `modal-toggle` | `MODAL_TOGGLE` | No | `{ modal, trigger, trap }` | Request open/close from a button |
+| `modal-before-open` | `MODAL_BEFORE_OPEN` | Yes | `{ modal, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
+| `modal-before-close` | `MODAL_BEFORE_CLOSE` | Yes | `{ modal, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
+| `modal-open` | `MODAL_OPEN` | No | `{ modal, trigger? }` | Fired after `open` is set |
+| `modal-close` | `MODAL_CLOSE` | No | `{ modal }` | Fired after `open` is removed |
+
+#### Deferring open or close
+
+```js
+import { EVENTS } from '@agencecinq/utils';
+
+document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_OPEN, (event) => {
+  if (event.detail.modal !== 'my-modal') return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+
+document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {
+  if (event.detail.modal !== 'my-modal') return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+```
+
+`resolve()` is idempotent. TypeScript: `BeforeOpenDetail` and `BeforeCloseDetail`
+from `@agencecinq/modal`.
+
+**UX:** defer open when the fetch is quick and the dialog would feel empty;
+otherwise open immediately and load on `modal-open`. Defer close for save,
+archive, or exit animation.
 
 ### Wiring: handle `modal-toggle`
 

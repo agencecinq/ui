@@ -4,6 +4,11 @@ import { loadImage } from './images';
 ---
 
 <PixelateDemoFrame>
+  <p class="text-sm text-gray-600">
+    The image uses <code>loading="lazy"</code>: the reveal runs when it enters
+    the viewport and finishes loading.
+  </p>
+
   <cinq-pixelate
     id="docs-pixelate-load"
     class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
@@ -11,6 +16,7 @@ import { loadImage } from './images';
   >
     <img
       src={loadImage}
+      loading="lazy"
       crossorigin="anonymous"
       alt="Desert dunes"
       width="960"

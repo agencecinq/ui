@@ -19,6 +19,7 @@ var e = {
 	COMBOBOX_SUBMIT: "combobox:submit",
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
+	CALENDAR_CHANGE: "calendar:change",
 	TAB_BEFORE_ACTIVATE: "tab-before-activate",
 	TAB_ACTIVATE: "tab-activate",
 	TAB_DELETE: "tab-delete",
@@ -41,23 +42,16 @@ var e = {
 		r = e, n ||= setTimeout(i, t);
 	};
 }, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug");
-var a = {
-	x: 0,
-	y: 0
-};
-window.addEventListener("pointermove", n(({ x: e, y: t }) => {
-	a.x = e, a.y = t;
-}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
 //#region src/utils/getHash.ts
-function o(e) {
+function a(e) {
 	let t = e.indexOf("#");
 	return t === -1 ? "" : e.substring(t + 1);
 }
 //#endregion
 //#region src/TabPanel.ts
-var s = class {
+var o = class {
 	el;
 	id;
 	constructor(e) {
@@ -73,7 +67,7 @@ var s = class {
 	destroy() {
 		this.el.removeAttribute("hidden"), this.el.classList.remove("is-active");
 	}
-}, c = class {
+}, s = class {
 	el;
 	active = !1;
 	id = "";
@@ -115,7 +109,7 @@ var s = class {
 	destroy() {
 		this.el.removeAttribute("tabindex"), this.el.removeAttribute("aria-selected"), this.el.classList.remove("is-active"), this.el.removeEventListener("click", this.handleClick);
 	}
-}, l = class extends HTMLElement {
+}, c = class extends HTMLElement {
 	$tabList;
 	current = 0;
 	tabPanels = [];
@@ -127,21 +121,21 @@ var s = class {
 		super(), this.$tabList = null;
 	}
 	connectedCallback() {
-		this.$tabList = this.querySelector("[role=\"tablist\"]");
-		let e = this.getAttribute("data-tabs-hash"), t = this.getAttribute("data-tabs-delay");
-		if (this.hash = e === null ? this.hash : e !== "false" && e !== "0", t !== null) {
-			let e = parseInt(t, 10);
-			this.delay = Number.isNaN(e) ? 0 : e;
-		}
-		this.href = this.hash && o(window.location.hash) || "", this.init();
+		this.init();
 	}
 	disconnectedCallback() {
 		this.destroy();
 	}
 	init() {
-		if (!this.$tabList) return;
-		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new c(e, t)), this.tabs.forEach((t, n) => {
-			this.tabPanels.push(new s(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TAB_ACTIVATE, () => {
+		this.$tabList = this.querySelector("[role=\"tablist\"]");
+		let t = this.getAttribute("data-tabs-hash"), n = this.getAttribute("data-tabs-delay");
+		if (this.hash = t === null ? this.hash : t !== "false" && t !== "0", n !== null) {
+			let e = parseInt(n, 10);
+			this.delay = Number.isNaN(e) ? 0 : e;
+		}
+		if (this.href = this.hash && a(window.location.hash) || "", !this.$tabList) return;
+		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new s(e, t)), this.tabs.forEach((t, n) => {
+			this.tabPanels.push(new o(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TAB_ACTIVATE, () => {
 				this.current = n, this.deactivateTabs(), this.deactivateTabPanels(), t.activate(!1), this.tabPanels.find((e) => e.id === t.controls)?.activate(), this.hash && (this.href = t.id, window.location.hash = t.id);
 			});
 		}), this.href) {
@@ -152,13 +146,13 @@ var s = class {
 			let e = this.tabs.findIndex((e) => e.active);
 			e >= 0 && (this.current = e);
 		}
-		let t = this.tabs[this.current];
-		t && (this.deactivateTabs(), this.deactivateTabPanels(), t.activate(!1), this.tabPanels.find((e) => e.id === t.controls)?.activate()), this.initEvents();
+		let r = this.tabs[this.current];
+		r && (this.deactivateTabs(), this.deactivateTabPanels(), r.activate(!1), this.tabPanels.find((e) => e.id === r.controls)?.activate()), this.initEvents();
 	}
 	initEvents() {
 		this.$tabList?.addEventListener("keydown", this.handleKeydown);
 	}
-	get isRtl() {
+	get #e() {
 		let e = this.$tabList ?? this;
 		return e ? getComputedStyle(e).direction === "rtl" : !1;
 	}
@@ -175,7 +169,7 @@ var s = class {
 			e.preventDefault(), this.current = 0, this.tabs[this.current].toggle();
 		}, c = () => {
 			e.preventDefault(), this.current = this.tabs.length - 1, this.tabs[this.current].toggle();
-		}, l = this.isRtl, u = {
+		}, l = this.#e, u = {
 			ArrowUp: a,
 			ArrowDown: o,
 			ArrowLeft: l ? o : a,
@@ -193,12 +187,12 @@ var s = class {
 	deactivateTabs = () => this.tabs.forEach((e) => e.deactivate());
 	deactivateTabPanels = () => this.tabPanels.forEach((e) => e.deactivate());
 	delete({ target: e }) {
-		return e.getAttribute("data-deletable") === null ? !1 : (this.tabs[this.current].delete(), this.tabPanels[this.current].delete(), this.tabs.splice(this.current, 1), this.tabPanels.splice(this.current, 1), this.current = 0 > this.current - 1 ? 0 : this.current - 1, this.tabs[this.current].toggle(), !0);
+		return e.getAttribute("data-deletable") !== null && (this.tabs[this.current].delete(), this.tabPanels[this.current].delete(), this.tabs.splice(this.current, 1), this.tabPanels.splice(this.current, 1), this.current = 0 > this.current - 1 ? 0 : this.current - 1, this.tabs[this.current].toggle(), !0);
 	}
 	destroy() {
 		this.$tabList?.removeEventListener("keydown", this.handleKeydown), this.tabs.forEach((e) => e.destroy()), this.tabPanels.forEach((e) => e.destroy()), this.tabs = [], this.tabPanels = [];
 	}
 };
-customElements.get("cinq-tabs") || customElements.define("cinq-tabs", l);
+customElements.get("cinq-tabs") || customElements.define("cinq-tabs", c);
 //#endregion
-export { l as Tabs };
+export { c as Tabs };

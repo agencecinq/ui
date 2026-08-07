@@ -90,7 +90,7 @@ export class Calendar extends HTMLElement {
   };
   current: Current = { month: 0, year: 0, day: null };
 
-  private keyboard: Keyboard | null = null;
+  #keyboard: Keyboard | null = null;
 
   $body: HTMLTableSectionElement | null = null;
   $title: HTMLElement | null = null;
@@ -100,15 +100,15 @@ export class Calendar extends HTMLElement {
   /** Selected days as `YYYY-MM-DD`. */
   picked: string[] = [];
 
-  private get isMultiple(): boolean {
+  get #isMultiple(): boolean {
     return this.options.mode === "multiple";
   }
 
-  private get isRange(): boolean {
+  get #isRange(): boolean {
     return this.options.mode === "range";
   }
 
-  private get isSingle(): boolean {
+  get #isSingle(): boolean {
     return this.options.mode === "single";
   }
 
@@ -118,14 +118,14 @@ export class Calendar extends HTMLElement {
 
   disconnectedCallback(): void {
     this.destroy();
-    this.keyboard = null;
+    this.#keyboard = null;
     this.$body = null;
     this.$title = null;
     this.$next = null;
     this.$previous = null;
   }
 
-  private readOptions(): Options {
+  #readOptions(): Options {
     const locale =
       this.getAttribute("locale") ||
       this.getAttribute("data-locale") ||
@@ -156,7 +156,7 @@ export class Calendar extends HTMLElement {
     this.today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     this.day = toDayString(this.today);
 
-    this.options = this.readOptions();
+    this.options = this.#readOptions();
 
     this.current = {
       month: parseNumber(
@@ -179,7 +179,7 @@ export class Calendar extends HTMLElement {
       throw new Error("Calendar: .js-body element not found");
     }
 
-    this.keyboard = new Keyboard(this);
+    this.#keyboard = new Keyboard(this);
 
     try {
       this.picked = JSON.parse(
@@ -192,9 +192,9 @@ export class Calendar extends HTMLElement {
     this.render();
     this.addEventListener("click", this.handleClick);
 
-    this.$body.addEventListener("keydown", this.keyboard.handleKeydown, false);
+    this.$body.addEventListener("keydown", this.#keyboard.handleKeydown, false);
 
-    if (this.isRange) {
+    if (this.#isRange) {
       this.$body.addEventListener("mousemove", this.handleMousemove, false);
     }
   }
@@ -202,10 +202,10 @@ export class Calendar extends HTMLElement {
   destroy(): void {
     this.removeEventListener("click", this.handleClick);
 
-    if (this.$body && this.keyboard) {
+    if (this.$body && this.#keyboard) {
       this.$body.removeEventListener(
         "keydown",
-        this.keyboard.handleKeydown,
+        this.#keyboard.handleKeydown,
         false,
       );
       this.$body.removeEventListener("mousemove", this.handleMousemove, false);
@@ -264,9 +264,9 @@ export class Calendar extends HTMLElement {
     }
 
     const day = $target.getAttribute("data-day") as string;
-    this.keyboard?.setFocusDay($target as HTMLButtonElement, { focus: false });
+    this.#keyboard?.setFocusDay($target as HTMLButtonElement, { focus: false });
 
-    if (this.isMultiple) {
+    if (this.#isMultiple) {
       const index = this.picked.indexOf(day);
 
       if (index >= 0) {
@@ -281,7 +281,7 @@ export class Calendar extends HTMLElement {
       return this.persistPicked();
     }
 
-    if (this.isSingle) {
+    if (this.#isSingle) {
       if (
         $target.classList.contains(this.options.stateClasses.active) &&
         this.options.deselect
@@ -320,7 +320,7 @@ export class Calendar extends HTMLElement {
 
   /** Paint in-between days while choosing the range end (mouse or keyboard). */
   previewRange(to: string) {
-    if (!this.isRange || 1 !== this.picked.length || !this.$body) {
+    if (!this.#isRange || 1 !== this.picked.length || !this.$body) {
       return;
     }
 
@@ -488,7 +488,7 @@ export class Calendar extends HTMLElement {
           if (isSelected) {
             $button.classList.add(this.options.stateClasses.active);
 
-            if (this.isRange) {
+            if (this.#isRange) {
               if (day === this.picked[0]) {
                 $button.classList.add(this.options.stateClasses.start);
               }
@@ -502,7 +502,7 @@ export class Calendar extends HTMLElement {
           }
 
           if (
-            this.isRange &&
+            this.#isRange &&
             2 === this.picked.length &&
             isBetween(day, this.picked[0], this.picked[1])
           ) {
@@ -523,7 +523,7 @@ export class Calendar extends HTMLElement {
       }
     }
 
-    this.keyboard?.sync({ focus });
+    this.#keyboard?.sync({ focus });
   }
 
   reset() {

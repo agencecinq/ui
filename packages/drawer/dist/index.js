@@ -1,8 +1,12 @@
 //#region ../utils/dist/index.js
 var e = {
+	DRAWER_BEFORE_CLOSE: "drawer-before-close",
+	DRAWER_BEFORE_OPEN: "drawer-before-open",
 	DRAWER_CLOSE: "drawer-close",
 	DRAWER_OPEN: "drawer-open",
 	DRAWER_TOGGLE: "drawer-toggle",
+	MODAL_BEFORE_CLOSE: "modal-before-close",
+	MODAL_BEFORE_OPEN: "modal-before-open",
 	MODAL_CLOSE: "modal-close",
 	MODAL_OPEN: "modal-open",
 	MODAL_TOGGLE: "modal-toggle",
@@ -46,29 +50,24 @@ r.hasAttribute("data-debug");
 var a = {
 	y: 0,
 	x: 0
-}, o = {
-	x: 0,
-	y: 0
 };
-window.addEventListener("pointermove", n(({ x: e, y: t }) => {
-	o.x = e, o.y = t;
-}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var s = (e, t) => {
+window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+var o = (e, t) => {
 	e !== void 0 && (a.x = e), t !== void 0 && (a.y = t), window.scrollTo(a.x, a.y);
 };
-function c() {
-	let e = r.scrollLeft, t = r.scrollTop, n = i.scrollLeft, o = i.scrollTop;
-	a.x = window.scrollX || e || n, a.y = window.scrollY || t || o || 0, r.style.setProperty("overflow", "hidden"), r.style.setProperty("height", "100%"), r.style.setProperty("scroll-padding-top", "0px"), s(a.x, a.y);
+function s() {
+	let e = r.scrollLeft, t = r.scrollTop, n = i.scrollLeft, s = i.scrollTop;
+	a.x = window.scrollX || e || n, a.y = window.scrollY || t || s || 0, r.style.setProperty("overflow", "hidden"), r.style.setProperty("height", "100%"), r.style.setProperty("scroll-padding-top", "0px"), o(a.x, a.y);
 }
-function l(e = 0) {
+function c(e = 0) {
 	let t = !0, n = a.y;
-	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), r.style.removeProperty("overflow"), r.style.removeProperty("height"), r.style.removeProperty("scroll-padding-top"), t && s(a.x, n);
+	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), r.style.removeProperty("overflow"), r.style.removeProperty("height"), r.style.removeProperty("scroll-padding-top"), t && o(a.x, n);
 }
-var u = {}, d = null;
-function f(e) {
+var l = {}, u = null;
+function d(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function p(e) {
+function f(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -82,23 +81,29 @@ function p(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => f(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => d(e) && e.getAttribute("tabindex") !== "-1");
 }
-function m(e) {
-	if (d) return;
+function p(e) {
+	if (u) return;
 	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-	!t || t === document.body || !t.isConnected || (d = t);
+	!t || t === document.body || !t.isConnected || (u = t);
 }
-function h() {
-	d?.focus(), d = null;
+function m() {
+	u?.focus(), u = null;
+}
+function h(e) {
+	queueMicrotask(() => {
+		let t = document.activeElement;
+		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || m();
+	});
 }
 function g(e, t = e) {
-	let n = p(e);
+	let n = f(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	m(), _(), u.keydown = (t) => {
+	p(), _(), l.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", u.keydown), t.focus(), t instanceof HTMLInputElement && [
+	}, document.addEventListener("keydown", l.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
 		"text",
 		"email",
@@ -106,7 +111,7 @@ function g(e, t = e) {
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
 function _(e = null) {
-	u.keydown && document.removeEventListener("keydown", u.keydown), e && e.focus();
+	l.keydown && document.removeEventListener("keydown", l.keydown), e && e.focus();
 }
 //#endregion
 //#region src/drawer.ts
@@ -129,28 +134,27 @@ var v = class extends HTMLElement {
 	}
 	init() {
 		if (!this.id) throw Error("Drawer: id attribute is required");
-		this.$panel = this.querySelector("[role=\"dialog\"]") || this, this.$overlay = this.querySelector("[data-dom=\"overlay\"]") || this.querySelector("[overlay]"), this.$overlay && this.$overlay.addEventListener("click", this.handleClick), document.documentElement.addEventListener("keyup", this.handleKeyUp), document.documentElement.addEventListener(e.DRAWER_OPEN, this.handleDrawerOpen), document.documentElement.addEventListener(e.DRAWER_TOGGLE, this.handleDrawerToggle);
+		if (this.$panel = this.querySelector("[role=\"dialog\"]"), !this.$panel) throw Error("Drawer: No [role=\"dialog\"] panel found");
+		this.$overlay = this.querySelector("[data-dom=\"overlay\"]") || this.querySelector("[overlay]"), this.$overlay && this.$overlay.addEventListener("click", this.#e), document.documentElement.addEventListener("keyup", this.#t), document.documentElement.addEventListener(e.DRAWER_OPEN, this.#n), document.documentElement.addEventListener(e.DRAWER_TOGGLE, this.#r);
 	}
 	destroy() {
-		this.$panel?.removeEventListener("transitionend", this.onCloseTransitionEnd), this.$overlay && this.$overlay.removeEventListener("click", this.handleClick), document.documentElement.removeEventListener("keyup", this.handleKeyUp), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.handleDrawerOpen), document.documentElement.removeEventListener(e.DRAWER_TOGGLE, this.handleDrawerToggle), this.hasAttribute("open") && (_(), l(!1), this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden"), queueMicrotask(() => {
-			[...document.querySelectorAll("cinq-drawer[open]")].some((e) => e !== this) || h();
-		})), this.$overlay = null, this.$panel = null;
+		this.$panel?.removeEventListener("transitionend", this.#i), this.$overlay && this.$overlay.removeEventListener("click", this.#e), document.documentElement.removeEventListener("keyup", this.#t), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.#n), document.documentElement.removeEventListener(e.DRAWER_TOGGLE, this.#r), this.hasAttribute("open") && (_(), c(!1), this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden"), h(this)), this.$overlay = null, this.$panel = null;
 	}
-	handleClick = () => this.toggle({
+	#e = () => this.toggle({
 		trigger: null,
 		trap: null
 	});
-	handleKeyUp = (e) => {
-		e.key === "Escape" && this.hasAttribute("open") && this.removeAttribute("open");
+	#t = (e) => {
+		e.key === "Escape" && this.hasAttribute("open") && this.close();
 	};
-	handleDrawerOpen = (e) => {
+	#n = (e) => {
 		if (e.detail.drawer !== this.id && this.hasAttribute("open")) {
-			this.removeAttribute("open");
+			this.close();
 			return;
 		}
-		e.detail.drawer === this.id && !this.hasAttribute("open") && (e.detail.trigger && (this.trigger = e.detail.trigger), this.setAttribute("open", ""));
+		e.detail.drawer === this.id && !this.hasAttribute("open") && (e.detail.trigger && (this.trigger = e.detail.trigger), this.open());
 	};
-	handleDrawerToggle = (e) => {
+	#r = (e) => {
 		let { trigger: t, trap: n, drawer: r } = e.detail;
 		r === this.id && this.toggle({
 			trigger: t,
@@ -158,32 +162,53 @@ var v = class extends HTMLElement {
 		});
 	};
 	toggle({ trigger: e, trap: t }) {
-		return !this.hasAttribute("open") && e && (this.trigger = e), this.trap = t || this, this.toggleAttribute("open");
+		let n = !this.hasAttribute("open");
+		return n && e && (this.trigger = e), this.trap = t || this, n ? this.open() : (this.close(), this.hasAttribute("open"));
 	}
-	onCloseTransitionEnd = (e) => {
-		e.target === e.currentTarget && (this.$panel?.removeEventListener("transitionend", this.onCloseTransitionEnd), !this.hasAttribute("open") && (this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden")));
+	#i = (e) => {
+		e.target === e.currentTarget && (this.$panel?.removeEventListener("transitionend", this.#i), !this.hasAttribute("open") && (this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden")));
 	};
 	open() {
-		this.$panel?.removeEventListener("transitionend", this.onCloseTransitionEnd), this.style.setProperty("opacity", "1"), this.style.setProperty("visibility", "visible"), m(this.trigger), t(document.documentElement, e.DRAWER_OPEN, {
+		if (this.hasAttribute("open")) return !1;
+		let n = () => this.setAttribute("open", "");
+		return t(document.documentElement, e.DRAWER_BEFORE_OPEN, {
+			drawer: this.id,
+			instance: this,
+			trigger: this.trigger,
+			resolve: n
+		}, { bubbles: !1 }) ? (n(), !0) : this.hasAttribute("open");
+	}
+	#a() {
+		this.$panel?.removeEventListener("transitionend", this.#i), this.style.setProperty("opacity", "1"), this.style.setProperty("visibility", "visible"), p(this.trigger), t(document.documentElement, e.DRAWER_OPEN, {
 			drawer: this.id,
 			trigger: this.trigger
 		}, {
 			bubbles: !1,
 			cancelable: !1
 		});
-		let n = this.trap || this, r = p(n);
-		r.length > 0 && g(n, r[0]), c();
+		let n = this.trap || this, r = f(n);
+		r.length > 0 && g(n, r[0]), s();
 	}
 	close() {
-		this.$panel?.removeEventListener("transitionend", this.onCloseTransitionEnd), _(), l(!1), queueMicrotask(() => {
-			document.querySelector("cinq-drawer[open]") || h();
-		}), t(document.documentElement, e.DRAWER_CLOSE, { drawer: this.id }, {
-			bubbles: !1,
-			cancelable: !1
-		}), this.$panel?.addEventListener("transitionend", this.onCloseTransitionEnd);
+		if (!this.hasAttribute("open")) return !1;
+		let n = () => this.removeAttribute("open");
+		return t(document.documentElement, e.DRAWER_BEFORE_CLOSE, {
+			drawer: this.id,
+			instance: this,
+			resolve: n
+		}, { bubbles: !1 }) ? (n(), !0) : !this.hasAttribute("open");
 	}
-	attributeChangedCallback(e, t, n) {
-		!this.isConnected || e !== "open" || (n === null ? this.close() : this.open());
+	attributeChangedCallback(n, r, i) {
+		if (!(!this.isConnected || n !== "open")) {
+			if (i !== null) {
+				this.#a();
+				return;
+			}
+			this.$panel?.removeEventListener("transitionend", this.#i), _(), c(!1), h(this), t(document.documentElement, e.DRAWER_CLOSE, { drawer: this.id }, {
+				bubbles: !1,
+				cancelable: !1
+			}), this.$panel?.addEventListener("transitionend", this.#i);
+		}
 	}
 };
 customElements.get("cinq-drawer") || customElements.define("cinq-drawer", v);
@@ -192,10 +217,10 @@ customElements.get("cinq-drawer") || customElements.define("cinq-drawer", v);
 var y = class extends HTMLElement {
 	controls = [];
 	$button = null;
-	handleDrawerClose = (e) => {
+	#e = (e) => {
 		this.$button && this.controls.includes(e.detail.drawer) && this.$button.setAttribute("aria-expanded", "false");
 	};
-	handleDrawerOpen = (e) => {
+	#t = (e) => {
 		this.$button && this.controls.includes(e.detail.drawer) && this.$button.setAttribute("aria-expanded", "true");
 	};
 	connectedCallback() {
@@ -206,12 +231,12 @@ var y = class extends HTMLElement {
 	}
 	init() {
 		if (this.$button = this.querySelector("[data-button]") || this.querySelector("button"), !this.$button) throw Error("DrawerButton: button element not found");
-		this.controls = (this.$button.ariaControlsElements ?? []).map((e) => e.id), this.$button.addEventListener("click", this.handleClick), document.documentElement.addEventListener(e.DRAWER_CLOSE, this.handleDrawerClose), document.documentElement.addEventListener(e.DRAWER_OPEN, this.handleDrawerOpen);
+		this.controls = (this.$button.ariaControlsElements ?? []).map((e) => e.id), this.$button.addEventListener("click", this.#n), document.documentElement.addEventListener(e.DRAWER_CLOSE, this.#e), document.documentElement.addEventListener(e.DRAWER_OPEN, this.#t);
 	}
 	destroy() {
-		this.$button && this.$button.removeEventListener("click", this.handleClick), document.documentElement.removeEventListener(e.DRAWER_CLOSE, this.handleDrawerClose), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.handleDrawerOpen);
+		this.$button && this.$button.removeEventListener("click", this.#n), document.documentElement.removeEventListener(e.DRAWER_CLOSE, this.#e), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.#t);
 	}
-	handleClick = () => {
+	#n = () => {
 		let n = this.$button?.getAttribute("data-trap");
 		this.controls.forEach((r) => {
 			let i = {

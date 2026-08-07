@@ -1,8 +1,12 @@
 //#region src/events.ts
 var e = {
+	DRAWER_BEFORE_CLOSE: "drawer-before-close",
+	DRAWER_BEFORE_OPEN: "drawer-before-open",
 	DRAWER_CLOSE: "drawer-close",
 	DRAWER_OPEN: "drawer-open",
 	DRAWER_TOGGLE: "drawer-toggle",
+	MODAL_BEFORE_CLOSE: "modal-before-close",
+	MODAL_BEFORE_OPEN: "modal-before-open",
 	MODAL_CLOSE: "modal-close",
 	MODAL_OPEN: "modal-open",
 	MODAL_TOGGLE: "modal-toggle",
@@ -101,11 +105,17 @@ function b(e) {
 function x() {
 	_?.focus(), _ = null;
 }
-function S(e, t = e) {
+function S(e) {
+	queueMicrotask(() => {
+		let t = document.activeElement;
+		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || x();
+	});
+}
+function C(e, t = e) {
 	let n = y(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	b(), C(), g.keydown = (t) => {
+	b(), w(), g.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
 	}, document.addEventListener("keydown", g.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
@@ -114,11 +124,11 @@ function S(e, t = e) {
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function C(e = null) {
+function w(e = null) {
 	g.keydown && document.removeEventListener("keydown", g.keydown), e && e.focus();
 }
 //#endregion
 //#region src/clamp.ts
-var w = (e, t, n) => Math.min(Math.max(e, t), n);
+var T = (e, t, n) => Math.min(Math.max(e, t), n);
 //#endregion
-export { e as EVENTS, S as addTrapFocus, s as body, d as breakpoints, w as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, y as getFocusableElements, o as html, c as isDebug, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as rememberReturnFocus, C as removeTrapFocus, x as restoreReturnFocus, l as scroll, a as throttle };
+export { e as EVENTS, C as addTrapFocus, s as body, d as breakpoints, T as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, y as getFocusableElements, o as html, c as isDebug, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as rememberReturnFocus, w as removeTrapFocus, x as restoreReturnFocus, S as scheduleRestoreReturnFocus, l as scroll, a as throttle };

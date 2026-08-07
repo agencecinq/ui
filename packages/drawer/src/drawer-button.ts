@@ -5,13 +5,13 @@ export class DrawerButton extends HTMLElement {
   controls: string[] = [];
   $button: HTMLButtonElement | null = null;
 
-  private handleDrawerClose = (event: CustomEvent<{ drawer: string }>) => {
+  #handleDrawerClose = (event: CustomEvent<{ drawer: string }>) => {
     if (this.$button && this.controls.includes(event.detail.drawer)) {
       this.$button.setAttribute("aria-expanded", "false");
     }
   };
 
-  private handleDrawerOpen = (event: CustomEvent<{ drawer: string }>) => {
+  #handleDrawerOpen = (event: CustomEvent<{ drawer: string }>) => {
     if (this.$button && this.controls.includes(event.detail.drawer)) {
       this.$button.setAttribute("aria-expanded", "true");
     }
@@ -43,33 +43,33 @@ export class DrawerButton extends HTMLElement {
       (element) => element.id,
     );
 
-    this.$button.addEventListener("click", this.handleClick);
+    this.$button.addEventListener("click", this.#handleClick);
     document.documentElement.addEventListener(
       EVENTS.DRAWER_CLOSE,
-      this.handleDrawerClose as EventListener,
+      this.#handleDrawerClose as EventListener,
     );
     document.documentElement.addEventListener(
       EVENTS.DRAWER_OPEN,
-      this.handleDrawerOpen as EventListener,
+      this.#handleDrawerOpen as EventListener,
     );
   }
 
   /** Detaches listeners. Safe to call from outside while the host stays mounted. */
   destroy(): void {
     if (this.$button) {
-      this.$button.removeEventListener("click", this.handleClick);
+      this.$button.removeEventListener("click", this.#handleClick);
     }
     document.documentElement.removeEventListener(
       EVENTS.DRAWER_CLOSE,
-      this.handleDrawerClose as EventListener,
+      this.#handleDrawerClose as EventListener,
     );
     document.documentElement.removeEventListener(
       EVENTS.DRAWER_OPEN,
-      this.handleDrawerOpen as EventListener,
+      this.#handleDrawerOpen as EventListener,
     );
   }
 
-  handleClick = () => {
+  #handleClick = () => {
     const trapId = this.$button?.getAttribute("data-trap");
 
     this.controls.forEach(control => {

@@ -77,8 +77,8 @@ Once the plugin has copied the snippet, you can render it in your layout or sect
 ```javascript
 const $drawer = document.querySelector('cinq-drawer#cart-drawer');
 
-$drawer.open();
-$drawer.close();
+$drawer.open(); // returns false if already open, aborted, or deferred
+$drawer.close(); // returns false if already closed, aborted, or deferred
 $drawer.toggle({ trigger: null, trap: null });
 $drawer.destroy(); // unbind
 $drawer.init(); // re-bind
@@ -90,11 +90,13 @@ When you mutate the drawer DOM at runtime, re-bind with `destroy()` â†’ mutate â
 
 Use constants from `@agencecinq/utils` (`EVENTS.DRAWER_*`). Events are dispatched on `document.documentElement`.
 
-| Event | Constant | Detail | Description |
-| ----- | -------- | ------ | ----------- |
-| `drawer-toggle` | `DRAWER_TOGGLE` | `{ drawer, trigger, trap }` | Request open/close from a button |
-| `drawer-open` | `DRAWER_OPEN` | `{ drawer, trigger? }` | Drawer opened (also closes other open drawers) |
-| `drawer-close` | `DRAWER_CLOSE` | `{ drawer }` | Drawer closed |
+| Event | Constant | Cancelable | Detail | Description |
+| ----- | -------- | ---------- | ------ | ----------- |
+| `drawer-toggle` | `DRAWER_TOGGLE` | No | `{ drawer, trigger, trap }` | Request open/close from a button |
+| `drawer-before-open` | `DRAWER_BEFORE_OPEN` | Yes | `{ drawer, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
+| `drawer-before-close` | `DRAWER_BEFORE_CLOSE` | Yes | `{ drawer, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
+| `drawer-open` | `DRAWER_OPEN` | No | `{ drawer, trigger? }` | Fired after `open` is set |
+| `drawer-close` | `DRAWER_CLOSE` | No | `{ drawer }` | Fired after `open` is removed |
 
 ```js
 import { EVENTS } from '@agencecinq/utils';
@@ -103,6 +105,43 @@ document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
   console.log(event.detail.drawer);
 });
 ```
+
+#### Deferring open or close
+
+Open and close paths dispatch cancelable `drawer-before-open` /
+`drawer-before-close` first. Call `preventDefault()` and commit with
+`detail.resolve()` when async work finishes:
+
+```js
+import { EVENTS } from '@agencecinq/utils';
+
+document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_OPEN, (event) => {
+  if (event.detail.drawer !== 'cart-drawer') return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+
+document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
+  if (event.detail.drawer !== 'cart-drawer') return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+```
+
+`resolve()` is idempotent. TypeScript: `BeforeOpenDetail` and `BeforeCloseDetail`
+from `@agencecinq/drawer`.
+
+**UX:** defer open when the fetch is quick and the panel would feel empty;
+otherwise open immediately and load on `drawer-open`. Defer close for save,
+archive, or exit animation.
 
 ---
 

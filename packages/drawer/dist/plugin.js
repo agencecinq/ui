@@ -2,14 +2,14 @@ import e from "fs-extra";
 import { dirname as t, resolve as n } from "node:path";
 import { fileURLToPath as r } from "node:url";
 //#region src/plugin.ts
-var i = t(r(import.meta.url));
-function a() {
+var i = r(import.meta.url), a = t(i);
+function o() {
 	return {
 		name: "vite-plugin-cinq-drawer",
 		async buildStart() {
-			let r = n(i, "../src/drawer.html.liquid"), a = n(process.cwd(), "snippets/cinq-drawer.html.liquid");
+			let r = n(a, "../src/drawer.html.liquid"), i = n(process.cwd(), "snippets/cinq-drawer.html.liquid");
 			try {
-				await e.pathExists(r) && (await e.ensureDir(t(a)), await e.copy(r, a), console.log("✅ CINQ : Liquid snippet copied."));
+				await e.pathExists(r) && (await e.ensureDir(t(i)), await e.copy(r, i), console.log("✅ CINQ : Liquid snippet copied."));
 			} catch (e) {
 				console.error("❌ CINQ : Copying error :", e);
 			}
@@ -23,4 +23,4 @@ function a() {
 	};
 }
 //#endregion
-export { a as cinqDrawerPlugin };
+export { o as cinqDrawerPlugin };

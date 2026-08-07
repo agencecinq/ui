@@ -4,6 +4,7 @@
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/switch/
  */
 export declare class Switch extends HTMLElement {
+    #private;
     static observedAttributes: string[];
     $input: HTMLInputElement | null;
     connectedCallback(): void;
@@ -19,9 +20,5 @@ export declare class Switch extends HTMLElement {
     activate(emit?: boolean): boolean;
     deactivate(emit?: boolean): boolean;
     destroy(): void;
-    private handleClick;
-    private handleKeydown;
-    private get detail();
-    private update;
 }
 //# sourceMappingURL=switch.d.ts.map

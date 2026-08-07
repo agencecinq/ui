@@ -18,8 +18,8 @@ export class Panel {
   height = 0;
   transitionDuration = 0;
 
-  private rafId = 0;
-  private timeoutId = 0;
+  #rafId = 0;
+  #timeoutId = 0;
 
   constructor(el: HTMLElement, index: number) {
     this.el = el;
@@ -57,11 +57,11 @@ export class Panel {
     );
     this.isOpen = this.$button.getAttribute("aria-expanded") === "true";
 
-    this.resize();
-    this.$button.addEventListener("click", this.handleClick);
-    this.$button.addEventListener("focus", this.handleFocus);
-    this.$button.addEventListener("blur", this.handleBlur);
-    window.addEventListener("resize", this.resize);
+    this.#resize();
+    this.$button.addEventListener("click", this.#handleClick);
+    this.$button.addEventListener("focus", this.#handleFocus);
+    this.$button.addEventListener("blur", this.#handleBlur);
+    window.addEventListener("resize", this.#resize);
   }
 
   get open(): boolean {
@@ -75,7 +75,7 @@ export class Panel {
 
     if (
       emit &&
-      !dispatchEvent(this.el, EVENTS.ACCORDION_PANEL_OPEN, this.detail)
+      !dispatchEvent(this.el, EVENTS.ACCORDION_PANEL_OPEN, this.#detail)
     ) {
       return false;
     }
@@ -84,19 +84,19 @@ export class Panel {
     this.el.setAttribute("data-accordion-open", "true");
     this.$body.removeAttribute("hidden");
 
-    this.resize();
+    this.#resize();
 
     this.$body.style.setProperty("max-height", "0");
 
-    this.clearAnimation();
-    this.rafId = requestAnimationFrame(() => {
-      this.rafId = 0;
+    this.#clearAnimation();
+    this.#rafId = requestAnimationFrame(() => {
+      this.#rafId = 0;
       if (!this.$body) return;
 
       this.$body.style.setProperty("max-height", `${this.height}px`);
 
-      this.timeoutId = window.setTimeout(() => {
-        this.timeoutId = 0;
+      this.#timeoutId = window.setTimeout(() => {
+        this.#timeoutId = 0;
         this.$body?.style.removeProperty("max-height");
       }, this.transitionDuration);
     });
@@ -113,7 +113,7 @@ export class Panel {
 
     if (
       emit &&
-      !dispatchEvent(this.el, EVENTS.ACCORDION_PANEL_CLOSE, this.detail)
+      !dispatchEvent(this.el, EVENTS.ACCORDION_PANEL_CLOSE, this.#detail)
     ) {
       return false;
     }
@@ -121,17 +121,17 @@ export class Panel {
     this.$button.setAttribute("aria-expanded", "false");
     this.el.setAttribute("data-accordion-open", "false");
 
-    this.resize();
+    this.#resize();
     this.$body.style.setProperty("max-height", `${this.height}px`);
 
-    this.clearAnimation();
-    this.rafId = requestAnimationFrame(() => {
-      this.rafId = 0;
+    this.#clearAnimation();
+    this.#rafId = requestAnimationFrame(() => {
+      this.#rafId = 0;
       this.$body?.style.setProperty("max-height", "0");
     });
 
-    this.timeoutId = window.setTimeout(() => {
-      this.timeoutId = 0;
+    this.#timeoutId = window.setTimeout(() => {
+      this.#timeoutId = 0;
       this.$body?.setAttribute("hidden", "");
     }, this.transitionDuration);
 
@@ -155,12 +155,12 @@ export class Panel {
   }
 
   destroy(): void {
-    this.clearAnimation();
+    this.#clearAnimation();
 
-    this.$button?.removeEventListener("click", this.handleClick);
-    this.$button?.removeEventListener("focus", this.handleFocus);
-    this.$button?.removeEventListener("blur", this.handleBlur);
-    window.removeEventListener("resize", this.resize);
+    this.$button?.removeEventListener("click", this.#handleClick);
+    this.$button?.removeEventListener("focus", this.#handleFocus);
+    this.$button?.removeEventListener("blur", this.#handleBlur);
+    window.removeEventListener("resize", this.#resize);
 
     if (this.$body) {
       this.$body.style.removeProperty("max-height");
@@ -173,31 +173,31 @@ export class Panel {
     this.$inner = null;
   }
 
-  private clearAnimation(): void {
-    if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = 0;
+  #clearAnimation(): void {
+    if (this.#rafId) {
+      cancelAnimationFrame(this.#rafId);
+      this.#rafId = 0;
     }
 
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
-      this.timeoutId = 0;
+    if (this.#timeoutId) {
+      clearTimeout(this.#timeoutId);
+      this.#timeoutId = 0;
     }
   }
 
-  private handleClick = (): void => {
+  #handleClick = (): void => {
     this.toggle();
   };
 
-  private handleFocus = (): void => {
+  #handleFocus = (): void => {
     this.$button?.classList.add("focus");
   };
 
-  private handleBlur = (): void => {
+  #handleBlur = (): void => {
     this.$button?.classList.remove("focus");
   };
 
-  private resize = (): void => {
+  #resize = (): void => {
     if (!this.$body) return;
 
     this.$body.removeAttribute("hidden");
@@ -218,7 +218,7 @@ export class Panel {
     }
   };
 
-  private get detail(): Detail {
+  get #detail(): Detail {
     return { el: this.el, index: this.index };
   }
 }

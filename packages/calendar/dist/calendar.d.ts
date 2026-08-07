@@ -9,23 +9,19 @@ import { Current, Options } from './types.js';
  * @see https://github.com/19h47/19h47-calendar
  */
 export declare class Calendar extends HTMLElement {
+    #private;
     today: Date;
     day: string;
     options: Options;
     current: Current;
-    private keyboard;
     $body: HTMLTableSectionElement | null;
     $title: HTMLElement | null;
     $next: HTMLButtonElement | null;
     $previous: HTMLButtonElement | null;
     /** Selected days as `YYYY-MM-DD`. */
     picked: string[];
-    private get isMultiple();
-    private get isRange();
-    private get isSingle();
     connectedCallback(): void;
     disconnectedCallback(): void;
-    private readOptions;
     /**
      * Bind markup + listeners. Call {@link destroy} first if already bound.
      */

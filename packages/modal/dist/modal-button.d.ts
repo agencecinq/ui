@@ -1,9 +1,8 @@
 export declare class ModalButton extends HTMLElement {
-    private $button;
+    #private;
+    $button: HTMLButtonElement | null;
     /** Controlled modal element IDs from `ariaControlsElements`. */
     controls: string[];
-    private handleModalClose;
-    private handleModalOpen;
     connectedCallback(): void;
     disconnectedCallback(): void;
     /**

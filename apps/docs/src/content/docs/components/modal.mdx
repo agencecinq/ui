@@ -6,6 +6,7 @@ description: Native `<dialog>` modal Web Component (`<cinq-modal>`).
 import ModalPlayground from "../_components/ModalPlayground.astro";
 import ModalStackedPlayground from "../_components/ModalStackedPlayground.astro";
 import ModalReplacePlayground from "../_components/ModalReplacePlayground.astro";
+import ModalAsyncBestiary from "../_components/ModalAsyncBestiary.astro";
 
 A modal presents content in a layer above the page. `<cinq-modal>` wraps a native
 `<dialog>` element, wires `showModal()` / `close()`, focus management, and
@@ -101,20 +102,77 @@ Copy‑paste starter markup:
 </cinq-modal>
 ```
 
+### Attributes
+
+| Attribute | Required | Description                                      |
+| --------- | -------- | ------------------------------------------------ |
+| `id`      | Yes      | Modal identifier; must match button `aria-controls`. |
+| `open`    | No       | Reflected state attribute (useful for styling). |
+
 ### Methods
 
-| Method    | Description                                      |
-| --------- | ------------------------------------------------ |
-| `show()`  | Opens the native dialog (calls `showModal()`).   |
-| `close()` | Closes the dialog.                               |
+| Method    | Description                                                                 |
+| --------- | --------------------------------------------------------------------------- |
+| `show()`  | Opens the native dialog. Returns `false` if already open, aborted, or deferred. |
+| `close()` | Closes the dialog. Returns `false` if already closed, aborted, or deferred. |
 
 ### Events
 
-| Event           | Dispatched by         | Detail payload                         | Description                                                   |
-| --------------- | --------------------- | -------------------------------------- | ------------------------------------------------------------- |
-| `modal-toggle`  | `cinq-modal-button`   | `{ modal, trigger, trap }`            | Emitted on `document.documentElement` to request a toggle.    |
-| `modal-open`    | `cinq-modal`          | `{ modal, trigger }`               | Fired after the modal has been opened. Multiple modals may stack.     |
-| `modal-close`   | `cinq-modal`          | `{ modal }`                        | Fired after the modal has been closed.                                |
+Prefer the constants from `@agencecinq/utils` (`EVENTS.MODAL_*`). Events are
+dispatched on `document.documentElement`.
+
+| Event                | Cancelable | Detail payload                            | Description                                                                 |
+| -------------------- | ---------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| `modal-toggle`       | No         | `{ modal, trigger, trap }`               | Request open/close from a button.                                           |
+| `modal-before-open`  | Yes        | `{ modal, instance, trigger, resolve }`  | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
+| `modal-before-close` | Yes        | `{ modal, instance, resolve }`           | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
+| `modal-open`         | No         | `{ modal, trigger? }`                    | Fired after `open` is set (`showModal()`, focus).                            |
+| `modal-close`        | No         | `{ modal }`                              | Fired after `open` is removed.                                               |
+
+### Deferring open or close
+
+Every open path (toggle or `show()`) dispatches cancelable `modal-before-open`
+first. Every close path (backdrop click, Escape, or `close()`) dispatches
+cancelable `modal-before-close` first. Without a listener (or without
+`preventDefault()`), the modal opens or closes immediately. To run async work,
+cancel the event and call `detail.resolve()` when ready:
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_OPEN, (event) => {
+  if (event.detail.modal !== "my-modal") return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+
+document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {
+  if (event.detail.modal !== "my-modal") return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+```
+
+`resolve()` is idempotent: safe to call more than once. `modal-open` and
+`modal-close` fire only after the matching `resolve()`.
+
+**UX:** defer **open** with `before-open` when the fetch is short (roughly under
+500 ms) and the dialog would feel broken if empty: show loading on the trigger
+while you wait, then call `resolve()`. For slower or unpredictable loads, skip
+the defer: let the modal open immediately and fetch on `modal-open` with a
+skeleton or spinner inside the dialog. Defer **close** with `before-close` when
+you need to save, archive, or run an exit animation before dismissing.
+
+TypeScript: import `BeforeOpenDetail` and `BeforeCloseDetail` from
+`@agencecinq/modal` to type listeners.
 
 ## Background scroll
 
@@ -222,3 +280,11 @@ returns focus to **Start checkout** on the page (native restore after the parent
 already returned focus there).
 
 <ModalReplacePlayground />
+
+### Async bestiary (`before-open` / `before-close`)
+
+Try opening and closing the modal below. Each transition is deferred until async
+work finishes: the creature loads before `showModal()`, then archives before the
+dialog closes.
+
+<ModalAsyncBestiary />

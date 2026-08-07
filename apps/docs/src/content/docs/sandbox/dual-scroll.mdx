@@ -16,7 +16,7 @@ Experimental demo, not published on npm. API may change or move.
 :::
 
 `<cinq-dual-scroll>` drives two columns with inverted scroll and spring easing.
-**Layout, pane content, and zone height stay in your markup and CSS** — the
+**Layout, pane content, and zone height stay in your markup and CSS.** The
 component listens for wheel/touch inside the host and updates column transforms.
 
 Inspired by [scroll-you-fools](https://github.com/19h47/scroll-you-fools), scoped
@@ -64,7 +64,7 @@ cinq-dual-scroll {
 }
 ```
 
-Column positioning (start off-screen, move on scroll) is also yours — see the
+Column positioning (start off-screen, move on scroll) is also yours. See the
 demos below.
 
 ```css
@@ -84,7 +84,7 @@ demos below.
 ```
 
 When `prefers-reduced-motion: reduce` is set, hide `<cinq-dual-scroll>` and show
-a linear `.dual-scroll-fallback` in CSS — or set `spring="1"` yourself if you
+a linear `.dual-scroll-fallback` in CSS, or set `spring="1"` yourself if you
 keep the effect without inertia. The component does not read that media query.
 
 ## Basic
@@ -101,9 +101,9 @@ keep the effect without inertia. The component does not read that media query.
 
 `spring` is `0.01`–`1` (default `0.1`). Lower = more inertia, `1` = instant.
 
-<DemoSpring spring="0.04" label="spring=&quot;0.04&quot; — slow, floaty" />
+<DemoSpring spring="0.04" label="spring=&quot;0.04&quot;: slow, floaty" />
 
-<DemoSpring spring="0.35" label="spring=&quot;0.35&quot; — snappy" />
+<DemoSpring spring="0.35" label="spring=&quot;0.35&quot;: snappy" />
 
 ```html
 <cinq-dual-scroll spring="0.04">…</cinq-dual-scroll>
@@ -112,15 +112,15 @@ keep the effect without inertia. The component does not read that media query.
 
 ## API
 
-- **`spring`** — easing factor (`0.01`–`1`, default `0.1`)
-- **Methods** — `init()`, `destroy()`, `sync()`
-- **CSS variable** — `--dual-scroll-pane-height` (host height in px, set by `sync()`)
+- **`spring`**: easing factor (`0.01`–`1`, default `0.1`)
+- **Methods**: `init()`, `destroy()`, `sync()`
+- **CSS variable**: `--dual-scroll-pane-height` (host height in px, set by `sync()`)
 
 Use `init()` / `destroy()` if you need to pause the effect without removing the
 element. `sync()` re-measures after DOM or size changes.
 
 ## Editorial use
 
-This pattern is **decorative / editorial** — it is not a replacement for normal
+This pattern is **decorative / editorial**. It is not a replacement for normal
 page scroll or accessible reading flow. Prefer a linear fallback or skip link when
 the content must be reachable without wheel gestures inside a fixed zone.

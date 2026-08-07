@@ -4,6 +4,12 @@ import { sequenceImages } from './images';
 ---
 
 <PixelateDemoFrame>
+  <p class="text-sm text-gray-600">
+    Three stacked photos, one scroll listener. Each host has its own reveal
+    window (<code>data-sequence-index</code>). Scroll slowly: the first can be
+    sharp while the next is still blocky.
+  </p>
+
   <div class="h-[20vh]" aria-hidden="true"></div>
 
   <div class="mx-auto flex max-w-3xl flex-col gap-8">

@@ -5,6 +5,7 @@
  * @see https://w3c.github.io/aria/#dom-ariamixin-ariacontrolselements
  */
 export declare class DisclosureButton extends HTMLElement {
+    #private;
     $button: HTMLButtonElement | null;
     elements: HTMLElement[];
     connectedCallback(): void;
@@ -14,8 +15,6 @@ export declare class DisclosureButton extends HTMLElement {
      */
     init(): void;
     get expanded(): boolean;
-    private get visibleElements();
-    private get allVisibleElements();
     /**
      * Toggles open/closed.
      * Closes when any controlled element is visible; otherwise opens all.
@@ -33,7 +32,5 @@ export declare class DisclosureButton extends HTMLElement {
     update(): void;
     /** Detaches listeners. Safe to call from outside while the host stays mounted. */
     destroy(): void;
-    private handleClick;
-    private detail;
 }
 //# sourceMappingURL=disclosure-button.d.ts.map

@@ -45,12 +45,12 @@ export class WindowSplitter extends HTMLElement {
   formatSize: FormatSize = defaultFormatSize;
   formatValue: FormatValue = defaultFormatValue;
 
-  private history: number | null = null;
-  private resizeObserver: ResizeObserver | null = null;
-  private keyboard: Keyboard | null = null;
-  private bound = false;
+  #history: number | null = null;
+  #resizeObserver: ResizeObserver | null = null;
+  #keyboard: Keyboard | null = null;
+  #bound = false;
   /** Active pointer drag; `null` when idle. `id` is `PointerEvent.pointerId`. */
-  private drag: {
+  #drag: {
     offset: number;
     origin: number;
     length: number;
@@ -58,6 +58,17 @@ export class WindowSplitter extends HTMLElement {
   } | null = null;
 
   connectedCallback(): void {
+    this.init();
+  }
+
+  disconnectedCallback(): void {
+    this.destroy();
+  }
+
+  /**
+   * Bind separator + listeners. Call {@link destroy} first if already bound.
+   */
+  init(): void {
     this.$separator = this.querySelector<HTMLElement>(
       '[role="separator"], [role="slider"]',
     );
@@ -68,50 +79,46 @@ export class WindowSplitter extends HTMLElement {
       );
     }
 
-    this.read();
+    this.#read();
     this.$separator.style.touchAction = "none";
 
-    this.keyboard = new Keyboard(this);
-    this.$separator.addEventListener("keydown", this.keyboard.handle);
-    this.$separator.addEventListener("pointerdown", this.handlePointerdown);
-    this.$separator.addEventListener("pointermove", this.handlePointermove);
-    this.$separator.addEventListener("pointerup", this.handlePointerup);
-    this.$separator.addEventListener("pointercancel", this.handlePointerup);
+    this.#keyboard = new Keyboard(this);
+    this.$separator.addEventListener("keydown", this.#keyboard.handle);
+    this.$separator.addEventListener("pointerdown", this.#handlePointerdown);
+    this.$separator.addEventListener("pointermove", this.#handlePointermove);
+    this.$separator.addEventListener("pointerup", this.#handlePointerup);
+    this.$separator.addEventListener("pointercancel", this.#handlePointerup);
     this.$separator.addEventListener(
       "lostpointercapture",
-      this.handlePointerup,
+      this.#handlePointerup,
     );
 
-    this.bound = true;
-    this.observe();
+    this.#bound = true;
+    this.#observe();
     this.sync();
   }
 
-  disconnectedCallback(): void {
-    this.destroy();
-  }
-
-  /** Detaches listeners and observers. Called automatically from `disconnectedCallback`. */
+  /** Detaches listeners and observers. Safe to call from outside while mounted. */
   destroy(): void {
-    if (this.bound && this.$separator) {
-      if (this.keyboard) {
-        this.$separator.removeEventListener("keydown", this.keyboard.handle);
+    if (this.#bound && this.$separator) {
+      if (this.#keyboard) {
+        this.$separator.removeEventListener("keydown", this.#keyboard.handle);
       }
-      this.$separator.removeEventListener("pointerdown", this.handlePointerdown);
-      this.$separator.removeEventListener("pointermove", this.handlePointermove);
-      this.$separator.removeEventListener("pointerup", this.handlePointerup);
-      this.$separator.removeEventListener("pointercancel", this.handlePointerup);
+      this.$separator.removeEventListener("pointerdown", this.#handlePointerdown);
+      this.$separator.removeEventListener("pointermove", this.#handlePointermove);
+      this.$separator.removeEventListener("pointerup", this.#handlePointerup);
+      this.$separator.removeEventListener("pointercancel", this.#handlePointerup);
       this.$separator.removeEventListener(
         "lostpointercapture",
-        this.handlePointerup,
+        this.#handlePointerup,
       );
       this.$separator.style.removeProperty("touch-action");
-      this.bound = false;
+      this.#bound = false;
     }
 
-    this.resizeObserver?.disconnect();
-    this.resizeObserver = null;
-    this.keyboard = null;
+    this.#resizeObserver?.disconnect();
+    this.#resizeObserver = null;
+    this.#keyboard = null;
     this.removeAttribute("dragging");
     this.$separator = null;
   }
@@ -121,7 +128,7 @@ export class WindowSplitter extends HTMLElement {
     _oldValue: string | null,
     newValue: string | null,
   ): void {
-    if (!this.bound) return;
+    if (!this.#bound) return;
 
     if (name === "data-windowsplitter-mode") {
       this.mode = parseMode(newValue);
@@ -213,7 +220,7 @@ export class WindowSplitter extends HTMLElement {
     if (!this.$separator) return;
 
     this.$separator.setAttribute("aria-valuetext", this.formatValue(this.value));
-    this.apply(this.value, false);
+    this.#apply(this.value, false);
   }
 
   /**
@@ -230,7 +237,7 @@ export class WindowSplitter extends HTMLElement {
 
     this.$separator.setAttribute("aria-valuenow", String(value));
     this.$separator.setAttribute("aria-valuetext", this.formatValue(value));
-    this.apply(value, trigger && changed);
+    this.#apply(value, trigger && changed);
 
     return changed;
   }
@@ -241,7 +248,7 @@ export class WindowSplitter extends HTMLElement {
       return false;
     }
 
-    this.history = this.value;
+    this.#history = this.value;
     return this.setValue(this.min, trigger);
   }
 
@@ -252,8 +259,8 @@ export class WindowSplitter extends HTMLElement {
     }
 
     const fallback = Math.round((this.min + this.max) / 2);
-    const next = this.history ?? fallback;
-    this.history = null;
+    const next = this.#history ?? fallback;
+    this.#history = null;
     return this.setValue(next, trigger);
   }
 
@@ -261,20 +268,20 @@ export class WindowSplitter extends HTMLElement {
     return this.collapsed ? this.restore(trigger) : this.collapse(trigger);
   }
 
-  private read(): void {
+  #read(): void {
     this.mode = parseMode(this.getAttribute("data-windowsplitter-mode"));
     this.step = parseNumber(this.getAttribute("data-windowsplitter-step"), 1);
     this.page = parseNumber(this.getAttribute("data-windowsplitter-page"), 10);
     this.fixed = parseBoolean(this.getAttribute("data-windowsplitter-fixed"));
   }
 
-  private observe(): void {
-    this.resizeObserver?.disconnect();
-    this.resizeObserver = new ResizeObserver(() => this.apply(this.value, false));
-    this.resizeObserver.observe(this);
+  #observe(): void {
+    this.#resizeObserver?.disconnect();
+    this.#resizeObserver = new ResizeObserver(() => this.#apply(this.value, false));
+    this.#resizeObserver.observe(this);
   }
 
-  private apply(value: number, trigger: boolean): void {
+  #apply(value: number, trigger: boolean): void {
     if (!this.$separator) {
       return;
     }
@@ -283,11 +290,11 @@ export class WindowSplitter extends HTMLElement {
     const span = Math.max(1, max - min);
     let length = 0;
 
-    if (this.drag) {
-      length = this.drag.length;
+    if (this.#drag) {
+      length = this.#drag.length;
     }
 
-    if (!this.drag) {
+    if (!this.#drag) {
       const { width, height } = this.getBoundingClientRect();
       length = this.orientation === "vertical" ? width : height;
     }
@@ -316,11 +323,11 @@ export class WindowSplitter extends HTMLElement {
     } else {
       this.removeAttribute("collapsed");
     }
-    this.update(value, ratio, length, offset);
-    this.emit(trigger, value, ratio);
+    this.#update(value, ratio, length, offset);
+    this.#emit(trigger, value, ratio);
   }
 
-  private update(
+  #update(
     value: number,
     ratio: number,
     length: number,
@@ -351,7 +358,7 @@ export class WindowSplitter extends HTMLElement {
     }
   }
 
-  private emit(trigger: boolean, value: number, ratio: number): void {
+  #emit(trigger: boolean, value: number, ratio: number): void {
     if (!trigger) {
       return;
     }
@@ -369,8 +376,9 @@ export class WindowSplitter extends HTMLElement {
     });
   }
 
-  private valueFromPointer(event: PointerEvent): number {
-    const { min, max, drag } = this;
+  #valueFromPointer(event: PointerEvent): number {
+    const { min, max } = this;
+    const drag = this.#drag;
 
     if (!drag) {
       return this.value;
@@ -386,7 +394,7 @@ export class WindowSplitter extends HTMLElement {
     return clamp(Math.round(min + span * ratio), min, max);
   }
 
-  private handlePointerdown = (event: PointerEvent): void => {
+  #handlePointerdown = (event: PointerEvent): void => {
     if (!this.$separator || this.disabled || event.button !== 0) {
       return;
     }
@@ -405,7 +413,7 @@ export class WindowSplitter extends HTMLElement {
     const origin = vertical ? left : top;
     const client = vertical ? event.clientX : event.clientY;
 
-    this.drag = {
+    this.#drag = {
       length,
       origin,
       offset: client - origin - this.ratio * length,
@@ -415,27 +423,27 @@ export class WindowSplitter extends HTMLElement {
     this.$separator.setPointerCapture(event.pointerId);
   };
 
-  private handlePointermove = (event: PointerEvent): void => {
-    if (!this.drag || event.pointerId !== this.drag.id) {
+  #handlePointermove = (event: PointerEvent): void => {
+    if (!this.#drag || event.pointerId !== this.#drag.id) {
       return;
     }
 
-    this.setValue(this.valueFromPointer(event));
+    this.setValue(this.#valueFromPointer(event));
     event.preventDefault();
   };
 
-  private handlePointerup = (event: PointerEvent): void => {
-    if (!this.drag) {
+  #handlePointerup = (event: PointerEvent): void => {
+    if (!this.#drag) {
       return;
     }
 
-    if (event.pointerId !== this.drag.id) {
+    if (event.pointerId !== this.#drag.id) {
       return;
     }
 
-    const { id } = this.drag;
+    const { id } = this.#drag;
 
-    this.drag = null;
+    this.#drag = null;
     this.removeAttribute("dragging");
 
     if (this.$separator?.hasPointerCapture?.(id)) {

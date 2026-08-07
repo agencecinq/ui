@@ -7,7 +7,7 @@ import { WindowSplitter } from './windowsplitter.js';
  * Up/Down for a horizontal one.
  */
 export default class Keyboard {
-    private readonly host;
+    #private;
     constructor(host: WindowSplitter);
     handle: (event: KeyboardEvent) => void;
 }

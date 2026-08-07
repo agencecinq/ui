@@ -6,6 +6,7 @@ import { Options } from './types.js';
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
  */
 export declare class Accordion extends HTMLElement {
+    #private;
     panels: Panel[];
     current: number;
     options: Options;
@@ -14,8 +15,5 @@ export declare class Accordion extends HTMLElement {
     init(): void;
     closeAll(): void;
     destroy(): void;
-    private handlePanelOpen;
-    private handleHashChange;
-    private handleKeydown;
 }
 //# sourceMappingURL=accordion.d.ts.map

@@ -65,28 +65,19 @@ export class Combobox extends HTMLElement {
   write: Write = DEFAULT_WRITE;
   onSelect: OnSelect | null = null;
 
-  private _value = "";
-  private _expanded = false;
-  private _search: SearchFn | null = null;
-  private _render: Render = DEFAULT_RENDER;
-  private searchId = 0;
-  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
-  private abortController: AbortController | null = null;
-  private keyboard: Keyboard | null = null;
-  private bound = false;
-  private reflectingAttribute = false;
+  #value = "";
+  #expanded = false;
+  #search: SearchFn | null = null;
+  #render: Render = DEFAULT_RENDER;
+  #searchId = 0;
+  #debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  #abortController: AbortController | null = null;
+  #keyboard: Keyboard | null = null;
+  #bound = false;
+  #reflectingAttribute = false;
 
   connectedCallback(): void {
-    this.$input =
-      this.querySelector<HTMLInputElement>('[role="combobox"]') ||
-      this.querySelector<HTMLInputElement>("input");
-    this.$listbox =
-      this.querySelector<HTMLElement>('[role="listbox"]') ||
-      this.querySelector<HTMLElement>("[data-combobox-listbox]");
-    this.$button =
-      this.querySelector<HTMLButtonElement>("[data-combobox-button]") || null;
-
-    this.mount();
+    this.init();
   }
 
   disconnectedCallback(): void {
@@ -101,7 +92,7 @@ export class Combobox extends HTMLElement {
     oldValue: string | null,
     newValue: string | null,
   ): void {
-    if (this.reflectingAttribute || oldValue === newValue) {
+    if (this.#reflectingAttribute || oldValue === newValue) {
       return;
     }
 
@@ -111,7 +102,7 @@ export class Combobox extends HTMLElement {
     }
 
     if (name === "disabled") {
-      this.syncDisabled();
+      this.#syncDisabled();
       return;
     }
 
@@ -127,13 +118,13 @@ export class Combobox extends HTMLElement {
     }
 
     if ((CONFIG_ATTRIBUTES as readonly string[]).includes(name)) {
-      this.syncOptionsFromAttributes();
+      this.#syncOptionsFromAttributes();
     }
   }
 
   /** Current textbox value (mirrored on the host `value` attribute). */
   get value(): string {
-    return this._value;
+    return this.#value;
   }
 
   set value(next: string) {
@@ -141,7 +132,7 @@ export class Combobox extends HTMLElement {
   }
 
   get expanded(): boolean {
-    return this._expanded;
+    return this.#expanded;
   }
 
   get disabled(): boolean {
@@ -161,38 +152,38 @@ export class Combobox extends HTMLElement {
   ): void {
     const value = next ?? "";
 
-    this._value = value;
+    this.#value = value;
 
     if (this.$input && this.$input.value !== value) {
       this.write(this.$input, value);
     }
 
     if (reflect) {
-      this.reflectValueAttribute();
+      this.#reflectValueAttribute();
     }
   }
 
   /** Required. Assign a search function to bind the combobox. */
   get search(): SearchFn | null {
-    return this._search;
+    return this.#search;
   }
 
   set search(value: SearchFn | null) {
-    this._search = value;
-    if (!this.bound) {
-      this.mount();
+    this.#search = value;
+    if (!this.#bound) {
+      this.init();
     }
   }
 
   get render(): Render {
-    return this._render;
+    return this.#render;
   }
 
   set render(value: Render) {
-    this._render = value;
+    this.#render = value;
   }
 
-  /** KeyboardHost: the focusable textbox (available after mount). */
+  /** KeyboardHost: the focusable textbox (available after init). */
   get input(): HTMLInputElement {
     if (!this.$input) {
       throw new Error("cinq-combobox: input is not ready");
@@ -205,7 +196,7 @@ export class Combobox extends HTMLElement {
     return -1 < this.index;
   }
 
-  private get listbox(): HTMLElement {
+  get #listbox(): HTMLElement {
     if (!this.$listbox) {
       throw new Error("cinq-combobox: listbox is not ready");
     }
@@ -215,13 +206,13 @@ export class Combobox extends HTMLElement {
   show(): void {
     if (!this.$input || !this.$listbox || this.disabled) return;
 
-    this.listbox.removeAttribute("hidden");
-    this.setExpanded(true);
+    this.#listbox.removeAttribute("hidden");
+    this.#setExpanded(true);
   }
 
   hide({ force = false, clear = true }: HideOptions = {}): void {
     if (!this.$input || !this.$listbox) return;
-    if (!force && !this._expanded) {
+    if (!force && !this.#expanded) {
       return;
     }
 
@@ -236,16 +227,16 @@ export class Combobox extends HTMLElement {
     this.index = -1;
 
     if (clear) {
-      this.clear();
+      this.#clear();
     } else {
       this.options.forEach(({ element }) => {
         element.setAttribute("aria-selected", "false");
       });
     }
 
-    this.clearActiveDescendant();
-    this.listbox.setAttribute("hidden", "");
-    this.setExpanded(false);
+    this.#clearActiveDescendant();
+    this.#listbox.setAttribute("hidden", "");
+    this.#setExpanded(false);
   }
 
   /** Accept the visually focused option (Enter / click / Tab). */
@@ -253,7 +244,7 @@ export class Combobox extends HTMLElement {
     if (!this.$input || !this.$listbox || this.disabled) return;
 
     const option = this.options[this.index] ?? null;
-    const detail = this.detail(option, this.index);
+    const detail = this.#detail(option, this.index);
 
     if (option && this.selectMode === "value") {
       const { value } = option;
@@ -262,30 +253,30 @@ export class Combobox extends HTMLElement {
     }
 
     this.onSelect?.(detail);
-    this.emit(EVENTS.COMBOBOX_SUBMIT, detail);
+    this.#emit(EVENTS.COMBOBOX_SUBMIT, detail);
     this.hide({ force: true });
   };
 
   destroy(): void {
-    this.searchId += 1;
-    this.clearDebounce();
-    this.abort();
+    this.#searchId += 1;
+    this.#clearDebounce();
+    this.#abort();
 
-    if (this.bound && this.$input && this.$listbox && this.keyboard) {
-      this.$input.removeEventListener("input", this.onInput);
-      this.$input.removeEventListener("keydown", this.keyboard.handle);
-      this.$input.removeEventListener("click", this.onInputClick);
-      this.$input.removeEventListener("focus", this.onFocus);
-      this.$input.removeEventListener("blur", this.onBlur);
-      this.$listbox.removeEventListener("mousedown", this.onListboxMousedown);
-      this.$listbox.removeEventListener("click", this.onListboxClick);
-      this.$button?.removeEventListener("mousedown", this.onButtonMousedown);
-      this.$button?.removeEventListener("click", this.onButtonClick);
-      document.removeEventListener("click", this.onDocumentClick);
+    if (this.#bound && this.$input && this.$listbox && this.#keyboard) {
+      this.$input.removeEventListener("input", this.#onInput);
+      this.$input.removeEventListener("keydown", this.#keyboard.handle);
+      this.$input.removeEventListener("click", this.#onInputClick);
+      this.$input.removeEventListener("focus", this.#onFocus);
+      this.$input.removeEventListener("blur", this.#onBlur);
+      this.$listbox.removeEventListener("mousedown", this.#onListboxMousedown);
+      this.$listbox.removeEventListener("click", this.#onListboxClick);
+      this.$button?.removeEventListener("mousedown", this.#onButtonMousedown);
+      this.$button?.removeEventListener("click", this.#onButtonClick);
+      document.removeEventListener("click", this.#onDocumentClick);
     }
 
-    this.keyboard = null;
-    this.bound = false;
+    this.#keyboard = null;
+    this.#bound = false;
   }
 
   /** Clear visual focus without closing the listbox. */
@@ -293,7 +284,7 @@ export class Combobox extends HTMLElement {
     if (!this.$input || !this.$listbox) return;
 
     if (!this.focused) {
-      this.clearActiveDescendant();
+      this.#clearActiveDescendant();
       return;
     }
 
@@ -305,42 +296,53 @@ export class Combobox extends HTMLElement {
   refresh(index: number): void {
     if (!this.$input || !this.$listbox) return;
 
-    this.sync(index);
-    this.active(index);
+    this.#sync(index);
+    this.#active(index);
 
     const { options, value } = this;
 
-    this.emit(EVENTS.COMBOBOX_UPDATE, { options, index, value });
+    this.#emit(EVENTS.COMBOBOX_UPDATE, { options, index, value });
   }
 
   /** Open the listbox if needed (runs search when closed / empty). */
   async ensureOpen(): Promise<boolean> {
     if (!this.$input || !this.$listbox || this.disabled) return false;
 
-    if (this._expanded && 0 < this.options.length) {
+    if (this.#expanded && 0 < this.options.length) {
       return true;
     }
 
     const { value } = this.input;
 
-    await this.run(value, { openWhenEmpty: true });
+    await this.#run(value, { openWhenEmpty: true });
 
-    return this._expanded && 0 < this.options.length;
+    return this.#expanded && 0 < this.options.length;
   }
 
-  private mount(): void {
-    this.destroy();
+  /**
+   * Bind markup + listeners once `search` is set. Call {@link destroy} first
+   * if already bound.
+   */
+  init(): void {
+    this.$input =
+      this.querySelector<HTMLInputElement>('[role="combobox"]') ||
+      this.querySelector<HTMLInputElement>("input");
+    this.$listbox =
+      this.querySelector<HTMLElement>('[role="listbox"]') ||
+      this.querySelector<HTMLElement>("[data-combobox-listbox]");
+    this.$button =
+      this.querySelector<HTMLButtonElement>("[data-combobox-button]") || null;
 
-    if (!this.isConnected || !this.$input || !this.$listbox || !this._search) {
+    if (!this.isConnected || !this.$input || !this.$listbox || !this.#search) {
       return;
     }
 
-    this.syncOptionsFromAttributes();
+    this.#syncOptionsFromAttributes();
     this.autocomplete =
       this.$input.getAttribute("aria-autocomplete") || "list";
 
     if (!this.$button) {
-      this.$button = this.resolveButton();
+      this.$button = this.#resolveButton();
     }
 
     const fromAttr = this.getAttribute("value");
@@ -350,16 +352,16 @@ export class Combobox extends HTMLElement {
       this.setValue(this.$input.value);
     }
 
-    this.syncDisabled();
+    this.#syncDisabled();
 
-    this.keyboard = new Keyboard(this);
-    this.sync(-1);
+    this.#keyboard = new Keyboard(this);
+    this.#sync(-1);
     this.hide({ force: true, clear: false });
-    this.bind();
-    this.bound = true;
+    this.#bind();
+    this.#bound = true;
   }
 
-  private syncOptionsFromAttributes(): void {
+  #syncOptionsFromAttributes(): void {
     const mode =
       (this.getAttribute("data-combobox-mode") as Mode | null) ?? "managed";
     const selectMode =
@@ -384,7 +386,7 @@ export class Combobox extends HTMLElement {
     );
   }
 
-  private syncDisabled(): void {
+  #syncDisabled(): void {
     const isDisabled = this.disabled;
 
     if (this.$input) {
@@ -405,7 +407,7 @@ export class Combobox extends HTMLElement {
       }
     }
 
-    if (isDisabled && this._expanded) {
+    if (isDisabled && this.#expanded) {
       this.hide({ force: true });
     }
   }
@@ -414,7 +416,7 @@ export class Combobox extends HTMLElement {
    * Find the optional open button linked through `ariaControlsElements`.
    * Prefer the host, then document.
    */
-  private resolveButton(): HTMLButtonElement | null {
+  #resolveButton(): HTMLButtonElement | null {
     const listbox = this.$listbox;
 
     if (!listbox) {
@@ -438,27 +440,27 @@ export class Combobox extends HTMLElement {
     return null;
   }
 
-  private bind(): void {
-    if (!this.$input || !this.$listbox || !this.keyboard) return;
+  #bind(): void {
+    if (!this.$input || !this.$listbox || !this.#keyboard) return;
 
-    this.$input.addEventListener("input", this.onInput);
-    this.$input.addEventListener("keydown", this.keyboard.handle);
-    this.$input.addEventListener("click", this.onInputClick);
-    this.$input.addEventListener("focus", this.onFocus);
-    this.$input.addEventListener("blur", this.onBlur);
+    this.$input.addEventListener("input", this.#onInput);
+    this.$input.addEventListener("keydown", this.#keyboard.handle);
+    this.$input.addEventListener("click", this.#onInputClick);
+    this.$input.addEventListener("focus", this.#onFocus);
+    this.$input.addEventListener("blur", this.#onBlur);
 
-    this.$listbox.addEventListener("mousedown", this.onListboxMousedown);
-    this.$listbox.addEventListener("click", this.onListboxClick);
+    this.$listbox.addEventListener("mousedown", this.#onListboxMousedown);
+    this.$listbox.addEventListener("click", this.#onListboxClick);
 
     if (this.$button) {
-      this.$button.addEventListener("mousedown", this.onButtonMousedown);
-      this.$button.addEventListener("click", this.onButtonClick);
+      this.$button.addEventListener("mousedown", this.#onButtonMousedown);
+      this.$button.addEventListener("click", this.#onButtonClick);
     }
 
-    document.addEventListener("click", this.onDocumentClick);
+    document.addEventListener("click", this.#onDocumentClick);
   }
 
-  private isTarget(target: EventTarget | null): boolean {
+  #isTarget(target: EventTarget | null): boolean {
     if (!(target instanceof Node)) {
       return false;
     }
@@ -473,20 +475,20 @@ export class Combobox extends HTMLElement {
     );
   }
 
-  private onDocumentClick = ({ target }: MouseEvent): void => {
-    if (this.isTarget(target)) {
+  #onDocumentClick = ({ target }: MouseEvent): void => {
+    if (this.#isTarget(target)) {
       return;
     }
 
     this.hide({ force: true });
   };
 
-  private onListboxMousedown = (event: MouseEvent): void => {
+  #onListboxMousedown = (event: MouseEvent): void => {
     // Keep focus on the textbox (aria-activedescendant pattern).
     event.preventDefault();
   };
 
-  private onInput = ({ target }: Event): void => {
+  #onInput = ({ target }: Event): void => {
     if (!(target instanceof HTMLInputElement) || this.disabled) {
       return;
     }
@@ -495,29 +497,29 @@ export class Combobox extends HTMLElement {
 
     this.setValue(value);
     this.blurOption();
-    this.schedule(value);
+    this.#schedule(value);
   };
 
-  private onInputClick = (event: MouseEvent): void => {
+  #onInputClick = (event: MouseEvent): void => {
     if (this.disabled) return;
     event.stopPropagation();
-    void this.toggle();
+    void this.#toggle();
   };
 
-  private onButtonMousedown = (event: MouseEvent): void => {
+  #onButtonMousedown = (event: MouseEvent): void => {
     event.preventDefault();
   };
 
-  private onButtonClick = (event: MouseEvent): void => {
+  #onButtonClick = (event: MouseEvent): void => {
     if (this.disabled) return;
     event.preventDefault();
     event.stopPropagation();
-    void this.toggle().then(() => {
+    void this.#toggle().then(() => {
       this.$input?.focus();
     });
   };
 
-  private onListboxClick = ({ target }: MouseEvent): void => {
+  #onListboxClick = ({ target }: MouseEvent): void => {
     if (this.disabled || !(target instanceof Element) || !this.$listbox) {
       return;
     }
@@ -531,7 +533,7 @@ export class Combobox extends HTMLElement {
     let index = this.options.findIndex(({ element }) => element === option);
 
     if (0 > index) {
-      this.sync(-1);
+      this.#sync(-1);
       index = this.options.findIndex(({ element }) => element === option);
 
       if (0 > index) {
@@ -543,7 +545,7 @@ export class Combobox extends HTMLElement {
     this.select();
   };
 
-  private onFocus = ({ target }: FocusEvent): void => {
+  #onFocus = ({ target }: FocusEvent): void => {
     if (!(target instanceof HTMLInputElement)) {
       return;
     }
@@ -554,16 +556,16 @@ export class Combobox extends HTMLElement {
     this.blurOption();
   };
 
-  private onBlur = ({ relatedTarget }: FocusEvent): void => {
-    if (this.isTarget(relatedTarget)) {
+  #onBlur = ({ relatedTarget }: FocusEvent): void => {
+    if (this.#isTarget(relatedTarget)) {
       return;
     }
   };
 
-  private async toggle(): Promise<void> {
+  async #toggle(): Promise<void> {
     if (this.disabled) return;
 
-    if (this._expanded) {
+    if (this.#expanded) {
       this.hide({ force: true });
       return;
     }
@@ -576,29 +578,29 @@ export class Combobox extends HTMLElement {
   }
 
   /** Build managed option markup from string labels. */
-  private build(index: number, labels: string[]): void {
-    this.listbox.innerHTML = "";
+  #build(index: number, labels: string[]): void {
+    this.#listbox.innerHTML = "";
 
     const { length } = labels;
-    const { id } = this.listbox;
+    const { id } = this.#listbox;
 
     labels.forEach((label, i) => {
       const props = new Props(i, index, id, length);
 
-      this.listbox.insertAdjacentHTML(
+      this.#listbox.insertAdjacentHTML(
         "beforeend",
-        this._render(label, props),
+        this.#render(label, props),
       );
     });
 
-    this.sync(index);
+    this.#sync(index);
   }
 
   /**
    * Reflect selection on existing `[role="option"]` nodes.
    * Does not invent markup — options must already have stable `id`s.
    */
-  private sync(index: number): void {
+  #sync(index: number): void {
     if (!this.$listbox) return;
 
     const elements = [
@@ -620,7 +622,7 @@ export class Combobox extends HTMLElement {
     });
   }
 
-  private active(index: number): void {
+  #active(index: number): void {
     if (-1 < index && this.options[index]) {
       const { id, element } = this.options[index];
 
@@ -632,110 +634,110 @@ export class Combobox extends HTMLElement {
       }
     }
 
-    this.clearActiveDescendant();
+    this.#clearActiveDescendant();
   }
 
   /** Remove `aria-activedescendant` — empty string is an invalid IDREF. */
-  private clearActiveDescendant(): void {
+  #clearActiveDescendant(): void {
     this.$input?.removeAttribute("aria-activedescendant");
   }
 
-  private emit(name: string, detail?: unknown): void {
+  #emit(name: string, detail?: unknown): void {
     dispatchEvent(this, name, detail, { cancelable: false });
   }
 
-  private setLoading(on: boolean): void {
+  #setLoading(on: boolean): void {
     this.loading = on;
 
     if (on) {
       this.$listbox?.setAttribute("aria-busy", "true");
-      this.reflectBusyAttribute(true);
+      this.#reflectBusyAttribute(true);
       return;
     }
 
     this.$listbox?.removeAttribute("aria-busy");
-    this.reflectBusyAttribute(false);
+    this.#reflectBusyAttribute(false);
   }
 
-  private setExpanded(open: boolean): void {
-    this._expanded = open;
+  #setExpanded(open: boolean): void {
+    this.#expanded = open;
 
     if (this.$input) {
       this.$input.setAttribute("aria-expanded", open ? "true" : "false");
     }
     this.$button?.setAttribute("aria-expanded", open ? "true" : "false");
-    this.reflectExpandedAttribute();
+    this.#reflectExpandedAttribute();
   }
 
-  private detail(option: Option | null, index: number): SelectDetail {
+  #detail(option: Option | null, index: number): SelectDetail {
     const { value = "" } = option ?? {};
 
     return { option, index, value };
   }
 
-  private schedule(value: string): void {
+  #schedule(value: string): void {
     if (this.disabled) return;
 
-    this.clearDebounce();
+    this.#clearDebounce();
 
     if (value.trim().length < this.minLength) {
-      this.abort();
-      this.searchId += 1;
-      this.clear();
-      this.emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
+      this.#abort();
+      this.#searchId += 1;
+      this.#clear();
+      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
       this.hide({ force: true });
       return;
     }
 
     if (0 < this.debounce) {
-      this.debounceTimer = setTimeout(() => {
-        this.debounceTimer = null;
-        void this.run(value);
+      this.#debounceTimer = setTimeout(() => {
+        this.#debounceTimer = null;
+        void this.#run(value);
       }, this.debounce);
       return;
     }
 
-    void this.run(value);
+    void this.#run(value);
   }
 
-  private async run(
+  async #run(
     value: string,
     { openWhenEmpty = false }: RunOptions = {},
   ): Promise<void> {
-    if (!this._search || this.disabled) return;
+    if (!this.#search || this.disabled) return;
 
-    this.abort();
-    this.abortController = new AbortController();
+    this.#abort();
+    this.#abortController = new AbortController();
 
-    const requestId = ++this.searchId;
-    const { signal } = this.abortController;
+    const requestId = ++this.#searchId;
+    const { signal } = this.#abortController;
 
-    this.emit(EVENTS.COMBOBOX_LOADING);
-    this.setLoading(true);
+    this.#emit(EVENTS.COMBOBOX_LOADING);
+    this.#setLoading(true);
 
     let raw: SearchResult;
 
     try {
-      raw = await this._search(value, { signal });
+      raw = await this.#search(value, { signal });
     } catch (error) {
-      if (signal.aborted || requestId !== this.searchId) {
+      if (signal.aborted || requestId !== this.#searchId) {
         return;
       }
 
-      this.setLoading(false);
+      this.#setLoading(false);
       throw error;
     }
 
-    if (requestId !== this.searchId) {
+    if (requestId !== this.#searchId) {
       return;
     }
 
-    this.apply(raw);
-    this.emit(EVENTS.COMBOBOX_LOADED);
-    this.setLoading(false);
+    this.#apply(raw);
+    this.#emit(EVENTS.COMBOBOX_LOADED);
+    this.#setLoading(false);
 
     if (0 === this.options.length) {
-      this.emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
+      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
 
       if (this.openOnEmpty) {
         this.show();
@@ -758,62 +760,62 @@ export class Combobox extends HTMLElement {
     this.show();
   }
 
-  private apply(raw: SearchResult): void {
+  #apply(raw: SearchResult): void {
     if (Array.isArray(raw)) {
       if (0 === raw.length) {
-        this.clear({ clearDom: this.mode === "managed" });
+        this.#clear({ clearDom: this.mode === "managed" });
         return;
       }
 
       if (typeof raw[0] === "string") {
-        this.build(-1, raw as string[]);
+        this.#build(-1, raw as string[]);
         return;
       }
 
-      this.replace(raw as HTMLElement[]);
+      this.#replace(raw as HTMLElement[]);
       return;
     }
 
     const { html, options } = raw;
 
     if (html != null && this.mode === "external") {
-      this.listbox.innerHTML = html;
-      this.sync(-1);
+      this.#listbox.innerHTML = html;
+      this.#sync(-1);
       return;
     }
 
     if (options) {
       if (0 === options.length) {
-        this.clear({ clearDom: true });
+        this.#clear({ clearDom: true });
         return;
       }
 
       if (typeof options[0] === "string") {
-        this.build(-1, options as string[]);
+        this.#build(-1, options as string[]);
         return;
       }
 
-      this.replace(options as HTMLElement[]);
+      this.#replace(options as HTMLElement[]);
       return;
     }
 
     if (this.mode === "external") {
-      this.sync(-1);
+      this.#sync(-1);
       return;
     }
 
-    this.clear({ clearDom: true });
+    this.#clear({ clearDom: true });
   }
 
-  private replace(elements: HTMLElement[]): void {
-    this.listbox.innerHTML = "";
+  #replace(elements: HTMLElement[]): void {
+    this.#listbox.innerHTML = "";
     elements.forEach((element) => {
-      this.listbox.appendChild(element);
+      this.#listbox.appendChild(element);
     });
-    this.sync(-1);
+    this.#sync(-1);
   }
 
-  private clear({ clearDom = true }: { clearDom?: boolean } = {}): void {
+  #clear({ clearDom = true }: { clearDom?: boolean } = {}): void {
     this.options = [];
     this.index = -1;
 
@@ -822,44 +824,44 @@ export class Combobox extends HTMLElement {
     }
   }
 
-  private clearDebounce(): void {
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-      this.debounceTimer = null;
+  #clearDebounce(): void {
+    if (this.#debounceTimer) {
+      clearTimeout(this.#debounceTimer);
+      this.#debounceTimer = null;
     }
   }
 
-  private abort(): void {
-    this.abortController?.abort();
-    this.abortController = null;
+  #abort(): void {
+    this.#abortController?.abort();
+    this.#abortController = null;
   }
 
-  private reflectValueAttribute(): void {
-    this.reflectingAttribute = true;
+  #reflectValueAttribute(): void {
+    this.#reflectingAttribute = true;
 
-    if (this._value) {
-      this.setAttribute("value", this._value);
+    if (this.#value) {
+      this.setAttribute("value", this.#value);
     } else {
       this.removeAttribute("value");
     }
 
-    this.reflectingAttribute = false;
+    this.#reflectingAttribute = false;
   }
 
-  private reflectExpandedAttribute(): void {
-    this.reflectingAttribute = true;
+  #reflectExpandedAttribute(): void {
+    this.#reflectingAttribute = true;
 
-    if (this._expanded) {
+    if (this.#expanded) {
       this.setAttribute("expanded", "");
     } else {
       this.removeAttribute("expanded");
     }
 
-    this.reflectingAttribute = false;
+    this.#reflectingAttribute = false;
   }
 
-  private reflectBusyAttribute(on: boolean): void {
-    this.reflectingAttribute = true;
+  #reflectBusyAttribute(on: boolean): void {
+    this.#reflectingAttribute = true;
 
     if (on) {
       this.setAttribute("busy", "");
@@ -867,7 +869,7 @@ export class Combobox extends HTMLElement {
       this.removeAttribute("busy");
     }
 
-    this.reflectingAttribute = false;
+    this.#reflectingAttribute = false;
   }
 }
 

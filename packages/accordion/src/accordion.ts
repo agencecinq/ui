@@ -47,12 +47,12 @@ export class Accordion extends HTMLElement {
         return panel;
       });
 
-    this.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.handlePanelOpen);
-    this.addEventListener("keydown", this.handleKeydown);
+    this.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.#handlePanelOpen);
+    this.addEventListener("keydown", this.#handleKeydown);
 
     if (this.options.hash) {
-      window.addEventListener("hashchange", this.handleHashChange);
-      this.handleHashChange();
+      window.addEventListener("hashchange", this.#handleHashChange);
+      this.#handleHashChange();
     }
   }
 
@@ -61,15 +61,15 @@ export class Accordion extends HTMLElement {
   }
 
   destroy(): void {
-    this.removeEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.handlePanelOpen);
-    this.removeEventListener("keydown", this.handleKeydown);
-    window.removeEventListener("hashchange", this.handleHashChange);
+    this.removeEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.#handlePanelOpen);
+    this.removeEventListener("keydown", this.#handleKeydown);
+    window.removeEventListener("hashchange", this.#handleHashChange);
 
     this.panels.forEach((panel) => panel.destroy());
     this.panels = [];
   }
 
-  private handlePanelOpen = (event: Event): void => {
+  #handlePanelOpen = (event: Event): void => {
     const { el, index } = (event as CustomEvent<Detail>).detail;
 
     if (el.closest("cinq-accordion") !== this) {
@@ -89,7 +89,7 @@ export class Accordion extends HTMLElement {
     });
   };
 
-  private handleHashChange = (): void => {
+  #handleHashChange = (): void => {
     const hash = getURLHash();
     if (!hash) {
       return;
@@ -110,7 +110,7 @@ export class Accordion extends HTMLElement {
     });
   };
 
-  private handleKeydown = (event: KeyboardEvent): void => {
+  #handleKeydown = (event: KeyboardEvent): void => {
     const target = event.target as Node;
     const index = this.panels.findIndex(
       (panel) => panel.$button != null && panel.$button.contains(target),

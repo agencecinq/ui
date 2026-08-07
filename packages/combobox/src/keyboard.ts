@@ -24,7 +24,11 @@ export type KeyboardHost = {
  * Bound once to `input` keydown; host owns state and side effects.
  */
 export default class Keyboard {
-  constructor(private readonly host: KeyboardHost) {}
+  readonly #host: KeyboardHost;
+
+  constructor(host: KeyboardHost) {
+    this.#host = host;
+  }
 
   handle = (event: KeyboardEvent): void => {
     const { key, ctrlKey, shiftKey } = event;
@@ -35,29 +39,29 @@ export default class Keyboard {
 
     switch (key) {
       case "Enter":
-        this.onEnter(event);
+        this.#onEnter(event);
         break;
       case "ArrowDown":
-        void this.onArrowDown(event);
+        void this.#onArrowDown(event);
         break;
       case "ArrowUp":
-        void this.onArrowUp(event);
+        void this.#onArrowUp(event);
         break;
       case "Escape":
-        this.onEscape(event);
+        this.#onEscape(event);
         break;
       case "Tab":
-        this.onTab();
+        this.#onTab();
         break;
       case "Home":
-        this.onHome(event);
+        this.#onHome(event);
         break;
       case "End":
-        this.onEnd(event);
+        this.#onEnd(event);
         break;
       case "ArrowLeft":
       case "ArrowRight":
-        this.host.blurOption();
+        this.#host.blurOption();
         break;
       default:
         break;
@@ -68,8 +72,8 @@ export default class Keyboard {
    * Accept focused option, or — when open without visual focus —
    * close and allow native form submit (no preventDefault).
    */
-  private onEnter(event: KeyboardEvent): void {
-    const { host } = this;
+  #onEnter(event: KeyboardEvent): void {
+    const host = this.#host;
 
     if (host.focused) {
       event.preventDefault();
@@ -82,10 +86,10 @@ export default class Keyboard {
     }
   }
 
-  private async onArrowDown(event: KeyboardEvent): Promise<void> {
+  async #onArrowDown(event: KeyboardEvent): Promise<void> {
     event.preventDefault();
 
-    const { host } = this;
+    const host = this.#host;
     const opened = await host.ensureOpen();
 
     if (!opened) {
@@ -110,10 +114,10 @@ export default class Keyboard {
     host.refresh(host.index);
   }
 
-  private async onArrowUp(event: KeyboardEvent): Promise<void> {
+  async #onArrowUp(event: KeyboardEvent): Promise<void> {
     event.preventDefault();
 
-    const { host } = this;
+    const host = this.#host;
     const opened = await host.ensureOpen();
 
     if (!opened) {
@@ -138,10 +142,10 @@ export default class Keyboard {
     host.refresh(host.index);
   }
 
-  private onEscape(event: KeyboardEvent): void {
+  #onEscape(event: KeyboardEvent): void {
     event.preventDefault();
 
-    const { host } = this;
+    const host = this.#host;
 
     if (host.expanded) {
       host.hide({ force: true });
@@ -152,8 +156,8 @@ export default class Keyboard {
     host.value = "";
   }
 
-  private onTab(): void {
-    const { host } = this;
+  #onTab(): void {
+    const host = this.#host;
 
     if (host.focused) {
       host.select();
@@ -163,8 +167,8 @@ export default class Keyboard {
     host.hide({ force: true });
   }
 
-  private onHome(event: KeyboardEvent): void {
-    const { host } = this;
+  #onHome(event: KeyboardEvent): void {
+    const host = this.#host;
 
     if (!host.focused) {
       return;
@@ -175,8 +179,8 @@ export default class Keyboard {
     host.input.setSelectionRange(0, 0);
   }
 
-  private onEnd(event: KeyboardEvent): void {
-    const { host } = this;
+  #onEnd(event: KeyboardEvent): void {
+    const host = this.#host;
 
     if (!host.focused) {
       return;

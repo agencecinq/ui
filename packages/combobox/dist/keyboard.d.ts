@@ -24,19 +24,8 @@ export type KeyboardHost = {
  * Bound once to `input` keydown; host owns state and side effects.
  */
 export default class Keyboard {
-    private readonly host;
+    #private;
     constructor(host: KeyboardHost);
     handle: (event: KeyboardEvent) => void;
-    /**
-     * Accept focused option, or — when open without visual focus —
-     * close and allow native form submit (no preventDefault).
-     */
-    private onEnter;
-    private onArrowDown;
-    private onArrowUp;
-    private onEscape;
-    private onTab;
-    private onHome;
-    private onEnd;
 }
 //# sourceMappingURL=keyboard.d.ts.map

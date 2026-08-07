@@ -7,6 +7,7 @@ import PortalToBody from "../_components/PortalToBody.astro";
 import DrawerPlayground from "../_components/DrawerPlayground.astro";
 import DrawerExclusivePlayground from "../_components/DrawerExclusivePlayground.astro";
 import DrawerMultiButtonPlayground from "../_components/DrawerMultiButtonPlayground.astro";
+import DrawerAsyncBestiary from "../_components/DrawerAsyncBestiary.astro";
 
 A drawer slides a panel in from the edge of the viewport. `<cinq-drawer>` wraps
 your overlay and panel markup, handles focus trap, scroll lock, and open/close
@@ -26,7 +27,7 @@ Import once:
 import "@agencecinq/drawer";
 ```
 
-Then write the markup — overlay, panel (`role="dialog"`), and buttons with
+Then write the markup: overlay, panel (`role="dialog"`), and buttons with
 matching `aria-controls`. The component adds interactivity only.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
@@ -66,19 +67,69 @@ matching `aria-controls`. The component adds interactivity only.
 
 ### Methods
 
-| Method     | Description                         |
-| ---------- | ----------------------------------- |
-| `open()`   | Opens the drawer.                  |
-| `close()`  | Closes the drawer.                 |
-| `toggle()` | Toggles between open and closed.   |
+| Method     | Description                                                                 |
+| ---------- | --------------------------------------------------------------------------- |
+| `open()`   | Opens the drawer. Returns `false` if already open, aborted, or deferred.    |
+| `close()`  | Closes the drawer. Returns `false` if already closed, aborted, or deferred. |
+| `toggle()` | Toggles between open and closed.                                           |
 
 ### Events
 
-| Event           | Dispatched by         | Detail payload                      | Description                                                   |
-| --------------- | --------------------- | ----------------------------------- | ------------------------------------------------------------- |
-| `drawer-toggle` | `cinq-drawer-button`  | `{ drawer, trigger, trap }`        | Emitted on `document.documentElement` to request a toggle.    |
-| `drawer-open`   | `cinq-drawer`         | `{ drawer, trigger }`              | Fired when a drawer starts opening. Other open drawers close themselves. |
-| `drawer-close`  | `cinq-drawer`         | `{ drawer }`                       | Fired when a drawer starts closing.                                   |
+Prefer the constants from `@agencecinq/utils` (`EVENTS.DRAWER_*`). Events are
+dispatched on `document.documentElement`.
+
+| Event                 | Cancelable | Detail payload                         | Description                                                                 |
+| --------------------- | ---------- | -------------------------------------- | --------------------------------------------------------------------------- |
+| `drawer-toggle`       | No         | `{ drawer, trigger, trap }`           | Request open/close from a button.                                           |
+| `drawer-before-open`  | Yes        | `{ drawer, instance, trigger, resolve }` | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
+| `drawer-before-close` | Yes        | `{ drawer, instance, resolve }`       | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
+| `drawer-open`         | No         | `{ drawer, trigger? }`                | Fired after `open` is set (trap, scroll lock, side effects).                |
+| `drawer-close`        | No         | `{ drawer }`                          | Fired after `open` is removed (scroll unlock, focus restore, side effects). |
+
+### Deferring open or close
+
+Every open path (toggle or `open()`) dispatches cancelable `drawer-before-open`
+first. Every close path (toggle, overlay click, Escape, or `close()`) dispatches
+cancelable `drawer-before-close` first. Without a listener (or without
+`preventDefault()`), the drawer opens or closes immediately. To run async work,
+cancel the event and call `detail.resolve()` when ready:
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_OPEN, (event) => {
+  if (event.detail.drawer !== "my-drawer") return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+
+document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
+  if (event.detail.drawer !== "my-drawer") return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+```
+
+`resolve()` is idempotent: safe to call more than once. `drawer-open` and
+`drawer-close` fire only after the matching `resolve()`, when side effects run.
+
+**UX:** defer **open** with `before-open` when the fetch is short (roughly under
+500 ms) and the panel would feel broken if empty: show loading on the trigger
+while you wait, then call `resolve()`. For slower or unpredictable loads, skip
+the defer: let the drawer open immediately and fetch on `drawer-open` with a
+skeleton or spinner inside the panel. Defer **close** with `before-close` when
+you need to save, archive, or run an exit animation before dismissing.
+
+TypeScript: import `BeforeOpenDetail` and `BeforeCloseDetail` from
+`@agencecinq/drawer` to type listeners.
 
 ## Shopify (Liquid snippet)
 
@@ -136,7 +187,7 @@ This copies the package snippet to your theme:
         class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
       >
         <div class="p-8 flex flex-col gap-4">
-          <h2 class="text-2xl font-bold">CINQ drawer — encounter prep</h2>
+          <h2 class="text-2xl font-bold">CINQ drawer: encounter prep</h2>
           <p class="text-gray-600">
             Keep quick notes on the next encounter: a troll ambush, a cloaker in the rafters, or a
             nest of jermlaines sabotaging the party.
@@ -174,8 +225,16 @@ notes → switch to bestiary → close: focus lands back on **Open left**.
 
 Several triggers can share the same `aria-controls` id. Each
 `<cinq-drawer-button>` listens for `drawer-open` / `drawer-close` and updates its
-own `aria-expanded` — open or close from any control and they all stay in sync
+own `aria-expanded`. Open or close from any control and they all stay in sync
 (red ring when collapsed, green when expanded).
 
 <DrawerMultiButtonPlayground />
+
+### Async bestiary (`before-open` / `before-close`)
+
+Try opening and closing the drawer below. Each transition is deferred until async
+work finishes: the creature loads before `open` is set, then archives before `open`
+is removed. The overlay shows the wait state while the hook is pending.
+
+<DrawerAsyncBestiary />
 

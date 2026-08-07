@@ -35,21 +35,21 @@ export class DisclosureButton extends HTMLElement {
 
     this.elements = (this.$button.ariaControlsElements ?? []) as HTMLElement[];
 
-    this.$button.addEventListener("click", this.handleClick);
+    this.$button.addEventListener("click", this.#handleClick);
   }
 
   get expanded(): boolean {
     return this.$button?.getAttribute("aria-expanded") === "true";
   }
 
-  private get visibleElements(): HTMLElement[] {
+  get #visibleElements(): HTMLElement[] {
     return this.elements.filter((element) => !element.hidden);
   }
 
-  private get allVisibleElements(): boolean {
+  get #allVisibleElements(): boolean {
     return (
       this.elements.length > 0 &&
-      this.visibleElements.length === this.elements.length
+      this.#visibleElements.length === this.elements.length
     );
   }
 
@@ -63,12 +63,12 @@ export class DisclosureButton extends HTMLElement {
       return false;
     }
 
-    if (this.visibleElements.length > 0) {
+    if (this.#visibleElements.length > 0) {
       if (
         !dispatchEvent(
           this.$button,
           DISCLOSURE_BUTTON_CLOSE,
-          this.detail(false),
+          this.#detail(false),
         )
       ) {
         return false;
@@ -82,7 +82,7 @@ export class DisclosureButton extends HTMLElement {
       !dispatchEvent(
         this.$button,
         DISCLOSURE_BUTTON_OPEN,
-        this.detail(true),
+        this.#detail(true),
       )
     ) {
       return false;
@@ -98,12 +98,12 @@ export class DisclosureButton extends HTMLElement {
       return;
     }
 
-    if (emit && this.visibleElements.length > 0) {
+    if (emit && this.#visibleElements.length > 0) {
       if (
         !dispatchEvent(
           this.$button,
           DISCLOSURE_BUTTON_CLOSE,
-          this.detail(false),
+          this.#detail(false),
         )
       ) {
         return;
@@ -122,12 +122,12 @@ export class DisclosureButton extends HTMLElement {
       return;
     }
 
-    if (emit && !this.allVisibleElements) {
+    if (emit && !this.#allVisibleElements) {
       if (
         !dispatchEvent(
           this.$button,
           DISCLOSURE_BUTTON_OPEN,
-          this.detail(true),
+          this.#detail(true),
         )
       ) {
         return;
@@ -149,7 +149,7 @@ export class DisclosureButton extends HTMLElement {
 
     this.$button.setAttribute(
       "aria-expanded",
-      this.visibleElements.length > 0 ? "true" : "false",
+      this.#visibleElements.length > 0 ? "true" : "false",
     );
   }
 
@@ -159,14 +159,14 @@ export class DisclosureButton extends HTMLElement {
       return;
     }
 
-    this.$button.removeEventListener("click", this.handleClick);
+    this.$button.removeEventListener("click", this.#handleClick);
   }
 
-  private handleClick = (): void => {
+  #handleClick = (): void => {
     this.toggle();
   };
 
-  private detail(open: boolean): Detail {
+  #detail(open: boolean): Detail {
     return {
       ids: this.elements.map((element) => element.id),
       elements: this.elements,

@@ -1,9 +1,10 @@
+export type { BeforeCloseDetail, BeforeOpenDetail } from './types.js';
 export declare class Drawer extends HTMLElement {
+    #private;
     trigger: HTMLElement | null;
     trap: HTMLElement | null;
-    private $overlay;
-    /** Panel that runs the slide transition (fallback: host). */
-    private $panel;
+    $overlay: Element | null;
+    $panel: HTMLElement | null;
     constructor();
     static get observedAttributes(): string[];
     connectedCallback(): void;
@@ -18,10 +19,6 @@ export declare class Drawer extends HTMLElement {
      * Safe to call from outside while the host stays mounted.
      */
     destroy(): void;
-    handleClick: () => boolean;
-    handleKeyUp: (event: KeyboardEvent) => void;
-    handleDrawerOpen: (event: CustomEvent) => void;
-    handleDrawerToggle: (event: CustomEvent) => void;
     /**
      * Toggles the drawer between open and closed.
      *
@@ -33,9 +30,20 @@ export declare class Drawer extends HTMLElement {
         trigger: HTMLElement | null;
         trap: HTMLElement | null;
     }): boolean;
-    private onCloseTransitionEnd;
-    open(): void;
-    close(): void;
+    /**
+     * Opens the drawer. Dispatches cancelable `drawer-before-open` with
+     * `detail.resolve()` to commit after async work.
+     *
+     * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+     */
+    open(): boolean;
+    /**
+     * Closes the drawer. Dispatches cancelable `drawer-before-close` with
+     * `detail.resolve()` to commit after async work.
+     *
+     * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+     */
+    close(): boolean;
     attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void;
 }
 //# sourceMappingURL=drawer.d.ts.map

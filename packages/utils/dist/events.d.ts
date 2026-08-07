@@ -1,7 +1,11 @@
 export declare const EVENTS: {
+    DRAWER_BEFORE_CLOSE: string;
+    DRAWER_BEFORE_OPEN: string;
     DRAWER_CLOSE: string;
     DRAWER_OPEN: string;
     DRAWER_TOGGLE: string;
+    MODAL_BEFORE_CLOSE: string;
+    MODAL_BEFORE_OPEN: string;
     MODAL_CLOSE: string;
     MODAL_OPEN: string;
     MODAL_TOGGLE: string;

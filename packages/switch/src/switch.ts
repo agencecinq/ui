@@ -26,9 +26,9 @@ export class Switch extends HTMLElement {
   init(): void {
     this.$input = this.querySelector<HTMLInputElement>("input");
 
-    this.addEventListener("click", this.handleClick);
-    this.addEventListener("keydown", this.handleKeydown);
-    this.update();
+    this.addEventListener("click", this.#handleClick);
+    this.addEventListener("keydown", this.#handleKeydown);
+    this.#update();
   }
 
   attributeChangedCallback(
@@ -37,7 +37,7 @@ export class Switch extends HTMLElement {
     newValue: string | null,
   ): void {
     if (name === "disabled") {
-      this.update();
+      this.#update();
 
       if (newValue !== null && this.matches(":focus")) {
         this.blur();
@@ -86,12 +86,12 @@ export class Switch extends HTMLElement {
   activate(emit = true): boolean {
     if (this.disabled || this.checked) return false;
 
-    if (emit && !dispatchEvent(this, EVENTS.SWITCH_ACTIVATE, this.detail)) {
+    if (emit && !dispatchEvent(this, EVENTS.SWITCH_ACTIVATE, this.#detail)) {
       return false;
     }
 
     this.setAttribute("aria-checked", "true");
-    this.update();
+    this.#update();
     this.setAttribute("checked", "");
     return true;
   }
@@ -99,23 +99,23 @@ export class Switch extends HTMLElement {
   deactivate(emit = true): boolean {
     if (this.disabled || !this.checked) return false;
 
-    if (emit && !dispatchEvent(this, EVENTS.SWITCH_DEACTIVATE, this.detail)) {
+    if (emit && !dispatchEvent(this, EVENTS.SWITCH_DEACTIVATE, this.#detail)) {
       return false;
     }
 
     this.setAttribute("aria-checked", "false");
-    this.update();
+    this.#update();
     this.removeAttribute("checked");
 
     return true;
   }
 
   destroy(): void {
-    this.removeEventListener("click", this.handleClick);
-    this.removeEventListener("keydown", this.handleKeydown);
+    this.removeEventListener("click", this.#handleClick);
+    this.removeEventListener("keydown", this.#handleKeydown);
   }
 
-  private handleClick = (event: MouseEvent): void => {
+  #handleClick = (event: MouseEvent): void => {
     if (this.disabled) {
       return;
     }
@@ -127,7 +127,7 @@ export class Switch extends HTMLElement {
     this.toggle();
   };
 
-  private handleKeydown = (event: KeyboardEvent): void => {
+  #handleKeydown = (event: KeyboardEvent): void => {
     if (this.disabled) {
       return;
     }
@@ -140,11 +140,11 @@ export class Switch extends HTMLElement {
     this.toggle();
   };
 
-  private get detail(): Detail {
+  get #detail(): Detail {
     return { el: this };
   }
 
-  private update(): void {
+  #update(): void {
     if (!this.$input) {
       return;
     }

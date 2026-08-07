@@ -1,0 +1,210 @@
+---
+import PortalToBody from "./PortalToBody.astro";
+import RegisterComponents from "./RegisterComponents.astro";
+---
+
+<RegisterComponents />
+
+<div class="not-content">
+  <section
+    class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4"
+    data-demo-root="async-bestiary"
+  >
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Bestiary drawer</h3>
+        <p class="text-sm text-gray-600" data-bestiary-status>
+          Open the drawer to load a creature. Close it to archive the entry.
+        </p>
+      </div>
+      <cinq-drawer-button class="block">
+        <button
+          type="button"
+          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+          aria-controls="async-bestiary-drawer"
+          aria-expanded="false"
+        >
+          Open bestiary
+        </button>
+      </cinq-drawer-button>
+    </div>
+
+    <cinq-drawer id="async-bestiary-drawer" class="group">
+      <div
+        data-dom="overlay"
+        class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
+      ></div>
+      <div
+        role="dialog"
+        class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
+      >
+        <div class="relative flex h-full flex-col">
+          <header class="flex items-center justify-between border-b px-6 py-4">
+            <h2 class="text-lg font-semibold text-gray-900">Monster entry</h2>
+            <cinq-drawer-button class="block">
+              <button
+                type="button"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+                aria-controls="async-bestiary-drawer"
+                aria-expanded="false"
+              >
+                ✕
+              </button>
+            </cinq-drawer-button>
+          </header>
+
+          <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
+            <label class="flex flex-col gap-1.5">
+              <span class="text-sm font-medium text-gray-700">Creature</span>
+              <select
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white"
+                data-monster-select
+              >
+                <option value="troll">Troll</option>
+                <option value="lich">Lich</option>
+                <option value="adult-black-dragon">Adult Black Dragon</option>
+              </select>
+            </label>
+
+            <div class="rounded-xl bg-gray-50 p-4 flex flex-col gap-2">
+              <h3 class="text-base font-semibold text-gray-900" data-monster-name>Creature</h3>
+              <p class="text-sm text-gray-600" data-monster-meta>Pick a creature and open the drawer.</p>
+              <p class="text-sm text-gray-700" data-monster-desc></p>
+            </div>
+          </div>
+
+          <footer class="border-t px-6 py-4">
+            <cinq-drawer-button class="block">
+              <button
+                type="button"
+                class="w-full px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+                aria-controls="async-bestiary-drawer"
+                aria-expanded="false"
+              >
+                Close and archive
+              </button>
+            </cinq-drawer-button>
+          </footer>
+
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-white/90 px-6 text-center text-sm font-medium text-gray-800"
+            data-busy
+            hidden
+          >
+            Working…
+          </div>
+        </div>
+      </div>
+    </cinq-drawer>
+
+    <PortalToBody selector="#async-bestiary-drawer" />
+  </section>
+</div>
+
+<script>
+  import { EVENTS } from "@agencecinq/utils";
+
+  const API_BASE = "https://www.dnd5eapi.co/api/monsters";
+  const DRAWER_ID = "async-bestiary-drawer";
+
+  function populateMonster(root, data) {
+    const nameEl = root.querySelector("[data-monster-name]");
+    const metaEl = root.querySelector("[data-monster-meta]");
+    const descEl = root.querySelector("[data-monster-desc]");
+
+    if (nameEl) nameEl.textContent = data.name;
+
+    if (metaEl) {
+      metaEl.textContent = `${data.hit_points} HP · ${data.type} · CR ${data.challenge_rating}`;
+    }
+
+    if (descEl && Array.isArray(data.desc) && data.desc.length > 0) {
+      descEl.textContent = data.desc[0];
+    }
+  }
+
+  customElements.whenDefined("cinq-drawer").then(() => {
+    const root = document.querySelector('[data-demo-root="async-bestiary"]');
+    if (!root) return;
+
+    const select = root.querySelector("[data-monster-select]");
+    const status = root.querySelector("[data-bestiary-status]");
+    const busy = root.querySelector("[data-busy]");
+    if (!select) return;
+
+    function currentSlug() {
+      return /** @type {HTMLSelectElement} */ (select).value;
+    }
+
+    function setBusy(message, visible) {
+      if (busy instanceof HTMLElement) {
+        busy.textContent = message;
+        busy.hidden = !visible;
+      }
+    }
+
+    function loadMonster(slug) {
+      const metaEl = root.querySelector("[data-monster-meta]");
+      if (metaEl) metaEl.textContent = "Consulting bestiary…";
+
+      return fetch(`${API_BASE}/${encodeURIComponent(slug)}`)
+        .then((response) => {
+          if (!response.ok) throw new Error("Network error");
+          return response.json();
+        })
+        .then((monster) => {
+          populateMonster(root, monster);
+        })
+        .catch(() => {
+          if (metaEl) metaEl.textContent = "Failed to load monster data.";
+        });
+    }
+
+    select.addEventListener("change", () => {
+      const drawer = document.getElementById(DRAWER_ID);
+      if (!drawer?.hasAttribute("open")) return;
+      void loadMonster(currentSlug());
+    });
+
+    document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_OPEN, (event) => {
+      if (event.detail.drawer !== DRAWER_ID) return;
+
+      event.preventDefault();
+      if (status) status.textContent = "Loading entry…";
+      setBusy("Loading entry…", true);
+
+      void loadMonster(currentSlug()).finally(() => {
+        setBusy("Working…", false);
+        if (status) status.textContent = "Entry loaded. Close the drawer to archive it.";
+        event.detail.resolve();
+      });
+    });
+
+    document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
+      if (event.detail.drawer !== DRAWER_ID) return;
+
+      event.preventDefault();
+      setBusy("Archiving entry…", true);
+
+      const slug = currentSlug();
+
+      void fetch(`${API_BASE}/${encodeURIComponent(slug)}`)
+        .then((response) => {
+          if (!response.ok) throw new Error("Network error");
+          return response.json();
+        })
+        .then((monster) => {
+          if (status) {
+            status.textContent = `Last archived: ${monster.name} (${monster.hit_points} HP · CR ${monster.challenge_rating}).`;
+          }
+        })
+        .catch(() => {
+          if (status) status.textContent = "Could not reach the bestiary.";
+        })
+        .finally(() => {
+          setBusy("Working…", false);
+          event.detail.resolve();
+        });
+    });
+  });
+</script>

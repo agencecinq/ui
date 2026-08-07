@@ -8,6 +8,7 @@ import { HideOptions, Mode, OnSelect, Option, Render, SearchFn, SelectMode, Writ
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
  */
 export declare class Combobox extends HTMLElement {
+    #private;
     static observedAttributes: string[];
     $input: HTMLInputElement | null;
     $listbox: HTMLElement | null;
@@ -24,16 +25,6 @@ export declare class Combobox extends HTMLElement {
     openOnEmpty: boolean;
     write: Write;
     onSelect: OnSelect | null;
-    private _value;
-    private _expanded;
-    private _search;
-    private _render;
-    private searchId;
-    private debounceTimer;
-    private abortController;
-    private keyboard;
-    private bound;
-    private reflectingAttribute;
     connectedCallback(): void;
     disconnectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
@@ -54,11 +45,10 @@ export declare class Combobox extends HTMLElement {
     set search(value: SearchFn | null);
     get render(): Render;
     set render(value: Render);
-    /** KeyboardHost: the focusable textbox (available after mount). */
+    /** KeyboardHost: the focusable textbox (available after init). */
     get input(): HTMLInputElement;
     /** Whether an option has visual focus (`aria-activedescendant`). */
     get focused(): boolean;
-    private get listbox();
     show(): void;
     hide({ force, clear }?: HideOptions): void;
     /** Accept the visually focused option (Enter / click / Tab). */
@@ -70,49 +60,10 @@ export declare class Combobox extends HTMLElement {
     refresh(index: number): void;
     /** Open the listbox if needed (runs search when closed / empty). */
     ensureOpen(): Promise<boolean>;
-    private mount;
-    private syncOptionsFromAttributes;
-    private syncDisabled;
     /**
-     * Find the optional open button linked through `ariaControlsElements`.
-     * Prefer the host, then document.
+     * Bind markup + listeners once `search` is set. Call {@link destroy} first
+     * if already bound.
      */
-    private resolveButton;
-    private bind;
-    private isTarget;
-    private onDocumentClick;
-    private onListboxMousedown;
-    private onInput;
-    private onInputClick;
-    private onButtonMousedown;
-    private onButtonClick;
-    private onListboxClick;
-    private onFocus;
-    private onBlur;
-    private toggle;
-    /** Build managed option markup from string labels. */
-    private build;
-    /**
-     * Reflect selection on existing `[role="option"]` nodes.
-     * Does not invent markup — options must already have stable `id`s.
-     */
-    private sync;
-    private active;
-    /** Remove `aria-activedescendant` — empty string is an invalid IDREF. */
-    private clearActiveDescendant;
-    private emit;
-    private setLoading;
-    private setExpanded;
-    private detail;
-    private schedule;
-    private run;
-    private apply;
-    private replace;
-    private clear;
-    private clearDebounce;
-    private abort;
-    private reflectValueAttribute;
-    private reflectExpandedAttribute;
-    private reflectBusyAttribute;
+    init(): void;
 }
 //# sourceMappingURL=combobox.d.ts.map

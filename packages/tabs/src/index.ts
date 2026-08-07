@@ -19,6 +19,17 @@ export class Tabs extends HTMLElement {
   }
 
   connectedCallback() {
+    this.init();
+  }
+
+  disconnectedCallback() {
+    this.destroy();
+  }
+
+  /**
+   * Bind tabs + panels. Call {@link destroy} first if already bound.
+   */
+  init() {
     this.$tabList = this.querySelector(
       '[role="tablist"]',
     ) as HTMLElement | null;
@@ -35,14 +46,6 @@ export class Tabs extends HTMLElement {
 
     this.href = (this.hash && getHash(window.location.hash)) || "";
 
-    this.init();
-  }
-
-  disconnectedCallback() {
-    this.destroy();
-  }
-
-  init() {
     if (!this.$tabList) {
       return;
     }
@@ -111,7 +114,7 @@ export class Tabs extends HTMLElement {
     this.$tabList?.addEventListener("keydown", this.handleKeydown);
   }
 
-  private get isRtl(): boolean {
+  get #isRtl(): boolean {
     const el = this.$tabList ?? this;
     return el ? getComputedStyle(el).direction === "rtl" : false;
   }
@@ -159,7 +162,7 @@ export class Tabs extends HTMLElement {
       this.tabs[this.current].toggle();
     };
 
-    const rtl = this.isRtl;
+    const rtl = this.#isRtl;
 
     const codes: Record<string, () => void | boolean> = {
       ArrowUp: previous,

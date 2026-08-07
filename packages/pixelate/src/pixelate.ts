@@ -126,11 +126,12 @@ export class Pixelate extends HTMLElement {
     return { width: canvas.clientWidth, height: canvas.clientHeight };
   }
 
-  #sourceRect(
+  // drawImage source crop — sx/sy top-left in the image, sw/sh width and height
+  #rect(
     width: number,
     height: number,
   ): { sx: number; sy: number; sw: number; sh: number } {
-    // Source rect for a cover crop centered in the canvas box
+    // Centered cover: map the canvas box back onto natural image coordinates
     const img = this.$img!;
     const iw = img.naturalWidth;
     const ih = img.naturalHeight;
@@ -191,7 +192,7 @@ export class Pixelate extends HTMLElement {
     }
 
     const pixel = this.#pixel();
-    const { sx, sy, sw, sh } = this.#sourceRect(width, height);
+    const { sx, sy, sw, sh } = this.#rect(width, height);
 
     if (pixel <= 1) {
       this.#reset(width, height, sx, sy, sw, sh);

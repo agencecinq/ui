@@ -12,6 +12,7 @@ import { FormatSize, FormatValue, Mode } from './types.js';
  * @see https://github.com/19h47/19h47-windowsplitter
  */
 export declare class WindowSplitter extends HTMLElement {
+    #private;
     static observedAttributes: string[];
     /** Focusable separator control inside the host. */
     $separator: HTMLElement | null;
@@ -21,15 +22,13 @@ export declare class WindowSplitter extends HTMLElement {
     fixed: boolean;
     formatSize: FormatSize;
     formatValue: FormatValue;
-    private history;
-    private resizeObserver;
-    private keyboard;
-    private bound;
-    /** Active pointer drag; `null` when idle. `id` is `PointerEvent.pointerId`. */
-    private drag;
     connectedCallback(): void;
     disconnectedCallback(): void;
-    /** Detaches listeners and observers. Called automatically from `disconnectedCallback`. */
+    /**
+     * Bind separator + listeners. Call {@link destroy} first if already bound.
+     */
+    init(): void;
+    /** Detaches listeners and observers. Safe to call from outside while mounted. */
     destroy(): void;
     attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void;
     /** Raw `aria-orientation` on `$separator` (HTML source of truth). */
@@ -59,14 +58,5 @@ export declare class WindowSplitter extends HTMLElement {
     /** Restore the primary pane to its pre-collapse value (or midpoint). */
     restore(trigger?: boolean): boolean;
     toggle(trigger?: boolean): boolean;
-    private read;
-    private observe;
-    private apply;
-    private update;
-    private emit;
-    private valueFromPointer;
-    private handlePointerdown;
-    private handlePointermove;
-    private handlePointerup;
 }
 //# sourceMappingURL=windowsplitter.d.ts.map

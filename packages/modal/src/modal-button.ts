@@ -1,15 +1,15 @@
 import { EVENTS, dispatchEvent } from '@agencecinq/utils';
 
 export class ModalButton extends HTMLElement {
-    private $button: HTMLButtonElement | null = null;
+  $button: HTMLButtonElement | null = null;
     /** Controlled modal element IDs from `ariaControlsElements`. */
     controls: string[] = [];
-  private handleModalClose = (event: CustomEvent<{ modal: string }>) => {
+  #handleModalClose = (event: CustomEvent<{ modal: string }>) => {
     if (this.$button && this.controls.includes(event.detail.modal)) {
       this.$button.setAttribute("aria-pressed", "false");
     }
   };
-  private handleModalOpen = (event: CustomEvent<{ modal: string }>) => {
+  #handleModalOpen = (event: CustomEvent<{ modal: string }>) => {
     if (this.$button && this.controls.includes(event.detail.modal)) {
       this.$button.setAttribute("aria-pressed", "true");
     }
@@ -41,8 +41,8 @@ export class ModalButton extends HTMLElement {
         );
 
         this.$button.addEventListener('click', this.show);
-        document.documentElement.addEventListener(EVENTS.MODAL_CLOSE, this.handleModalClose as EventListener);
-        document.documentElement.addEventListener(EVENTS.MODAL_OPEN, this.handleModalOpen as EventListener);
+        document.documentElement.addEventListener(EVENTS.MODAL_CLOSE, this.#handleModalClose as EventListener);
+        document.documentElement.addEventListener(EVENTS.MODAL_OPEN, this.#handleModalOpen as EventListener);
     }
 
     /** Detaches listeners. Safe to call from outside while the host stays mounted. */
@@ -50,8 +50,8 @@ export class ModalButton extends HTMLElement {
         if (this.$button) {
             this.$button.removeEventListener('click', this.show);
         }
-        document.documentElement.removeEventListener(EVENTS.MODAL_CLOSE, this.handleModalClose as EventListener);
-        document.documentElement.removeEventListener(EVENTS.MODAL_OPEN, this.handleModalOpen as EventListener);
+        document.documentElement.removeEventListener(EVENTS.MODAL_CLOSE, this.#handleModalClose as EventListener);
+        document.documentElement.removeEventListener(EVENTS.MODAL_OPEN, this.#handleModalOpen as EventListener);
     }
 
   show = () => {

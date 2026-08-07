@@ -42,17 +42,10 @@ var e = {
 		r = e, n ||= setTimeout(i, t);
 	};
 }, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug");
-var a = {
-	x: 0,
-	y: 0
-};
-window.addEventListener("pointermove", n(({ x: e, y: t }) => {
-	a.x = e, a.y = t;
-}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
 //#region src/disclosure-button.ts
-var { DISCLOSURE_BUTTON_OPEN: o, DISCLOSURE_BUTTON_CLOSE: s } = e, c = class extends HTMLElement {
+var { DISCLOSURE_BUTTON_OPEN: a, DISCLOSURE_BUTTON_CLOSE: o } = e, s = class extends HTMLElement {
 	$button = null;
 	elements = [];
 	connectedCallback() {
@@ -63,40 +56,40 @@ var { DISCLOSURE_BUTTON_OPEN: o, DISCLOSURE_BUTTON_CLOSE: s } = e, c = class ext
 	}
 	init() {
 		if (this.$button = this.querySelector("button"), !this.$button) throw Error("DisclosureButton: button element not found");
-		this.elements = this.$button.ariaControlsElements ?? [], this.$button.addEventListener("click", this.handleClick);
+		this.elements = this.$button.ariaControlsElements ?? [], this.$button.addEventListener("click", this.#n);
 	}
 	get expanded() {
 		return this.$button?.getAttribute("aria-expanded") === "true";
 	}
-	get visibleElements() {
+	get #e() {
 		return this.elements.filter((e) => !e.hidden);
 	}
-	get allVisibleElements() {
-		return this.elements.length > 0 && this.visibleElements.length === this.elements.length;
+	get #t() {
+		return this.elements.length > 0 && this.#e.length === this.elements.length;
 	}
 	toggle() {
-		return this.$button ? this.visibleElements.length > 0 ? t(this.$button, s, this.detail(!1)) ? (this.close(!1), !0) : !1 : t(this.$button, o, this.detail(!0)) ? (this.open(!1), !0) : !1 : !1;
+		return this.$button ? this.#e.length > 0 ? t(this.$button, o, this.#r(!1)) ? (this.close(!1), !0) : !1 : t(this.$button, a, this.#r(!0)) ? (this.open(!1), !0) : !1 : !1;
 	}
 	close(e = !0) {
-		this.$button && (e && this.visibleElements.length > 0 && !t(this.$button, s, this.detail(!1)) || (this.elements.forEach((e) => {
+		this.$button && (e && this.#e.length > 0 && !t(this.$button, o, this.#r(!1)) || (this.elements.forEach((e) => {
 			e.hidden = !0;
 		}), this.update()));
 	}
 	open(e = !0) {
-		this.$button && (e && !this.allVisibleElements && !t(this.$button, o, this.detail(!0)) || (this.elements.forEach((e) => {
+		this.$button && (e && !this.#t && !t(this.$button, a, this.#r(!0)) || (this.elements.forEach((e) => {
 			e.hidden = !1;
 		}), this.update()));
 	}
 	update() {
-		this.$button && this.$button.setAttribute("aria-expanded", this.visibleElements.length > 0 ? "true" : "false");
+		this.$button && this.$button.setAttribute("aria-expanded", this.#e.length > 0 ? "true" : "false");
 	}
 	destroy() {
-		this.$button && this.$button.removeEventListener("click", this.handleClick);
+		this.$button && this.$button.removeEventListener("click", this.#n);
 	}
-	handleClick = () => {
+	#n = () => {
 		this.toggle();
 	};
-	detail(e) {
+	#r(e) {
 		return {
 			ids: this.elements.map((e) => e.id),
 			elements: this.elements,
@@ -105,6 +98,6 @@ var { DISCLOSURE_BUTTON_OPEN: o, DISCLOSURE_BUTTON_CLOSE: s } = e, c = class ext
 		};
 	}
 };
-customElements.get("cinq-disclosure-button") || customElements.define("cinq-disclosure-button", c);
+customElements.get("cinq-disclosure-button") || customElements.define("cinq-disclosure-button", s);
 //#endregion
-export { c as DisclosureButton };
+export { s as DisclosureButton };

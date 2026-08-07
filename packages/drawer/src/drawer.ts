@@ -7,15 +7,16 @@ import {
   getFocusableElements,
   dispatchEvent,
   rememberReturnFocus,
-  restoreReturnFocus,
+  scheduleRestoreReturnFocus,
 } from "@agencecinq/utils";
+
+export type { BeforeCloseDetail, BeforeOpenDetail } from "./types.js";
 
 export class Drawer extends HTMLElement {
   trigger: HTMLElement | null = null;
   trap: HTMLElement | null = null;
-  private $overlay: Element | null = null;
-  /** Panel that runs the slide transition (fallback: host). */
-  private $panel: HTMLElement | null = null;
+  $overlay: Element | null = null;
+  $panel: HTMLElement | null = null;
 
   constructor() {
     super();
@@ -42,23 +43,27 @@ export class Drawer extends HTMLElement {
       throw new Error("Drawer: id attribute is required");
     }
 
-    this.$panel = this.querySelector<HTMLElement>('[role="dialog"]') || this;
+    this.$panel = this.querySelector<HTMLElement>('[role="dialog"]');
+
+    if (!this.$panel) {
+      throw new Error('Drawer: No [role="dialog"] panel found');
+    }
     this.$overlay =
       this.querySelector('[data-dom="overlay"]') ||
       this.querySelector("[overlay]");
 
     if (this.$overlay) {
-      this.$overlay.addEventListener("click", this.handleClick);
+      this.$overlay.addEventListener("click", this.#handleClick);
     }
 
-    document.documentElement.addEventListener("keyup", this.handleKeyUp);
+    document.documentElement.addEventListener("keyup", this.#handleKeyUp);
     document.documentElement.addEventListener(
       EVENTS.DRAWER_OPEN,
-      this.handleDrawerOpen as EventListener,
+      this.#handleDrawerOpen as EventListener,
     );
     document.documentElement.addEventListener(
       EVENTS.DRAWER_TOGGLE,
-      this.handleDrawerToggle as EventListener,
+      this.#handleDrawerToggle as EventListener,
     );
   }
 
@@ -70,21 +75,21 @@ export class Drawer extends HTMLElement {
   destroy(): void {
     this.$panel?.removeEventListener(
       "transitionend",
-      this.onCloseTransitionEnd,
+      this.#onCloseTransitionEnd,
     );
 
     if (this.$overlay) {
-      this.$overlay.removeEventListener("click", this.handleClick);
+      this.$overlay.removeEventListener("click", this.#handleClick);
     }
 
-    document.documentElement.removeEventListener("keyup", this.handleKeyUp);
+    document.documentElement.removeEventListener("keyup", this.#handleKeyUp);
     document.documentElement.removeEventListener(
       EVENTS.DRAWER_OPEN,
-      this.handleDrawerOpen as EventListener,
+      this.#handleDrawerOpen as EventListener,
     );
     document.documentElement.removeEventListener(
       EVENTS.DRAWER_TOGGLE,
-      this.handleDrawerToggle as EventListener,
+      this.#handleDrawerToggle as EventListener,
     );
 
     if (this.hasAttribute("open")) {
@@ -93,34 +98,27 @@ export class Drawer extends HTMLElement {
       this.style.setProperty("opacity", "0");
       this.style.setProperty("visibility", "hidden");
 
-      // Defer: exclusive multi-toggle closes A then opens B in the same turn.
-      queueMicrotask(() => {
-        const othersOpen = [
-          ...document.querySelectorAll("cinq-drawer[open]"),
-        ].some((drawer) => drawer !== this);
-        if (!othersOpen) {
-          restoreReturnFocus();
-        }
-      });
+      // Defer: another overlay may take focus before we restore.
+      scheduleRestoreReturnFocus(this);
     }
 
     this.$overlay = null;
     this.$panel = null;
   }
 
-  handleClick = (): boolean => {
+  #handleClick = (): boolean => {
     return this.toggle({ trigger: null, trap: null });
   };
 
-  handleKeyUp = (event: KeyboardEvent): void => {
+  #handleKeyUp = (event: KeyboardEvent): void => {
     if (event.key === "Escape" && this.hasAttribute("open")) {
-      this.removeAttribute("open");
+      this.close();
     }
   };
 
-  handleDrawerOpen = (event: CustomEvent): void => {
+  #handleDrawerOpen = (event: CustomEvent): void => {
     if (event.detail.drawer !== this.id && this.hasAttribute("open")) {
-      this.removeAttribute("open");
+      this.close();
       return;
     }
 
@@ -128,11 +126,11 @@ export class Drawer extends HTMLElement {
       if (event.detail.trigger) {
         this.trigger = event.detail.trigger;
       }
-      this.setAttribute("open", "");
+      this.open();
     }
   };
 
-  handleDrawerToggle = (event: CustomEvent): void => {
+  #handleDrawerToggle = (event: CustomEvent): void => {
     const { trigger, trap, drawer } = event.detail;
 
     if (drawer !== this.id) {
@@ -165,17 +163,22 @@ export class Drawer extends HTMLElement {
 
     this.trap = trap || this;
 
-    return this.toggleAttribute("open");
+    if (!opening) {
+      this.close();
+      return this.hasAttribute("open");
+    }
+
+    return this.open();
   }
 
-  private onCloseTransitionEnd = (event: TransitionEvent): void => {
+  #onCloseTransitionEnd = (event: TransitionEvent): void => {
     if (event.target !== event.currentTarget) {
       return;
     }
 
     this.$panel?.removeEventListener(
       "transitionend",
-      this.onCloseTransitionEnd,
+      this.#onCloseTransitionEnd,
     );
 
     if (this.hasAttribute("open")) {
@@ -186,58 +189,65 @@ export class Drawer extends HTMLElement {
     this.style.setProperty("visibility", "hidden");
   };
 
-  open(): void {
-    this.$panel?.removeEventListener(
-      "transitionend",
-      this.onCloseTransitionEnd,
-    );
-
-    this.style.setProperty("opacity", "1");
-    this.style.setProperty("visibility", "visible");
-
-    rememberReturnFocus(this.trigger);
-
-    dispatchEvent(
-      document.documentElement,
-      EVENTS.DRAWER_OPEN,
-      { drawer: this.id, trigger: this.trigger },
-      { bubbles: false, cancelable: false },
-    );
-
-    const container = this.trap || this;
-    const focusables = getFocusableElements(container);
-    if (focusables.length > 0) {
-      addTrapFocus(container, focusables[0]);
+  /**
+   * Opens the drawer. Dispatches cancelable `drawer-before-open` with
+   * `detail.resolve()` to commit after async work.
+   *
+   * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+   */
+  open(): boolean {
+    if (this.hasAttribute("open")) {
+      return false;
     }
 
-    disableScroll();
+    const resolve = (): void => this.setAttribute("open", "");
+
+    const proceed = dispatchEvent(
+      document.documentElement,
+      EVENTS.DRAWER_BEFORE_OPEN,
+      {
+        drawer: this.id,
+        instance: this,
+        trigger: this.trigger,
+        resolve,
+      },
+      { bubbles: false },
+    );
+
+    if (!proceed) {
+      return this.hasAttribute("open");
+    }
+
+    resolve();
+    return true;
   }
 
-  close(): void {
-    this.$panel?.removeEventListener(
-      "transitionend",
-      this.onCloseTransitionEnd,
-    );
+  /**
+   * Closes the drawer. Dispatches cancelable `drawer-before-close` with
+   * `detail.resolve()` to commit after async work.
+   *
+   * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+   */
+  close(): boolean {
+    if (!this.hasAttribute("open")) {
+      return false;
+    }
 
-    removeTrapFocus();
-    enableScroll(false);
+    const resolve = (): void => this.removeAttribute("open");
 
-    // Defer so an exclusive open in the same turn (multi `aria-controls`, or
-    // DRAWER_OPEN closing a peer) can set `open` before we decide to restore.
-    queueMicrotask(() => {
-      if (!document.querySelector("cinq-drawer[open]")) {
-        restoreReturnFocus();
-      }
-    });
-
-    dispatchEvent(
+    const proceed = dispatchEvent(
       document.documentElement,
-      EVENTS.DRAWER_CLOSE,
-      { drawer: this.id },
-      { bubbles: false, cancelable: false },
+      EVENTS.DRAWER_BEFORE_CLOSE,
+      { drawer: this.id, instance: this, resolve },
+      { bubbles: false },
     );
 
-    this.$panel?.addEventListener("transitionend", this.onCloseTransitionEnd);
+    if (!proceed) {
+      return !this.hasAttribute("open");
+    }
+
+    resolve();
+    return true;
   }
 
   attributeChangedCallback(
@@ -251,10 +261,52 @@ export class Drawer extends HTMLElement {
     }
 
     if (newValue !== null) {
-      this.open();
-    } else {
-      this.close();
+      this.$panel?.removeEventListener(
+        "transitionend",
+        this.#onCloseTransitionEnd,
+      );
+
+      this.style.setProperty("opacity", "1");
+      this.style.setProperty("visibility", "visible");
+
+      rememberReturnFocus(this.trigger);
+
+      dispatchEvent(
+        document.documentElement,
+        EVENTS.DRAWER_OPEN,
+        { drawer: this.id, trigger: this.trigger },
+        { bubbles: false, cancelable: false },
+      );
+
+      const container = this.trap || this;
+      const focusables = getFocusableElements(container);
+      if (focusables.length > 0) {
+        addTrapFocus(container, focusables[0]);
+      }
+
+      disableScroll();
+      return;
     }
+
+    this.$panel?.removeEventListener(
+      "transitionend",
+      this.#onCloseTransitionEnd,
+    );
+
+    removeTrapFocus();
+    enableScroll(false);
+
+    // Defer: another overlay may take focus before we restore.
+    scheduleRestoreReturnFocus(this);
+
+    dispatchEvent(
+      document.documentElement,
+      EVENTS.DRAWER_CLOSE,
+      { drawer: this.id },
+      { bubbles: false, cancelable: false },
+    );
+
+    this.$panel?.addEventListener("transitionend", this.#onCloseTransitionEnd);
   }
 }
 
