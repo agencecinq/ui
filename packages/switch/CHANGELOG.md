@@ -1,5 +1,17 @@
 # @agencecinq/switch
 
+## 3.0.1
+
+### Patch Changes
+
+- ddbd6be: Add cancelable `before-open` / `before-close` hooks with `detail.resolve()` to drawer and modal. Align modal on `open` attribute + ACC like drawer.
+
+  **@agencecinq/utils:** `MODAL_*` / `DRAWER_*` before events; `scheduleRestoreReturnFocus`.
+
+  **Docs:** async bestiary playground demos, pixelate sandbox hooks, UX note on defer vs in-panel loading.
+
+  **Hosts:** `#` private fields and `init`/`destroy` lifecycle consistency (accordion, calendar, combobox, disclosure-button, switch, tabs, windowsplitter).
+
 ## 3.0.0
 
 ### Major Changes
