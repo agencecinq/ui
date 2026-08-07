@@ -6,8 +6,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        index: resolve(__dirname, 'src/index.ts'),
-        plugin: resolve(__dirname, 'src/plugin.ts')
+        index: resolve(import.meta.dirname, 'src/index.ts'),
+        plugin: resolve(import.meta.dirname, 'src/plugin.ts')
       },
       formats: ['es'],
       fileName: (format, entryName) => `${entryName}.js`
