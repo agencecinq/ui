@@ -43,9 +43,150 @@
     return Number($host.getAttribute('pixel') ?? PIXEL_MAX);
   }
 
-  function progress(element) {
+  function pixelateRefs($host) {
+    if (!($host instanceof HTMLElement)) {
+      return null;
+    }
+
+    const host = /** @type {{ $img?: HTMLImageElement | null; $canvas?: HTMLCanvasElement | null }} */ (
+      $host
+    );
+    const img = host.$img ?? $host.querySelector('img');
+    const canvas = host.$canvas ?? $host.querySelector('canvas');
+
+    if (!(img instanceof HTMLImageElement) || !(canvas instanceof HTMLCanvasElement)) {
+      return null;
+    }
+
+    return { img, canvas };
+  }
+
+  function pixelateCoverRect(
+    img,
+    width,
+    height,
+  ) {
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.max(width / iw, height / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = (width - dw) / 2;
+    const dy = (height - dh) / 2;
+
+    return {
+      sx: Math.max(0, -dx / scale),
+      sy: Math.max(0, -dy / scale),
+      sw: width / scale,
+      sh: height / scale,
+    };
+  }
+
+  function pixelateExportMeta($host) {
+    const refs = pixelateRefs($host);
+
+    if (!refs || !refs.img.complete) {
+      return null;
+    }
+
+    const { img, canvas } = refs;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    if (width === 0 || height === 0) {
+      return null;
+    }
+
+    const pixel = readPixel($host);
+    const dpr = window.devicePixelRatio || 1;
+
+    return {
+      img,
+      width,
+      height,
+      exportWidth: Math.round(width * dpr),
+      exportHeight: Math.round(height * dpr),
+      pixel,
+      dpr,
+    };
+  }
+
+  function renderPixelateExport($host) {
+    const meta = pixelateExportMeta($host);
+
+    if (!meta) {
+      return null;
+    }
+
+    const { img, width, height, exportWidth, exportHeight, pixel, dpr } = meta;
+    const { sx, sy, sw, sh } = pixelateCoverRect(img, width, height);
+    const exportCanvas = document.createElement('canvas');
+    const context = exportCanvas.getContext('2d');
+
+    if (!context) {
+      return null;
+    }
+
+    exportCanvas.width = exportWidth;
+    exportCanvas.height = exportHeight;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (pixel <= 1) {
+      context.imageSmoothingEnabled = true;
+      context.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
+      return exportCanvas;
+    }
+
+    const sampleWidth = Math.max(1, Math.ceil(width / pixel));
+    const sampleHeight = Math.max(1, Math.ceil(height / pixel));
+    const sampleCanvas = document.createElement('canvas');
+    const sampleContext = sampleCanvas.getContext('2d');
+
+    if (!sampleContext) {
+      return null;
+    }
+
+    sampleCanvas.width = sampleWidth;
+    sampleCanvas.height = sampleHeight;
+    sampleContext.imageSmoothingEnabled = false;
+    sampleContext.drawImage(img, sx, sy, sw, sh, 0, 0, sampleWidth, sampleHeight);
+    context.imageSmoothingEnabled = false;
+    context.drawImage(
+      sampleCanvas,
+      0,
+      0,
+      sampleWidth,
+      sampleHeight,
+      0,
+      0,
+      width,
+      height,
+    );
+
+    return exportCanvas;
+  }
+
+  function progress(element, index) {
     const { top, bottom } = element.getBoundingClientRect();
     const height = window.innerHeight;
+
+    if (index !== undefined) {
+      const start = index * SEQUENCE_STAGGER;
+      const end = start + 0.45;
+
+      if (bottom <= 0 || top <= height * (1 - end)) {
+        return 1;
+      }
+
+      if (top >= height * (1 - start)) {
+        return 0;
+      }
+
+      const range = height * (end - start);
+      const traveled = height * (1 - start) - top;
+
+      return Math.min(1, Math.max(0, traveled / range));
+    }
 
     if (bottom <= 0 || top <= height * SCROLL_END) {
       return 1;
@@ -60,26 +201,6 @@
 
   function pixelFromProgress(progress) {
     return Math.round(PIXEL_MAX - progress * (PIXEL_MAX - PIXEL_MIN));
-  }
-
-  function sequenceProgress(element, index) {
-    const { top, bottom } = element.getBoundingClientRect();
-    const height = window.innerHeight;
-    const start = index * SEQUENCE_STAGGER;
-    const end = start + 0.45;
-
-    if (bottom <= 0 || top <= height * (1 - end)) {
-      return 1;
-    }
-
-    if (top >= height * (1 - start)) {
-      return 0;
-    }
-
-    const range = height * (end - start);
-    const traveled = height * (1 - start) - top;
-
-    return Math.min(1, Math.max(0, traveled / range));
   }
 
   function wait(ms) {
@@ -160,6 +281,8 @@
     const $spinbutton = document.querySelector('#docs-pixelate-spinbutton');
     const $spinbuttonHost = document.querySelector('#docs-pixelate-spinbutton-demo');
     const $spinbuttonValue = document.querySelector('#docs-pixelate-spinbutton-value');
+    const $spinbuttonBuffer = document.querySelector('#docs-pixelate-spinbutton-buffer');
+    const $spinbuttonDownload = document.querySelector('#docs-pixelate-spinbutton-download');
     const $switchControl = document.querySelector('#docs-pixelate-switch');
     const $switchHost = document.querySelector('#docs-pixelate-switch-demo');
     const $disclosureControl = document.querySelector(
@@ -172,7 +295,12 @@
     const $hoverCard = document.querySelector('#docs-pixelate-hover-card');
     const $hoverHost = document.querySelector('#docs-pixelate-hover');
     const $loadHost = document.querySelector('#docs-pixelate-load');
-    const $pointerHost = document.querySelector('#docs-pixelate-pointer');
+    const $pointerCenterHost = document.querySelector('#docs-pixelate-pointer-center');
+    const $pointerCenterValue = document.querySelector('#docs-pixelate-pointer-center-value');
+    const $pointerHorizontalHost = document.querySelector('#docs-pixelate-pointer-horizontal');
+    const $pointerHorizontalValue = document.querySelector(
+      '#docs-pixelate-pointer-horizontal-value',
+    );
     const $ioHost = document.querySelector('#docs-pixelate-io');
     const $ioValue = document.querySelector('#docs-pixelate-io-value');
     const $ioPixel = document.querySelector('#docs-pixelate-io-pixel');
@@ -449,6 +577,48 @@
       if ($spinbuttonValue) {
         $spinbuttonValue.textContent = String(Math.round(value));
       }
+
+      updateSpinbuttonBuffer($spinbuttonHost);
+    }
+
+    function updateSpinbuttonBuffer($host) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const meta = pixelateExportMeta($host);
+
+          if ($spinbuttonBuffer && meta) {
+            $spinbuttonBuffer.textContent = `${meta.exportWidth}×${meta.exportHeight}px export`;
+          }
+        });
+      });
+    }
+
+    function downloadSpinbuttonPng() {
+      if (!($spinbuttonHost instanceof HTMLElement)) {
+        return;
+      }
+
+      $spinbuttonHost.sync();
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          try {
+            const exportCanvas = renderPixelateExport($spinbuttonHost);
+
+            if (!exportCanvas) {
+              return;
+            }
+
+            const pixel = readPixel($spinbuttonHost);
+            const link = document.createElement('a');
+            link.download = `coastal-cliffs-pixel-${pixel}.png`;
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+          } catch {
+            window.alert('Could not export the canvas. Check CORS on the image.');
+          }
+        });
+      });
     }
 
     function syncGridPixelate() {
@@ -466,13 +636,12 @@
     }
 
     function syncSequencePixelate() {
-      $sequenceHosts.forEach(($host) => {
+      $sequenceHosts.forEach(($host, index) => {
         if (!($host instanceof HTMLElement)) {
           return;
         }
 
-        const index = Number($host.dataset.sequenceIndex ?? 0);
-        setPixel($host, pixelFromProgress(sequenceProgress($host, index)));
+        setPixel($host, pixelFromProgress(progress($host, index)));
       });
     }
 
@@ -495,10 +664,6 @@
       $img?.addEventListener('load', reveal, { once: true });
     }
 
-    window.addEventListener('scroll', syncScrollPixelate, { passive: true });
-    window.addEventListener('resize', syncScrollPixelate, { passive: true });
-    syncScrollPixelate();
-
     $spinbutton?.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
       if (!(event instanceof CustomEvent)) {
         return;
@@ -520,6 +685,8 @@
         syncSpinbuttonPixelate(Number($input.value));
       }
     }
+
+    $spinbuttonDownload?.addEventListener('click', downloadSpinbuttonPng);
 
     $switchControl?.addEventListener(EVENTS.SWITCH_ACTIVATE, () => {
       if (!($switchHost instanceof HTMLElement)) {
@@ -609,14 +776,73 @@
       setPixel($splitterPixelate, COMPARISON_PIXEL);
     }
 
-    $pointerHost?.addEventListener('mousemove', (event) => {
-      if (!($pointerHost instanceof HTMLElement) || !(event instanceof MouseEvent)) {
+    function pixelFromDistance($host, clientX, clientY) {
+      const rect = $host.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const maxDistance = Math.hypot(rect.width / 2, rect.height / 2);
+      const distance = Math.hypot(clientX - centerX, clientY - centerY);
+      const ratio = Math.min(1, distance / maxDistance);
+
+      return ratio * PIXEL_MAX;
+    }
+
+    function pixelFromX($host, clientX) {
+      const { left, width } = $host.getBoundingClientRect();
+      const ratio = (clientX - left) / width;
+
+      return (1 - ratio) * PIXEL_MAX;
+    }
+
+    function updatePointerCenterReadout(pixel) {
+      if ($pointerCenterValue) {
+        $pointerCenterValue.textContent = String(Math.round(pixel));
+      }
+    }
+
+    function updatePointerHorizontalReadout(pixel) {
+      if ($pointerHorizontalValue) {
+        $pointerHorizontalValue.textContent = String(Math.round(pixel));
+      }
+    }
+
+    $pointerCenterHost?.addEventListener('mousemove', (event) => {
+      if (
+        !($pointerCenterHost instanceof HTMLElement) ||
+        !(event instanceof MouseEvent)
+      ) {
         return;
       }
 
-      const rect = $pointerHost.getBoundingClientRect();
-      const ratio = (event.clientX - rect.left) / rect.width;
-      setPixel($pointerHost, (1 - ratio) * PIXEL_MAX);
+      const pixel = pixelFromDistance(
+        $pointerCenterHost,
+        event.clientX,
+        event.clientY,
+      );
+      setPixel($pointerCenterHost, pixel);
+      updatePointerCenterReadout(pixel);
+    });
+
+    $pointerCenterHost?.addEventListener('mouseleave', () => {
+      if (!($pointerCenterHost instanceof HTMLElement)) {
+        return;
+      }
+
+      setPixel($pointerCenterHost, PIXEL_MAX);
+      updatePointerCenterReadout(PIXEL_MAX);
+    });
+
+    $pointerHorizontalHost?.addEventListener('mousemove', (event) => {
+      if (
+        !($pointerHorizontalHost instanceof HTMLElement) ||
+        !(event instanceof MouseEvent)
+      ) {
+        return;
+      }
+
+      const pixel = pixelFromX($pointerHorizontalHost, event.clientX);
+      setPixel($pointerHorizontalHost, pixel);
+      updatePointerHorizontalReadout(pixel);
     });
 
     if ($ioHost instanceof HTMLElement && 'IntersectionObserver' in window) {
@@ -667,9 +893,28 @@
       syncResizePixelate();
     });
 
-    window.addEventListener('scroll', syncSequencePixelate, { passive: true });
-    window.addEventListener('resize', syncSequencePixelate, { passive: true });
-    syncSequencePixelate();
+    function syncScrollDemos() {
+      syncScrollPixelate();
+      syncSequencePixelate();
+    }
+
+    let scrollTicking = false;
+
+    function onScrollFrame() {
+      if (scrollTicking) {
+        return;
+      }
+
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        syncScrollDemos();
+        scrollTicking = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScrollFrame, { passive: true });
+    window.addEventListener('resize', syncScrollDemos, { passive: true });
+    syncScrollDemos();
   }
 
   customElements.whenDefined('cinq-pixelate').then(bindPixelatePlayground);

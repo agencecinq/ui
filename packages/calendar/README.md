@@ -94,8 +94,7 @@ const MAX = 3;
 el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
   if (el.picked.length <= MAX) return;
 
-  el.picked = el.picked.slice(0, MAX);
-  el.persistPicked();
+  el.setPicked(el.picked.slice(0, MAX));
   el.render();
 });
 ```
@@ -191,7 +190,7 @@ Dispatched on the host `<cinq-calendar>` (bubble). Constants live on
 | `picked` | Selected days as `YYYY-MM-DD` |
 | `current` | Viewed `{ month, year, day }` |
 | `render()` | Rebuild the grid |
-| `move(deltaMonths)` | Navigate by months |
+| `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
 | `destroy()` | Detach listeners and clear the grid |
 | `renderInner(inner, date)` | Per-cell hook (override) |
 

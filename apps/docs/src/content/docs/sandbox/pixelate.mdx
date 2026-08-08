@@ -29,11 +29,13 @@ Experimental demo, not published on npm. API may change or move.
 :::
 
 `<cinq-pixelate>` wraps an `<img>` and a sibling `<canvas>`. It reads the
-`pixel` attribute (`0` to `256`) and redraws the canvas. **Scroll, sliders,
-hover, and animations stay in your app.** The component only reflects
-`pixel` and exposes `sync()`.
+`pixel` attribute and redraws the canvas. **Scroll, sliders, hover, and
+animations stay in your app.** The component only reflects `pixel` and
+exposes `sync()`.
 
-`0` is sharp. Higher values are blockier (`256` is the coarsest).
+`pixel` is the **block size** in CSS pixels (side length of each square), not
+a pixelation percentage. `0` is sharp. Higher values mean larger blocks and a
+blockier image (`256` is the coarsest).
 
 ## Markup
 
@@ -121,7 +123,7 @@ a sharp result).
 
 ## Attributes
 
-- **`pixel`** (default `256`): block size in CSS pixels. `0` is sharp. Clamped to `0`–`256`.
+- **`pixel`** (default `256`): block size in CSS px. `0` = sharp, `256` = coarsest. Lower is sharper, higher is blockier — not a 0–100 % pixelation slider.
 
 ## Programmatic API
 
@@ -134,11 +136,40 @@ $host.sync() // redraw after layout changes
 $host.destroy()
 ```
 
-Public DOM refs: `$img`, `$canvas`. Constants: `PIXEL_MIN` (`0`),
-`PIXEL_MAX` (`256`).
+Public DOM refs: `$img`, `$canvas`. Constants: `PIXEL_MIN` (`0`, sharp) and
+`PIXEL_MAX` (`256`, coarsest).
 
 Call `sync()` after you change `pixel` from script if you need an immediate
 redraw outside `attributeChangedCallback` (sliders, rAF loops, etc.).
+
+## Animation helper
+
+Several examples below animate `pixel` with the same helpers. `animate`
+always returns a `Promise` that resolves when the transition finishes:
+
+```js
+function ease(t) {
+  return 1 - (1 - t) ** 3
+}
+
+function animate($host, from, to, duration) {
+  const start = performance.now()
+
+  return new Promise((resolve) => {
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration)
+      $host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
+      $host.sync()
+      if (t < 1) {
+        requestAnimationFrame(frame)
+        return
+      }
+      resolve()
+    }
+    requestAnimationFrame(frame)
+  })
+}
+```
 
 ## Scroll reveal
 
@@ -151,8 +182,8 @@ pattern is not enough on a real page:
 
 ### Scroll scrub
 
-One `<cinq-pixelate>`, one reveal window. A scroll listener maps
-`getBoundingClientRect()` to `pixel`, continuous while scrolling. Here the
+One `<cinq-pixelate>`, one reveal window. A scroll listener coalesced with
+`requestAnimationFrame` maps `getBoundingClientRect()` to `pixel`. Here the
 reveal finishes when the host top crosses 40 % of the viewport:
 
 Use this for a **single hero** (full-bleed photo, chapter opener) where scroll
@@ -174,18 +205,31 @@ function progress(element) {
   return 1 - (top - height * end) / (height - height * end)
 }
 
+function syncScrollScrub() {
+  const value = progress($host)
+  $host.setAttribute(
+    "pixel",
+    String(Math.round(PIXEL_MAX - value * (PIXEL_MAX - PIXEL_MIN))),
+  )
+  $host.sync()
+}
+
+let ticking = false
+
 window.addEventListener(
   "scroll",
   () => {
-    const value = progress($host)
-    $host.setAttribute(
-      "pixel",
-      String(Math.round(PIXEL_MAX - value * (PIXEL_MAX - PIXEL_MIN))),
-    )
-    $host.sync()
+    if (ticking) return
+    ticking = true
+    requestAnimationFrame(() => {
+      syncScrollScrub()
+      ticking = false
+    })
   },
   { passive: true },
 )
+
+syncScrollScrub()
 ```
 
 <DemoScrollScrub />
@@ -226,26 +270,19 @@ observer.observe($host)
 several `<cinq-pixelate>` in a column needs **per-image timing**. Without
 stagger, every host would share the same reveal curve and sharpen together.
 
-**Several stacked hosts, one scroll listener.** Each gets its own reveal
-window via `data-sequence-index`.
+**Several stacked hosts, one scroll listener.** Stagger each host’s reveal
+window with the loop index (`start = index × 0.12`, window length `0.45`
+viewport heights). While the first image is already sharp, the next can still
+be blocky: an art-directed cascade on a single continuous scroll.
 
-Stagger shifts each host’s reveal window with `data-sequence-index` (`start =
-index × 0.12`, window length `0.45` viewport heights). While the first image
-is already sharp, the next can still be blocky: an art-directed cascade on a
-single continuous scroll.
-
-This is not Visibility ratio × 3: `IntersectionObserver` reveals each tile
-when **it** becomes visible, with no shared timeline tuning. Stagger lets you
-**orchestrate** the order and overlap on one scroll pass.
-
-One listener, batch update on every scroll:
+One listener, one sync per frame:
 
 ```js
 import { PIXEL_MAX } from "@agencecinq/pixelate"
 
 const $hosts = document.querySelectorAll("[data-pixelate-sequence]")
 
-function sequenceProgress(element, index) {
+function progress(element, index) {
   const { top, bottom } = element.getBoundingClientRect()
   const height = window.innerHeight
   const start = index * 0.12
@@ -261,17 +298,30 @@ function sequenceProgress(element, index) {
 }
 
 function syncSequence() {
-  $hosts.forEach(($host) => {
-    const index = Number($host.dataset.sequenceIndex ?? 0)
+  $hosts.forEach(($host, index) => {
     $host.setAttribute(
       "pixel",
-      String(Math.round((1 - sequenceProgress($host, index)) * PIXEL_MAX)),
+      String(Math.round((1 - progress($host, index)) * PIXEL_MAX)),
     )
     $host.sync()
   })
 }
 
-window.addEventListener("scroll", syncSequence, { passive: true })
+let ticking = false
+
+window.addEventListener(
+  "scroll",
+  () => {
+    if (ticking) return
+    ticking = true
+    requestAnimationFrame(() => {
+      syncSequence()
+      ticking = false
+    })
+  },
+  { passive: true },
+)
+
 syncSequence()
 ```
 
@@ -281,17 +331,17 @@ syncSequence()
 
 **CINQ UI:** [`cinq-spinbutton`](../components/spinbutton/).
 
-Drive `pixel` from a bounded numeric control, more accessible than a bare range
-input:
+Drive `pixel` (block size) from a bounded numeric control. Decrease for
+sharper, increase for blockier:
 
 ```html
-<cinq-spinbutton data-spinbutton-step="32">
+<cinq-spinbutton data-spinbutton-step="8">
   <button type="button" name="decrease" tabindex="-1" aria-label="Decrease">
     −
   </button>
   <input
     type="number"
-    aria-label="Pixel size"
+    aria-label="Block size"
     aria-valuemin="0"
     aria-valuemax="256"
     aria-valuenow="160"
@@ -320,13 +370,36 @@ $spinbutton.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
 })
 ```
 
+The live demo adds **Download PNG**: it re-renders the current `pixel` level at
+display size (× `devicePixelRatio`) and exports that PNG. The image uses
+`crossorigin="anonymous"` so export is allowed.
+
+```js
+const width = $host.$canvas.clientWidth
+const height = $host.$canvas.clientHeight
+const pixel = Number($host.getAttribute("pixel") ?? 0)
+const dpr = window.devicePixelRatio || 1
+
+// Same cover crop + downsample + upscale as cinq-pixelate, on an offscreen canvas…
+// use $host.$img as the drawImage source
+const exportCanvas = document.createElement("canvas")
+exportCanvas.width = Math.round(width * dpr)
+exportCanvas.height = Math.round(height * dpr)
+
+// …then:
+const link = document.createElement("a")
+link.download = `photo-pixel-${pixel}.png`
+link.href = exportCanvas.toDataURL("image/png")
+link.click()
+```
+
 <DemoSpinbutton />
 
 ## Switch
 
 **CINQ UI:** [`cinq-switch`](../components/switch/).
 
-Binary sharp ↔ blocky. Animation stays in your app:
+Binary sharp ↔ blocky. Uses the [animation helper](#animation-helper):
 
 ```js
 import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
@@ -334,21 +407,6 @@ import { EVENTS } from "@agencecinq/utils"
 
 const $host = document.querySelector("cinq-pixelate")
 const $toggle = document.querySelector("cinq-switch")
-
-function ease(t) {
-  return 1 - (1 - t) ** 3
-}
-
-function animate($host, from, to, duration) {
-  const start = performance.now()
-  function frame(now) {
-    const t = Math.min(1, (now - start) / duration)
-    $host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
-    $host.sync()
-    if (t < 1) requestAnimationFrame(frame)
-  }
-  requestAnimationFrame(frame)
-}
 
 $toggle.addEventListener(EVENTS.SWITCH_ACTIVATE, () => {
   animate(
@@ -375,7 +433,8 @@ $toggle.addEventListener(EVENTS.SWITCH_DEACTIVATE, () => {
 
 **CINQ UI:** [`cinq-disclosure-button`](../components/disclosure-button/).
 
-Reveal on open, pixelate before close. Swap the trigger label yourself. The
+Reveal on open, pixelate before close. Uses the
+[animation helper](#animation-helper). Swap the trigger label yourself. The
 component keeps its label fixed per the APG pattern:
 
 ```html
@@ -401,28 +460,6 @@ const $control = document.querySelector("#photo-disclosure")
 const $trigger = $control?.querySelector("button")
 const labels = { closed: "View photo", open: "Hide photo" }
 let closing = false
-
-function ease(t) {
-  return 1 - (1 - t) ** 3
-}
-
-function animate($host, from, to, duration) {
-  const start = performance.now()
-
-  return new Promise((resolve) => {
-    function frame(now) {
-      const t = Math.min(1, (now - start) / duration)
-      $host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
-      $host.sync()
-      if (t < 1) {
-        requestAnimationFrame(frame)
-        return
-      }
-      resolve()
-    }
-    requestAnimationFrame(frame)
-  })
-}
 
 $trigger?.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
   $trigger.textContent = labels.open
@@ -454,32 +491,19 @@ $trigger?.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, (event) => {
 
 ## Hover reveal
 
-Animate `pixel` on enter/leave. Easing lives in your app:
+Animate `pixel` on enter/leave. Uses the [animation helper](#animation-helper):
 
 ```js
+import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
+
 const $host = document.querySelector("cinq-pixelate")
 const $card = $host.closest("[data-pixelate-card]")
 
-function ease(t) {
-  return 1 - (1 - t) ** 3
-}
-
-function animate($host, from, to, duration) {
-  const start = performance.now()
-  function frame(now) {
-    const t = Math.min(1, (now - start) / duration)
-    $host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
-    $host.sync()
-    if (t < 1) requestAnimationFrame(frame)
-  }
-  requestAnimationFrame(frame)
-}
-
 $card.addEventListener("mouseenter", () => {
-  animate($host, Number($host.getAttribute("pixel") ?? 256), 0, 450)
+  animate($host, Number($host.getAttribute("pixel") ?? PIXEL_MAX), PIXEL_MIN, 450)
 })
 $card.addEventListener("mouseleave", () => {
-  animate($host, Number($host.getAttribute("pixel") ?? 256), 48, 450)
+  animate($host, Number($host.getAttribute("pixel") ?? PIXEL_MAX), 48, 450)
 })
 ```
 
@@ -488,7 +512,8 @@ $card.addEventListener("mouseleave", () => {
 ## Load reveal
 
 Use `loading="lazy"` on the `<img>` so the fetch waits until the host is near
-the viewport. The reveal runs on `load`:
+the viewport. The reveal runs on `load` (uses the
+[animation helper](#animation-helper)):
 
 ```html
 <cinq-pixelate pixel="256">
@@ -510,21 +535,6 @@ import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
 const $host = document.querySelector("cinq-pixelate")
 const $img = $host.$img
 
-function ease(t) {
-  return 1 - (1 - t) ** 3
-}
-
-function animate($host, from, to, duration) {
-  const start = performance.now()
-  function frame(now) {
-    const t = Math.min(1, (now - start) / duration)
-    $host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
-    $host.sync()
-    if (t < 1) requestAnimationFrame(frame)
-  }
-  requestAnimationFrame(frame)
-}
-
 function reveal() {
   animate($host, PIXEL_MAX, PIXEL_MIN, 900)
 }
@@ -537,16 +547,59 @@ else $img.addEventListener("load", reveal, { once: true })
 
 ## Pointer position
 
-Map horizontal cursor position to `pixel`. The value persists when the pointer
-leaves the host:
+Map cursor position to `pixel`. The live demo shows both mappings side by side.
+
+### From center
+
+Sharp at the center, blockier toward the edges. Reset on `mouseleave`:
 
 ```js
+import { PIXEL_MAX } from "@agencecinq/pixelate"
+
 const $host = document.querySelector("cinq-pixelate")
 
+function pixelFromDistance($host, clientX, clientY) {
+  const rect = $host.getBoundingClientRect()
+  const centerX = rect.left + rect.width / 2
+  const centerY = rect.top + rect.height / 2
+  const maxDistance = Math.hypot(rect.width / 2, rect.height / 2)
+  const distance = Math.hypot(clientX - centerX, clientY - centerY)
+  const ratio = Math.min(1, distance / maxDistance)
+
+  return ratio * PIXEL_MAX
+}
+
 $host.addEventListener("mousemove", (event) => {
+  const pixel = pixelFromDistance($host, event.clientX, event.clientY)
+  $host.setAttribute("pixel", String(Math.round(pixel)))
+  $host.sync()
+})
+
+$host.addEventListener("mouseleave", () => {
+  $host.setAttribute("pixel", String(PIXEL_MAX))
+  $host.sync()
+})
+```
+
+### Horizontal
+
+Left blocky, right sharp. The last value persists on `mouseleave`:
+
+```js
+import { PIXEL_MAX } from "@agencecinq/pixelate"
+
+const $host = document.querySelector("cinq-pixelate")
+
+function pixelFromX($host, clientX) {
   const { left, width } = $host.getBoundingClientRect()
-  const ratio = (event.clientX - left) / width
-  $host.setAttribute("pixel", String(Math.round((1 - ratio) * 256)))
+  const ratio = (clientX - left) / width
+
+  return (1 - ratio) * PIXEL_MAX
+}
+
+$host.addEventListener("mousemove", (event) => {
+  const pixel = pixelFromX($host, event.clientX)
+  $host.setAttribute("pixel", String(Math.round(pixel)))
   $host.sync()
 })
 ```
@@ -622,35 +675,14 @@ $host.sync()
 
 **CINQ UI:** [`cinq-modal`](../components/modal/), [`cinq-modal-button`](../components/modal/).
 
-**Open:** listen for `modal-open`, then reveal.
+**Open:** listen for `modal-open`, then reveal. Uses the
+[animation helper](#animation-helper):
 
 ```js
 import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
 import { EVENTS } from "@agencecinq/utils"
 
 const $host = document.querySelector("cinq-pixelate")
-
-function ease(t) {
-  return 1 - (1 - t) ** 3
-}
-
-function animate($host, from, to, duration) {
-  const start = performance.now()
-
-  return new Promise((resolve) => {
-    function frame(now) {
-      const t = Math.min(1, (now - start) / duration)
-      $host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
-      $host.sync()
-      if (t < 1) {
-        requestAnimationFrame(frame)
-        return
-      }
-      resolve()
-    }
-    requestAnimationFrame(frame)
-  })
-}
 
 document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
   if (event.detail.modal !== "photo-modal") return
@@ -661,7 +693,7 @@ document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
 ```
 
 **Close:** listen for `modal-before-close`, `preventDefault()`, pixelate, then
-`event.detail.resolve()`.
+`event.detail.resolve()`. Same `$host` and `animate` as above.
 
 ```js
 document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {
@@ -669,7 +701,7 @@ document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => 
 
   event.preventDefault()
 
-  void animate(
+  animate(
     $host,
     Number($host.getAttribute("pixel") ?? PIXEL_MIN),
     PIXEL_MAX,
@@ -686,35 +718,14 @@ document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => 
 
 **CINQ UI:** [`cinq-drawer`](../components/drawer/), [`cinq-drawer-button`](../components/drawer/).
 
-**Open:** listen for `drawer-open`, then reveal.
+**Open:** listen for `drawer-open`, then reveal. Uses the
+[animation helper](#animation-helper):
 
 ```js
 import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
 import { EVENTS } from "@agencecinq/utils"
 
 const $host = document.querySelector("cinq-pixelate")
-
-function ease(t) {
-  return 1 - (1 - t) ** 3
-}
-
-function animate($host, from, to, duration) {
-  const start = performance.now()
-
-  return new Promise((resolve) => {
-    function frame(now) {
-      const t = Math.min(1, (now - start) / duration)
-      $host.setAttribute("pixel", String(Math.round(from + (to - from) * ease(t))))
-      $host.sync()
-      if (t < 1) {
-        requestAnimationFrame(frame)
-        return
-      }
-      resolve()
-    }
-    requestAnimationFrame(frame)
-  })
-}
 
 document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
   if (event.detail.drawer !== "photo-drawer") return
@@ -725,7 +736,7 @@ document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
 ```
 
 **Close:** listen for `drawer-before-close`, `preventDefault()`, depixelate, then
-`event.detail.resolve()`.
+`event.detail.resolve()`. Same `$host` and `animate` as above.
 
 ```js
 document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
@@ -733,7 +744,7 @@ document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) =>
 
   event.preventDefault()
 
-  void animate(
+  animate(
     $host,
     Number($host.getAttribute("pixel") ?? PIXEL_MIN),
     PIXEL_MAX,

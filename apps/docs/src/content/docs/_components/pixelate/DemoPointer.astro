@@ -4,18 +4,69 @@ import { pointerImage } from './images';
 ---
 
 <PixelateDemoFrame>
-  <cinq-pixelate
-    id="docs-pixelate-pointer"
-    class="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-lg"
-    pixel="256"
-  >
-    <img
-      src={pointerImage}
-      crossorigin="anonymous"
-      alt="City skyline at night"
-      width="960"
-      height="540"
-    />
-    <canvas role="img" aria-label="City skyline at night"></canvas>
-  </cinq-pixelate>
+  <p class="text-sm text-gray-600">
+    Map pointer position to <code>pixel</code>. Two mappings, side by side.
+  </p>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <div class="flex flex-col gap-2">
+      <p class="text-sm font-medium text-gray-900">From center</p>
+      <p class="text-sm text-gray-600">
+        Sharp in the middle, blocky at the edges. Resets on mouseleave.
+      </p>
+      <cinq-pixelate
+        id="docs-pixelate-pointer-center"
+        class="cursor-crosshair overflow-hidden rounded-2xl shadow-lg"
+        pixel="256"
+      >
+        <img
+          src={pointerImage}
+          crossorigin="anonymous"
+          alt="City skyline at night"
+          width="960"
+          height="540"
+        />
+        <canvas role="img" aria-label="City skyline at night"></canvas>
+      </cinq-pixelate>
+      <p class="text-sm text-gray-600">
+        <code>pixel</code>:{' '}
+        <span
+          id="docs-pixelate-pointer-center-value"
+          class="font-mono font-medium text-gray-900"
+        >
+          256
+        </span>
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-sm font-medium text-gray-900">Horizontal</p>
+      <p class="text-sm text-gray-600">
+        Left blocky, right sharp. Last value persists on mouseleave.
+      </p>
+      <cinq-pixelate
+        id="docs-pixelate-pointer-horizontal"
+        class="cursor-crosshair overflow-hidden rounded-2xl shadow-lg"
+        pixel="256"
+      >
+        <img
+          src={pointerImage}
+          crossorigin="anonymous"
+          alt="City skyline at night"
+          width="960"
+          height="540"
+        />
+        <canvas role="img" aria-label="City skyline at night"></canvas>
+      </cinq-pixelate>
+      <p class="text-sm text-gray-600">
+        <code>pixel</code>:{' '}
+        <span
+          id="docs-pixelate-pointer-horizontal-value"
+          class="font-mono font-medium text-gray-900"
+        >
+          256
+        </span>
+      </p>
+    </div>
+  </div>
 </PixelateDemoFrame>

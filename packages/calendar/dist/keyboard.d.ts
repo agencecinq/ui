@@ -1,6 +1,7 @@
 import { Calendar } from './calendar.js';
 /** APG day-grid focus: roving tabindex + keyboard navigation. */
 export default class Keyboard {
+    #private;
     host: Calendar;
     constructor(host: Calendar);
     setFocusDay($button: HTMLButtonElement, { focus }?: {
@@ -12,6 +13,7 @@ export default class Keyboard {
     sync({ focus }?: {
         focus?: boolean | undefined;
     }): void;
-    handleKeydown: (event: KeyboardEvent) => false | void;
+    attach(): void;
+    detach(): void;
 }
 //# sourceMappingURL=keyboard.d.ts.map

@@ -27,15 +27,15 @@ export declare class Calendar extends HTMLElement {
      */
     init(): void;
     destroy(): void;
-    move(deltaMonths: number, { focus }?: {
+    /** Navigate by `delta` months (negative = previous). */
+    move(delta: number, { focus }?: {
         focus?: boolean | undefined;
     }): void;
-    persistPicked(): void;
+    /** Assign selection, mirror `data-picked-dates`, optionally emit `calendar:change`. */
+    setPicked(picked: string[], emit?: boolean): void;
     setDaySelected($el: HTMLElement, selected: boolean): void;
-    handleClick: (event: MouseEvent) => void;
     /** Paint in-between days while choosing the range end (mouse or keyboard). */
     previewRange(to: string): void;
-    handleMousemove: (event: MouseEvent) => void;
     getMonthName(month: number): string;
     getWeekdays(): string[];
     renderDays(): void;

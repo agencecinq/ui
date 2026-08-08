@@ -1,8 +1,12 @@
 //#region ../utils/dist/index.js
 var e = {
+	DRAWER_BEFORE_CLOSE: "drawer-before-close",
+	DRAWER_BEFORE_OPEN: "drawer-before-open",
 	DRAWER_CLOSE: "drawer-close",
 	DRAWER_OPEN: "drawer-open",
 	DRAWER_TOGGLE: "drawer-toggle",
+	MODAL_BEFORE_CLOSE: "modal-before-close",
+	MODAL_BEFORE_OPEN: "modal-before-open",
 	MODAL_CLOSE: "modal-close",
 	MODAL_OPEN: "modal-open",
 	MODAL_TOGGLE: "modal-toggle",
@@ -113,7 +117,13 @@ var h = class {
 		let n = (e) => t.find((t) => t.getAttribute("data-day") === e), r = this.host.current.day && (n(this.host.current.day) || n(this.dayInView())) || t.find((e) => this.host.picked.includes(e.getAttribute("data-day") || "")) || n(this.host.day) || t[0];
 		this.setFocusDay(r, { focus: e });
 	}
-	handleKeydown = (e) => {
+	attach() {
+		this.host.$body?.addEventListener("keydown", this.#e, !1);
+	}
+	detach() {
+		this.host.$body?.removeEventListener("keydown", this.#e, !1);
+	}
+	#e = (e) => {
 		let t = e.target.closest(".js-day");
 		if (!t) return;
 		let n = t.getAttribute("data-day"), r = (c(n).getDay() - this.host.options.firstDay + 7) % 7, { key: i, code: a } = e, o = () => {
@@ -173,7 +183,7 @@ var h = class {
 	>
 		${t}
 	</button>
-`, b = () => document.documentElement.getAttribute("lang") || "en", x = class extends HTMLElement {
+`, b = class extends HTMLElement {
 	today = /* @__PURE__ */ new Date();
 	day = "";
 	options = {
@@ -196,23 +206,14 @@ var h = class {
 	$next = null;
 	$previous = null;
 	picked = [];
-	get #t() {
-		return this.options.mode === "multiple";
-	}
-	get #n() {
-		return this.options.mode === "range";
-	}
-	get #r() {
-		return this.options.mode === "single";
-	}
 	connectedCallback() {
 		this.init();
 	}
 	disconnectedCallback() {
 		this.destroy(), this.#e = null, this.$body = null, this.$title = null, this.$next = null, this.$previous = null;
 	}
-	#i() {
-		let e = this.getAttribute("locale") || this.getAttribute("data-locale") || b(), t = this.getAttribute("first-day");
+	#t() {
+		let e = this.getAttribute("locale") || this.getAttribute("data-locale") || document.documentElement.getAttribute("lang") || "en", t = this.getAttribute("first-day");
 		return {
 			mode: v(this),
 			firstDay: t != null && t !== "" ? n(t, f(e)) : f(e),
@@ -226,33 +227,22 @@ var h = class {
 	}
 	init() {
 		let e = /* @__PURE__ */ new Date();
-		if (this.today = new Date(e.getFullYear(), e.getMonth(), e.getDate()), this.day = s(this.today), this.options = this.#i(), this.current = {
+		if (this.today = new Date(e.getFullYear(), e.getMonth(), e.getDate()), this.day = s(this.today), this.options = this.#t(), this.current = {
 			month: n(this.getAttribute("data-month"), this.today.getMonth()),
 			year: n(this.getAttribute("data-year"), this.today.getFullYear()),
 			day: null
 		}, this.$title = this.querySelector(".js-title"), this.$body = this.querySelector(".js-body"), this.$next = this.querySelector(".js-next"), this.$previous = this.querySelector(".js-previous"), !this.$body) throw Error("Calendar: .js-body element not found");
-		this.#e = new h(this);
-		try {
-			this.picked = JSON.parse(this.getAttribute("data-picked-dates") || "[]");
-		} catch {
-			this.picked = [];
-		}
-		this.render(), this.addEventListener("click", this.handleClick), this.$body.addEventListener("keydown", this.#e.handleKeydown, !1), this.#n && this.$body.addEventListener("mousemove", this.handleMousemove, !1);
+		this.#e = new h(this), this.picked = JSON.parse(this.getAttribute("data-picked-dates") || "[]"), this.render(), this.addEventListener("click", this.#n), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#r, !1);
 	}
 	destroy() {
-		this.removeEventListener("click", this.handleClick), this.$body && this.#e && (this.$body.removeEventListener("keydown", this.#e.handleKeydown, !1), this.$body.removeEventListener("mousemove", this.handleMousemove, !1)), this.reset();
+		this.removeEventListener("click", this.#n), this.#e && (this.#e.detach(), this.$body?.removeEventListener("mousemove", this.#r, !1)), this.reset(), this.#a = () => {};
 	}
 	move(e, { focus: t = !0 } = {}) {
 		let n = new Date(this.current.year, this.current.month + e, 1);
 		this.current.year = n.getFullYear(), this.current.month = n.getMonth(), this.render({ focus: t });
 	}
-	persistPicked() {
-		this.setAttribute("data-picked-dates", JSON.stringify(this.picked));
-		let n = {
-			values: this.picked,
-			name: this.options.name
-		};
-		t(this, e.CALENDAR_CHANGE, n, { cancelable: !1 });
+	setPicked(e, t = !0) {
+		this.picked = e, this.#i(), t && this.#a();
 	}
 	setDaySelected(e, t) {
 		if (t) {
@@ -261,25 +251,25 @@ var h = class {
 		}
 		e.classList.remove(this.options.stateClasses.active), e.removeAttribute("aria-selected");
 	}
-	handleClick = (e) => {
+	#n = (e) => {
 		let t = e.target;
 		if (t.closest(".js-next") || t.closest(".js-title")) return this.move(1, { focus: !1 });
 		if (t.closest(".js-previous")) return this.move(-1, { focus: !1 });
 		if (t = t.closest(".js-day"), !t || t.getAttribute("aria-disabled") === "true") return;
 		let n = t.getAttribute("data-day");
-		if (this.#e?.setFocusDay(t, { focus: !1 }), this.#t) {
+		if (this.#e?.setFocusDay(t, { focus: !1 }), this.options.mode === "multiple") {
 			let e = this.picked.indexOf(n);
-			return e >= 0 ? (this.picked.splice(e, 1), this.setDaySelected(t, !1)) : (this.picked.push(n), this.picked.sort(), this.setDaySelected(t, !0)), this.persistPicked();
+			return e >= 0 ? (this.picked.splice(e, 1), this.setDaySelected(t, !1)) : (this.picked.push(n), this.picked.sort(), this.setDaySelected(t, !0)), this.#o();
 		}
-		return this.#r ? t.classList.contains(this.options.stateClasses.active) && this.options.deselect ? (this.picked = [], this.setDaySelected(t, !1), this.persistPicked()) : (this.picked.forEach((e) => {
+		return this.options.mode === "single" ? t.classList.contains(this.options.stateClasses.active) && this.options.deselect ? (this.picked = [], this.setDaySelected(t, !1), this.#o()) : (this.picked.forEach((e) => {
 			let t = this.$body?.querySelector(`[data-day="${e}"]`);
 			t && this.setDaySelected(t, !1);
-		}), this.picked = [n], this.setDaySelected(t, !0), this.persistPicked()) : (1 < this.picked.length && (this.$body?.querySelectorAll(".js-day").forEach((e) => {
+		}), this.picked = [n], this.setDaySelected(t, !0), this.#o()) : (1 < this.picked.length && (this.$body?.querySelectorAll(".js-day").forEach((e) => {
 			e.classList.remove(this.options.stateClasses.range), this.setDaySelected(e, !1);
-		}), this.picked = [], this.setAttribute("data-picked-dates", JSON.stringify(this.picked))), this.picked.push(n), this.picked.sort(), this.setDaySelected(t, !0), this.persistPicked());
+		}), this.picked = [], this.#i()), this.picked.push(n), this.picked.sort(), this.setDaySelected(t, !0), this.#o());
 	};
 	previewRange(e) {
-		if (!this.#n || this.picked.length !== 1 || !this.$body) return;
+		if (this.options.mode !== "range" || this.picked.length !== 1 || !this.$body) return;
 		let t = this.$body.querySelector(`[data-day="${e}"]`);
 		if (!t || t.getAttribute("aria-disabled") === "true") return;
 		let n = this.$body.querySelectorAll(".js-day"), r = this.$body.querySelector(`[data-day="${this.picked[0]}"]`), i = !1, a = this.picked[0], o = e;
@@ -288,7 +278,7 @@ var h = class {
 			e.classList.remove(this.options.stateClasses.range, this.options.stateClasses.end, this.options.stateClasses.start), l(t, a, o) && e.classList.add(this.options.stateClasses.range);
 		}), r?.classList.add(this.options.stateClasses.start), t.classList.add(this.options.stateClasses.end), i && (r?.classList.add(this.options.stateClasses.end), r?.classList.remove(this.options.stateClasses.start), t.classList.add(this.options.stateClasses.start), t.classList.remove(this.options.stateClasses.end));
 	}
-	handleMousemove = (e) => {
+	#r = (e) => {
 		let t = e.target.closest(".js-day");
 		if (!t) return;
 		let n = t.getAttribute("data-day");
@@ -334,7 +324,7 @@ var h = class {
 						tabIndex: -1
 					});
 					let u = p.querySelector("button");
-					o && (u.classList.add(this.options.stateClasses.active), this.#n && (e === this.picked[0] && u.classList.add(this.options.stateClasses.start), this.picked.length > 1 && e === this.picked[this.picked.length - 1] && u.classList.add(this.options.stateClasses.end))), this.#n && this.picked.length === 2 && l(e, this.picked[0], this.picked[1]) && u.classList.add(this.options.stateClasses.range), this.renderInner(p, c), f.appendChild(p), a.appendChild(f), i += 1;
+					o && (u.classList.add(this.options.stateClasses.active), this.options.mode === "range" && (e === this.picked[0] && u.classList.add(this.options.stateClasses.start), this.picked.length > 1 && e === this.picked[this.picked.length - 1] && u.classList.add(this.options.stateClasses.end))), this.options.mode === "range" && this.picked.length === 2 && l(e, this.picked[0], this.picked[1]) && u.classList.add(this.options.stateClasses.range), this.renderInner(p, c), f.appendChild(p), a.appendChild(f), i += 1;
 				}
 			}
 			a.childNodes.length && this.$body.appendChild(a);
@@ -348,7 +338,20 @@ var h = class {
 		this.reset(), this.renderDays(), this.renderHeader(this.current.month, this.current.year), this.renderCalendar(this.current.month, this.current.year, { focus: e });
 	}
 	renderInner(e, t) {}
+	#i() {
+		this.setAttribute("data-picked-dates", JSON.stringify(this.picked));
+	}
+	#a = () => {
+		let n = {
+			values: this.picked,
+			name: this.options.name
+		};
+		t(this, e.CALENDAR_CHANGE, n, { cancelable: !1 });
+	};
+	#o() {
+		this.#i(), this.#a();
+	}
 };
-customElements.get("cinq-calendar") || customElements.define("cinq-calendar", x);
+customElements.get("cinq-calendar") || customElements.define("cinq-calendar", b);
 //#endregion
-export { x as Calendar, c as fromDayString, f as getWeekStart, s as toDayString };
+export { b as Calendar, c as fromDayString, f as getWeekStart, s as toDayString };

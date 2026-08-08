@@ -5,9 +5,9 @@ import { sequenceImages } from './images';
 
 <PixelateDemoFrame>
   <p class="text-sm text-gray-600">
-    Three stacked photos, one scroll listener. Each host has its own reveal
-    window (<code>data-sequence-index</code>). Scroll slowly: the first can be
-    sharp while the next is still blocky.
+    Three stacked photos, one scroll listener. Each host gets a staggered reveal
+    window from its index in the list. Scroll slowly: the first can be sharp
+    while the next is still blocky.
   </p>
 
   <div class="h-[20vh]" aria-hidden="true"></div>
@@ -19,7 +19,6 @@ import { sequenceImages } from './images';
           id={`docs-pixelate-seq-${index}`}
           class="overflow-hidden rounded-2xl shadow-lg"
           data-pixelate-sequence
-          data-sequence-index={index}
           pixel="256"
         >
           <img

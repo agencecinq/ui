@@ -88,7 +88,15 @@ export default class Keyboard {
     this.setFocusDay(preferred, { focus });
   }
 
-  handleKeydown = (event: KeyboardEvent) => {
+  attach(): void {
+    this.host.$body?.addEventListener("keydown", this.#handleKeydown, false);
+  }
+
+  detach(): void {
+    this.host.$body?.removeEventListener("keydown", this.#handleKeydown, false);
+  }
+
+  #handleKeydown = (event: KeyboardEvent) => {
     const $target = (event.target as HTMLElement).closest(
       ".js-day",
     ) as HTMLButtonElement | null;
