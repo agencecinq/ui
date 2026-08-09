@@ -70,11 +70,8 @@ function d(e, t, n = 0) {
 	return (new Date(t, e).getDay() - n + 7) % 7;
 }
 function f(e) {
-	try {
-		let t = new Intl.Locale(e).getWeekInfo?.();
-		if (t) return t.firstDay === 7 ? 0 : t.firstDay;
-	} catch {}
-	return 0;
+	let t = new Intl.Locale(e).getWeekInfo?.();
+	return t ? t.firstDay === 7 ? 0 : t.firstDay : 0;
 }
 function p(e, t = "short") {
 	return Array.from({ length: 7 }, (n, r) => new Date(2020, 0, 5 + r).toLocaleDateString(e, { weekday: t }));
@@ -164,13 +161,13 @@ var h = class {
 	range: "range",
 	start: "start",
 	end: "end"
-}, _ = /* @__PURE__ */ new Set([
+}, _ = [
 	"single",
 	"range",
 	"multiple"
-]), v = (e) => {
+], v = (e) => {
 	let t = e.getAttribute("mode");
-	return t && _.has(t) ? t : "single";
+	return t && _.includes(t) ? t : "single";
 }, y = (e, t, n, { disabled: r, selected: i, current: a, tabIndex: o }) => `
 	<button
 		type="button"
@@ -232,17 +229,17 @@ var h = class {
 			year: n(this.getAttribute("data-year"), this.today.getFullYear()),
 			day: null
 		}, this.$title = this.querySelector(".js-title"), this.$body = this.querySelector(".js-body"), this.$next = this.querySelector(".js-next"), this.$previous = this.querySelector(".js-previous"), !this.$body) throw Error("Calendar: .js-body element not found");
-		this.#e = new h(this), this.picked = JSON.parse(this.getAttribute("data-picked-dates") || "[]"), this.render(), this.addEventListener("click", this.#n), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#r, !1);
+		this.#e = new h(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.render(), this.addEventListener("click", this.#n), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#r, !1);
 	}
 	destroy() {
-		this.removeEventListener("click", this.#n), this.#e && (this.#e.detach(), this.$body?.removeEventListener("mousemove", this.#r, !1)), this.reset(), this.#a = () => {};
+		this.removeEventListener("click", this.#n), this.#e && (this.#e.detach(), this.$body?.removeEventListener("mousemove", this.#r, !1)), this.reset(), this.#i = () => {};
 	}
 	move(e, { focus: t = !0 } = {}) {
-		let n = new Date(this.current.year, this.current.month + e, 1);
-		this.current.year = n.getFullYear(), this.current.month = n.getMonth(), this.render({ focus: t });
+		let { year: n, month: r } = this.current, i = new Date(n, r + e, 1);
+		this.current.year = i.getFullYear(), this.current.month = i.getMonth(), this.render({ focus: t });
 	}
 	setPicked(e, t = !0) {
-		this.picked = e, this.#i(), t && this.#a();
+		this.picked = e, this.setAttribute("data-picked", JSON.stringify(this.picked)), t && this.#i();
 	}
 	setDaySelected(e, t) {
 		if (t) {
@@ -252,21 +249,23 @@ var h = class {
 		e.classList.remove(this.options.stateClasses.active), e.removeAttribute("aria-selected");
 	}
 	#n = (e) => {
-		let t = e.target;
+		let { target: t } = e;
+		if (!(t instanceof HTMLElement)) return;
 		if (t.closest(".js-next") || t.closest(".js-title")) return this.move(1, { focus: !1 });
 		if (t.closest(".js-previous")) return this.move(-1, { focus: !1 });
-		if (t = t.closest(".js-day"), !t || t.getAttribute("aria-disabled") === "true") return;
-		let n = t.getAttribute("data-day");
-		if (this.#e?.setFocusDay(t, { focus: !1 }), this.options.mode === "multiple") {
-			let e = this.picked.indexOf(n);
-			return e >= 0 ? (this.picked.splice(e, 1), this.setDaySelected(t, !1)) : (this.picked.push(n), this.picked.sort(), this.setDaySelected(t, !0)), this.#o();
+		let n = t.closest(".js-day");
+		if (!n || n.getAttribute("aria-disabled") === "true") return;
+		let r = n.getAttribute("data-day");
+		if (this.#e?.setFocusDay(n, { focus: !1 }), this.options.mode === "multiple") {
+			let e = this.picked.indexOf(r);
+			return e >= 0 ? (this.picked.splice(e, 1), this.setDaySelected(n, !1)) : (this.picked.push(r), this.picked.sort(), this.setDaySelected(n, !0)), this.setPicked(this.picked);
 		}
-		return this.options.mode === "single" ? t.classList.contains(this.options.stateClasses.active) && this.options.deselect ? (this.picked = [], this.setDaySelected(t, !1), this.#o()) : (this.picked.forEach((e) => {
+		return this.options.mode === "single" ? n.classList.contains(this.options.stateClasses.active) && this.options.deselect ? (this.picked = [], this.setDaySelected(n, !1), this.setPicked(this.picked)) : (this.picked.forEach((e) => {
 			let t = this.$body?.querySelector(`[data-day="${e}"]`);
 			t && this.setDaySelected(t, !1);
-		}), this.picked = [n], this.setDaySelected(t, !0), this.#o()) : (1 < this.picked.length && (this.$body?.querySelectorAll(".js-day").forEach((e) => {
+		}), this.picked = [r], this.setDaySelected(n, !0), this.setPicked(this.picked)) : (1 < this.picked.length && (this.$body?.querySelectorAll(".js-day").forEach((e) => {
 			e.classList.remove(this.options.stateClasses.range), this.setDaySelected(e, !1);
-		}), this.picked = [], this.#i()), this.picked.push(n), this.picked.sort(), this.setDaySelected(t, !0), this.#o());
+		}), this.picked = []), this.picked.push(r), this.picked.sort(), this.setDaySelected(n, !0), this.setPicked(this.picked));
 	};
 	previewRange(e) {
 		if (this.options.mode !== "range" || this.picked.length !== 1 || !this.$body) return;
@@ -338,19 +337,13 @@ var h = class {
 		this.reset(), this.renderDays(), this.renderHeader(this.current.month, this.current.year), this.renderCalendar(this.current.month, this.current.year, { focus: e });
 	}
 	renderInner(e, t) {}
-	#i() {
-		this.setAttribute("data-picked-dates", JSON.stringify(this.picked));
-	}
-	#a = () => {
+	#i = () => {
 		let n = {
 			values: this.picked,
 			name: this.options.name
 		};
 		t(this, e.CALENDAR_CHANGE, n, { cancelable: !1 });
 	};
-	#o() {
-		this.#i(), this.#a();
-	}
 };
 customElements.get("cinq-calendar") || customElements.define("cinq-calendar", b);
 //#endregion

@@ -23,11 +23,12 @@ const stateClassesDefault: StateClasses = {
   end: "end",
 };
 
-const MODES = new Set<Mode>(["single", "range", "multiple"]);
+const MODES = ["single", "range", "multiple"] as const;
 
 const parseMode = (el: HTMLElement): Mode => {
   const mode = el.getAttribute("mode");
-  if (mode && MODES.has(mode as Mode)) {
+
+  if (mode && (MODES as readonly string[]).includes(mode)) {
     return mode as Mode;
   }
 
@@ -168,7 +169,7 @@ export class Calendar extends HTMLElement {
     this.#keyboard = new Keyboard(this);
 
     this.picked = JSON.parse(
-      this.getAttribute("data-picked-dates") || "[]",
+      this.getAttribute("data-picked") || "[]",
     ) as string[];
 
     this.render();
@@ -208,25 +209,24 @@ export class Calendar extends HTMLElement {
     this.render({ focus });
   }
 
-  /** Assign selection, mirror `data-picked-dates`, optionally emit `calendar:change`. */
+  /** Assign selection, mirror `data-picked`, optionally emit `calendar:change`. */
   setPicked(picked: string[], emit = true): void {
     this.picked = picked;
-    this.#reflectPickedAttribute();
+    this.setAttribute("data-picked", JSON.stringify(this.picked));
 
     if (emit) {
       this.#dispatchChange();
     }
   }
 
-  setDaySelected($el: HTMLElement, selected: boolean) {
+  setDaySelected($el: HTMLElement, selected: boolean): void {
     if (selected) {
       $el.classList.add(this.options.stateClasses.active);
-      $el.setAttribute("aria-selected", "true");
-      return;
+      return $el.setAttribute("aria-selected", "true");
     }
 
     $el.classList.remove(this.options.stateClasses.active);
-    $el.removeAttribute("aria-selected");
+    return $el.removeAttribute("aria-selected");
   }
 
   #handleClick = (event: MouseEvent) => {
@@ -265,7 +265,7 @@ export class Calendar extends HTMLElement {
         this.setDaySelected($day, true);
       }
 
-      return this.#commitPicked();
+      return this.setPicked(this.picked);
     }
 
     if (this.options.mode === "single") {
@@ -275,7 +275,7 @@ export class Calendar extends HTMLElement {
       ) {
         this.picked = [];
         this.setDaySelected($day, false);
-        return this.#commitPicked();
+        return this.setPicked(this.picked);
       }
 
       this.picked.forEach(pickedDay => {
@@ -287,7 +287,7 @@ export class Calendar extends HTMLElement {
 
       this.picked = [day];
       this.setDaySelected($day, true);
-      return this.#commitPicked();
+      return this.setPicked(this.picked);
     }
 
     if (1 < this.picked.length) {
@@ -296,13 +296,12 @@ export class Calendar extends HTMLElement {
         this.setDaySelected($el as HTMLElement, false);
       });
       this.picked = [];
-      this.#reflectPickedAttribute();
     }
 
     this.picked.push(day);
     this.picked.sort();
     this.setDaySelected($day, true);
-    return this.#commitPicked();
+    return this.setPicked(this.picked);
   };
 
   /** Paint in-between days while choosing the range end (mouse or keyboard). */
@@ -525,10 +524,6 @@ export class Calendar extends HTMLElement {
   /** Override to enrich or rebuild each day cell. Keep `.js-day` and `data-day`. */
   renderInner(_inner: HTMLElement, _date: Date) { }
 
-  #reflectPickedAttribute(): void {
-    this.setAttribute("data-picked-dates", JSON.stringify(this.picked));
-  }
-
   #dispatchChange = (): void => {
     const detail: Detail = {
       values: this.picked,
@@ -537,11 +532,6 @@ export class Calendar extends HTMLElement {
 
     dispatchEvent(this, EVENTS.CALENDAR_CHANGE, detail, { cancelable: false });
   };
-
-  #commitPicked(): void {
-    this.#reflectPickedAttribute();
-    this.#dispatchChange();
-  }
 }
 
 if (!customElements.get("cinq-calendar")) {

@@ -86,7 +86,8 @@ Toggle discrete days (no range painting). Click again to remove.
 ```
 
 There is no built-in max. Cap the selection in your app (e.g. after
-`calendar:change`):
+`calendar:change`). Pass `emit: false` to `setPicked` so the trim does not
+fire a second `calendar:change`:
 
 ```js
 const MAX = 3;
@@ -94,7 +95,7 @@ const MAX = 3;
 el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
   if (el.picked.length <= MAX) return;
 
-  el.setPicked(el.picked.slice(0, MAX));
+  el.setPicked(el.picked.slice(0, MAX), false);
   el.render();
 });
 ```
@@ -161,7 +162,7 @@ el.renderInner = (inner, date) => {
 | `name` | Forwarded in `calendar:change` detail |
 | `data-month` | Initial month (`0`–`11`) |
 | `data-year` | Initial year |
-| `data-picked-dates` | JSON array of `YYYY-MM-DD` days to preselect |
+| `data-picked` | JSON array of `YYYY-MM-DD` days to preselect |
 
 ## Keyboard (focus in the grid)
 

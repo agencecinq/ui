@@ -44,16 +44,13 @@ export function getLeadingDays(
  * Falls back to Sunday when `Intl.Locale.getWeekInfo` is unavailable.
  */
 export function getWeekStart(locale: string): number {
-  try {
-    const intlLocale = new Intl.Locale(locale) as Intl.Locale & {
-      getWeekInfo?: () => { firstDay: number };
-    };
-    const weekInfo = intlLocale.getWeekInfo?.();
-    if (weekInfo) {
-      return weekInfo.firstDay === 7 ? 0 : weekInfo.firstDay;
-    }
-  } catch {
-    /* ignore */
+  const intlLocale = new Intl.Locale(locale) as Intl.Locale & {
+    getWeekInfo?: () => { firstDay: number };
+  };
+  const weekInfo = intlLocale.getWeekInfo?.();
+
+  if (weekInfo) {
+    return weekInfo.firstDay === 7 ? 0 : weekInfo.firstDay;
   }
 
   return 0;

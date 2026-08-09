@@ -89,7 +89,9 @@ range preview.
 ```
 
 The package does not enforce a maximum number of days. That is application
-logic — listen to `calendar:change` and trim `picked` yourself:
+logic — listen to `calendar:change` and trim `picked` yourself. Pass
+`emit: false` to `setPicked` so the trim does not fire a second
+`calendar:change`:
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
@@ -99,7 +101,7 @@ const MAX = 3;
 el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
   if (el.picked.length <= MAX) return;
 
-  el.setPicked(el.picked.slice(0, MAX));
+  el.setPicked(el.picked.slice(0, MAX), false);
   el.render();
 });
 ```
@@ -115,7 +117,7 @@ Seed the viewed month and selection from attributes:
   allow-past
   data-month="10"
   data-year="2025"
-  data-picked-dates='["2025-11-10","2025-11-18"]'
+  data-picked='["2025-11-10","2025-11-18"]'
 >
   <!-- header + table -->
 </cinq-calendar>
@@ -196,7 +198,7 @@ el.renderInner = (inner, date) => {
 | `button-class` | Extra classes on day buttons |
 | `name` | Forwarded in change event detail |
 | `data-month` / `data-year` | Initial view (`month` is `0`–`11`) |
-| `data-picked-dates` | JSON array of preselected `YYYY-MM-DD` days |
+| `data-picked` | JSON array of preselected `YYYY-MM-DD` days |
 
 ## Events
 
@@ -231,7 +233,7 @@ document.querySelector("cinq-calendar")?.addEventListener(
 | `picked` | Selected days as `YYYY-MM-DD` |
 | `current` | Viewed `{ month, year, day }` |
 | `render()` | Rebuild the grid |
-| `setPicked(picked, emit?)` | Assign selection, mirror `data-picked-dates`, emit `calendar:change` (default `emit: true`) |
+| `setPicked(picked, emit?)` | Assign selection, mirror `data-picked`. Emits `calendar:change` when `emit` is true (default). Pass `false` to sync without re-firing the event. |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
 | `destroy()` | Detach listeners and clear the grid |
 | `renderInner(inner, date)` | Per-cell hook (override) |
