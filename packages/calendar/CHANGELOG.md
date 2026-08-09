@@ -1,5 +1,11 @@
 # @agencecinq/calendar
 
+## 3.0.0
+
+### Major Changes
+
+- b3c745e: Rename `data-picked-dates` to `data-picked` and simplify internal selection updates through `setPicked`.
+
 ## 2.0.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.12
+
+### Patch Changes
+
+- Updated dependencies [b3c745e]
+  - @agencecinq/calendar@3.0.0
+
 ## 4.4.11
 
 ### Patch Changes
