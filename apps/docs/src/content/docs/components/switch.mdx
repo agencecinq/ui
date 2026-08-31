@@ -28,7 +28,7 @@ import "@agencecinq/switch";
 ```
 
 Then write the WAI-ARIA markup. The host `<cinq-switch>` is the focusable switch
-element — set `role="switch"`, `aria-checked`, and `tabindex` explicitly.
+element. Set `role="switch"`, `aria-checked`, and `tabindex` explicitly.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
 > auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
@@ -58,7 +58,7 @@ When disabled, use `disabled` or `aria-disabled="true"` and `tabindex="-1"`:
 </cinq-switch>
 ```
 
-The component upgrades automatically on `connectedCallback` — no manual
+The component upgrades automatically on `connectedCallback`. No manual
 initialization is needed.
 
 ## Required markup
@@ -70,7 +70,7 @@ initialization is needed.
 | `aria-checked` | **Yes** | Current on/off state (`"true"` or `"false"`). |
 | `tabindex="0"` | **Yes** | Makes the switch keyboard-focusable (use `-1` when disabled). |
 | Accessible name | **Yes** | Via `aria-label`, `aria-labelledby`, or visible label text. |
-| Hidden `<input>` | Optional | Form helper only — not the switch. One input in the host. Keep it in a `hidden` container with `tabindex="-1"` and `aria-hidden="true"`. |
+| Hidden `<input>` | Optional | Form helper only, not the switch. One input in the host. Keep it in a `hidden` container with `tabindex="-1"` and `aria-hidden="true"`. |
 | `aria-hidden="true"` on On/Off text | Recommended | Decorative state labels must not appear in the accessible name. |
 
 Per the [APG switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/),
@@ -86,11 +86,11 @@ The playground below covers every supported markup pattern:
 
 | Variant | When to use |
 | ------- | ----------- |
-| Visible label text | Default — text inside `<cinq-switch>` becomes the accessible name. |
+| Visible label text | Default. Text inside `<cinq-switch>` becomes the accessible name. |
 | `aria-label` | Icon-only or compact switches with no visible label. |
 | `aria-labelledby` | Name lives in a separate visible element (heading, table cell, etc.). |
 | `aria-describedby` | Extra static help text announced with the switch. |
-| Minimal | No slider, no checkbox — UI-only toggle outside a form. |
+| Minimal | No slider, no checkbox. UI-only toggle outside a form. |
 | Pre-checked | `aria-checked="true"` (+ optional `checked` for initial CSS). |
 | Form helper | Hidden `<input>` for form submission. |
 | Switch group | `<fieldset>` / `<legend>` wrapping several switches. |
@@ -223,11 +223,11 @@ first toggle. The component reflects `checked` automatically after state changes
 
 The switch **must** have an accessible name. Use one of:
 
-- `aria-label="…"` on `<cinq-switch>`
+- `aria-label="Battle cries"` on `<cinq-switch>`
 - `aria-labelledby="some-id"` referencing a visible label
 - Visible label text inside the slotted content (when it provides the name)
 
-The component does not check this — rely on axe-core / Lighthouse / your CI.
+The component does not check this. Rely on axe-core / Lighthouse / your CI.
 
 ## Keyboard support
 
@@ -252,8 +252,8 @@ cinq-switch:focus-visible {
 
 | Attribute | Required | Description |
 | --------- | -------- | ----------- |
-| `checked` | No | Reflected state on the host — useful for styling (`cinq-switch[checked]`). |
-| `disabled` | No | Observed — syncs the hidden checkbox and blurs focus when set externally. Pair with `aria-disabled="true"` and `tabindex="-1"` in markup. |
+| `checked` | No | Reflected state on the host. Useful for styling (`cinq-switch[checked]`). |
+| `disabled` | No | Observed. Syncs the hidden checkbox and blurs focus when set externally. Pair with `aria-disabled="true"` and `tabindex="-1"` in markup. |
 
 ### Methods
 
@@ -317,12 +317,27 @@ After mutating light DOM, call `destroy()` then `init()`:
 
 ```js
 $switch.destroy();
-// mutate light DOM…
+// mutate light DOM...
 $switch.init();
 ```
 
 `activate()` and `deactivate()` accept an optional `emit` flag (default `true`).
-Pass `false` to update state without dispatching an event.
+Pass `false` to update state without dispatching an event. The **Programmatic API**
+playground section includes a silent sync button.
+
+## Form submission
+
+The hidden checkbox stays in sync with `aria-checked`. Submit the form to read values
+with `FormData` (see **Form submission** in the playground).
+
+## Advanced settings panel
+
+The **Campaign settings (advanced)** playground demo combines:
+
+- form submit with multiple switches
+- a master switch that enables/disables a child via `disabled` + `tabindex`
+- preset loading with `activate(false)` (no events)
+- locking the whole panel with an external `disabled` attribute
 
 ## Examples
 

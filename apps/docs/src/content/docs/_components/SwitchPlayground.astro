@@ -178,6 +178,43 @@ import RegisterComponents from './RegisterComponents.astro';
     background-color: #1f2937;
     outline-color: #111827;
   }
+
+  .docs-switch-advanced-panel {
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: #fafafa;
+  }
+
+  .docs-switch-advanced-panel legend {
+    padding: 0 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .docs-switch-advanced-panel .docs-switch + .docs-switch {
+    margin-top: 0.5rem;
+  }
+
+  .docs-switch-advanced-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 32rem;
+  }
+
+  .docs-switch-advanced-output {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #374151;
+    white-space: pre-wrap;
+  }
 </style>
 
 <div class="not-content">
@@ -207,7 +244,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </cinq-switch>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last event: <span id="docs-switch-status" class="font-mono font-medium text-gray-900">—</span>
+          Last event: <span id="docs-switch-status" class="font-mono font-medium text-gray-900">-</span>
         </p>
       </div>
     </section>
@@ -269,7 +306,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <span class="slider" aria-hidden="true"></span>
             </cinq-switch>
-            <p class="text-xs text-gray-500">No visible label — name comes from <code>aria-label</code>.</p>
+            <p class="text-xs text-gray-500">No visible label. Name comes from <code>aria-label</code>.</p>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -301,7 +338,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Minimal markup</h3>
           <p class="text-sm text-gray-600">
-            No slider, no hidden checkbox — enough when you do not submit a form. The visible text
+            No slider, no hidden checkbox. Enough when you do not submit a form. The visible text
             inside the host provides the accessible name. Style the on state with <code>[aria-checked="true"]</code> or <code>[checked]</code>.
           </p>
         </div>
@@ -322,8 +359,8 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Pre-checked state</h3>
           <p class="text-sm text-gray-600">
-            Set <code>aria-checked="true"</code> in markup for an initially on switch. Add <code>checked</code> on the host too if you style with <code>cinq-switch[checked]</code>
-            — the component reflects <code>checked</code> after the first toggle.
+            Set <code>aria-checked="true"</code> in markup for an initially on switch. Add <code>checked</code>             on the host too if you style with <code>cinq-switch[checked]</code>.
+            The component reflects <code>checked</code> after the first toggle.
           </p>
         </div>
 
@@ -409,7 +446,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Form helper input</h3>
           <p class="text-sm text-gray-600">
             Optional hidden <code>&lt;input&gt;</code> for form submission (one per host). Keep
-            it hidden from assistive tech — the host is the switch.
+            it hidden from assistive tech. The host is the switch.
           </p>
         </div>
 
@@ -430,6 +467,51 @@ import RegisterComponents from './RegisterComponents.astro';
             />
           </div>
         </cinq-switch>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Form submission</h3>
+          <p class="text-sm text-gray-600">
+            Submit the form to read checkbox values synced by the component. The host stays the
+            accessible switch; the hidden input is for the form only.
+          </p>
+        </div>
+
+        <form id="docs-switch-form" class="flex flex-col gap-3 max-w-md">
+          <cinq-switch
+            class="docs-switch self-start"
+            role="switch"
+            aria-checked="false"
+            tabindex="0"
+          >
+            <span class="label">Daily henchman reports</span>
+            <span class="slider" aria-hidden="true"></span>
+            <div hidden>
+              <input
+                type="checkbox"
+                name="henchman_reports"
+                value="yes"
+                tabindex="-1"
+                aria-hidden="true"
+              />
+            </div>
+          </cinq-switch>
+
+          <button
+            type="submit"
+            class="self-start rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+          >
+            Submit preferences
+          </button>
+        </form>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Submitted:
+          <span id="docs-switch-form-status" class="font-mono font-medium text-gray-900">-</span>
+        </p>
       </div>
     </section>
 
@@ -521,10 +603,29 @@ import RegisterComponents from './RegisterComponents.astro';
           >
             Turn off
           </button>
+          <button
+            type="button"
+            id="docs-switch-programmatic-toggle"
+            class="px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-50"
+          >
+            Toggle
+          </button>
+          <button
+            type="button"
+            id="docs-switch-programmatic-silent"
+            class="px-3 py-2 rounded-lg border border-dashed border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
+          >
+            Sync on (silent)
+          </button>
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           State: <span id="docs-switch-programmatic-status" class="font-mono font-medium text-gray-900">off</span>
+        </p>
+        <p class="text-sm text-gray-600">
+          Events:
+          <span id="docs-switch-programmatic-events" class="font-mono font-medium text-gray-900">none</span>
+          (silent sync skips them)
         </p>
       </div>
     </section>
@@ -534,14 +635,20 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Cancellable events</h3>
           <p class="text-sm text-gray-600">
-            Activate and deactivate events fire <em>before</em> the state changes. Call <code>event.preventDefault()</code> to abort — useful for confirmations or gating access.
+            Activate and deactivate events fire <em>before</em> the state changes. Call <code>event.preventDefault()</code> to abort. Useful for confirmations or gating access.
           </p>
         </div>
 
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="docs-switch-cancel-allow" class="rounded border-gray-300" checked />
-          Allow activation
-        </label>
+        <div class="flex flex-wrap gap-4 text-sm text-gray-700">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="docs-switch-cancel-allow-on" class="rounded border-gray-300" checked />
+            Allow activation
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="docs-switch-cancel-allow-off" class="rounded border-gray-300" checked />
+            Allow deactivation
+          </label>
+        </div>
 
         <cinq-switch
           id="docs-switch-cancel"
@@ -558,8 +665,126 @@ import RegisterComponents from './RegisterComponents.astro';
         </cinq-switch>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last attempt: <span id="docs-switch-cancel-status" class="font-mono font-medium text-gray-900">—</span>
+          Last attempt: <span id="docs-switch-cancel-status" class="font-mono font-medium text-gray-900">-</span>
         </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Campaign settings (advanced)</h3>
+          <p class="text-sm text-gray-600">
+            Form submit, a master switch that enables/disables a child, preset loading via
+            <code>activate(false)</code>, and external <code>disabled</code> on the whole panel.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-switch-advanced-preset"
+            class="rounded-lg bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+          >
+            Load veteran preset
+          </button>
+          <button
+            type="button"
+            id="docs-switch-advanced-reset"
+            class="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
+          >
+            Reset defaults
+          </button>
+          <button
+            type="button"
+            id="docs-switch-advanced-lock"
+            class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+          >
+            Lock panel
+          </button>
+        </div>
+
+        <form id="docs-switch-advanced-form" class="docs-switch-advanced-form">
+          <fieldset id="docs-switch-advanced-fieldset" class="docs-switch-advanced-panel">
+            <legend>Table rules</legend>
+
+            <cinq-switch
+              id="docs-switch-advanced-master"
+              class="docs-switch"
+              role="switch"
+              aria-checked="false"
+              tabindex="0"
+            >
+              <span class="label">Enable house rules</span>
+              <span class="slider" aria-hidden="true"></span>
+              <div hidden>
+                <input
+                  type="checkbox"
+                  name="house_rules"
+                  value="yes"
+                  tabindex="-1"
+                  aria-hidden="true"
+                />
+              </div>
+            </cinq-switch>
+
+            <cinq-switch
+              id="docs-switch-advanced-fumbles"
+              class="docs-switch"
+              role="switch"
+              aria-checked="false"
+              disabled
+              aria-disabled="true"
+              tabindex="-1"
+            >
+              <span class="label">Critical fumbles</span>
+              <span class="slider" aria-hidden="true"></span>
+              <div hidden>
+                <input
+                  type="checkbox"
+                  name="critical_fumbles"
+                  value="yes"
+                  tabindex="-1"
+                  aria-hidden="true"
+                  disabled
+                />
+              </div>
+            </cinq-switch>
+
+            <cinq-switch
+              id="docs-switch-advanced-milestone"
+              class="docs-switch"
+              role="switch"
+              aria-checked="false"
+              tabindex="0"
+            >
+              <span class="label">Milestone leveling</span>
+              <span class="slider" aria-hidden="true"></span>
+              <div hidden>
+                <input
+                  type="checkbox"
+                  name="milestone_leveling"
+                  value="yes"
+                  tabindex="-1"
+                  aria-hidden="true"
+                />
+              </div>
+            </cinq-switch>
+          </fieldset>
+
+          <button
+            type="submit"
+            class="self-start rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+          >
+            Save campaign settings
+          </button>
+        </form>
+
+        <pre
+          id="docs-switch-advanced-output"
+          class="docs-switch-advanced-output"
+          aria-live="polite"
+        >Toggle house rules, load a preset, or submit the form.</pre>
       </div>
     </section>
   </div>
@@ -601,13 +826,25 @@ import RegisterComponents from './RegisterComponents.astro';
   ) as Switch | null;
   const programmaticOn = document.getElementById('docs-switch-programmatic-on');
   const programmaticOff = document.getElementById('docs-switch-programmatic-off');
+  const programmaticToggle = document.getElementById('docs-switch-programmatic-toggle');
+  const programmaticSilent = document.getElementById('docs-switch-programmatic-silent');
   const programmaticStatus = document.getElementById('docs-switch-programmatic-status');
+  const programmaticEvents = document.getElementById('docs-switch-programmatic-events');
 
-  if (programmaticHost && programmaticStatus) {
+  if (programmaticHost && programmaticStatus && programmaticEvents) {
     const update = () => syncSwitchStatus(programmaticHost, programmaticStatus);
+    const logEvent = (name: string) => {
+      programmaticEvents.textContent = name;
+    };
 
-    programmaticHost.addEventListener(EVENTS.SWITCH_ACTIVATE, update);
-    programmaticHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, update);
+    programmaticHost.addEventListener(EVENTS.SWITCH_ACTIVATE, () => {
+      update();
+      logEvent(EVENTS.SWITCH_ACTIVATE);
+    });
+    programmaticHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, () => {
+      update();
+      logEvent(EVENTS.SWITCH_DEACTIVATE);
+    });
 
     programmaticOn?.addEventListener('click', () => {
       programmaticHost.activate();
@@ -616,17 +853,42 @@ import RegisterComponents from './RegisterComponents.astro';
     programmaticOff?.addEventListener('click', () => {
       programmaticHost.deactivate();
     });
+
+    programmaticToggle?.addEventListener('click', () => {
+      programmaticHost.toggle();
+    });
+
+    programmaticSilent?.addEventListener('click', () => {
+      programmaticHost.activate(false);
+      update();
+      logEvent('none (activate with emit: false)');
+    });
+  }
+
+  const switchForm = document.getElementById('docs-switch-form') as HTMLFormElement | null;
+  const switchFormStatus = document.getElementById('docs-switch-form-status');
+
+  if (switchForm && switchFormStatus) {
+    switchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(switchForm);
+      const henchman = data.get('henchman_reports');
+      switchFormStatus.textContent = henchman ? 'henchman_reports=yes' : 'henchman_reports=(off)';
+    });
   }
 
   const cancelHost = document.getElementById('docs-switch-cancel') as Switch | null;
-  const cancelAllow = document.getElementById(
-    'docs-switch-cancel-allow',
+  const cancelAllowOn = document.getElementById(
+    'docs-switch-cancel-allow-on',
+  ) as HTMLInputElement | null;
+  const cancelAllowOff = document.getElementById(
+    'docs-switch-cancel-allow-off',
   ) as HTMLInputElement | null;
   const cancelStatus = document.getElementById('docs-switch-cancel-status');
 
   if (cancelHost && cancelStatus) {
     cancelHost.addEventListener(EVENTS.SWITCH_ACTIVATE, (event) => {
-      if (cancelAllow && !cancelAllow.checked) {
+      if (cancelAllowOn && !cancelAllowOn.checked) {
         event.preventDefault();
         cancelStatus.textContent = 'activation blocked';
         return;
@@ -635,8 +897,157 @@ import RegisterComponents from './RegisterComponents.astro';
       cancelStatus.textContent = 'activated';
     });
 
-    cancelHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, () => {
+    cancelHost.addEventListener(EVENTS.SWITCH_DEACTIVATE, (event) => {
+      if (cancelAllowOff && !cancelAllowOff.checked) {
+        event.preventDefault();
+        cancelStatus.textContent = 'deactivation blocked';
+        return;
+      }
+
       cancelStatus.textContent = 'deactivated';
     });
+  }
+
+  const advancedForm = document.getElementById('docs-switch-advanced-form') as HTMLFormElement | null;
+  const advancedOutput = document.getElementById('docs-switch-advanced-output');
+  const advancedMaster = document.getElementById('docs-switch-advanced-master') as Switch | null;
+  const advancedFumbles = document.getElementById('docs-switch-advanced-fumbles') as Switch | null;
+  const advancedMilestone = document.getElementById('docs-switch-advanced-milestone') as Switch | null;
+  const advancedPreset = document.getElementById('docs-switch-advanced-preset');
+  const advancedReset = document.getElementById('docs-switch-advanced-reset');
+  const advancedLock = document.getElementById('docs-switch-advanced-lock');
+
+  if (
+    advancedForm &&
+    advancedOutput &&
+    advancedMaster &&
+    advancedFumbles &&
+    advancedMilestone
+  ) {
+    let panelLocked = false;
+
+    const formatFormData = () => {
+      const data = new FormData(advancedForm);
+      const lines = ['FormData:'];
+      data.forEach((value, key) => {
+        lines.push(`  ${key}=${value}`);
+      });
+      if (1 === lines.length) {
+        lines.push('  (all switches off)');
+      }
+      return lines.join('\n');
+    };
+
+    const writeOutput = (message: string) => {
+      advancedOutput.textContent = `${message}\n\n${formatFormData()}`;
+    };
+
+    const silentActivate = (host: Switch) => {
+      if (host.disabled) {
+        host.removeAttribute('disabled');
+        host.removeAttribute('aria-disabled');
+        host.setAttribute('tabindex', '0');
+      }
+
+      if (!host.checked) {
+        host.activate(false);
+      }
+    };
+
+    const silentDeactivate = (host: Switch) => {
+      if (host.disabled) {
+        host.removeAttribute('disabled');
+        host.removeAttribute('aria-disabled');
+        host.setAttribute('tabindex', '0');
+      }
+
+      if (host.checked) {
+        host.deactivate(false);
+      }
+    };
+
+    const setChildEnabled = (enabled: boolean) => {
+      if (panelLocked) return;
+
+      if (enabled) {
+        advancedFumbles.removeAttribute('disabled');
+        advancedFumbles.removeAttribute('aria-disabled');
+        advancedFumbles.setAttribute('tabindex', '0');
+        return;
+      }
+
+      silentDeactivate(advancedFumbles);
+
+      advancedFumbles.setAttribute('disabled', '');
+      advancedFumbles.setAttribute('aria-disabled', 'true');
+      advancedFumbles.setAttribute('tabindex', '-1');
+    };
+
+    advancedMaster.addEventListener(EVENTS.SWITCH_ACTIVATE, () => {
+      setChildEnabled(true);
+      writeOutput('House rules enabled. Critical fumbles is now available.');
+    });
+
+    advancedMaster.addEventListener(EVENTS.SWITCH_DEACTIVATE, () => {
+      setChildEnabled(false);
+      writeOutput('House rules disabled. Critical fumbles locked off.');
+    });
+
+    advancedPreset?.addEventListener('click', () => {
+      if (panelLocked) {
+        writeOutput('Panel is locked. Unlock to load a preset.');
+        return;
+      }
+
+      setChildEnabled(true);
+      silentActivate(advancedMaster);
+      silentActivate(advancedMilestone);
+      silentActivate(advancedFumbles);
+      writeOutput('Veteran preset loaded silently (activate with emit: false).');
+    });
+
+    advancedReset?.addEventListener('click', () => {
+      if (panelLocked) {
+        writeOutput('Panel is locked. Unlock to reset.');
+        return;
+      }
+
+      silentDeactivate(advancedMaster);
+      silentDeactivate(advancedMilestone);
+      setChildEnabled(false);
+      writeOutput('Defaults restored silently.');
+    });
+
+    advancedLock?.addEventListener('click', () => {
+      panelLocked = !panelLocked;
+
+      for (const host of [advancedMaster, advancedFumbles, advancedMilestone]) {
+        if (panelLocked) {
+          host.setAttribute('disabled', '');
+          host.setAttribute('aria-disabled', 'true');
+          host.setAttribute('tabindex', '-1');
+        } else {
+          host.removeAttribute('disabled');
+          host.removeAttribute('aria-disabled');
+          host.setAttribute('tabindex', '0');
+        }
+      }
+
+      if (!panelLocked && !advancedMaster.checked) {
+        setChildEnabled(false);
+      } else if (!panelLocked && advancedMaster.checked) {
+        setChildEnabled(true);
+      }
+
+      advancedLock.textContent = panelLocked ? 'Unlock panel' : 'Lock panel';
+      writeOutput(panelLocked ? 'Panel locked via disabled attribute.' : 'Panel unlocked.');
+    });
+
+    advancedForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      writeOutput('Form submitted.');
+    });
+
+    writeOutput('Toggle house rules, load a preset, or submit the form.');
   }
 </script>
