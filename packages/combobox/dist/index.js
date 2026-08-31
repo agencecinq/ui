@@ -165,12 +165,12 @@ function u({ id: e, index: t, size: n, selected: r }) {
 	return ` id="${e}" role="option" aria-posinset="${t + 1}" aria-setsize="${n}"${i}`;
 }
 var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
-	"data-combobox-mode",
-	"data-combobox-select-mode",
-	"data-combobox-debounce",
-	"data-combobox-min-length",
-	"data-combobox-open-on-empty",
-	"data-combobox-autoselect"
+	"data-mode",
+	"data-select-mode",
+	"data-debounce",
+	"data-min-length",
+	"data-open-on-empty",
+	"data-autoselect"
 ], p = class extends HTMLElement {
 	static observedAttributes = [
 		"value",
@@ -180,7 +180,6 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	];
 	$input = null;
 	$listbox = null;
-	$button = null;
 	index = -1;
 	options = [];
 	loading = !1;
@@ -207,7 +206,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		this.init();
 	}
 	disconnectedCallback() {
-		this.destroy(), this.$input = null, this.$listbox = null, this.$button = null;
+		this.destroy(), this.$input = null, this.$listbox = null;
 	}
 	attributeChangedCallback(e, t, n) {
 		if (!(this.#l || t === n)) {
@@ -242,7 +241,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	}
 	setValue(e, { reflect: t = !0 } = {}) {
 		let n = e ?? "";
-		this.#e = n, this.$input && this.$input.value !== n && this.write(this.$input, n), t && this.#V();
+		this.#e = n, this.$input && this.$input.value !== n && this.write(this.$input, n), t && this.#R();
 	}
 	get search() {
 		return this.#n;
@@ -268,7 +267,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		return this.$listbox;
 	}
 	show() {
-		!this.$input || !this.$listbox || this.disabled || (this.#u.removeAttribute("hidden"), this.#M(!0));
+		!this.$input || !this.$listbox || this.disabled || (this.#u.removeAttribute("hidden"), this.#k(!0));
 	}
 	hide({ force: e = !1, clear: t = !0 } = {}) {
 		if (!this.$input || !this.$listbox || !e && !this.#t) return;
@@ -277,26 +276,26 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			let { value: e } = n;
 			this.setValue(e);
 		}
-		this.index = -1, t ? this.#R() : this.options.forEach(({ element: e }) => {
+		this.index = -1, t ? this.#F() : this.options.forEach(({ element: e }) => {
 			e.setAttribute("aria-selected", "false");
-		}), this.#k(), this.#u.setAttribute("hidden", ""), this.#M(!1);
+		}), this.#E(), this.#u.setAttribute("hidden", ""), this.#k(!1);
 	}
 	select = () => {
 		if (!this.$input || !this.$listbox || this.disabled) return;
-		let t = this.options[this.index] ?? null, n = this.#N(t, this.index);
+		let t = this.options[this.index] ?? null, n = this.#A(t, this.index);
 		if (t && this.selectMode === "value") {
 			let { value: e } = t;
 			this.setValue(e);
 		}
-		this.onSelect?.(n), this.#A(e.COMBOBOX_SUBMIT, n), this.hide({ force: !0 });
+		this.onSelect?.(n), this.#D(e.COMBOBOX_SUBMIT, n), this.hide({ force: !0 });
 	};
 	destroy() {
-		this.#i += 1, this.#z(), this.#B(), this.#c && this.$input && this.$listbox && this.#s && (this.$input.removeEventListener("input", this.#v), this.$input.removeEventListener("keydown", this.#s.handle), this.$input.removeEventListener("click", this.#y), this.$input.removeEventListener("focus", this.#C), this.$input.removeEventListener("blur", this.#w), this.$listbox.removeEventListener("mousedown", this.#_), this.$listbox.removeEventListener("click", this.#S), this.$button?.removeEventListener("mousedown", this.#b), this.$button?.removeEventListener("click", this.#x), document.removeEventListener("click", this.#g)), this.#s = null, this.#c = !1;
+		this.#i += 1, this.#I(), this.#L(), this.#c && this.$input && this.$listbox && this.#s && (this.$input.removeEventListener("input", this.#_), this.$input.removeEventListener("keydown", this.#s.handle), this.$input.removeEventListener("click", this.#v), this.$input.removeEventListener("focus", this.#b), this.$input.removeEventListener("blur", this.#x), this.$listbox.removeEventListener("mousedown", this.#g), this.$listbox.removeEventListener("click", this.#y), document.removeEventListener("click", this.#h)), this.#s = null, this.#c = !1;
 	}
 	blurOption() {
 		if (!(!this.$input || !this.$listbox)) {
 			if (!this.focused) {
-				this.#k();
+				this.#E();
 				return;
 			}
 			this.index = -1, this.refresh(this.index);
@@ -304,9 +303,9 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	}
 	refresh(t) {
 		if (!this.$input || !this.$listbox) return;
-		this.#D(t), this.#O(t);
+		this.#w(t), this.#T(t);
 		let { options: n, value: r } = this;
-		this.#A(e.COMBOBOX_UPDATE, {
+		this.#D(e.COMBOBOX_UPDATE, {
 			options: n,
 			index: t,
 			value: r
@@ -316,78 +315,61 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		if (!this.$input || !this.$listbox || this.disabled) return !1;
 		if (this.#t && 0 < this.options.length) return !0;
 		let { value: e } = this.input;
-		return await this.#F(e, { openWhenEmpty: !0 }), this.#t && 0 < this.options.length;
+		return await this.#M(e, { openWhenEmpty: !0 }), this.#t && 0 < this.options.length;
 	}
 	init() {
-		if (this.$input = this.querySelector("[role=\"combobox\"]") || this.querySelector("input"), this.$listbox = this.querySelector("[role=\"listbox\"]") || this.querySelector("[data-combobox-listbox]"), this.$button = this.querySelector("[data-combobox-button]") || null, !this.isConnected || !this.$input || !this.$listbox || !this.#n) return;
-		this.#d(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list", this.$button ||= this.#p();
+		if (this.$input = this.querySelector("[role=\"combobox\"]") || this.querySelector("input"), this.$listbox = this.querySelector("[role=\"listbox\"]"), !this.isConnected || !this.$input || !this.$listbox || !this.#n) return;
+		this.#d(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list";
 		let e = this.getAttribute("value");
-		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new s(this), this.#D(-1), this.hide({
+		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new s(this), this.#w(-1), this.hide({
 			force: !0,
 			clear: !1
-		}), this.#m(), this.#c = !0;
+		}), this.#p(), this.#c = !0;
 	}
 	#d() {
-		let e = this.getAttribute("data-combobox-mode") ?? "managed", t = this.getAttribute("data-combobox-select-mode") ?? "value";
-		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, n(this.getAttribute("data-combobox-debounce"), 0)), this.minLength = Math.max(0, n(this.getAttribute("data-combobox-min-length"), 0)), this.openOnEmpty = r(this.getAttribute("data-combobox-open-on-empty")), this.autoselect = r(this.getAttribute("data-combobox-autoselect"));
+		let e = this.getAttribute("data-mode") ?? "managed", t = this.getAttribute("data-select-mode") ?? "value";
+		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, n(this.getAttribute("data-debounce"), 0)), this.minLength = Math.max(0, n(this.getAttribute("data-min-length"), 0)), this.openOnEmpty = r(this.getAttribute("data-open-on-empty")), this.autoselect = r(this.getAttribute("data-autoselect"));
 	}
 	#f() {
 		let e = this.disabled;
-		this.$input && (this.$input.disabled = e, e ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled")), this.$button && (this.$button.disabled = e, e ? this.$button.setAttribute("disabled", "") : this.$button.removeAttribute("disabled")), e && this.#t && this.hide({ force: !0 });
+		this.$input && (this.$input.disabled = e, e ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled")), e && this.#t && this.hide({ force: !0 });
 	}
 	#p() {
-		let e = this.$listbox;
-		if (!e) return null;
-		for (let t of [this, document]) {
-			let n = t.querySelectorAll("button[aria-controls]");
-			for (let t of n) if ((t.ariaControlsElements ?? []).includes(e)) return t;
-		}
-		return null;
+		!this.$input || !this.$listbox || !this.#s || (this.$input.addEventListener("input", this.#_), this.$input.addEventListener("keydown", this.#s.handle), this.$input.addEventListener("click", this.#v), this.$input.addEventListener("focus", this.#b), this.$input.addEventListener("blur", this.#x), this.$listbox.addEventListener("mousedown", this.#g), this.$listbox.addEventListener("click", this.#y), document.addEventListener("click", this.#h));
 	}
-	#m() {
-		!this.$input || !this.$listbox || !this.#s || (this.$input.addEventListener("input", this.#v), this.$input.addEventListener("keydown", this.#s.handle), this.$input.addEventListener("click", this.#y), this.$input.addEventListener("focus", this.#C), this.$input.addEventListener("blur", this.#w), this.$listbox.addEventListener("mousedown", this.#_), this.$listbox.addEventListener("click", this.#S), this.$button && (this.$button.addEventListener("mousedown", this.#b), this.$button.addEventListener("click", this.#x)), document.addEventListener("click", this.#g));
+	#m(e) {
+		return e instanceof Node && this.contains(e);
 	}
-	#h(e) {
-		return e instanceof Node ? this.$input === e || !!this.$input?.contains(e) || this.$listbox === e || !!this.$listbox?.contains(e) || this.$button === e || !!this.$button?.contains(e) : !1;
-	}
-	#g = ({ target: e }) => {
-		this.#h(e) || this.hide({ force: !0 });
+	#h = ({ target: e }) => {
+		this.#m(e) || this.hide({ force: !0 });
 	};
-	#_ = (e) => {
+	#g = (e) => {
 		e.preventDefault();
 	};
-	#v = ({ target: e }) => {
+	#_ = ({ target: e }) => {
 		if (!(e instanceof HTMLInputElement) || this.disabled) return;
 		let { value: t } = e;
-		this.setValue(t), this.blurOption(), this.#P(t);
+		this.setValue(t), this.blurOption(), this.#j(t);
 	};
-	#y = (e) => {
-		this.disabled || (e.stopPropagation(), this.#T());
+	#v = (e) => {
+		this.disabled || (e.stopPropagation(), this.#S());
 	};
-	#b = (e) => {
-		e.preventDefault();
-	};
-	#x = (e) => {
-		this.disabled || (e.preventDefault(), e.stopPropagation(), this.#T().then(() => {
-			this.$input?.focus();
-		}));
-	};
-	#S = ({ target: e }) => {
+	#y = ({ target: e }) => {
 		if (this.disabled || !(e instanceof Element) || !this.$listbox) return;
 		let t = e.closest("[role=\"option\"]");
 		if (!t || !this.$listbox.contains(t)) return;
 		let n = this.options.findIndex(({ element: e }) => e === t);
-		0 > n && (this.#D(-1), n = this.options.findIndex(({ element: e }) => e === t), 0 > n) || (this.index = n, this.select());
+		0 > n && (this.#w(-1), n = this.options.findIndex(({ element: e }) => e === t), 0 > n) || (this.index = n, this.select());
 	};
-	#C = ({ target: e }) => {
+	#b = ({ target: e }) => {
 		if (!(e instanceof HTMLInputElement)) return;
 		let { value: t } = e;
 		this.setValue(t), this.blurOption();
 	};
-	#w = ({ relatedTarget: e }) => {
-		this.#h(e);
+	#x = ({ relatedTarget: e }) => {
+		this.#m(e);
 	};
-	async #T() {
+	async #S() {
 		if (!this.disabled) {
 			if (this.#t) {
 				this.hide({ force: !0 });
@@ -396,15 +378,15 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			await this.ensureOpen() && this.blurOption();
 		}
 	}
-	#E(e, t) {
+	#C(e, t) {
 		this.#u.innerHTML = "";
 		let { length: n } = t, { id: r } = this.#u;
 		t.forEach((t, i) => {
 			let a = l(i, e, r, n);
 			this.#u.insertAdjacentHTML("beforeend", this.#r(t, a));
-		}), this.#D(e);
+		}), this.#w(e);
 	}
-	#D(e) {
+	#w(e) {
 		if (!this.$listbox) return;
 		let t = [...this.$listbox.querySelectorAll("[role=\"option\"]")];
 		this.options = t.map((t, n) => {
@@ -418,7 +400,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			};
 		});
 	}
-	#O(e) {
+	#T(e) {
 		if (-1 < e && this.options[e]) {
 			let { id: t, element: n } = this.options[e];
 			if (t) {
@@ -426,25 +408,25 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 				return;
 			}
 		}
-		this.#k();
+		this.#E();
 	}
-	#k() {
+	#E() {
 		this.$input?.removeAttribute("aria-activedescendant");
 	}
-	#A(e, n) {
+	#D(e, n) {
 		t(this, e, n, { cancelable: !1 });
 	}
-	#j(e) {
+	#O(e) {
 		if (this.loading = e, e) {
-			this.$listbox?.setAttribute("aria-busy", "true"), this.#U(!0);
+			this.$listbox?.setAttribute("aria-busy", "true"), this.#B(!0);
 			return;
 		}
-		this.$listbox?.removeAttribute("aria-busy"), this.#U(!1);
+		this.$listbox?.removeAttribute("aria-busy"), this.#B(!1);
 	}
-	#M(e) {
-		this.#t = e, this.$input && this.$input.setAttribute("aria-expanded", e ? "true" : "false"), this.$button?.setAttribute("aria-expanded", e ? "true" : "false"), this.#H();
+	#k(e) {
+		this.#t = e, this.$input && this.$input.setAttribute("aria-expanded", e ? "true" : "false"), this.#z();
 	}
-	#N(e, t) {
+	#A(e, t) {
 		let { value: n = "" } = e ?? {};
 		return {
 			option: e,
@@ -452,36 +434,36 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			value: n
 		};
 	}
-	#P(t) {
+	#j(t) {
 		if (!this.disabled) {
-			if (this.#z(), t.trim().length < this.minLength) {
-				this.#B(), this.#i += 1, this.#R(), this.#A(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 });
+			if (this.#I(), t.trim().length < this.minLength) {
+				this.#L(), this.#i += 1, this.#F(), this.#D(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 });
 				return;
 			}
 			if (0 < this.debounce) {
 				this.#a = setTimeout(() => {
-					this.#a = null, this.#F(t);
+					this.#a = null, this.#M(t);
 				}, this.debounce);
 				return;
 			}
-			this.#F(t);
+			this.#M(t);
 		}
 	}
-	async #F(t, { openWhenEmpty: n = !1 } = {}) {
+	async #M(t, { openWhenEmpty: n = !1 } = {}) {
 		if (!this.#n || this.disabled) return;
-		this.#B(), this.#o = new AbortController();
+		this.#L(), this.#o = new AbortController();
 		let r = ++this.#i, { signal: i } = this.#o;
-		this.#A(e.COMBOBOX_LOADING), this.#j(!0);
+		this.#D(e.COMBOBOX_LOADING), this.#O(!0);
 		let a;
 		try {
 			a = await this.#n(t, { signal: i });
 		} catch (e) {
 			if (i.aborted || r !== this.#i) return;
-			throw this.#j(!1), e;
+			throw this.#O(!1), e;
 		}
 		if (r === this.#i) {
-			if (this.#I(a), this.#A(e.COMBOBOX_LOADED), this.#j(!1), this.options.length === 0) {
-				if (this.#A(e.COMBOBOX_EMPTY, { value: t }), this.openOnEmpty) {
+			if (this.#N(a), this.#D(e.COMBOBOX_LOADED), this.#O(!1), this.options.length === 0) {
+				if (this.#D(e.COMBOBOX_EMPTY, { value: t }), this.openOnEmpty) {
 					this.show();
 					return;
 				}
@@ -498,63 +480,63 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			this.index = this.autoselect ? 0 : -1, this.refresh(this.index), this.show();
 		}
 	}
-	#I(e) {
+	#N(e) {
 		if (Array.isArray(e)) {
 			if (e.length === 0) {
-				this.#R({ clearDom: this.mode === "managed" });
+				this.#F({ clearDom: this.mode === "managed" });
 				return;
 			}
 			if (typeof e[0] == "string") {
-				this.#E(-1, e);
+				this.#C(-1, e);
 				return;
 			}
-			this.#L(e);
+			this.#P(e);
 			return;
 		}
 		let { html: t, options: n } = e;
 		if (t != null && this.mode === "external") {
-			this.#u.innerHTML = t, this.#D(-1);
+			this.#u.innerHTML = t, this.#w(-1);
 			return;
 		}
 		if (n) {
 			if (n.length === 0) {
-				this.#R({ clearDom: !0 });
+				this.#F({ clearDom: !0 });
 				return;
 			}
 			if (typeof n[0] == "string") {
-				this.#E(-1, n);
+				this.#C(-1, n);
 				return;
 			}
-			this.#L(n);
+			this.#P(n);
 			return;
 		}
 		if (this.mode === "external") {
-			this.#D(-1);
+			this.#w(-1);
 			return;
 		}
-		this.#R({ clearDom: !0 });
+		this.#F({ clearDom: !0 });
 	}
-	#L(e) {
+	#P(e) {
 		this.#u.innerHTML = "", e.forEach((e) => {
 			this.#u.appendChild(e);
-		}), this.#D(-1);
+		}), this.#w(-1);
 	}
-	#R({ clearDom: e = !0 } = {}) {
+	#F({ clearDom: e = !0 } = {}) {
 		this.options = [], this.index = -1, e && this.$listbox && (this.$listbox.innerHTML = "");
 	}
-	#z() {
+	#I() {
 		this.#a &&= (clearTimeout(this.#a), null);
 	}
-	#B() {
+	#L() {
 		this.#o?.abort(), this.#o = null;
 	}
-	#V() {
+	#R() {
 		this.#l = !0, this.#e ? this.setAttribute("value", this.#e) : this.removeAttribute("value"), this.#l = !1;
 	}
-	#H() {
+	#z() {
 		this.#l = !0, this.#t ? this.setAttribute("expanded", "") : this.removeAttribute("expanded"), this.#l = !1;
 	}
-	#U(e) {
+	#B(e) {
 		this.#l = !0, e ? this.setAttribute("busy", "") : this.removeAttribute("busy"), this.#l = !1;
 	}
 };

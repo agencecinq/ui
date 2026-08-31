@@ -16,7 +16,6 @@ export declare class Combobox extends HTMLElement {
     static observedAttributes: string[];
     $input: HTMLInputElement | null;
     $listbox: HTMLElement | null;
-    $button: HTMLButtonElement | null;
     index: number;
     options: Option[];
     loading: boolean;

@@ -1,5 +1,14 @@
 # @agencecinq/combobox
 
+## 2.0.0
+
+### Major Changes
+
+- Rename host data attributes: drop the `combobox` prefix (`data-mode`, `data-select-mode`, `data-debounce`, `data-min-length`, `data-open-on-empty`, `data-autoselect`).
+- Require `[role="listbox"]` inside the host (drop `[data-combobox-listbox]` / `[data-listbox]` fallback).
+- Drop built-in open-button handling: no `$button`, no internal toggle listeners or `aria-expanded` / `disabled` sync on the button (wire it in the app — see docs).
+- Remove unused `Options.button` property.
+
 ## 1.0.4
 
 ### Patch Changes

@@ -138,7 +138,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-combobox-event-log:empty::before {
-    content: 'No events yet…';
+    content: 'No events yet.';
     color: #9ca3af;
   }
 
@@ -153,23 +153,210 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-combobox-empty.is-visible {
     display: block;
   }
+
+  .docs-combobox-picked {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.375rem;
+    background: #ecfdf5;
+    color: #047857;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8125rem;
+  }
+
+  /* ── Advanced compendium ─────────────────────────────────────────────────── */
+  .docs-combobox-advanced-layout {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .docs-combobox-advanced-layout {
+      grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .docs-combobox--palette {
+    max-width: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  }
+
+  .docs-combobox--palette input[role='combobox'] {
+    padding-left: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .docs-combobox--palette [role='listbox'] {
+    max-height: 20rem;
+    padding: 0.375rem;
+    border-radius: 0.75rem;
+  }
+
+  .docs-combobox--palette [role='option'] {
+    padding: 0;
+    margin: 0;
+  }
+
+  .docs-combobox--palette [role='option'][aria-selected='true'] .docs-combobox-rich-option {
+    background: #f3f4f6;
+    outline: 1px solid #d1d5db;
+  }
+
+  .docs-combobox-rich-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  .docs-combobox-rich-option__avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    background: #111827;
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .docs-combobox-rich-option__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .docs-combobox-rich-option__name {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .docs-combobox-rich-option__meta {
+    display: block;
+    margin-top: 0.125rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  .docs-combobox-rich-option__badge {
+    flex-shrink: 0;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .docs-combobox-detail {
+    min-height: 14rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+    padding: 1.25rem;
+  }
+
+  .docs-combobox-detail.is-empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #6b7280;
+  }
+
+  .docs-combobox-detail__eyebrow {
+    margin: 0 0 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+  }
+
+  .docs-combobox-detail__title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .docs-combobox-detail__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .docs-combobox-detail__stat {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+  }
+
+  .docs-combobox-detail__stat dt {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9ca3af;
+  }
+
+  .docs-combobox-detail__stat dd {
+    margin: 0.25rem 0 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .docs-combobox-detail__blurb {
+    margin: 1rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #374151;
+  }
+
+  .docs-combobox-advanced-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .docs-combobox-advanced-kbd {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
 </style>
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
-    <!-- 1. Managed — sync local list -->
+    <!-- 1. Managed: sync local list -->
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Undermountain bestiary</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Local list</h3>
           <p class="text-sm text-gray-600">
-            <code>mode: 'managed'</code> (default) — synchronous <code>search</code> over a local
-            list, with an optional open button (<code>tabindex="-1"</code>).
+            Managed mode: sync <code>search</code>, optional open button, and
+            <code>data-autoselect</code> (first match highlighted on open).
           </p>
         </div>
 
         <label for="docs-monster-local" class="text-sm font-medium text-gray-700">Monster</label>
-        <cinq-combobox id="docs-monster-local" class="docs-combobox">
+        <cinq-combobox id="docs-monster-local" class="docs-combobox" data-autoselect>
           <input
             id="docs-monster-local-input"
             type="text"
@@ -187,7 +374,7 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-controls="docs-monster-local-listbox"
             aria-expanded="false"
           >
-            ▼
+            Open
           </button>
           <ul
             id="docs-monster-local-listbox"
@@ -198,20 +385,19 @@ import RegisterComponents from './RegisterComponents.astro';
         </cinq-combobox>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800" aria-live="polite">
-          Status: <span data-combobox-status="local" class="font-mono font-medium text-gray-900">—</span>
+          Status: <span data-combobox-status="local" class="font-mono font-medium text-gray-900">-</span>
         </p>
       </div>
     </section>
 
-    <!-- 2. Managed — async fetch + event log -->
+    <!-- 2. Managed: async fetch + event log -->
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Scroll of summoning</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Async search</h3>
           <p class="text-sm text-gray-600">
-            Async <code>search</code> with <code>fetch</code> + <code>AbortSignal</code> (blob URL,
-            no network), a short artificial delay so <code>busy</code> is visible, and an event log
-            (<code>loading</code> / <code>loaded</code> / <code>submit</code> / <code>update</code>).
+            Managed mode: async <code>search</code>, <code>AbortSignal</code>, event log, and
+            <code>[busy]</code> while loading.
           </p>
         </div>
 
@@ -246,15 +432,13 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <!-- 3. External — grouped HTML -->
+    <!-- 3. External: grouped HTML -->
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Compendium search (external)</h3>
+          <h3 class="text-lg font-semibold text-gray-900">External mode</h3>
           <p class="text-sm text-gray-600">
-            <code>mode: 'external'</code> — grouped HTML, debounce, <code>minLength</code>,
-            <code>openOnEmpty</code>, and <code>combobox:empty</code>. Selection uses the default <code>selectMode: 'value'</code> so the chosen label fills the textbox. <code>onSelect</code>
-            still runs for side effects (here: update the hint).
+            Grouped HTML, debounce, <code>minLength</code>, and <code>combobox:empty</code>.
           </p>
         </div>
 
@@ -263,10 +447,10 @@ import RegisterComponents from './RegisterComponents.astro';
           <cinq-combobox
             id="docs-monster-external"
             class="docs-combobox"
-            data-combobox-mode="external"
-            data-combobox-debounce="280"
-            data-combobox-min-length="2"
-            data-combobox-open-on-empty
+            data-mode="external"
+            data-debounce="280"
+            data-min-length="2"
+            data-open-on-empty
           >
             <input
               id="docs-monster-external-input"
@@ -277,7 +461,7 @@ import RegisterComponents from './RegisterComponents.astro';
               aria-expanded="false"
               aria-controls="docs-monster-external-listbox"
               autocomplete="off"
-              placeholder="Type at least 2 characters…"
+              placeholder="Type at least 2 characters"
             />
             <div
               id="docs-monster-external-listbox"
@@ -295,8 +479,146 @@ import RegisterComponents from './RegisterComponents.astro';
         </form>
 
         <p class="text-sm text-gray-600" aria-live="polite">
-          Hint: <span data-combobox-hint="external" class="font-mono font-medium text-gray-900">Idle — try “be”, “mi”, or “xx”.</span>
+          Hint: <span data-combobox-hint="external" class="font-mono font-medium text-gray-900">Idle. Try "be", "mi", or "xx".</span>
         </p>
+      </div>
+    </section>
+
+    <!-- 4. Custom select: picker without filling the input -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Custom select</h3>
+          <p class="text-sm text-gray-600">
+            By default, choosing an option fills the input (see <strong>Local list</strong> above).
+            With <code>data-select-mode="custom"</code>, the input stays your filter. Handle the
+            choice in <code>combobox:submit</code>.
+          </p>
+          <ol class="list-decimal pl-5 text-sm text-gray-600 space-y-1">
+            <li>Type <code class="text-xs">be</code> in the field below.</li>
+            <li>Open the list (Down arrow or click the input).</li>
+            <li>Pick an option (click or Enter).</li>
+            <li>
+              <strong>Query</strong> stays <code class="text-xs">be</code>. Only <strong>Picked</strong> updates.
+            </li>
+          </ol>
+        </div>
+
+        <label for="docs-monster-custom" class="text-sm font-medium text-gray-700">Filter</label>
+        <cinq-combobox
+          id="docs-monster-custom"
+          class="docs-combobox"
+          data-select-mode="custom"
+        >
+          <input
+            id="docs-monster-custom-input"
+            type="text"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="docs-monster-custom-listbox"
+            autocomplete="off"
+            placeholder="Type to filter"
+          />
+          <ul
+            id="docs-monster-custom-listbox"
+            role="listbox"
+            aria-label="Monsters"
+            hidden
+          ></ul>
+        </cinq-combobox>
+
+        <dl class="grid gap-2 text-sm text-gray-800 sm:grid-cols-2">
+          <div class="rounded-lg bg-gray-50 px-3 py-2">
+            <dt class="text-gray-600">Query (unchanged on pick)</dt>
+            <dd>
+              <span data-combobox-query="custom" class="font-mono font-medium text-gray-900">-</span>
+            </dd>
+          </div>
+          <div class="rounded-lg bg-gray-50 px-3 py-2">
+            <dt class="text-gray-600">Picked</dt>
+            <dd>
+              <span data-combobox-picked="custom" class="docs-combobox-picked">-</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- 5. Advanced: rich external UI + detail panel -->
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Compendium (advanced)</h3>
+          <p class="text-sm text-gray-600">
+            External mode and <code>selectMode: custom</code>: rich grouped options, debounced async
+            search, empty state, and a detail panel fed from <code>combobox:submit</code>.
+          </p>
+        </div>
+
+        <div class="docs-combobox-advanced-layout">
+          <div class="flex flex-col gap-3">
+            <label for="docs-monster-advanced-input" class="text-sm font-medium text-gray-700">
+              Search compendium
+            </label>
+            <cinq-combobox
+              id="docs-monster-advanced"
+              class="docs-combobox docs-combobox--palette"
+              data-mode="external"
+              data-select-mode="custom"
+              data-debounce="220"
+              data-min-length="1"
+              data-autoselect
+            >
+              <input
+                id="docs-monster-advanced-input"
+                type="search"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded="false"
+                aria-controls="docs-monster-advanced-listbox"
+                autocomplete="off"
+                placeholder="Try mind, dragon, undead"
+              />
+              <div
+                id="docs-monster-advanced-listbox"
+                role="listbox"
+                aria-label="Compendium results"
+                hidden
+              ></div>
+            </cinq-combobox>
+            <p
+              data-combobox-empty="advanced"
+              class="docs-combobox-empty rounded-lg border border-amber-200 bg-amber-50 text-amber-900"
+              role="status"
+            ></p>
+            <div class="docs-combobox-advanced-toolbar">
+              <p class="text-sm text-gray-600" aria-live="polite">
+                Filter:
+                <span data-combobox-filter="advanced" class="font-mono font-medium text-gray-900">-</span>
+              </p>
+              <button
+                type="button"
+                data-combobox-clear="advanced"
+                class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                Clear selection
+              </button>
+            </div>
+            <p class="docs-combobox-advanced-kbd">
+              Down arrow to navigate, Enter to inspect. The filter stays in the field.
+            </p>
+          </div>
+
+          <aside
+            data-combobox-detail="advanced"
+            class="docs-combobox-detail is-empty"
+            aria-live="polite"
+          >
+            <p class="text-sm">Pick a creature from the list.</p>
+            <p class="mt-1 text-xs text-gray-500">The search field keeps your filter.</p>
+          </aside>
+        </div>
       </div>
     </section>
   </div>
@@ -316,6 +638,39 @@ import RegisterComponents from './RegisterComponents.astro';
       | Promise<{ html: string }>;
     onSelect: ((detail: { option: { element: HTMLElement } | null }) => void) | null;
     options: { length: number };
+    expanded: boolean;
+    disabled: boolean;
+    ensureOpen: () => Promise<boolean>;
+    hide: (options?: { force?: boolean }) => void;
+    setValue: (value: string) => void;
+    $input: HTMLInputElement | null;
+  };
+
+  const wireOpenButton = (host: ComboboxHost, button: HTMLButtonElement) => {
+    const sync = () => {
+      button.setAttribute('aria-expanded', host.expanded ? 'true' : 'false');
+      button.disabled = host.disabled;
+      if (host.disabled) {
+        button.setAttribute('disabled', '');
+      } else {
+        button.removeAttribute('disabled');
+      }
+    };
+
+    button.addEventListener('mousedown', (event) => event.preventDefault());
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (host.disabled) return;
+      if (host.expanded) host.hide({ force: true });
+      else void host.ensureOpen().then(() => host.$input?.focus());
+    });
+
+    const observer = new MutationObserver(sync);
+    observer.observe(host, {
+      attributes: true,
+      attributeFilter: ['expanded', 'disabled'],
+    });
+    sync();
   };
 
   const LOCAL_MONSTERS = [
@@ -416,6 +771,101 @@ import RegisterComponents from './RegisterComponents.astro';
     return initial <= 'M' ? 'Aberrations & beasts' : 'Undermountain denizens';
   };
 
+  const MONSTER_TYPES = [
+    'Aberration',
+    'Beast',
+    'Dragon',
+    'Giant',
+    'Humanoid',
+    'Monstrosity',
+    'Undead',
+  ] as const;
+
+  const HABITATS = ['Underdark', 'Forest', 'Swamp', 'Mountains', 'Ruins', 'Urban'] as const;
+
+  const hashString = (value: string) =>
+    [...value].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+  const metaFor = (name: string) => {
+    const seed = hashString(name);
+    const type = MONSTER_TYPES[seed % MONSTER_TYPES.length];
+    const habitat = HABITATS[(seed >> 3) % HABITATS.length];
+    const cr = ((seed % 18) + 1) / 4;
+    const crLabel = Number.isInteger(cr) ? String(cr) : cr.toFixed(1);
+    const initials = name
+      .split(/[\s,]+/)
+      .map((part) => part.charAt(0))
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+    const boss = 10 <= seed % 20;
+
+    return { type, habitat, cr: crLabel, initials, boss };
+  };
+
+  const renderAdvancedResults = async (query: string, signal: AbortSignal) => {
+    await new Promise<void>((resolve, reject) => {
+      const timer = window.setTimeout(resolve, 180);
+      const onAbort = () => {
+        window.clearTimeout(timer);
+        reject(signal.reason ?? new DOMException('Aborted', 'AbortError'));
+      };
+      if (signal.aborted) {
+        onAbort();
+        return;
+      }
+      signal.addEventListener('abort', onAbort, { once: true });
+    });
+
+    const matches = filterMonsters(LOCAL_MONSTERS, query);
+    if (matches.length === 0) return '';
+
+    const groups = new Map<string, string[]>();
+    matches.forEach((name) => {
+      const { type } = metaFor(name);
+      const bucket = groups.get(type) ?? [];
+      bucket.push(name);
+      groups.set(type, bucket);
+    });
+
+    let optionIndex = 0;
+
+    return [...groups.entries()]
+      .map(([type, names]) => {
+        const options = names
+          .map((name) => {
+            const { cr, habitat, initials, boss } = metaFor(name);
+            const optionId = `docs-advanced-option-${optionIndex}`;
+            optionIndex += 1;
+
+            return `<div
+  role="option"
+  id="${optionId}"
+  data-value="${escapeHtml(name)}"
+  data-cr="${escapeHtml(cr)}"
+  data-type="${escapeHtml(type)}"
+  data-habitat="${escapeHtml(habitat)}"
+>
+  <div class="docs-combobox-rich-option">
+    <span class="docs-combobox-rich-option__avatar" aria-hidden="true">${escapeHtml(initials)}</span>
+    <span class="docs-combobox-rich-option__body">
+      <span class="docs-combobox-rich-option__name">${escapeHtml(name)}</span>
+      <span class="docs-combobox-rich-option__meta">CR ${escapeHtml(cr)}, ${escapeHtml(habitat)}</span>
+    </span>
+    ${boss ? '<span class="docs-combobox-rich-option__badge">Boss</span>' : ''}
+  </div>
+</div>`;
+          })
+          .join('');
+
+        return `<div role="group" aria-label="${escapeHtml(type)}">
+  <p class="docs-combobox-group-label">${escapeHtml(type)}</p>
+  ${options}
+</div>`;
+      })
+      .join('');
+  };
+
   const renderGroupedResults = async (query: string, signal: AbortSignal) => {
     const response = await fetch(MONSTERS_URL, { signal });
     if (!response.ok) {
@@ -465,6 +915,11 @@ import RegisterComponents from './RegisterComponents.astro';
     if (host && status) {
       host.search = (value) => filterMonsters(LOCAL_MONSTERS, value);
 
+      const button = host.querySelector('button[aria-controls]');
+      if (button instanceof HTMLButtonElement) {
+        wireOpenButton(host, button);
+      }
+
       host.addEventListener(EVENTS.COMBOBOX_SUBMIT, (event) => {
         const { value } = (event as CustomEvent<{ value: string }>).detail;
         status.textContent = `Selected: ${value}`;
@@ -485,7 +940,7 @@ import RegisterComponents from './RegisterComponents.astro';
       };
 
       host.search = async (value, { signal }) => {
-        status.textContent = 'Fetching bestiary…';
+        status.textContent = 'Loading...';
 
         const response = await fetch(MONSTERS_URL, { signal });
         if (!response.ok) {
@@ -514,11 +969,14 @@ import RegisterComponents from './RegisterComponents.astro';
         return results;
       };
 
-      host.addEventListener(EVENTS.COMBOBOX_LOADING, () => log('loading'));
+      host.addEventListener(EVENTS.COMBOBOX_LOADING, () => {
+        status.textContent = 'Loading...';
+        log('loading');
+      });
       host.addEventListener(EVENTS.COMBOBOX_LOADED, () => log('loaded'));
       host.addEventListener(EVENTS.COMBOBOX_SUBMIT, (event) => {
         const { value, index } = (event as CustomEvent<{ value: string; index: number }>).detail;
-        log(`submit → ${value} (index ${index})`);
+        log(`submit: ${value} (index ${index})`);
       });
       host.addEventListener(EVENTS.COMBOBOX_UPDATE, (event) => {
         const { options, index, value } = (
@@ -552,7 +1010,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
       host.search = async (query, { signal }) => {
         hideEmpty();
-        hint.textContent = `Searching “${query}”…`;
+        hint.textContent = `Searching "${query}"...`;
         const html = await renderGroupedResults(query, signal);
         return { html };
       };
@@ -560,8 +1018,8 @@ import RegisterComponents from './RegisterComponents.astro';
       host.onSelect = ({ option, value }) => {
         const link = option?.element.querySelector('a');
         hint.textContent = link
-          ? `Selected → ${value} (${link.getAttribute('href')})`
-          : `Selected → ${value || '(empty)'}`;
+          ? `Selected: ${value} (${link.getAttribute('href')})`
+          : `Selected: ${value || '(empty)'}`;
       };
 
       host.addEventListener(EVENTS.COMBOBOX_EMPTY, (event) => {
@@ -569,7 +1027,7 @@ import RegisterComponents from './RegisterComponents.astro';
         const message =
           value.trim().length < 2
             ? 'Type at least 2 characters to search.'
-            : `No monsters match “${value}”.`;
+            : `No monsters match "${value}".`;
         showEmpty(message);
         hint.textContent = message;
       });
@@ -584,8 +1042,132 @@ import RegisterComponents from './RegisterComponents.astro';
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         const input = host.querySelector<HTMLInputElement>('input');
-        hint.textContent = `Form submit → q=${input?.value || '(empty)'}`;
+        hint.textContent = `Form submit: q=${input?.value || '(empty)'}`;
       });
+    }
+  }
+
+  // ── 4. Custom select ──────────────────────────────────────────────────────
+  {
+    const host = document.getElementById('docs-monster-custom') as ComboboxHost | null;
+    const queryEl = document.querySelector('[data-combobox-query="custom"]');
+    const pickedEl = document.querySelector('[data-combobox-picked="custom"]');
+
+    if (host && queryEl && pickedEl) {
+      const syncQuery = () => {
+        queryEl.textContent = host.$input?.value || '-';
+      };
+
+      host.search = (value) => filterMonsters(LOCAL_MONSTERS, value);
+
+      host.addEventListener(EVENTS.COMBOBOX_UPDATE, syncQuery);
+      host.addEventListener(EVENTS.COMBOBOX_SUBMIT, (event) => {
+        const { value } = (event as CustomEvent<{ value: string }>).detail;
+        pickedEl.textContent = value || '-';
+        syncQuery();
+      });
+
+      syncQuery();
+    }
+  }
+
+  // ── 5. Advanced compendium ────────────────────────────────────────────────
+  {
+    const host = document.getElementById('docs-monster-advanced') as ComboboxHost | null;
+    const emptyEl = document.querySelector<HTMLElement>('[data-combobox-empty="advanced"]');
+    const filterEl = document.querySelector('[data-combobox-filter="advanced"]');
+    const detailEl = document.querySelector<HTMLElement>('[data-combobox-detail="advanced"]');
+    const clearBtn = document.querySelector<HTMLButtonElement>('[data-combobox-clear="advanced"]');
+
+    if (host && emptyEl && filterEl && detailEl && clearBtn) {
+      const hideEmpty = () => {
+        emptyEl.textContent = '';
+        emptyEl.classList.remove('is-visible');
+      };
+
+      const showEmpty = (message: string) => {
+        emptyEl.textContent = message;
+        emptyEl.classList.add('is-visible');
+      };
+
+      const syncFilter = () => {
+        filterEl.textContent = host.$input?.value.trim() || '-';
+      };
+
+      const renderEmptyDetail = () => {
+        detailEl.classList.add('is-empty');
+        detailEl.innerHTML = `
+          <p class="text-sm">Pick a creature from the list.</p>
+          <p class="mt-1 text-xs text-gray-500">The search field keeps your filter.</p>
+        `;
+      };
+
+      const renderDetail = (name: string, cr: string, type: string, habitat: string) => {
+        const { initials } = metaFor(name);
+        detailEl.classList.remove('is-empty');
+        detailEl.innerHTML = `
+          <p class="docs-combobox-detail__eyebrow">Compendium entry</p>
+          <h4 class="docs-combobox-detail__title">${escapeHtml(name)}</h4>
+          <dl class="docs-combobox-detail__stats">
+            <div class="docs-combobox-detail__stat">
+              <dt>Challenge</dt>
+              <dd>CR ${escapeHtml(cr)}</dd>
+            </div>
+            <div class="docs-combobox-detail__stat">
+              <dt>Type</dt>
+              <dd>${escapeHtml(type)}</dd>
+            </div>
+            <div class="docs-combobox-detail__stat">
+              <dt>Habitat</dt>
+              <dd>${escapeHtml(habitat)}</dd>
+            </div>
+          </dl>
+          <p class="docs-combobox-detail__blurb">
+            ${escapeHtml(initials)}: ${escapeHtml(name)} indexed from the Undermountain bestiary.
+            Selection came from <code>combobox:submit</code>; the filter field was not overwritten.
+          </p>
+        `;
+      };
+
+      host.search = async (query, { signal }) => {
+        hideEmpty();
+        syncFilter();
+        const html = await renderAdvancedResults(query, signal);
+        return { html };
+      };
+
+      host.addEventListener(EVENTS.COMBOBOX_UPDATE, syncFilter);
+      host.addEventListener(EVENTS.COMBOBOX_EMPTY, (event) => {
+        const { value } = (event as CustomEvent<{ value: string }>).detail;
+        showEmpty(`No creatures match "${value}".`);
+      });
+      host.addEventListener(EVENTS.COMBOBOX_LOADED, () => {
+        if (0 < host.options.length) hideEmpty();
+      });
+      host.addEventListener(EVENTS.COMBOBOX_SUBMIT, (event) => {
+        const { option, value } = (
+          event as CustomEvent<{ option: { element: HTMLElement } | null; value: string }>
+        ).detail;
+        const element = option?.element;
+        const cr = element?.dataset.cr ?? metaFor(value).cr;
+        const type = element?.dataset.type ?? metaFor(value).type;
+        const habitat = element?.dataset.habitat ?? metaFor(value).habitat;
+
+        renderDetail(value, cr, type, habitat);
+        syncFilter();
+      });
+
+      clearBtn.addEventListener('click', () => {
+        renderEmptyDetail();
+        host.setValue('');
+        host.hide({ force: true });
+        syncFilter();
+        hideEmpty();
+        host.$input?.focus();
+      });
+
+      renderEmptyDetail();
+      syncFilter();
     }
   }
 </script>

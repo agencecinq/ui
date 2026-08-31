@@ -86,7 +86,5 @@ export interface Options {
     autoselect?: boolean;
     write?: Write;
     render?: Render;
-    /** Optional open button (APG). */
-    button?: HTMLButtonElement | null;
 }
 //# sourceMappingURL=types.d.ts.map

@@ -51,12 +51,12 @@ const DEFAULT_RENDER: Render = (label, props) =>
   `<li${serializeOptionAttrs(props)}>${label}</li>`;
 
 const CONFIG_ATTRIBUTES = [
-  "data-combobox-mode",
-  "data-combobox-select-mode",
-  "data-combobox-debounce",
-  "data-combobox-min-length",
-  "data-combobox-open-on-empty",
-  "data-combobox-autoselect",
+  "data-mode",
+  "data-select-mode",
+  "data-debounce",
+  "data-min-length",
+  "data-open-on-empty",
+  "data-autoselect",
 ] as const;
 
 /**
@@ -77,7 +77,6 @@ export class Combobox extends HTMLElement {
 
   $input: HTMLInputElement | null = null;
   $listbox: HTMLElement | null = null;
-  $button: HTMLButtonElement | null = null;
 
   index = -1;
   options: Option[] = [];
@@ -112,7 +111,6 @@ export class Combobox extends HTMLElement {
     this.destroy();
     this.$input = null;
     this.$listbox = null;
-    this.$button = null;
   }
 
   attributeChangedCallback(
@@ -262,7 +260,7 @@ export class Combobox extends HTMLElement {
       });
     }
 
-    this.#clearActiveDescendant();
+    this.$input?.removeAttribute("aria-activedescendant");
     this.#listbox.setAttribute("hidden", "");
     this.#setExpanded(false);
   }
@@ -298,8 +296,6 @@ export class Combobox extends HTMLElement {
       this.$input.removeEventListener("blur", this.#onBlur);
       this.$listbox.removeEventListener("mousedown", this.#onListboxMousedown);
       this.$listbox.removeEventListener("click", this.#onListboxClick);
-      this.$button?.removeEventListener("mousedown", this.#onButtonMousedown);
-      this.$button?.removeEventListener("click", this.#onButtonClick);
       document.removeEventListener("click", this.#onDocumentClick);
     }
 
@@ -312,7 +308,7 @@ export class Combobox extends HTMLElement {
     if (!this.$input || !this.$listbox) return;
 
     if (!this.focused) {
-      this.#clearActiveDescendant();
+      this.$input?.removeAttribute("aria-activedescendant");
       return;
     }
 
@@ -355,11 +351,7 @@ export class Combobox extends HTMLElement {
     this.$input =
       this.querySelector<HTMLInputElement>('[role="combobox"]') ||
       this.querySelector<HTMLInputElement>("input");
-    this.$listbox =
-      this.querySelector<HTMLElement>('[role="listbox"]') ||
-      this.querySelector<HTMLElement>("[data-combobox-listbox]");
-    this.$button =
-      this.querySelector<HTMLButtonElement>("[data-combobox-button]") || null;
+    this.$listbox = this.querySelector<HTMLElement>('[role="listbox"]');
 
     if (!this.isConnected || !this.$input || !this.$listbox || !this.#search) {
       return;
@@ -368,10 +360,6 @@ export class Combobox extends HTMLElement {
     this.#syncOptionsFromAttributes();
     this.autocomplete =
       this.$input.getAttribute("aria-autocomplete") || "list";
-
-    if (!this.$button) {
-      this.$button = this.#resolveButton();
-    }
 
     const fromAttr = this.getAttribute("value");
     if (fromAttr !== null) {
@@ -391,26 +379,26 @@ export class Combobox extends HTMLElement {
 
   #syncOptionsFromAttributes(): void {
     const mode =
-      (this.getAttribute("data-combobox-mode") as Mode | null) ?? "managed";
+      (this.getAttribute("data-mode") as Mode | null) ?? "managed";
     const selectMode =
-      (this.getAttribute("data-combobox-select-mode") as SelectMode | null) ??
+      (this.getAttribute("data-select-mode") as SelectMode | null) ??
       "value";
 
     this.mode = mode === "external" ? "external" : "managed";
     this.selectMode = selectMode === "custom" ? "custom" : "value";
     this.debounce = Math.max(
       0,
-      parseNumber(this.getAttribute("data-combobox-debounce"), 0),
+      parseNumber(this.getAttribute("data-debounce"), 0),
     );
     this.minLength = Math.max(
       0,
-      parseNumber(this.getAttribute("data-combobox-min-length"), 0),
+      parseNumber(this.getAttribute("data-min-length"), 0),
     );
     this.openOnEmpty = parseBoolean(
-      this.getAttribute("data-combobox-open-on-empty"),
+      this.getAttribute("data-open-on-empty"),
     );
     this.autoselect = parseBoolean(
-      this.getAttribute("data-combobox-autoselect"),
+      this.getAttribute("data-autoselect"),
     );
   }
 
@@ -426,46 +414,9 @@ export class Combobox extends HTMLElement {
       }
     }
 
-    if (this.$button) {
-      this.$button.disabled = isDisabled;
-      if (isDisabled) {
-        this.$button.setAttribute("disabled", "");
-      } else {
-        this.$button.removeAttribute("disabled");
-      }
-    }
-
     if (isDisabled && this.#expanded) {
       this.hide({ force: true });
     }
-  }
-
-  /**
-   * Find the optional open button linked through `ariaControlsElements`.
-   * Prefer the host, then document.
-   */
-  #resolveButton(): HTMLButtonElement | null {
-    const listbox = this.$listbox;
-
-    if (!listbox) {
-      return null;
-    }
-
-    for (const scope of [this as ParentNode, document]) {
-      const buttons = scope.querySelectorAll<HTMLButtonElement>(
-        "button[aria-controls]",
-      );
-
-      for (const button of buttons) {
-        const controlled = button.ariaControlsElements ?? [];
-
-        if (controlled.includes(listbox)) {
-          return button;
-        }
-      }
-    }
-
-    return null;
   }
 
   #bind(): void {
@@ -480,31 +431,11 @@ export class Combobox extends HTMLElement {
     this.$listbox.addEventListener("mousedown", this.#onListboxMousedown);
     this.$listbox.addEventListener("click", this.#onListboxClick);
 
-    if (this.$button) {
-      this.$button.addEventListener("mousedown", this.#onButtonMousedown);
-      this.$button.addEventListener("click", this.#onButtonClick);
-    }
-
     document.addEventListener("click", this.#onDocumentClick);
   }
 
-  #isTarget(target: EventTarget | null): boolean {
-    if (!(target instanceof Node)) {
-      return false;
-    }
-
-    return (
-      this.$input === target ||
-      !!this.$input?.contains(target) ||
-      this.$listbox === target ||
-      !!this.$listbox?.contains(target) ||
-      this.$button === target ||
-      !!this.$button?.contains(target)
-    );
-  }
-
   #onDocumentClick = ({ target }: MouseEvent): void => {
-    if (this.#isTarget(target)) {
+    if (target instanceof Node && this.contains(target)) {
       return;
     }
 
@@ -532,19 +463,6 @@ export class Combobox extends HTMLElement {
     if (this.disabled) return;
     event.stopPropagation();
     void this.#toggle();
-  };
-
-  #onButtonMousedown = (event: MouseEvent): void => {
-    event.preventDefault();
-  };
-
-  #onButtonClick = (event: MouseEvent): void => {
-    if (this.disabled) return;
-    event.preventDefault();
-    event.stopPropagation();
-    void this.#toggle().then(() => {
-      this.$input?.focus();
-    });
   };
 
   #onListboxClick = ({ target }: MouseEvent): void => {
@@ -585,7 +503,7 @@ export class Combobox extends HTMLElement {
   };
 
   #onBlur = ({ relatedTarget }: FocusEvent): void => {
-    if (this.#isTarget(relatedTarget)) {
+    if (relatedTarget instanceof Node && this.contains(relatedTarget)) {
       return;
     }
   };
@@ -662,11 +580,7 @@ export class Combobox extends HTMLElement {
       }
     }
 
-    this.#clearActiveDescendant();
-  }
-
-  /** Remove `aria-activedescendant` — empty string is an invalid IDREF. */
-  #clearActiveDescendant(): void {
+    // Never set aria-activedescendant="" — remove the attribute (invalid IDREF).
     this.$input?.removeAttribute("aria-activedescendant");
   }
 
@@ -693,7 +607,6 @@ export class Combobox extends HTMLElement {
     if (this.$input) {
       this.$input.setAttribute("aria-expanded", open ? "true" : "false");
     }
-    this.$button?.setAttribute("aria-expanded", open ? "true" : "false");
     this.#reflectExpandedAttribute();
   }
 

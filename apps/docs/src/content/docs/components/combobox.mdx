@@ -5,12 +5,10 @@ description: Accessible WAI-ARIA combobox Web Component (`<cinq-combobox>`) for 
 
 import ComboboxPlayground from "../_components/ComboboxPlayground.astro";
 
-An editable combobox with list autocomplete lets users type a filter and pick from
-suggestions. `<cinq-combobox>` wires keyboard behaviour, popup visibility,
-`aria-expanded`, `aria-selected`, `aria-activedescendant`, and `aria-busy`.
+`<cinq-combobox>` adds keyboard support, popup visibility, and ARIA state to combobox markup you provide.
 
 Inspired by [`@19h47/combobox`](https://github.com/19h47/19h47-combobox) and the
-[WAI-ARIA Authoring Practices combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
+[WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
 
 ## Install
 
@@ -26,9 +24,8 @@ Import once:
 import "@agencecinq/combobox";
 ```
 
-Then write the WAI-ARIA markup explicitly — the component adds interactivity
-only. Assign a **`search`** function on the host. Mounting waits until both the
-element is connected and `search` is set.
+Write the combobox markup, then assign `search` on the host. The component mounts
+once the element is connected and `search` is set.
 
 ```html
 <label for="monster">Monster</label>
@@ -49,7 +46,7 @@ element is connected and `search` is set.
     aria-controls="monster-listbox"
     aria-expanded="false"
   >
-    ▼
+    Open
   </button>
   <ul id="monster-listbox" role="listbox" aria-label="Monsters" hidden></ul>
 </cinq-combobox>
@@ -66,6 +63,32 @@ host.search = (value, { signal }) => {
 };
 ```
 
+An open button is optional. Wire the toggle and sync `aria-expanded` / `disabled`
+yourself:
+
+```js
+const button = host.querySelector("button[aria-controls]");
+
+const syncButton = () => {
+  button.setAttribute("aria-expanded", host.expanded ? "true" : "false");
+  button.disabled = host.disabled;
+};
+
+button.addEventListener("mousedown", (event) => event.preventDefault());
+button.addEventListener("click", (event) => {
+  event.stopPropagation();
+  if (host.disabled) return;
+  if (host.expanded) host.hide({ force: true });
+  else void host.ensureOpen().then(() => host.$input?.focus());
+});
+
+new MutationObserver(syncButton).observe(host, {
+  attributes: true,
+  attributeFilter: ["expanded", "disabled"],
+});
+syncButton();
+```
+
 `search` may return an array or a `Promise`. Stale responses are ignored. The
 previous `AbortSignal` is aborted when a newer search starts.
 
@@ -79,11 +102,11 @@ previous `AbortSignal` is aborted when a newer search starts.
 | Selector / attribute | Required | Role |
 | -------------------- | -------- | ---- |
 | `<cinq-combobox>` | **Yes** | Host wrapper. |
-| `input` ‖ `[role="combobox"]` | **Yes** | Focusable textbox. |
+| `input` or `[role="combobox"]` | **Yes** | Focusable textbox. |
 | `[role="listbox"]` with stable `id` | **Yes** | Popup list, referenced by `aria-controls`. |
 | `role="combobox"` + `aria-autocomplete="list"` | **Yes** | On the input. |
 | `aria-controls` / `aria-expanded` | **Yes** | On the input (and optional button). |
-| Optional `button[aria-controls]` | No | Open/close toggle (`tabindex="-1"`). |
+| Optional `button[aria-controls]` inside the host | No | Optional pointer/touch toggle. Wire it in your app. |
 | `[role="option"]` with stable `id` | In `external` mode | Generated in `managed` mode from `{listboxId}-option-{n}`. |
 
 ## Options
@@ -93,19 +116,122 @@ Configure via data attributes on the host (observed at runtime), or properties f
 | Attribute / property | Type | Default | Description |
 | -------------------- | ---- | ------- | ----------- |
 | `value` | `string` | `""` | Mirrored textbox value. Setting it updates the input without opening the list or firing `combobox:submit`. |
-| `disabled` | boolean | `false` | Disables the input and open button. Closes the list if open. |
+| `disabled` | boolean | `false` | Disables the input and closes the list if open. |
 | `expanded` | boolean | `false` | Reflected open state. Setting it opens / closes the list from outside. |
 | `busy` | boolean | `false` | Reflected while a search is in flight (mirrors `aria-busy` on the listbox). |
-| `search` (property) | `SearchFn` | — | **Required.** `(value, { signal }) => SearchResult \| Promise<…>` |
-| `data-combobox-mode` | `managed` \| `external` | `managed` | Who owns listbox markup |
-| `data-combobox-select-mode` | `value` \| `custom` | `value` | Fill the textbox, or only fire `onSelect` / `combobox:submit` |
-| `data-combobox-debounce` | `number` | `0` | Debounce (ms) for input-driven searches |
-| `data-combobox-min-length` | `number` | `0` | Minimum trimmed length before searching |
-| `data-combobox-open-on-empty` | boolean | `false` | Keep popup open on empty results |
-| `data-combobox-autoselect` | boolean | `false` | Highlight the first suggestion |
-| `render` (property) | `(label, props) => string` | `<li…>` | HTML for each managed option |
+| `search` (property) | `SearchFn` | - | **Required.** `(value, { signal }) => SearchResult \| Promise<...>` |
+| `data-mode` | `managed` \| `external` | `managed` | Who owns listbox markup |
+| `data-select-mode` | `value` \| `custom` | `value` | Fill the textbox, or only fire `onSelect` / `combobox:submit` |
+| `data-debounce` | `number` | `0` | Debounce (ms) for input-driven searches |
+| `data-min-length` | `number` | `0` | Minimum trimmed length before searching |
+| `data-open-on-empty` | boolean | `false` | Keep popup open on empty results |
+| `data-autoselect` | boolean | `false` | Highlight the first suggestion |
+| `render` (property) | `(label, props) => string` | `<li>` | HTML for each managed option |
 | `write` (property) | `(input, value) => void` | sets `input.value` | How a chosen option is written |
-| `onSelect` (property) | `(detail) => void` | — | Called when an option is accepted |
+| `onSelect` (property) | `(detail) => void` | - | Called when an option is accepted |
+
+## Custom `render`
+
+In managed mode, override `render` to control option markup. Use
+`serializeOptionAttrs` so `id`, `role`, and ARIA stay correct:
+
+```js
+import { serializeOptionAttrs } from "@agencecinq/combobox";
+
+host.render = (label, props) =>
+  `<li${serializeOptionAttrs(props)} class="my-option">${label}</li>`;
+```
+
+`optionRenderProps(index, selectedIndex, listboxId, size)` is also exported if
+you build props yourself.
+
+## Custom `write`
+
+When `selectMode` is `value` (default), `write` runs on accept:
+
+```js
+host.write = (input, value) => {
+  input.value = value.toUpperCase();
+};
+```
+
+## `selectMode: 'custom'`
+
+**Default (`value`)**: accepting an option writes its label into the input (classic autocomplete).
+
+**Custom**: the input is only a filter. Accepting an option fires `combobox:submit` /
+`onSelect` but does **not** change the textbox. You store or display the choice elsewhere
+(link, chip, hidden field, router navigation, etc.).
+
+```html
+<cinq-combobox id="monster-picker" data-select-mode="custom">
+  <input
+    type="text"
+    role="combobox"
+    aria-autocomplete="list"
+    aria-expanded="false"
+    aria-controls="monster-listbox"
+    placeholder="Filter monsters"
+  />
+  <ul id="monster-listbox" role="listbox" hidden></ul>
+</cinq-combobox>
+<p>Picked: <span id="monster-picked">-</span></p>
+```
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+const host = document.querySelector("#monster-picker");
+const picked = document.querySelector("#monster-picked");
+
+host.search = (query) =>
+  monsters.filter((name) =>
+    name.toLowerCase().startsWith(query.toLowerCase()),
+  );
+
+host.addEventListener(EVENTS.COMBOBOX_SUBMIT, ({ detail }) => {
+  // detail.value = chosen monster; input still holds the filter ("be", etc.)
+  picked.textContent = detail.value;
+});
+```
+
+Try it in the **Custom select** playground section: type `be`, pick **Beholder**. Query
+stays `be`; Picked shows `Beholder`.
+
+For a fuller UI (rich external options, detail panel, empty state), see **Compendium (advanced)** in the playground.
+
+## Advanced UI
+
+Combine **external** mode, **custom** select, and your own markup to build command-palette or
+compendium UIs:
+
+- `search` returns grouped HTML (`{ html }`) with avatars, badges, metadata on each `[role="option"]`
+- `data-select-mode="custom"` keeps the filter in the input; `combobox:submit` drives a detail panel
+- `data-*` on options (`data-cr`, `data-type`, etc.) are read in the submit handler
+- pair `combobox:empty` with a visible empty state and `data-debounce` for async feel
+
+The **Compendium (advanced)** playground demo wires all of this end-to-end.
+
+## `search` return shapes
+
+| Return | Mode | Effect |
+| ------ | ---- | ------ |
+| `string[]` | managed | Rebuild options via `render` |
+| `HTMLElement[]` | either | Replace listbox children |
+| `{ html }` | external | Set listbox `innerHTML` |
+| `{ options: string[] \| HTMLElement[] }` | either | Same as the array forms above |
+
+## Control from outside
+
+```js
+host.setValue("Mind Flayer"); // or host.value = "..."
+host.setAttribute("expanded", ""); // open
+host.removeAttribute("expanded"); // close
+host.setAttribute("disabled", "");
+```
+
+While a search is in flight, the host reflects `[busy]` and the listbox gets
+`aria-busy="true"`.
 
 ## Styling hooks
 
@@ -151,8 +277,8 @@ Dispatched on the **host** `<cinq-combobox>` (bubble). Constants live on `@agenc
 
 | Event | Constant | Detail | When |
 | ----- | -------- | ------ | ---- |
-| `combobox:loading` | `COMBOBOX_LOADING` | — | Before search resolves |
-| `combobox:loaded` | `COMBOBOX_LOADED` | — | After a non-stale search resolves |
+| `combobox:loading` | `COMBOBOX_LOADING` | - | Before search resolves |
+| `combobox:loaded` | `COMBOBOX_LOADED` | - | After a non-stale search resolves |
 | `combobox:update` | `COMBOBOX_UPDATE` | `{ options, index, value }` | After options / ARIA are synced |
 | `combobox:submit` | `COMBOBOX_SUBMIT` | `{ option, index, value }` | When an option is chosen |
 | `combobox:empty` | `COMBOBOX_EMPTY` | `{ value }` | No options (or below minLength) |
@@ -169,20 +295,20 @@ $host.addEventListener(EVENTS.COMBOBOX_SUBMIT, ({ detail }) => {
 
 | Key | Function |
 | --- | -------- |
-| `↓` | Open list and move to first / next option |
-| `Alt` + `↓` | Open list without moving visual focus |
-| `↑` | Open list and move to last / previous option |
-| `Alt` + `↑` | Open list without moving visual focus |
+| `ArrowDown` | Open list and move to first / next option |
+| `Alt` + `ArrowDown` | Open list without moving visual focus |
+| `ArrowUp` | Open list and move to last / previous option |
+| `Alt` + `ArrowUp` | Open list without moving visual focus |
 | `Enter` | Accept focused option. Without focus, close and allow form submit |
 | `Escape` | Close list, or clear field if already closed |
 | `Tab` | Accept focused option, otherwise close |
-| `Home` / `End` / `←` / `→` | Return editing to the textbox when an option has visual focus |
+| `Home` / `End` / `ArrowLeft` / `ArrowRight` | Return editing to the textbox when an option has visual focus |
 
 DOM focus stays on the textbox. Visual focus uses `aria-activedescendant`.
 
 ## Styling the listbox
 
-The component does not position the popup — you own listbox CSS. For viewport-aware placement (flip when near the bottom edge, escape `overflow: hidden` ancestors), use [CSS Anchor Positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning):
+The component does not position the popup. Style the listbox yourself. For placement that flips near the viewport edge, use [CSS Anchor Positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning):
 
 ```css
 cinq-combobox {
@@ -211,7 +337,7 @@ cinq-combobox [role="listbox"] {
 }
 ```
 
-`position: fixed` + anchor keeps the list in the top layer relative to the viewport while `flip-block` opens upward when there is not enough space below.
+`position: fixed` + anchor keeps the list aligned to the input; `flip-block` opens upward when there is not enough space below.
 
 ## Playground (live)
 
