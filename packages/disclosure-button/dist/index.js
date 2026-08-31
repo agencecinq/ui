@@ -60,7 +60,7 @@ var { DISCLOSURE_BUTTON_OPEN: a, DISCLOSURE_BUTTON_CLOSE: o } = e, s = class ext
 	}
 	init() {
 		if (this.$button = this.querySelector("button"), !this.$button) throw Error("DisclosureButton: button element not found");
-		this.elements = this.$button.ariaControlsElements ?? [], this.$button.addEventListener("click", this.#n);
+		this.elements = this.$button.ariaControlsElements ?? [], this.$button.addEventListener("click", this.#t);
 	}
 	get expanded() {
 		return this.$button?.getAttribute("aria-expanded") === "true";
@@ -68,19 +68,16 @@ var { DISCLOSURE_BUTTON_OPEN: a, DISCLOSURE_BUTTON_CLOSE: o } = e, s = class ext
 	get #e() {
 		return this.elements.filter((e) => !e.hidden);
 	}
-	get #t() {
-		return this.elements.length > 0 && this.#e.length === this.elements.length;
-	}
 	toggle() {
-		return this.$button ? this.#e.length > 0 ? t(this.$button, o, this.#r(!1)) ? (this.close(!1), !0) : !1 : t(this.$button, a, this.#r(!0)) ? (this.open(!1), !0) : !1 : !1;
+		return this.$button ? this.#e.length > 0 ? t(this.$button, o, this.#n(!1)) ? (this.close(!1), !0) : !1 : t(this.$button, a, this.#n(!0)) ? (this.open(!1), !0) : !1 : !1;
 	}
 	close(e = !0) {
-		this.$button && (e && this.#e.length > 0 && !t(this.$button, o, this.#r(!1)) || (this.elements.forEach((e) => {
+		this.$button && (e && this.#e.length > 0 && !t(this.$button, o, this.#n(!1)) || (this.elements.forEach((e) => {
 			e.hidden = !0;
 		}), this.update()));
 	}
 	open(e = !0) {
-		this.$button && (e && !this.#t && !t(this.$button, a, this.#r(!0)) || (this.elements.forEach((e) => {
+		this.$button && (e && this.#e.length !== this.elements.length && !t(this.$button, a, this.#n(!0)) || (this.elements.forEach((e) => {
 			e.hidden = !1;
 		}), this.update()));
 	}
@@ -88,12 +85,12 @@ var { DISCLOSURE_BUTTON_OPEN: a, DISCLOSURE_BUTTON_CLOSE: o } = e, s = class ext
 		this.$button && this.$button.setAttribute("aria-expanded", this.#e.length > 0 ? "true" : "false");
 	}
 	destroy() {
-		this.$button && this.$button.removeEventListener("click", this.#n);
+		this.$button && this.$button.removeEventListener("click", this.#t);
 	}
-	#n = () => {
+	#t = () => {
 		this.toggle();
 	};
-	#r(e) {
+	#n(e) {
 		return {
 			ids: this.elements.map((e) => e.id),
 			elements: this.elements,

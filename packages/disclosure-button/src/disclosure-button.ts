@@ -23,9 +23,6 @@ export class DisclosureButton extends HTMLElement {
     this.elements = [];
   }
 
-  /**
-   * Bind markup + listeners. Call {@link destroy} first if already bound.
-   */
   init(): void {
     this.$button = this.querySelector<HTMLButtonElement>("button");
 
@@ -46,18 +43,6 @@ export class DisclosureButton extends HTMLElement {
     return this.elements.filter((element) => !element.hidden);
   }
 
-  get #allVisibleElements(): boolean {
-    return (
-      this.elements.length > 0 &&
-      this.#visibleElements.length === this.elements.length
-    );
-  }
-
-  /**
-   * Toggles open/closed.
-   * Closes when any controlled element is visible; otherwise opens all.
-   * @returns `false` if a cancelable event was aborted.
-   */
   toggle(): boolean {
     if (!this.$button) {
       return false;
@@ -116,13 +101,12 @@ export class DisclosureButton extends HTMLElement {
     this.update();
   }
 
-  /** Shows every controlled element. Dispatches an open event by default. */
   open(emit = true): void {
     if (!this.$button) {
       return;
     }
 
-    if (emit && !this.#allVisibleElements) {
+    if (emit && this.#visibleElements.length !== this.elements.length) {
       if (
         !dispatchEvent(
           this.$button,
@@ -140,10 +124,6 @@ export class DisclosureButton extends HTMLElement {
     this.update();
   }
 
-  /**
-   * Syncs `aria-expanded` from controlled element visibility.
-   * Call after an external dismiss so the trigger stays honest.
-   */
   update(): void {
     if (!this.$button) return;
 
@@ -153,7 +133,6 @@ export class DisclosureButton extends HTMLElement {
     );
   }
 
-  /** Detaches listeners. Safe to call from outside while the host stays mounted. */
   destroy(): void {
     if (!this.$button) {
       return;

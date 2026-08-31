@@ -273,7 +273,7 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Programmatic open &amp. close</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Programmatic open &amp; close</h3>
           <p class="text-sm text-gray-600">
             Call <code>open()</code> or <code>close()</code> on the host element — from an external
             control, a dismiss button inside the region, or your own routing logic.
@@ -329,6 +329,92 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
+          <h3 class="text-lg font-semibold text-gray-900">Silent updates</h3>
+          <p class="text-sm text-gray-600">
+            Pass <code>false</code> to <code>open()</code> or <code>close()</code> to mutate{' '}
+            <code>hidden</code> without dispatching an event — useful when your app already owns
+            the transition or wants to avoid duplicate listeners firing.
+          </p>
+        </div>
+
+        <cinq-disclosure-button id="docs-disclosure-silent-host">
+          <button
+            type="button"
+            id="docs-disclosure-silent-trigger"
+            class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+            aria-expanded="false"
+            aria-controls="docs-disclosure-silent-region"
+          >
+            Show trap description
+          </button>
+        </cinq-disclosure-button>
+
+        <div
+          id="docs-disclosure-silent-region"
+          class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+          hidden
+        >
+          <p class="m-0">
+            A pressure plate releases a scything blade. Detect magic reveals an abjuration anchored
+            to the third flagstone from the west wall.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-disclosure-silent-open"
+            class="rounded-lg bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200"
+          >
+            Open (silent)
+          </button>
+          <button
+            type="button"
+            id="docs-disclosure-silent-close"
+            class="rounded-lg bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200"
+          >
+            Close (silent)
+          </button>
+          <button
+            type="button"
+            id="docs-disclosure-silent-open-emit"
+            class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
+          >
+            Open (with event)
+          </button>
+          <button
+            type="button"
+            id="docs-disclosure-silent-close-emit"
+            class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
+          >
+            Close (with event)
+          </button>
+          <button
+            type="button"
+            id="docs-disclosure-silent-reset"
+            class="rounded-lg bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200"
+          >
+            Reset counter
+          </button>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Region:{' '}
+          <span id="docs-disclosure-silent-state" class="font-mono font-medium text-gray-900">
+            closed
+          </span>
+          {' · '}
+          Events dispatched:{' '}
+          <span id="docs-disclosure-silent-events" class="font-mono font-medium text-gray-900">
+            0
+          </span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
           <h3 class="text-lg font-semibold text-gray-900">Cancellable events</h3>
           <p class="text-sm text-gray-600">
             Open and close events fire <em>before</em> the state changes. Call <code>event.preventDefault()</code> to abort — useful for confirmations or gating access.
@@ -362,6 +448,52 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           Last attempt: <span id="docs-disclosure-cancel-status" class="font-mono font-medium text-gray-900">—</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Confirm before close</h3>
+          <p class="text-sm text-gray-600">
+            Gate the close transition with <code>event.preventDefault()</code> on{' '}
+            <code>DISCLOSURE_BUTTON_CLOSE</code> — for unsaved notes, in-progress reads, or any
+            dismiss that needs confirmation.
+          </p>
+        </div>
+
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="docs-disclosure-confirm-required" class="rounded border-gray-300" checked />
+          Require confirmation before closing
+        </label>
+
+        <cinq-disclosure-button id="docs-disclosure-confirm-host">
+          <button
+            type="button"
+            id="docs-disclosure-confirm-trigger"
+            class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+            aria-expanded="false"
+            aria-controls="docs-disclosure-confirm-region"
+          >
+            View quest log
+          </button>
+        </cinq-disclosure-button>
+
+        <div
+          id="docs-disclosure-confirm-region"
+          class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
+          hidden
+        >
+          <p class="m-0">
+            Retrieve the sigil from the sunken vault before the new moon. The lighthouse keeper
+            knows the tide tables — do not confront him until you have proof of the cult&apos;s pact.
+          </p>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last close attempt:{' '}
+          <span id="docs-disclosure-confirm-status" class="font-mono font-medium text-gray-900">—</span>
         </p>
       </div>
     </section>
@@ -533,6 +665,100 @@ import RegisterComponents from './RegisterComponents.astro';
 
     cancelHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
       cancelStatus.textContent = 'closed';
+    });
+  }
+
+  const silentHost = document.getElementById(
+    'docs-disclosure-silent-host',
+  ) as DisclosureButton | null;
+  const silentTrigger = document.getElementById('docs-disclosure-silent-trigger');
+  const silentState = document.getElementById('docs-disclosure-silent-state');
+  const silentEvents = document.getElementById('docs-disclosure-silent-events');
+  const silentOpen = document.getElementById('docs-disclosure-silent-open');
+  const silentClose = document.getElementById('docs-disclosure-silent-close');
+  const silentOpenEmit = document.getElementById('docs-disclosure-silent-open-emit');
+  const silentCloseEmit = document.getElementById('docs-disclosure-silent-close-emit');
+  const silentReset = document.getElementById('docs-disclosure-silent-reset');
+
+  if (
+    silentHost &&
+    silentTrigger &&
+    silentState &&
+    silentEvents &&
+    silentOpen &&
+    silentClose &&
+    silentOpenEmit &&
+    silentCloseEmit &&
+    silentReset
+  ) {
+    let eventCount = 0;
+
+    const syncSilent = () => {
+      silentState.textContent = silentHost.expanded ? 'open' : 'closed';
+      silentEvents.textContent = String(eventCount);
+    };
+
+    silentHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      eventCount += 1;
+      syncSilent();
+    });
+
+    silentHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, () => {
+      eventCount += 1;
+      syncSilent();
+    });
+
+    silentOpen.addEventListener('click', () => {
+      silentHost.open(false);
+      syncSilent();
+    });
+
+    silentClose.addEventListener('click', () => {
+      silentHost.close(false);
+      syncSilent();
+    });
+
+    silentOpenEmit.addEventListener('click', () => {
+      silentHost.open();
+    });
+
+    silentCloseEmit.addEventListener('click', () => {
+      silentHost.close();
+    });
+
+    silentReset.addEventListener('click', () => {
+      eventCount = 0;
+      silentHost.close(false);
+      syncSilent();
+    });
+
+    syncSilent();
+  }
+
+  const confirmRequired = document.getElementById(
+    'docs-disclosure-confirm-required',
+  ) as HTMLInputElement | null;
+  const confirmHost = document.getElementById(
+    'docs-disclosure-confirm-host',
+  ) as DisclosureButton | null;
+  const confirmStatus = document.getElementById('docs-disclosure-confirm-status');
+
+  if (confirmRequired && confirmHost && confirmStatus) {
+    confirmHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
+      confirmStatus.textContent = 'opened';
+    });
+
+    confirmHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, (event) => {
+      if (
+        confirmRequired.checked &&
+        !window.confirm('Close the quest log without marking the objective complete?')
+      ) {
+        event.preventDefault();
+        confirmStatus.textContent = 'close blocked (preventDefault)';
+        return;
+      }
+
+      confirmStatus.textContent = 'closed';
     });
   }
 </script>

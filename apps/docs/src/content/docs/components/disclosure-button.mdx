@@ -338,6 +338,27 @@ $region.hidden = true;
 $host.update();
 ```
 
+### Silent `open()` / `close()`
+
+Pass `false` to skip event dispatch when your app already handles the transition:
+
+```js
+$host.open(false);
+$host.close(false);
+```
+
+The DOM still updates (`hidden`, `aria-expanded` via `update()` inside `open`/`close`).
+
+### Confirm before close
+
+```js
+$host.addEventListener(EVENTS.DISCLOSURE_BUTTON_CLOSE, (event) => {
+  if (!window.confirm("Close without saving?")) {
+    event.preventDefault();
+  }
+});
+```
+
 ## Playground (live)
 
 <DisclosurePlayground />
