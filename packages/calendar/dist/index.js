@@ -242,11 +242,7 @@ var h = class {
 		this.picked = e, this.setAttribute("data-picked", JSON.stringify(this.picked)), t && this.#i();
 	}
 	setDaySelected(e, t) {
-		if (t) {
-			e.classList.add(this.options.stateClasses.active), e.setAttribute("aria-selected", "true");
-			return;
-		}
-		e.classList.remove(this.options.stateClasses.active), e.removeAttribute("aria-selected");
+		return t ? (e.classList.add(this.options.stateClasses.active), e.setAttribute("aria-selected", "true")) : (e.classList.remove(this.options.stateClasses.active), e.removeAttribute("aria-selected"));
 	}
 	#n = (e) => {
 		let { target: t } = e;

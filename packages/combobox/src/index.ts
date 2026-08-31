@@ -1,13 +1,17 @@
-import { Combobox } from "./combobox.js";
+import {
+  Combobox,
+  optionRenderProps,
+  serializeOptionAttrs,
+} from "./combobox.js";
 
-export { Combobox };
-export { default as Props } from "./Props.js";
+export { Combobox, optionRenderProps, serializeOptionAttrs };
 export type {
-  EmptyDetail,
+  Detail,
   HideOptions,
   Mode,
   OnSelect,
   Option,
+  OptionRenderProps,
   Options,
   Render,
   SearchContext,
@@ -15,6 +19,5 @@ export type {
   SearchResult,
   SelectDetail,
   SelectMode,
-  UpdateDetail,
   Write,
 } from "./types.js";

@@ -1,5 +1,11 @@
 # @agencecinq/spinbutton
 
+## 3.0.0
+
+### Major Changes
+
+- Rename host data attributes: `data-spinbutton-step` → `data-step`, `data-spinbutton-delay` → `data-delay`.
+
 ## 2.0.0
 
 ### Major Changes

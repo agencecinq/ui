@@ -1,8 +1,12 @@
 //#region ../utils/dist/index.js
 var e = {
+	DRAWER_BEFORE_CLOSE: "drawer-before-close",
+	DRAWER_BEFORE_OPEN: "drawer-before-open",
 	DRAWER_CLOSE: "drawer-close",
 	DRAWER_OPEN: "drawer-open",
 	DRAWER_TOGGLE: "drawer-toggle",
+	MODAL_BEFORE_CLOSE: "modal-before-close",
+	MODAL_BEFORE_OPEN: "modal-before-open",
 	MODAL_CLOSE: "modal-close",
 	MODAL_OPEN: "modal-open",
 	MODAL_TOGGLE: "modal-toggle",
@@ -79,7 +83,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = {
 	}
 	init() {
 		if (this.$input = this.querySelector("input"), !this.$input) throw Error("Spinbutton must have an input element");
-		this.$increase = this.querySelector("button[name=\"increase\"]"), this.$decrease = this.querySelector("button[name=\"decrease\"]"), this.$live = this.querySelector("[aria-live]"), this.options.step = n(this.getAttribute("data-spinbutton-step"), s.step), this.options.delay = n(this.getAttribute("data-spinbutton-delay"), s.delay);
+		this.$increase = this.querySelector("button[name=\"increase\"]"), this.$decrease = this.querySelector("button[name=\"decrease\"]"), this.$live = this.querySelector("[aria-live]"), this.options.step = n(this.getAttribute("data-step"), s.step), this.options.delay = n(this.getAttribute("data-delay"), s.delay);
 		let i = this.$input.getAttribute("aria-valuemin"), a = this.$input.getAttribute("aria-valuemax"), o = n(this.$input.getAttribute("aria-valuenow"), 0);
 		this.value = {
 			min: i !== null && n(i, 0),
@@ -89,9 +93,10 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = {
 			t(this, e.SPINBUTTON_CHANGE, { value: this.value.now });
 		}, this.options.delay);
 	}
-	#n = (e) => {
-		let t = e.target;
-		this.setValue(n(t.value, this.value.now));
+	#n = ({ target: e }) => {
+		if (!(e instanceof HTMLInputElement)) return;
+		let { value: t } = e;
+		this.setValue(n(t, this.value.now));
 	};
 	#r = (e) => {
 		let { step: t } = this.options, n = {

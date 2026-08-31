@@ -1,6 +1,12 @@
-import { default as Props } from './Props.js';
-/** How the listbox DOM is produced. */
-export type Mode = "managed" | "external";
+/** Plain props passed to `render` when building managed options. */
+export type OptionRenderProps = {
+    id: string;
+    index: number;
+    size: number;
+    selected: boolean;
+};
+export type Write = (input: HTMLInputElement, value: string) => void;
+export type Render = (label: string, props: OptionRenderProps) => string;
 /**
  * What happens when an option is accepted (Enter, click, Tab with visual focus).
  * - `value` — write the option label/value into the textbox (classic autocomplete).
@@ -31,20 +37,14 @@ export type SearchResult = string[] | HTMLElement[] | {
     options?: string[] | HTMLElement[];
 };
 export type SearchFn = (value: string, context: SearchContext) => SearchResult | Promise<SearchResult>;
-export type Write = (input: HTMLInputElement, value: string) => void;
-export type Render = (result: string, props: Props) => string;
-export type SelectDetail = {
+/** How the listbox DOM is produced. */
+export type Mode = "managed" | "external";
+export type Detail = {
+    value: string;
+};
+export type SelectDetail = Detail & {
     option: Option | null;
     index: number;
-    value: string;
-};
-export type UpdateDetail = {
-    options: Option[];
-    index: number;
-    value: string;
-};
-export type EmptyDetail = {
-    value: string;
 };
 export type OnSelect = (detail: SelectDetail) => void;
 export type HideOptions = {

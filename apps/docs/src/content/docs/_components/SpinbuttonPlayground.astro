@@ -10,6 +10,57 @@ import RegisterComponents from './RegisterComponents.astro';
     outline-offset: 1px;
     border-radius: 0.25rem;
   }
+
+  .docs-spinbutton-seats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.35rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .docs-spinbutton-seats__seat {
+    aspect-ratio: 1;
+    border-radius: 0.25rem;
+    background: #e5e7eb;
+  }
+
+  .docs-spinbutton-seats__seat.is-adventurer {
+    background: #111827;
+  }
+
+  .docs-spinbutton-seats__seat.is-henchman {
+    background: #f59e0b;
+  }
+
+  .docs-spinbutton-seats__seat.is-porter {
+    background: #8b5cf6;
+  }
+
+  .docs-spinbutton-seats-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.75rem;
+    color: #4b5563;
+  }
+
+  .docs-spinbutton-seats-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .docs-spinbutton-seats-legend span {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.125rem;
+    flex-shrink: 0;
+  }
 </style>
 
 <div class="not-content">
@@ -17,10 +68,10 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Basic spinbutton</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Spell level</h3>
           <p class="text-sm text-gray-600">
-            Use the buttons or keyboard (<kbd>↑</kbd>/<kbd>↓</kbd>, <kbd>Page Up</kbd>/<kbd>Page Down</kbd>,
-            <kbd>Home</kbd>/<kbd>End</kbd>).{' '}
+            Basic usage on a wizard&apos;s spell picker. Use the buttons or keyboard (<kbd>↑</kbd>/<kbd>↓</kbd>,{' '}
+            <kbd>Page Up</kbd>/<kbd>Page Down</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>).{' '}
             <code>spinbutton-change</code> events are logged below.
           </p>
         </div>
@@ -33,7 +84,7 @@ import RegisterComponents from './RegisterComponents.astro';
             type="button"
             name="decrease"
             tabindex="-1"
-            aria-label="Decrease"
+            aria-label="One spell level less"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             −
@@ -53,7 +104,7 @@ import RegisterComponents from './RegisterComponents.astro';
             type="button"
             name="increase"
             tabindex="-1"
-            aria-label="Increase"
+            aria-label="One spell level more"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             +
@@ -70,11 +121,11 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Markup variants</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Camp gear &amp; initiative</h3>
           <p class="text-sm text-gray-600">
-            The playground below covers every supported markup pattern: visible label via{' '}
-            <code>aria-labelledby</code>, plain <code>type="text"</code> with an explicit{' '}
-            <code>role="spinbutton"</code>, and an input-only control with no + / − buttons
+            Three markup patterns from the same party sheet: rations via{' '}
+            <code>aria-labelledby</code>, encumbrance on <code>type="text"</code> with an explicit{' '}
+            <code>role="spinbutton"</code>, and an initiative modifier with no + / − buttons
             (keyboard only).
           </p>
         </div>
@@ -186,12 +237,12 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Accessible value text</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Spell level (i18n)</h3>
           <p class="text-sm text-gray-600">
-            Assign <code>formatValue</code> to keep <code>aria-valuetext</code> (and an optional{' '}
-            <code>[aria-live]</code> child) in sync. Use <code>Intl.PluralRules</code> in your app:
-            English has <strong>one/other</strong>, Polish adds <strong>few/many</strong>, Arabic
-            can use up to six categories. Switch locale below to hear the difference.
+            Assign <code>formatValue</code> so <code>aria-valuetext</code> reads naturally in the
+            spell book (and mirrors into an optional <code>[aria-live]</code> child). Use{' '}
+            <code>Intl.PluralRules</code> in your app: English has <strong>one/other</strong>, Polish
+            adds <strong>few/many</strong>. Switch locale below to hear the difference.
           </p>
         </div>
 
@@ -255,16 +306,17 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Custom step</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Treasury</h3>
           <p class="text-sm text-gray-600">
-            Set <code>data-spinbutton-step</code> on the host. Buttons, arrow keys, and{' '}
-            <kbd>Page Up</kbd>/<kbd>Page Down</kbd> (×5) all respect the same increment.
+            Party gold counted in increments of 10 gp. Set <code>data-step</code> on the
+            host. Buttons, arrow keys, and <kbd>Page Up</kbd>/<kbd>Page Down</kbd> (×5) all respect
+            the same increment.
           </p>
         </div>
 
         <cinq-spinbutton
           id="docs-spinbutton-step"
-          data-spinbutton-step="10"
+          data-step="10"
           class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
         >
           <button
@@ -305,18 +357,18 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Bounded vs. unbounded</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Bounds on the trail</h3>
           <p class="text-sm text-gray-600">
-            <code>aria-valuemin</code> and <code>aria-valuemax</code> are both optional. When absent,
-            the corresponding bound falls back to <code>Number.MIN_SAFE_INTEGER</code> /
-            <code>Number.MAX_SAFE_INTEGER</code> and the matching button is never auto-disabled.
+            <code>aria-valuemin</code> and <code>aria-valuemax</code> are each optional. XP can
+            climb without a ceiling, arrows cannot go below zero, and prepared 1st-level slots cannot
+            exceed the mage&apos;s daily allowance.
           </p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-3">
           <div class="flex flex-col gap-2">
             <span id="bounds-none-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
-              No bounds
+              Experience points
             </span>
             <cinq-spinbutton
               class="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
@@ -325,33 +377,34 @@ import RegisterComponents from './RegisterComponents.astro';
                 type="button"
                 name="decrease"
                 tabindex="-1"
-                aria-label="Decrease (no bounds)"
+                aria-label="Decrease experience points"
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
               >
                 −
               </button>
               <input
                 type="number"
-                value="0"
+                value="1250"
                 aria-labelledby="bounds-none-label"
-                aria-valuenow="0"
-                class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
+                aria-valuenow="1250"
+                class="w-16 bg-transparent text-center font-mono text-base focus:outline-none"
               />
               <button
                 type="button"
                 name="increase"
                 tabindex="-1"
-                aria-label="Increase (no bounds)"
+                aria-label="Increase experience points"
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
               >
                 +
               </button>
             </cinq-spinbutton>
+            <p class="text-xs text-gray-500">No min or max. The − / + buttons never auto-disable.</p>
           </div>
 
           <div class="flex flex-col gap-2">
             <span id="bounds-min-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
-              Min only (≥ 0)
+              Arrows (min 0)
             </span>
             <cinq-spinbutton
               class="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
@@ -360,7 +413,7 @@ import RegisterComponents from './RegisterComponents.astro';
                 type="button"
                 name="decrease"
                 tabindex="-1"
-                aria-label="Decrease (min 0)"
+                aria-label="Decrease arrows"
                 disabled
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
@@ -378,17 +431,18 @@ import RegisterComponents from './RegisterComponents.astro';
                 type="button"
                 name="increase"
                 tabindex="-1"
-                aria-label="Increase (min 0)"
+                aria-label="Increase arrows"
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
               >
                 +
               </button>
             </cinq-spinbutton>
+            <p class="text-xs text-gray-500">Minimum only. − disables at zero.</p>
           </div>
 
           <div class="flex flex-col gap-2">
             <span id="bounds-max-label" class="text-xs font-medium uppercase tracking-wide text-gray-500">
-              Max only (≤ 10)
+              1st-level slots (max 4)
             </span>
             <cinq-spinbutton
               class="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
@@ -397,30 +451,31 @@ import RegisterComponents from './RegisterComponents.astro';
                 type="button"
                 name="decrease"
                 tabindex="-1"
-                aria-label="Decrease (max 10)"
+                aria-label="Decrease prepared slots"
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100"
               >
                 −
               </button>
               <input
                 type="number"
-                value="10"
+                value="4"
                 aria-labelledby="bounds-max-label"
-                aria-valuemax="10"
-                aria-valuenow="10"
+                aria-valuemax="4"
+                aria-valuenow="4"
                 class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
               />
               <button
                 type="button"
                 name="increase"
                 tabindex="-1"
-                aria-label="Increase (max 10)"
+                aria-label="Increase prepared slots"
                 disabled
                 class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 +
               </button>
             </cinq-spinbutton>
+            <p class="text-xs text-gray-500">Maximum only. + disables when all slots are filled.</p>
           </div>
         </div>
       </div>
@@ -429,11 +484,11 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Free typing</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Party size</h3>
           <p class="text-sm text-gray-600">
-            Type freely in the input: intermediate keystrokes do not dispatch events. The value is
-            committed on <kbd>Enter</kbd> or blur (<code>change</code>). Out-of-range entries set{' '}
-            <code>aria-invalid="true"</code> briefly, then clamp to min/max.
+            Recruiting for the delve: type freely in the input. Intermediate keystrokes do not
+            dispatch events. The value commits on <kbd>Enter</kbd> or blur (<code>change</code>).
+            Out-of-range entries set <code>aria-invalid="true"</code> briefly, then clamp to min/max.
           </p>
         </div>
 
@@ -445,7 +500,7 @@ import RegisterComponents from './RegisterComponents.astro';
             type="button"
             name="decrease"
             tabindex="-1"
-            aria-label="Decrease"
+            aria-label="One fewer adventurer"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             −
@@ -463,14 +518,14 @@ import RegisterComponents from './RegisterComponents.astro';
             type="button"
             name="increase"
             tabindex="-1"
-            aria-label="Increase"
+            aria-label="One more adventurer"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             +
           </button>
         </cinq-spinbutton>
 
-        <p class="text-xs text-gray-500">Try typing <strong>99</strong>, then blur the field.</p>
+        <p class="text-xs text-gray-500">Try typing <strong>99</strong> recruits, then blur the field.</p>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           Committed value:{' '}
@@ -485,42 +540,42 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Throttled events</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Combat round</h3>
           <p class="text-sm text-gray-600">
-            <code>data-spinbutton-delay</code> throttles <code>spinbutton-change</code> dispatches
-            only. DOM updates (value, <code>aria-valuenow</code>, button disabled state) are
-            immediate. Hold the button below or mash the arrow keys to compare counts.
+            Initiative tracker with <code>data-delay</code> throttling{' '}
+            <code>spinbutton-change</code> only. DOM updates (round number, button disabled state)
+            stay immediate. Hold + or mash the arrow keys to compare round count vs. events logged.
           </p>
         </div>
 
         <cinq-spinbutton
           id="docs-spinbutton-throttle"
-          data-spinbutton-delay="500"
+          data-delay="500"
           class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
         >
           <button
             type="button"
             name="decrease"
             tabindex="-1"
-            aria-label="Decrease"
+            aria-label="Previous round"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             −
           </button>
           <input
             type="number"
-            value="0"
-            aria-label="Counter"
-            aria-valuemin="0"
+            value="1"
+            aria-label="Combat round"
+            aria-valuemin="1"
             aria-valuemax="999"
-            aria-valuenow="0"
+            aria-valuenow="1"
             class="w-16 bg-transparent text-center font-mono text-base focus:outline-none"
           />
           <button
             type="button"
             name="increase"
             tabindex="-1"
-            aria-label="Increase"
+            aria-label="Next round"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             +
@@ -533,20 +588,20 @@ import RegisterComponents from './RegisterComponents.astro';
             id="docs-spinbutton-throttle-burst"
             class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
           >
-            Burst +10 (programmatic)
+            Advance 10 rounds (programmatic)
           </button>
           <button
             type="button"
             id="docs-spinbutton-throttle-reset"
             class="rounded-lg bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200"
           >
-            Reset counters
+            Reset tracker
           </button>
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          DOM value:{' '}
-          <span id="docs-spinbutton-throttle-value" class="font-mono font-medium text-gray-900">0</span>
+          Round:{' '}
+          <span id="docs-spinbutton-throttle-value" class="font-mono font-medium text-gray-900">1</span>
           {' · '}
           Events dispatched:{' '}
           <span id="docs-spinbutton-throttle-events" class="font-mono font-medium text-gray-900">0</span>
@@ -557,24 +612,25 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Live controls</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Hit points</h3>
           <p class="text-sm text-gray-600">
-            Type into the inputs below to call <code>setMin()</code>, <code>setMax()</code>, and{' '}
-            <code>setValue()</code> on the spinbutton at runtime.
+            Wound tracker with bounds adjusted at runtime. Type into the inputs below to call{' '}
+            <code>setMin()</code>, <code>setMax()</code>, and <code>setValue()</code> on the
+            spinbutton while the party rests or takes damage.
           </p>
         </div>
 
         <div class="grid gap-6 md:grid-cols-[auto_1fr] md:items-center">
           <cinq-spinbutton
             id="docs-spinbutton-controls"
-            data-spinbutton-step="5"
+            data-step="5"
             class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
           >
             <button
               type="button"
               name="decrease"
               tabindex="-1"
-              aria-label="Decrease"
+              aria-label="Lose hit points"
               class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               −
@@ -592,7 +648,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               name="increase"
               tabindex="-1"
-              aria-label="Increase"
+              aria-label="Gain hit points"
               class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               +
@@ -640,24 +696,24 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Programmatic API</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Torches (programmatic)</h3>
           <p class="text-sm text-gray-600">
-            Call <code>increase()</code>, <code>decrease()</code>, or <code>setValue()</code> from
-            external controls. Pass <code>emit: false</code> to update the DOM without dispatching
-            an event.
+            Light or snuff torches from external controls. Call <code>increase()</code>,{' '}
+            <code>decrease()</code>, or <code>setValue()</code> programmatically. Pass{' '}
+            <code>emit: false</code> to update the DOM without dispatching an event.
           </p>
         </div>
 
         <cinq-spinbutton
           id="docs-spinbutton-programmatic"
-          data-spinbutton-step="1"
+          data-step="1"
           class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
         >
           <button
             type="button"
             name="decrease"
             tabindex="-1"
-            aria-label="Decrease"
+            aria-label="Snuff one torch"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             −
@@ -665,7 +721,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <input
             type="number"
             value="5"
-            aria-label="Torch count"
+            aria-label="Torches lit"
             aria-valuemin="0"
             aria-valuemax="20"
             aria-valuenow="5"
@@ -675,7 +731,7 @@ import RegisterComponents from './RegisterComponents.astro';
             type="button"
             name="increase"
             tabindex="-1"
-            aria-label="Increase"
+            aria-label="Light one torch"
             class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             +
@@ -688,38 +744,414 @@ import RegisterComponents from './RegisterComponents.astro';
             id="docs-spinbutton-programmatic-decrease"
             class="rounded-lg bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200"
           >
-            Decrease
+            Snuff one
           </button>
           <button
             type="button"
             id="docs-spinbutton-programmatic-increase"
             class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
           >
-            Increase
+            Light one
           </button>
           <button
             type="button"
             id="docs-spinbutton-programmatic-set"
             class="rounded-lg bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200"
           >
-            Set to 10
+            Set to 10 torches
           </button>
           <button
             type="button"
             id="docs-spinbutton-programmatic-silent"
             class="rounded-lg bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200"
           >
-            Set to 15 (silent)
+            Set to 15 torches (silent)
           </button>
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Value:{' '}
+          Torches lit:{' '}
           <span id="docs-spinbutton-programmatic-status" class="font-mono font-medium text-gray-900">5</span>
           {' · '}
           Events:{' '}
           <span id="docs-spinbutton-programmatic-events" class="font-mono font-medium text-gray-900">0</span>
         </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Shop: torches</h3>
+          <p class="text-sm text-gray-600">
+            General store line item before the delve: minimum 1, maximum stock,{' '}
+            <code>formatValue</code> for screen readers, and a <code>spinbutton-change</code>{' '}
+            listener to refresh the gp total.
+          </p>
+        </div>
+
+        <div
+          lang="en"
+          data-spinbutton-quantity
+          class="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-gray-50 p-4"
+        >
+          <div>
+            <p id="docs-spinbutton-quantity-label" class="text-sm font-semibold text-gray-900">
+              Torches
+            </p>
+            <p class="text-xs text-gray-500">
+              7 gp each ·{' '}
+              <span data-spinbutton-quantity-stock class="font-mono">12</span> in stock
+            </p>
+          </div>
+
+          <cinq-spinbutton
+            id="docs-spinbutton-quantity"
+            data-unit-price="7"
+            class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-white p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+          >
+            <button
+              type="button"
+              name="decrease"
+              tabindex="-1"
+              aria-label="One torch less"
+              class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              −
+            </button>
+            <input
+              type="number"
+              value="1"
+              aria-labelledby="docs-spinbutton-quantity-label"
+              aria-valuemin="1"
+              aria-valuemax="12"
+              aria-valuenow="1"
+              class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
+            />
+            <button
+              type="button"
+              name="increase"
+              tabindex="-1"
+              aria-label="One torch more"
+              class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              +
+            </button>
+            <div class="sr-only" aria-live="polite" aria-atomic="true"></div>
+          </cinq-spinbutton>
+
+          <p
+            data-spinbutton-quantity-total
+            class="w-full text-sm text-gray-800 sm:w-auto sm:text-right"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            1 torch · 7 gp
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Watch duration</h3>
+          <p class="text-sm text-gray-600">
+            Camp rest split into hours and minutes. Rollover at the edges (59 → next hour when
+            allowed) lives in your app layer, not inside the component.
+          </p>
+        </div>
+
+        <div
+          data-spinbutton-duration
+          class="flex flex-wrap items-end gap-4 rounded-xl bg-gray-50 p-4"
+          role="group"
+          aria-labelledby="docs-spinbutton-duration-label"
+        >
+          <p id="docs-spinbutton-duration-label" class="sr-only">
+            Rest duration
+          </p>
+
+          <div class="flex flex-col gap-1">
+            <span id="docs-spinbutton-duration-hours-label" class="text-xs font-medium text-gray-600">
+              Hours
+            </span>
+            <cinq-spinbutton
+              id="docs-spinbutton-duration-hours"
+              class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-white p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+            >
+              <button
+                type="button"
+                name="decrease"
+                tabindex="-1"
+                aria-label="One hour less"
+                class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                value="1"
+                aria-labelledby="docs-spinbutton-duration-hours-label"
+                aria-valuemin="0"
+                aria-valuemax="23"
+                aria-valuenow="1"
+                class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
+              />
+              <button
+                type="button"
+                name="increase"
+                tabindex="-1"
+                aria-label="One hour more"
+                class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                +
+              </button>
+            </cinq-spinbutton>
+          </div>
+
+          <span class="pb-2 font-mono text-lg text-gray-400" aria-hidden="true">:</span>
+
+          <div class="flex flex-col gap-1">
+            <span id="docs-spinbutton-duration-minutes-label" class="text-xs font-medium text-gray-600">
+              Minutes
+            </span>
+            <cinq-spinbutton
+              id="docs-spinbutton-duration-minutes"
+              class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-white p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+            >
+              <button
+                type="button"
+                name="decrease"
+                tabindex="-1"
+                aria-label="One minute less"
+                class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                value="30"
+                aria-labelledby="docs-spinbutton-duration-minutes-label"
+                aria-valuemin="0"
+                aria-valuemax="59"
+                aria-valuenow="30"
+                class="w-12 bg-transparent text-center font-mono text-base focus:outline-none"
+              />
+              <button
+                type="button"
+                name="increase"
+                tabindex="-1"
+                aria-label="One minute more"
+                class="grid h-8 w-8 place-items-center rounded-md bg-gray-50 shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                +
+              </button>
+            </cinq-spinbutton>
+          </div>
+
+          <p
+            data-spinbutton-duration-summary
+            class="pb-1 text-sm text-gray-800"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            1 h 30 min rest
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Expedition roster</h3>
+          <p class="text-sm text-gray-600">
+            Three spinbuttons share 12 party slots on the Undermountain contract. Each{' '}
+            <code>setMax()</code> is derived from what the others already claimed. Porters cannot
+            outnumber adventurers.
+          </p>
+        </div>
+
+        <div
+          lang="en"
+          data-spinbutton-checkout
+          data-capacity="12"
+          class="grid gap-6 lg:grid-cols-[1fr_min(16rem,100%)] lg:items-start"
+        >
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-3" role="group" aria-labelledby="docs-spinbutton-ticket-adventurer-label">
+              <div>
+                <h4 id="docs-spinbutton-ticket-adventurer-label" class="text-sm font-semibold text-gray-900">
+                  Adventurers
+                </h4>
+                <p class="text-xs text-gray-500">42 gp upkeep each</p>
+              </div>
+              <cinq-spinbutton
+                id="docs-spinbutton-ticket-adventurer"
+                data-ticket="adventurer"
+                data-price="42"
+                class="inline-flex w-fit max-w-[12rem] items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+              >
+                <button
+                  type="button"
+                  name="decrease"
+                  tabindex="-1"
+                  aria-label="Decrease adventurers"
+                  class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  −
+                </button>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  role="spinbutton"
+                  value="2"
+                  aria-labelledby="docs-spinbutton-ticket-adventurer-label"
+                  aria-valuemin="1"
+                  aria-valuemax="12"
+                  aria-valuenow="2"
+                  aria-valuetext="2 adventurers"
+                  class="w-10 bg-transparent text-center font-mono text-base focus:outline-none"
+                />
+                <button
+                  type="button"
+                  name="increase"
+                  tabindex="-1"
+                  aria-label="Increase adventurers"
+                  class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  +
+                </button>
+                <div class="sr-only" aria-live="polite" aria-atomic="true"></div>
+              </cinq-spinbutton>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3" role="group" aria-labelledby="docs-spinbutton-ticket-henchman-label">
+              <div>
+                <h4 id="docs-spinbutton-ticket-henchman-label" class="text-sm font-semibold text-amber-950">
+                  Henchmen
+                </h4>
+                <p class="text-xs text-amber-800">
+                  24 gp upkeep each · max{' '}
+                  <span data-spinbutton-ticket-max="henchman" class="font-mono font-medium">9</span>
+                </p>
+              </div>
+              <cinq-spinbutton
+                id="docs-spinbutton-ticket-henchman"
+                data-ticket="henchman"
+                data-price="24"
+                class="inline-flex w-fit max-w-[12rem] items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 p-1 text-amber-950 focus-within:ring-2 focus-within:ring-amber-500"
+              >
+                <button
+                  type="button"
+                  name="decrease"
+                  tabindex="-1"
+                  aria-label="Decrease henchmen"
+                  class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  −
+                </button>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  role="spinbutton"
+                  value="1"
+                  aria-labelledby="docs-spinbutton-ticket-henchman-label"
+                  aria-valuemin="0"
+                  aria-valuemax="10"
+                  aria-valuenow="1"
+                  aria-valuetext="1 henchman"
+                  class="w-10 bg-transparent text-center font-mono text-base focus:outline-none"
+                />
+                <button
+                  type="button"
+                  name="increase"
+                  tabindex="-1"
+                  aria-label="Increase henchmen"
+                  class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  +
+                </button>
+                <div class="sr-only" aria-live="polite" aria-atomic="true"></div>
+              </cinq-spinbutton>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3" role="group" aria-labelledby="docs-spinbutton-ticket-porter-label">
+              <div>
+                <h4 id="docs-spinbutton-ticket-porter-label" class="text-sm font-semibold text-violet-950">
+                  Porters
+                </h4>
+                <p class="text-xs text-violet-800">
+                  No pay · one per adventurer · max{' '}
+                  <span data-spinbutton-ticket-max="porter" class="font-mono font-medium">2</span>
+                </p>
+              </div>
+              <cinq-spinbutton
+                id="docs-spinbutton-ticket-porter"
+                data-ticket="porter"
+                data-price="0"
+                class="inline-flex w-fit max-w-[12rem] items-center gap-2 rounded-lg border border-violet-300 bg-violet-50 p-1 text-violet-950 focus-within:ring-2 focus-within:ring-violet-500"
+              >
+                <button
+                  type="button"
+                  name="decrease"
+                  tabindex="-1"
+                  aria-label="Decrease porters"
+                  class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  −
+                </button>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  role="spinbutton"
+                  value="0"
+                  aria-labelledby="docs-spinbutton-ticket-porter-label"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="0"
+                  aria-valuetext="0 porters"
+                  class="w-10 bg-transparent text-center font-mono text-base focus:outline-none"
+                />
+                <button
+                  type="button"
+                  name="increase"
+                  tabindex="-1"
+                  aria-label="Increase porters"
+                  class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  +
+                </button>
+                <div class="sr-only" aria-live="polite" aria-atomic="true"></div>
+              </cinq-spinbutton>
+            </div>
+          </div>
+
+          <div class="rounded-xl bg-gray-50 p-4">
+            <p class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">Party slots</p>
+            <ul class="docs-spinbutton-seats-legend" aria-hidden="true">
+              <li><span style="background:#111827"></span> Adventurers</li>
+              <li><span style="background:#f59e0b"></span> Henchmen</li>
+              <li><span style="background:#8b5cf6"></span> Porters</li>
+            </ul>
+            <ul class="docs-spinbutton-seats mb-3" data-spinbutton-seats aria-hidden="true">
+              {
+                Array.from({ length: 12 }, () => (
+                  <li class="docs-spinbutton-seats__seat" />
+                ))
+              }
+            </ul>
+            <p
+              data-spinbutton-checkout-summary
+              class="text-sm text-gray-800"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              3 in party · 108 gp upkeep · 9 slots open
+            </p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -993,9 +1425,231 @@ import RegisterComponents from './RegisterComponents.astro';
 
       reset?.addEventListener('click', () => {
         eventCount = 0;
-        host.setValue(0, false);
+        host.setValue(1, false);
         sync();
       });
+    }
+  }
+
+  {
+    const root = document.querySelector('[data-spinbutton-quantity]');
+    const host = document.getElementById('docs-spinbutton-quantity') as Spinbutton | null;
+    const total = root?.querySelector<HTMLElement>('[data-spinbutton-quantity-total]');
+
+    if (root && host && total) {
+      const unitPrice = Number.parseInt(host.getAttribute('data-unit-price') ?? '0', 10);
+      const stock = host.value.max !== false ? host.value.max : 0;
+      const pluralRules = new Intl.PluralRules(root.getAttribute('lang') ?? undefined);
+      const labels: Partial<Record<Intl.LDMLPluralRule, string>> = {
+        one: 'torch',
+        other: 'torches',
+      };
+
+      host.formatValue = (value) => {
+        const unit = labels[pluralRules.select(value)] ?? labels.other ?? 'torches';
+        return `${value} ${unit}`;
+      };
+
+      const syncTotal = () => {
+        const quantity = host.value.now;
+        const lineTotal = quantity * unitPrice;
+        const unit = labels[pluralRules.select(quantity)] ?? labels.other ?? 'torches';
+        total.textContent = `${quantity} ${unit} · ${lineTotal} gp`;
+      };
+
+      host.addEventListener(EVENTS.SPINBUTTON_CHANGE, syncTotal);
+      syncTotal();
+
+      const stockEl = root.querySelector('[data-spinbutton-quantity-stock]');
+      if (stockEl) stockEl.textContent = String(stock);
+    }
+  }
+
+  {
+    const root = document.querySelector('[data-spinbutton-duration]');
+    const hours = document.getElementById('docs-spinbutton-duration-hours') as Spinbutton | null;
+    const minutes = document.getElementById(
+      'docs-spinbutton-duration-minutes',
+    ) as Spinbutton | null;
+    const summary = root?.querySelector<HTMLElement>('[data-spinbutton-duration-summary]');
+
+    if (root && hours && minutes && summary) {
+      const MAX_TOTAL = 23 * 60 + 59;
+      let minutesBeforeStep = minutes.value.now;
+
+      const syncSummary = () => {
+        const h = hours.value.now;
+        const m = minutes.value.now;
+
+        if (h === 0 && m === 0) {
+          summary.textContent = 'No rest';
+          return;
+        }
+
+        if (h === 0) {
+          summary.textContent = `${m} min rest`;
+          return;
+        }
+
+        if (m === 0) {
+          summary.textContent = `${h} h rest`;
+          return;
+        }
+
+        summary.textContent = `${h} h ${m} min rest`;
+      };
+
+      const setTotalMinutes = (total: number, emit = true) => {
+        const clamped = Math.min(Math.max(total, 0), MAX_TOTAL);
+        hours.setValue(Math.floor(clamped / 60), emit);
+        minutes.setValue(clamped % 60, false);
+        syncSummary();
+      };
+
+      const tryRollover = (direction: 1 | -1, previousMinutes: number) => {
+        const h = hours.value.now;
+        const m = minutes.value.now;
+
+        if (direction === 1 && previousMinutes === 59 && m === 59 && h < 23) {
+          setTotalMinutes(h * 60 + 60);
+          return true;
+        }
+
+        if (direction === -1 && previousMinutes === 0 && m === 0 && h > 0) {
+          setTotalMinutes(h * 60 - 1);
+          return true;
+        }
+
+        return false;
+      };
+
+      const afterMinutesStep = (direction: 1 | -1, previousMinutes: number) => {
+        window.requestAnimationFrame(() => {
+          if (!tryRollover(direction, previousMinutes)) {
+            syncSummary();
+          }
+        });
+      };
+
+      minutes.$increase?.addEventListener('mousedown', () => {
+        minutesBeforeStep = minutes.value.now;
+      });
+      minutes.$decrease?.addEventListener('mousedown', () => {
+        minutesBeforeStep = minutes.value.now;
+      });
+
+      minutes.$increase?.addEventListener('click', () => afterMinutesStep(1, minutesBeforeStep));
+      minutes.$decrease?.addEventListener('click', () => afterMinutesStep(-1, minutesBeforeStep));
+
+      minutes.$input?.addEventListener(
+        'keydown',
+        (event) => {
+          if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+          const previousMinutes = minutes.value.now;
+          const direction = event.key === 'ArrowUp' ? 1 : -1;
+          afterMinutesStep(direction, previousMinutes);
+        },
+        true,
+      );
+
+      hours.addEventListener(EVENTS.SPINBUTTON_CHANGE, syncSummary);
+      minutes.addEventListener(EVENTS.SPINBUTTON_CHANGE, syncSummary);
+      syncSummary();
+    }
+  }
+
+  {
+    const root = document.querySelector('[data-spinbutton-checkout]');
+    if (root) {
+      type TicketKey = 'adventurer' | 'henchman' | 'porter';
+
+      const TICKET_LABELS: Record<
+        TicketKey,
+        Partial<Record<Intl.LDMLPluralRule, string>>
+      > = {
+        adventurer: { one: 'adventurer', other: 'adventurers' },
+        henchman: { one: 'henchman', other: 'henchmen' },
+        porter: { one: 'porter', other: 'porters' },
+      };
+
+      const capacity = Number.parseInt(root.getAttribute('data-capacity') ?? '12', 10);
+      const summary = root.querySelector<HTMLElement>('[data-spinbutton-checkout-summary]');
+      const seats = [...root.querySelectorAll<HTMLElement>('[data-spinbutton-seats] > *')];
+      const locale = root.getAttribute('lang') ?? undefined;
+      const pluralRules = new Intl.PluralRules(locale);
+      const tickets = {} as Record<TicketKey, Spinbutton>;
+
+      root.querySelectorAll<Spinbutton>('cinq-spinbutton[data-ticket]').forEach((host) => {
+        const key = host.getAttribute('data-ticket') as TicketKey | null;
+        if (!key) return;
+
+        const labels = TICKET_LABELS[key];
+        host.formatValue = (value) => {
+          const form = pluralRules.select(value);
+          const unit = labels[form] ?? labels.other ?? key;
+          return `${value} ${unit}`;
+        };
+
+        tickets[key] = host;
+      });
+
+      const syncCheckout = () => {
+        const adventurer = tickets.adventurer.value.now;
+        const henchman = tickets.henchman.value.now;
+
+        if (tickets.porter.value.now > adventurer) {
+          tickets.porter.setValue(adventurer, false);
+        }
+
+        const porter = tickets.porter.value.now;
+        const taken = adventurer + henchman + porter;
+        const left = capacity - taken;
+
+        tickets.adventurer.setMax(adventurer + left, false);
+        tickets.henchman.setMax(henchman + left, false);
+        tickets.porter.setMax(Math.min(adventurer, porter + left), false);
+
+        const henchmanMaxEl = root.querySelector('[data-spinbutton-ticket-max="henchman"]');
+        const porterMaxEl = root.querySelector('[data-spinbutton-ticket-max="porter"]');
+        const henchmanMax = tickets.henchman.value.max;
+        const porterMax = tickets.porter.value.max;
+
+        if (henchmanMaxEl) {
+          henchmanMaxEl.textContent = henchmanMax === false ? '—' : String(henchmanMax);
+        }
+
+        if (porterMaxEl) {
+          porterMaxEl.textContent = porterMax === false ? '—' : String(porterMax);
+        }
+
+        const total = (['adventurer', 'henchman', 'porter'] as const).reduce((sum, key) => {
+          const price = Number.parseInt(tickets[key].getAttribute('data-price') ?? '0', 10);
+          return sum + tickets[key].value.now * price;
+        }, 0);
+
+        seats.forEach((seat, index) => {
+          seat.classList.remove('is-adventurer', 'is-henchman', 'is-porter');
+
+          if (index < adventurer) {
+            seat.classList.add('is-adventurer');
+          } else if (index < adventurer + henchman) {
+            seat.classList.add('is-henchman');
+          } else if (index < taken) {
+            seat.classList.add('is-porter');
+          }
+        });
+
+        if (summary) {
+          const slotsWord = pluralRules.select(left) === 'one' ? 'slot' : 'slots';
+          summary.textContent = `${taken} in party · ${total} gp upkeep · ${left} ${slotsWord} open`;
+        }
+      };
+
+      Object.values(tickets).forEach((host) => {
+        host.addEventListener(EVENTS.SPINBUTTON_CHANGE, syncCheckout);
+      });
+
+      syncCheckout();
     }
   }
 

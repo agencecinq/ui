@@ -51,40 +51,36 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 		return i(e(this.getAttribute("pixel"), 256), 0, 256);
 	}
 	#o() {
-		let e = this.$canvas;
-		return e ? {
-			width: e.clientWidth,
-			height: e.clientHeight
-		} : {
-			width: 0,
-			height: 0
+		let { clientWidth: e, clientHeight: t } = this.$canvas;
+		return {
+			width: e,
+			height: t
 		};
 	}
 	#s(e, t) {
-		let n = this.$img, r = n.naturalWidth, i = n.naturalHeight, a = Math.max(e / r, t / i), o = r * a, s = i * a, c = (e - o) / 2, l = (t - s) / 2;
+		let n = this.$img.naturalWidth, r = this.$img.naturalHeight, i = Math.max(e / n, t / r), a = n * i, o = r * i, s = (e - a) / 2, c = (t - o) / 2;
 		return {
-			sx: Math.max(0, -c / a),
-			sy: Math.max(0, -l / a),
-			sw: e / a,
-			sh: t / a
+			sx: Math.max(0, -s / i),
+			sy: Math.max(0, -c / i),
+			sw: e / i,
+			sh: t / i
 		};
 	}
 	#c(e, t, n, r, i, a) {
-		let o = this.$canvas, s = this.$img, c = this.#e, l = window.devicePixelRatio || 1, u = Math.round(e * l), d = Math.round(t * l);
-		(o.width !== u || o.height !== d) && (o.width = u, o.height = d), c.setTransform(l, 0, 0, l, 0, 0), c.clearRect(0, 0, e, t), c.imageSmoothingEnabled = !0, c.drawImage(s, n, r, i, a, 0, 0, e, t);
+		let o = window.devicePixelRatio || 1, s = Math.round(e * o), c = Math.round(t * o);
+		(this.$canvas.width !== s || this.$canvas.height !== c) && (this.$canvas.width = s, this.$canvas.height = c), this.#e.setTransform(o, 0, 0, o, 0, 0), this.#e.clearRect(0, 0, e, t), this.#e.imageSmoothingEnabled = !0, this.#e.drawImage(this.$img, n, r, i, a, 0, 0, e, t);
 	}
 	#l() {
-		let e = this.$canvas, t = this.$img, n = this.#e;
-		if (!e || !t || !n || !t.complete) return;
-		let { width: r, height: i } = this.#o();
-		if (r === 0 || i === 0) return;
-		let a = this.#a(), { sx: o, sy: s, sw: c, sh: l } = this.#s(r, i);
-		if (a <= 1) {
-			this.#c(r, i, o, s, c, l);
+		if (!this.$canvas || !this.$img || !this.#e || !this.$img.complete) return;
+		let { width: e, height: t } = this.#o();
+		if (e === 0 || t === 0) return;
+		let n = this.#a(), { sx: r, sy: i, sw: a, sh: o } = this.#s(e, t);
+		if (n <= 1) {
+			this.#c(e, t, r, i, a, o);
 			return;
 		}
-		let u = Math.max(1, Math.ceil(r / a)), d = Math.max(1, Math.ceil(i / a));
-		(e.width !== u || e.height !== d) && (e.width = u, e.height = d), n.setTransform(1, 0, 0, 1, 0, 0), n.clearRect(0, 0, u, d), n.imageSmoothingEnabled = !1, n.drawImage(t, o, s, c, l, 0, 0, u, d);
+		let s = Math.max(1, Math.ceil(e / n)), c = Math.max(1, Math.ceil(t / n));
+		(this.$canvas.width !== s || this.$canvas.height !== c) && (this.$canvas.width = s, this.$canvas.height = c), this.#e.setTransform(1, 0, 0, 1, 0, 0), this.#e.clearRect(0, 0, s, c), this.#e.imageSmoothingEnabled = !1, this.#e.drawImage(this.$img, r, i, a, o, 0, 0, s, c);
 	}
 };
 customElements.get("cinq-pixelate") || customElements.define("cinq-pixelate", s);

@@ -178,17 +178,6 @@ var v = class extends HTMLElement {
 			resolve: n
 		}, { bubbles: !1 }) ? (n(), !0) : this.hasAttribute("open");
 	}
-	#a() {
-		this.$panel?.removeEventListener("transitionend", this.#i), this.style.setProperty("opacity", "1"), this.style.setProperty("visibility", "visible"), p(this.trigger), t(document.documentElement, e.DRAWER_OPEN, {
-			drawer: this.id,
-			trigger: this.trigger
-		}, {
-			bubbles: !1,
-			cancelable: !1
-		});
-		let n = this.trap || this, r = f(n);
-		r.length > 0 && g(n, r[0]), s();
-	}
 	close() {
 		if (!this.hasAttribute("open")) return !1;
 		let n = () => this.removeAttribute("open");
@@ -201,7 +190,15 @@ var v = class extends HTMLElement {
 	attributeChangedCallback(n, r, i) {
 		if (!(!this.isConnected || n !== "open")) {
 			if (i !== null) {
-				this.#a();
+				this.$panel?.removeEventListener("transitionend", this.#i), this.style.setProperty("opacity", "1"), this.style.setProperty("visibility", "visible"), p(this.trigger), t(document.documentElement, e.DRAWER_OPEN, {
+					drawer: this.id,
+					trigger: this.trigger
+				}, {
+					bubbles: !1,
+					cancelable: !1
+				});
+				let n = this.trap || this, r = f(n);
+				r.length > 0 && g(n, r[0]), s();
 				return;
 			}
 			this.$panel?.removeEventListener("transitionend", this.#i), _(), c(!1), h(this), t(document.documentElement, e.DRAWER_CLOSE, { drawer: this.id }, {

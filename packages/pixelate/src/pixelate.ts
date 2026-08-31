@@ -117,24 +117,19 @@ export class Pixelate extends HTMLElement {
   }
 
   #layout(): { width: number; height: number } {
-    const canvas = this.$canvas;
+    const { clientWidth: width, clientHeight: height } = this.$canvas!;
 
-    if (!canvas) {
-      return { width: 0, height: 0 };
-    }
-
-    return { width: canvas.clientWidth, height: canvas.clientHeight };
+    return { width, height };
   }
 
-  // drawImage source crop — sx/sy top-left in the image, sw/sh width and height
+  // drawImage source crop: sx/sy top-left in the image, sw/sh width and height
   #rect(
     width: number,
     height: number,
   ): { sx: number; sy: number; sw: number; sh: number } {
     // Centered cover: map the canvas box back onto natural image coordinates
-    const img = this.$img!;
-    const iw = img.naturalWidth;
-    const ih = img.naturalHeight;
+    const iw = this.$img!.naturalWidth;
+    const ih = this.$img!.naturalHeight;
     const scale = Math.max(width / iw, height / ih);
     const dw = iw * scale;
     const dh = ih * scale;
@@ -158,30 +153,27 @@ export class Pixelate extends HTMLElement {
     sh: number,
   ): void {
     // Sharp image: hi-DPR buffer, smoothing on
-    const canvas = this.$canvas!;
-    const img = this.$img!;
-    const context = this.#context!;
     const dpr = window.devicePixelRatio || 1;
     const bufferWidth = Math.round(width * dpr);
     const bufferHeight = Math.round(height * dpr);
 
-    if (canvas.width !== bufferWidth || canvas.height !== bufferHeight) {
-      canvas.width = bufferWidth;
-      canvas.height = bufferHeight;
+    if (
+      this.$canvas!.width !== bufferWidth ||
+      this.$canvas!.height !== bufferHeight
+    ) {
+      this.$canvas!.width = bufferWidth;
+      this.$canvas!.height = bufferHeight;
     }
 
-    context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    context.clearRect(0, 0, width, height);
-    context.imageSmoothingEnabled = true;
-    context.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
+    this.#context!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.#context!.clearRect(0, 0, width, height);
+    // Resizing the bitmap resets the context. Set smoothing before each draw.
+    this.#context!.imageSmoothingEnabled = true;
+    this.#context!.drawImage(this.$img!, sx, sy, sw, sh, 0, 0, width, height);
   }
 
   #draw(): void {
-    const canvas = this.$canvas;
-    const img = this.$img;
-    const context = this.#context;
-
-    if (!canvas || !img || !context || !img.complete) {
+    if (!this.$canvas || !this.$img || !this.#context || !this.$img.complete) {
       return;
     }
 
@@ -203,16 +195,20 @@ export class Pixelate extends HTMLElement {
     const sampleWidth = Math.max(1, Math.ceil(width / pixel));
     const sampleHeight = Math.max(1, Math.ceil(height / pixel));
 
-    if (canvas.width !== sampleWidth || canvas.height !== sampleHeight) {
-      canvas.width = sampleWidth;
-      canvas.height = sampleHeight;
+    if (
+      this.$canvas.width !== sampleWidth ||
+      this.$canvas.height !== sampleHeight
+    ) {
+      this.$canvas.width = sampleWidth;
+      this.$canvas.height = sampleHeight;
     }
 
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, sampleWidth, sampleHeight);
-    context.imageSmoothingEnabled = false;
-    context.drawImage(
-      img,
+    this.#context.setTransform(1, 0, 0, 1, 0, 0);
+    this.#context.clearRect(0, 0, sampleWidth, sampleHeight);
+    // Resizing the bitmap resets the context. Set smoothing before each draw.
+    this.#context.imageSmoothingEnabled = false;
+    this.#context.drawImage(
+      this.$img,
       sx,
       sy,
       sw,

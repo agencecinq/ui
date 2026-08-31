@@ -27,7 +27,7 @@ import "@agencecinq/combobox";
 ```
 
 Then write the WAI-ARIA markup explicitly — the component adds interactivity
-only. Assign a **`search`** function on the host; mounting waits until both the
+only. Assign a **`search`** function on the host. Mounting waits until both the
 element is connected and `search` is set.
 
 ```html
@@ -66,7 +66,7 @@ host.search = (value, { signal }) => {
 };
 ```
 
-`search` may return an array or a `Promise`. Stale responses are ignored; the
+`search` may return an array or a `Promise`. Stale responses are ignored. The
 previous `AbortSignal` is aborted when a newer search starts.
 
 | Mode | Who owns the listbox DOM | Typical use |
@@ -80,7 +80,7 @@ previous `AbortSignal` is aborted when a newer search starts.
 | -------------------- | -------- | ---- |
 | `<cinq-combobox>` | **Yes** | Host wrapper. |
 | `input` ‖ `[role="combobox"]` | **Yes** | Focusable textbox. |
-| `[role="listbox"]` with stable `id` | **Yes** | Popup list; referenced by `aria-controls`. |
+| `[role="listbox"]` with stable `id` | **Yes** | Popup list, referenced by `aria-controls`. |
 | `role="combobox"` + `aria-autocomplete="list"` | **Yes** | On the input. |
 | `aria-controls` / `aria-expanded` | **Yes** | On the input (and optional button). |
 | Optional `button[aria-controls]` | No | Open/close toggle (`tabindex="-1"`). |
@@ -93,7 +93,7 @@ Configure via data attributes on the host (observed at runtime), or properties f
 | Attribute / property | Type | Default | Description |
 | -------------------- | ---- | ------- | ----------- |
 | `value` | `string` | `""` | Mirrored textbox value. Setting it updates the input without opening the list or firing `combobox:submit`. |
-| `disabled` | boolean | `false` | Disables the input and open button; closes the list if open. |
+| `disabled` | boolean | `false` | Disables the input and open button. Closes the list if open. |
 | `expanded` | boolean | `false` | Reflected open state. Setting it opens / closes the list from outside. |
 | `busy` | boolean | `false` | Reflected while a search is in flight (mirrors `aria-busy` on the listbox). |
 | `search` (property) | `SearchFn` | — | **Required.** `(value, { signal }) => SearchResult \| Promise<…>` |
@@ -173,12 +173,45 @@ $host.addEventListener(EVENTS.COMBOBOX_SUBMIT, ({ detail }) => {
 | `Alt` + `↓` | Open list without moving visual focus |
 | `↑` | Open list and move to last / previous option |
 | `Alt` + `↑` | Open list without moving visual focus |
-| `Enter` | Accept focused option; without focus, close and allow form submit |
+| `Enter` | Accept focused option. Without focus, close and allow form submit |
 | `Escape` | Close list, or clear field if already closed |
 | `Tab` | Accept focused option, otherwise close |
 | `Home` / `End` / `←` / `→` | Return editing to the textbox when an option has visual focus |
 
-DOM focus stays on the textbox; visual focus uses `aria-activedescendant`.
+DOM focus stays on the textbox. Visual focus uses `aria-activedescendant`.
+
+## Styling the listbox
+
+The component does not position the popup — you own listbox CSS. For viewport-aware placement (flip when near the bottom edge, escape `overflow: hidden` ancestors), use [CSS Anchor Positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning):
+
+```css
+cinq-combobox {
+  anchor-name: --combobox-anchor;
+  anchor-scope: --combobox-anchor; /* one name per host on the page */
+}
+
+cinq-combobox [role="listbox"] {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+}
+
+@supports (anchor-name: --x) and (position-anchor: --x) {
+  cinq-combobox [role="listbox"] {
+    position: fixed;
+    position-anchor: --combobox-anchor;
+    top: anchor(bottom);
+    left: anchor(left);
+    width: anchor-size(width);
+    right: auto;
+    margin-top: 0.25rem;
+    position-try-fallbacks: flip-block;
+  }
+}
+```
+
+`position: fixed` + anchor keeps the list in the top layer relative to the viewport while `flip-block` opens upward when there is not enough space below.
 
 ## Playground (live)
 

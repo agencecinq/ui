@@ -1,4 +1,8 @@
-import { HideOptions, Mode, OnSelect, Option, Render, SearchFn, SelectMode, Write } from './types.js';
+import { HideOptions, Mode, OnSelect, Option, OptionRenderProps, Render, SearchFn, SelectMode, Write } from './types.js';
+/** Build plain props for a managed `[role="option"]`. */
+export declare function optionRenderProps(index: number, selectedIndex: number, listboxId: string, size: number): OptionRenderProps;
+/** Serialize managed option ARIA attributes for HTML markup. */
+export declare function serializeOptionAttrs({ id, index, size, selected, }: OptionRenderProps): string;
 /**
  * Editable combobox with list autocomplete Web Component.
  *

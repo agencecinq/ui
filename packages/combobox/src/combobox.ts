@@ -1,12 +1,12 @@
 import { EVENTS, dispatchEvent, parseBoolean, parseNumber } from "@agencecinq/utils";
-import Props from "./Props.js";
 import Keyboard from "./keyboard.js";
 import type {
-  EmptyDetail,
+  Detail,
   HideOptions,
   Mode,
   OnSelect,
   Option,
+  OptionRenderProps,
   Render,
   RunOptions,
   SearchFn,
@@ -20,7 +20,35 @@ const DEFAULT_WRITE: Write = (el, value) => {
   el.value = value;
 };
 
-const DEFAULT_RENDER: Render = (result, props) => `<li${props}>${result}</li>`;
+/** Build plain props for a managed `[role="option"]`. */
+export function optionRenderProps(
+  index: number,
+  selectedIndex: number,
+  listboxId: string,
+  size: number,
+): OptionRenderProps {
+  return {
+    id: `${listboxId}-option-${index}`,
+    index,
+    size,
+    selected: index === selectedIndex,
+  };
+}
+
+/** Serialize managed option ARIA attributes for HTML markup. */
+export function serializeOptionAttrs({
+  id,
+  index,
+  size,
+  selected,
+}: OptionRenderProps): string {
+  const selectedAttr = selected ? ' aria-selected="true"' : "";
+
+  return ` id="${id}" role="option" aria-posinset="${index + 1}" aria-setsize="${size}"${selectedAttr}`;
+}
+
+const DEFAULT_RENDER: Render = (label, props) =>
+  `<li${serializeOptionAttrs(props)}>${label}</li>`;
 
 const CONFIG_ATTRIBUTES = [
   "data-combobox-mode",
@@ -585,7 +613,7 @@ export class Combobox extends HTMLElement {
     const { id } = this.#listbox;
 
     labels.forEach((label, i) => {
-      const props = new Props(i, index, id, length);
+      const props = optionRenderProps(i, index, id, length);
 
       this.#listbox.insertAdjacentHTML(
         "beforeend",
@@ -684,7 +712,7 @@ export class Combobox extends HTMLElement {
       this.#abort();
       this.#searchId += 1;
       this.#clear();
-      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
+      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies Detail);
       this.hide({ force: true });
       return;
     }
@@ -737,7 +765,7 @@ export class Combobox extends HTMLElement {
     this.#setLoading(false);
 
     if (0 === this.options.length) {
-      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
+      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies Detail);
 
       if (this.openOnEmpty) {
         this.show();

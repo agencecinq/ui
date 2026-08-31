@@ -1,5 +1,6 @@
 {
   "$schema": "https://v2-10-5.turborepo.dev/schema.json",
+  "concurrency": "15",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

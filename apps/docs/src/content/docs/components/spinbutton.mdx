@@ -82,17 +82,15 @@ all ARIA state lives on the focusable `<input>`. The host carries no ARIA state.
 
 ## Markup variants
 
-The playground below covers every supported markup pattern:
-
-| Variant | When to use |
-| ------- | ----------- |
+| Variant | Notes |
+| ------- | ----- |
 | `input type="number"` | Default. Implicit `role="spinbutton"`. |
-| `input type="text"` + `role="spinbutton"` | Free typing without native number spinners. |
-| `aria-label` | Compact controls with no visible label. |
-| `aria-labelledby` | Name lives in a separate visible element. |
-| Input only | No + / − buttons. Keyboard and programmatic API still work. |
-| `formatValue` (property) | Optional formatter for `aria-valuetext` and the optional `[aria-live]` child. |
-| Bounded / unbounded | `aria-valuemin` / `aria-valuemax` are each optional. |
+| `input type="text"` + `role="spinbutton"` | Free typing without native number spinners. Add `inputmode="numeric"`. |
+| `aria-label` | Accessible name on the `<input>` when no visible label is shown. |
+| `aria-labelledby` | Accessible name from a separate element via `id` reference. |
+| Input only | Host contains only an `<input>`. No `button[name="increase"]` or `button[name="decrease"]`. Keyboard and programmatic API still work. |
+| `[aria-live]` | Optional child inside the host. Receives `textContent` when `formatValue` is set. |
+| `aria-valuemin` / `aria-valuemax` | Each optional. Omit either bound for an open range on that side. |
 
 ### `input type="text"`
 
@@ -107,6 +105,31 @@ The playground below covers every supported markup pattern:
   aria-valuenow="50"
   value="50"
 />
+```
+
+### `aria-labelledby`
+
+```html
+<span id="rations-label">Rations (days)</span>
+
+<cinq-spinbutton>
+  <button name="decrease" type="button" aria-label="Decrease rations" tabindex="-1">
+    −
+  </button>
+
+  <input
+    type="number"
+    aria-labelledby="rations-label"
+    aria-valuemin="1"
+    aria-valuemax="30"
+    aria-valuenow="7"
+    value="7"
+  />
+
+  <button name="increase" type="button" aria-label="Increase rations" tabindex="-1">
+    +
+  </button>
+</cinq-spinbutton>
 ```
 
 ### Input only (no buttons)
@@ -129,7 +152,32 @@ The playground below covers every supported markup pattern:
 Pluralisation depends on locale (English: one/other; Polish: one/few/many/other;
 Arabic: six categories). Do not hard-code `value === 1` in a Web Component.
 Assign `formatValue` and use `Intl.PluralRules` (or your i18n library) in the
-app layer:
+app layer. Add one `[aria-live]` child inside the host when you want screen
+readers to hear the formatted string on every change (typical pattern: hide it
+with a screen-reader-only class).
+
+```html
+<cinq-spinbutton>
+  <button name="decrease" type="button" aria-label="Decrease" tabindex="-1">
+    −
+  </button>
+
+  <input
+    type="number"
+    aria-label="Spell level"
+    aria-valuemin="0"
+    aria-valuemax="9"
+    aria-valuenow="1"
+    value="1"
+  />
+
+  <button name="increase" type="button" aria-label="Increase" tabindex="-1">
+    +
+  </button>
+
+  <div aria-live="polite" aria-atomic="true" class="sr-only"></div>
+</cinq-spinbutton>
+```
 
 ```js
 const host = document.querySelector("cinq-spinbutton");
@@ -166,6 +214,11 @@ When `formatValue` is set, assistive technologies may announce its return value
 **instead of** the raw number in `aria-valuenow`. Phrase the string as a complete,
 grammatically correct label (e.g. `"5 levels"`, not `"levels"` alone).
 
+The component finds the live region with `querySelector("[aria-live]")` and sets
+`textContent` to the same string as `aria-valuetext`. It never creates or styles
+that node. For a visible readout in your UI, skip `sr-only` or mirror
+`aria-valuetext` in a separate element.
+
 ## Accessibility
 
 ### Accessible label is required
@@ -175,8 +228,6 @@ The input **must** have an accessible name. Use one of:
 - `aria-label="…"` on the `<input>`
 - `aria-labelledby="some-id"` referencing a visible label
 - Visible label text associated with the input (via `<label>` or `aria-labelledby`)
-
-The component does not check this. Rely on axe-core / Lighthouse / your CI.
 
 ### Buttons must be out of the tab order
 
@@ -207,8 +258,8 @@ Configured via data attributes on the host:
 
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
-| `data-spinbutton-step` | number | `1` | Increment used by buttons and arrow keys. |
-| `data-spinbutton-delay` | number | `100` | Minimum interval (ms) between `spinbutton-change` dispatches during rapid value changes. DOM updates are not throttled. |
+| `data-step` | number | `1` | Increment used by buttons and arrow keys. |
+| `data-delay` | number | `100` | Minimum interval (ms) between `spinbutton-change` dispatches during rapid value changes. DOM updates are not throttled. |
 
 ### Methods
 
@@ -236,7 +287,7 @@ Configured via data attributes on the host:
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `spinbutton-change` | Yes | value: number | Throttled notification when the value changes (see `data-spinbutton-delay`). |
+| `spinbutton-change` | Yes | value: number | Throttled notification when the value changes (see `data-delay`). |
 
 The event is dispatched on `<cinq-spinbutton>` (bubbles). The typed value is
 committed on `change` (blur / Enter), not on every keystroke, so the user can

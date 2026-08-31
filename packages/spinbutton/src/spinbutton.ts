@@ -60,9 +60,6 @@ export class Spinbutton extends HTMLElement {
     this.$live = null;
   }
 
-  /**
-   * Bind markup + listeners. Call {@link destroy} first if already bound.
-   */
   init(): void {
     this.$input = this.querySelector<HTMLInputElement>("input");
 
@@ -79,11 +76,11 @@ export class Spinbutton extends HTMLElement {
     this.$live = this.querySelector<HTMLElement>("[aria-live]");
 
     this.options.step = parseNumber(
-      this.getAttribute("data-spinbutton-step"),
+      this.getAttribute("data-step"),
       DEFAULTS.step,
     );
     this.options.delay = parseNumber(
-      this.getAttribute("data-spinbutton-delay"),
+      this.getAttribute("data-delay"),
       DEFAULTS.delay,
     );
 
@@ -107,9 +104,13 @@ export class Spinbutton extends HTMLElement {
     }, this.options.delay);
   }
 
-  #handleChange = (event: Event): void => {
-    const target = event.target as HTMLInputElement;
-    this.setValue(parseNumber(target.value, this.value.now));
+  #handleChange = ({ target }: Event): void => {
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const { value } = target;
+    this.setValue(parseNumber(value, this.value.now));
   };
 
   #handleKeydown = (event: KeyboardEvent): void => {

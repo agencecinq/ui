@@ -110,16 +110,18 @@ When `prefers-reduced-motion: reduce` is set, hide the canvas and show the
 
 ## Rendering
 
-1. **JS** crops the `<img>` with centered **cover**, then draws into the
-   `<canvas>` bitmap.
-2. **CSS** upscales that bitmap to the host size.
+The component draws the bitmap. **You** style how the `<canvas>` is displayed.
 
-When `pixel` is above `1`, the canvas buffer is **smaller** than the display
-box. Stretch it with `width` / `height: 100%` and
-`image-rendering: pixelated` for blocky edges.
+1. **JS** (component) — centered **cover** crop, then draw into the canvas buffer.
+   When `pixel` > `1`, the buffer is smaller than the host. `imageSmoothingEnabled =
+   false` keeps the downsample sharp inside that buffer.
+2. **CSS** (consumer) — stretch the canvas to the host (`width` / `height: 100%`).
+   Set **`image-rendering: pixelated`** on the canvas for blocky upscale edges
+   (typical look). Use `auto` for a softer mosaic, or `crisp-edges` where it
+   behaves better in your target browsers.
 
-At `0` or `1`, the buffer matches the display size (× `devicePixelRatio` for
-a sharp result).
+At `pixel` `0` or `1`, the buffer matches the display size (× `devicePixelRatio`
+for a sharp result). `image-rendering` on the canvas has little effect there.
 
 ## Attributes
 
@@ -335,7 +337,7 @@ Drive `pixel` (block size) from a bounded numeric control. Decrease for
 sharper, increase for blockier:
 
 ```html
-<cinq-spinbutton data-spinbutton-step="8">
+<cinq-spinbutton data-step="8">
   <button type="button" name="decrease" tabindex="-1" aria-label="Decrease">
     −
   </button>

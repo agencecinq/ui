@@ -121,8 +121,8 @@ who do reach them via swipe gestures still get a meaningful name.
 
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
-| `data-spinbutton-step` | number | `1` | Increment used by buttons and arrow keys. |
-| `data-spinbutton-delay` | number | `100` | Minimum interval (ms) between `spinbutton-change` dispatches during rapid value changes. DOM updates are not throttled. |
+| `data-step` | number | `1` | Increment used by buttons and arrow keys. |
+| `data-delay` | number | `100` | Minimum interval (ms) between `spinbutton-change` dispatches during rapid value changes. DOM updates are not throttled. |
 
 | Property | Description |
 | -------- | ----------- |
@@ -193,7 +193,7 @@ $spinbutton.init();
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `spinbutton-change` | Yes | value: number | Throttled notification when the value changes (see `data-spinbutton-delay`). |
+| `spinbutton-change` | Yes | value: number | Throttled notification when the value changes (see `data-delay`). |
 
 ```js
 import { EVENTS } from "@agencecinq/utils";

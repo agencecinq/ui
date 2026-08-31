@@ -1,7 +1,13 @@
-import type Props from "./Props.js";
+/** Plain props passed to `render` when building managed options. */
+export type OptionRenderProps = {
+  id: string;
+  index: number;
+  size: number;
+  selected: boolean;
+};
 
-/** How the listbox DOM is produced. */
-export type Mode = "managed" | "external";
+export type Write = (input: HTMLInputElement, value: string) => void;
+export type Render = (label: string, props: OptionRenderProps) => string;
 
 /**
  * What happens when an option is accepted (Enter, click, Tab with visual focus).
@@ -35,32 +41,25 @@ export type SearchResult =
   | string[]
   | HTMLElement[]
   | {
-      html?: string;
-      options?: string[] | HTMLElement[];
-    };
+    html?: string;
+    options?: string[] | HTMLElement[];
+  };
 
 export type SearchFn = (
   value: string,
   context: SearchContext,
 ) => SearchResult | Promise<SearchResult>;
 
-export type Write = (input: HTMLInputElement, value: string) => void;
-export type Render = (result: string, props: Props) => string;
+/** How the listbox DOM is produced. */
+export type Mode = "managed" | "external";
 
-export type SelectDetail = {
+export type Detail = {
+  value: string;
+};
+
+export type SelectDetail = Detail & {
   option: Option | null;
   index: number;
-  value: string;
-};
-
-export type UpdateDetail = {
-  options: Option[];
-  index: number;
-  value: string;
-};
-
-export type EmptyDetail = {
-  value: string;
 };
 
 export type OnSelect = (detail: SelectDetail) => void;

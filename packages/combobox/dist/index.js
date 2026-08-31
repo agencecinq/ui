@@ -1,8 +1,12 @@
 //#region ../utils/dist/index.js
 var e = {
+	DRAWER_BEFORE_CLOSE: "drawer-before-close",
+	DRAWER_BEFORE_OPEN: "drawer-before-open",
 	DRAWER_CLOSE: "drawer-close",
 	DRAWER_OPEN: "drawer-open",
 	DRAWER_TOGGLE: "drawer-toggle",
+	MODAL_BEFORE_CLOSE: "modal-before-close",
+	MODAL_BEFORE_OPEN: "modal-before-open",
 	MODAL_CLOSE: "modal-close",
 	MODAL_OPEN: "modal-open",
 	MODAL_TOGGLE: "modal-toggle",
@@ -48,21 +52,8 @@ var e = {
 }, a = document.documentElement, { body: o } = document;
 a.hasAttribute("data-debug"), window.addEventListener("pointermove", i(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
 //#endregion
-//#region src/Props.ts
+//#region src/keyboard.ts
 var s = class {
-	id;
-	role;
-	"aria-posinset";
-	"aria-setsize";
-	"aria-selected";
-	constructor(e, t, n, r) {
-		this.id = `${n}-option-${e}`, this.role = "option", this["aria-posinset"] = e + 1, this["aria-setsize"] = r, e === t && (this["aria-selected"] = "true");
-	}
-	toString() {
-		let e = this;
-		return Object.keys(this).reduce((t, n) => `${t} ${n}="${e[n]}"`, "");
-	}
-}, c = class {
 	#e;
 	constructor(e) {
 		this.#e = e;
@@ -158,21 +149,34 @@ var s = class {
 		let { length: n } = t.input.value;
 		t.input.setSelectionRange(n, n);
 	}
-}, l = (e, t) => {
+}, c = (e, t) => {
 	e.value = t;
-}, u = (e, t) => `<li${t}>${e}</li>`, d = [
+};
+function l(e, t, n, r) {
+	return {
+		id: `${n}-option-${e}`,
+		index: e,
+		size: r,
+		selected: e === t
+	};
+}
+function u({ id: e, index: t, size: n, selected: r }) {
+	let i = r ? " aria-selected=\"true\"" : "";
+	return ` id="${e}" role="option" aria-posinset="${t + 1}" aria-setsize="${n}"${i}`;
+}
+var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	"data-combobox-mode",
 	"data-combobox-select-mode",
 	"data-combobox-debounce",
 	"data-combobox-min-length",
 	"data-combobox-open-on-empty",
 	"data-combobox-autoselect"
-], f = class extends HTMLElement {
+], p = class extends HTMLElement {
 	static observedAttributes = [
 		"value",
 		"disabled",
 		"expanded",
-		...d
+		...f
 	];
 	$input = null;
 	$listbox = null;
@@ -187,12 +191,12 @@ var s = class {
 	debounce = 0;
 	minLength = 0;
 	openOnEmpty = !1;
-	write = l;
+	write = c;
 	onSelect = null;
 	#e = "";
 	#t = !1;
 	#n = null;
-	#r = u;
+	#r = d;
 	#i = 0;
 	#a = null;
 	#o = null;
@@ -221,7 +225,7 @@ var s = class {
 				});
 				return;
 			}
-			d.includes(e) && this.#d();
+			f.includes(e) && this.#d();
 		}
 	}
 	get value() {
@@ -318,7 +322,7 @@ var s = class {
 		if (this.$input = this.querySelector("[role=\"combobox\"]") || this.querySelector("input"), this.$listbox = this.querySelector("[role=\"listbox\"]") || this.querySelector("[data-combobox-listbox]"), this.$button = this.querySelector("[data-combobox-button]") || null, !this.isConnected || !this.$input || !this.$listbox || !this.#n) return;
 		this.#d(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list", this.$button ||= this.#p();
 		let e = this.getAttribute("value");
-		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new c(this), this.#D(-1), this.hide({
+		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new s(this), this.#D(-1), this.hide({
 			force: !0,
 			clear: !1
 		}), this.#m(), this.#c = !0;
@@ -396,7 +400,7 @@ var s = class {
 		this.#u.innerHTML = "";
 		let { length: n } = t, { id: r } = this.#u;
 		t.forEach((t, i) => {
-			let a = new s(i, e, r, n);
+			let a = l(i, e, r, n);
 			this.#u.insertAdjacentHTML("beforeend", this.#r(t, a));
 		}), this.#D(e);
 	}
@@ -554,6 +558,6 @@ var s = class {
 		this.#l = !0, e ? this.setAttribute("busy", "") : this.removeAttribute("busy"), this.#l = !1;
 	}
 };
-customElements.get("cinq-combobox") || customElements.define("cinq-combobox", f);
+customElements.get("cinq-combobox") || customElements.define("cinq-combobox", p);
 //#endregion
-export { f as Combobox, s as Props };
+export { p as Combobox, l as optionRenderProps, u as serializeOptionAttrs };

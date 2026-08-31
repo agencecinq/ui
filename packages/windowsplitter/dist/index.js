@@ -1,8 +1,12 @@
 //#region ../utils/dist/index.js
 var e = {
+	DRAWER_BEFORE_CLOSE: "drawer-before-close",
+	DRAWER_BEFORE_OPEN: "drawer-before-open",
 	DRAWER_CLOSE: "drawer-close",
 	DRAWER_OPEN: "drawer-open",
 	DRAWER_TOGGLE: "drawer-toggle",
+	MODAL_BEFORE_CLOSE: "modal-before-close",
+	MODAL_BEFORE_OPEN: "modal-before-open",
 	MODAL_CLOSE: "modal-close",
 	MODAL_OPEN: "modal-open",
 	MODAL_TOGGLE: "modal-toggle",

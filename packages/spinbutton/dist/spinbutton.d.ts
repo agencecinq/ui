@@ -16,9 +16,6 @@ export declare class Spinbutton extends HTMLElement {
     set formatValue(fn: FormatValue | undefined);
     connectedCallback(): void;
     disconnectedCallback(): void;
-    /**
-     * Bind markup + listeners. Call {@link destroy} first if already bound.
-     */
     init(): void;
     decrease: () => void;
     increase: () => void;
