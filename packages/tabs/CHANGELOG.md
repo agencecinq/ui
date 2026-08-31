@@ -1,5 +1,11 @@
 # @agencecinq/tabs
 
+## 11.0.0
+
+### Major Changes
+
+- Rename host data attributes: drop the `tabs` prefix (`data-hash`, `data-delay`).
+
 ## 10.0.4
 
 ### Patch Changes

@@ -1,0 +1,142 @@
+---
+title: Utils
+description: Shared helpers and event constants for CINQ UI Web Components (`@agencecinq/utils`).
+---
+
+`@agencecinq/utils` is the shared contract between CINQ UI packages: event
+names, a small `dispatchEvent` helper, focus/scroll utilities, and attribute
+parsers. Every component doc assumes these conventions. This page is the single
+reference when you wire events or reuse overlay helpers in your own code.
+
+## Install
+
+```bash
+pnpm add @agencecinq/utils
+```
+
+Most component packages list `@agencecinq/utils` as a peer dependency. Import
+from the package directly when you listen to events or call helpers:
+
+```js
+import { EVENTS, dispatchEvent, disableScroll, enableScroll } from "@agencecinq/utils";
+```
+
+## Event naming
+
+Custom events follow **`{package}:{action}`** in kebab-case:
+
+- `drawer:before-open`, `tabs:activate`, `accordion:open`
+- Constants live on `EVENTS` (e.g. `EVENTS.DRAWER_OPEN` to `"drawer:open"`)
+
+Prefer `EVENTS.*` over string literals so renames stay centralized.
+
+### Where to listen
+
+| Target | Packages | Notes |
+| ------ | -------- | ----- |
+| `document.documentElement` | Drawer, Modal | Open/close/toggle and before-hooks. `before-*` events use `bubbles: false`. |
+| Host custom element | Spinbutton, Switch, Combobox, Window Splitter, Calendar | Listen on the `<cinq-*>` instance. |
+| Panel / tab child (bubbles) | Accordion, Tabs | Fired on `[data-panel]` or `[role="tab"]`. Listen on `<cinq-accordion>` / `<cinq-tabs>` or the child. |
+| Trigger button | Disclosure Button | Fired on the slotted `<button>`. |
+
+### Cancelable hooks
+
+Several packages dispatch a **before** event with `detail.resolve()` (Drawer,
+Modal) or rely on `preventDefault()` (Accordion, Tabs, Disclosure Button).
+When `dispatchEvent` returns `false`, the component aborts the state change.
+
+```js
+document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_OPEN, (event) => {
+  event.preventDefault();
+  loadBestiary().then(() => event.detail.resolve());
+});
+```
+
+## `EVENTS` catalog
+
+Grouped by package. See each component page for payload shapes and examples.
+
+| Constant | Event | Cancelable | Component |
+| -------- | ----- | ---------- | --------- |
+| `DRAWER_TOGGLE` | `drawer:toggle` | Yes | Drawer button |
+| `DRAWER_BEFORE_OPEN` | `drawer:before-open` | Yes | Drawer |
+| `DRAWER_OPEN` | `drawer:open` | No | Drawer |
+| `DRAWER_BEFORE_CLOSE` | `drawer:before-close` | Yes | Drawer |
+| `DRAWER_CLOSE` | `drawer:close` | No | Drawer |
+| `MODAL_TOGGLE` | `modal:toggle` | Yes | Modal button |
+| `MODAL_BEFORE_OPEN` | `modal:before-open` | Yes | Modal |
+| `MODAL_OPEN` | `modal:open` | No | Modal |
+| `MODAL_BEFORE_CLOSE` | `modal:before-close` | Yes | Modal |
+| `MODAL_CLOSE` | `modal:close` | No | Modal |
+| `TABS_BEFORE_ACTIVATE` | `tabs:before-activate` | Yes | Tabs |
+| `TABS_ACTIVATE` | `tabs:activate` | No | Tabs |
+| `TABS_DELETE` | `tabs:delete` | No | Tabs |
+| `ACCORDION_OPEN` | `accordion:open` | Yes | Accordion |
+| `ACCORDION_CLOSE` | `accordion:close` | Yes | Accordion |
+| `DISCLOSURE_BUTTON_OPEN` | `disclosure-button:open` | Yes | Disclosure Button |
+| `DISCLOSURE_BUTTON_CLOSE` | `disclosure-button:close` | Yes | Disclosure Button |
+| `SWITCH_ACTIVATE` | `switch:activate` | Yes | Switch |
+| `SWITCH_DEACTIVATE` | `switch:deactivate` | Yes | Switch |
+| `SPINBUTTON_CHANGE` | `spinbutton:change` | No | Spinbutton |
+| `COMBOBOX_LOADING` | `combobox:loading` | No | Combobox |
+| `COMBOBOX_LOADED` | `combobox:loaded` | No | Combobox |
+| `COMBOBOX_UPDATE` | `combobox:update` | No | Combobox |
+| `COMBOBOX_SUBMIT` | `combobox:submit` | No | Combobox |
+| `COMBOBOX_EMPTY` | `combobox:empty` | No | Combobox |
+| `WINDOWSPLITTER_CHANGE` | `windowsplitter:change` | No | Window Splitter |
+| `CALENDAR_CHANGE` | `calendar:change` | No | Calendar |
+| `CART_BEFORE_ADD` | `cart:before-add` | Yes | Host apps (Shopify cart) |
+| `CART_BEFORE_UPDATE` | `cart:before-update` | Yes | Host apps (Shopify cart) |
+| `CART_UPDATE` | `cart:update` | No | Host apps (Shopify cart) |
+| `VARIANT_CHANGE` | `variant:change` | No | Host apps (product variants) |
+
+## `dispatchEvent`
+
+```js
+import { EVENTS, dispatchEvent } from "@agencecinq/utils";
+
+const proceed = dispatchEvent(host, EVENTS.ACCORDION_OPEN, { el, index });
+if (!proceed) return; // a listener called preventDefault()
+```
+
+Defaults: `bubbles: true`, `cancelable: true`. Drawer/Modal before-events and
+some notifications pass `{ bubbles: false }` or `{ cancelable: false }`.
+
+Returns `false` when a listener cancels, otherwise `true`.
+
+## Focus helpers
+
+Used internally by Drawer and Modal, exported for custom overlays:
+
+| Export | Role |
+| ------ | ---- |
+| `addTrapFocus(container, elementToFocus?)` | Tab cycle inside an open overlay. |
+| `removeTrapFocus(elementToFocus?)` | Tear down trap, optionally move focus. |
+| `getFocusableElements(container)` | Visible, tabbable descendants. |
+| `rememberReturnFocus(element?)` | Stash page control (first call wins). |
+| `restoreReturnFocus()` | Focus stashed element and clear stash. |
+| `scheduleRestoreReturnFocus(closingHost?)` | Defer restore until after close animations. Skip if focus already moved outside. |
+
+## Scroll lock
+
+| Export | Role |
+| ------ | ---- |
+| `disableScroll()` | Lock `document` scroll and preserve position for restore. |
+| `enableScroll(position?)` | Unlock and resume previous Y unless `position` is a number or `false`. |
+
+Drawer and Modal call these while open. You can reuse them for other full-screen overlays.
+
+## Attribute parsers
+
+| Export | Role |
+| ------ | ---- |
+| `parseBoolean(value, fallback?)` | `"false"` / `"0"` to `false`, absent to `fallback`. |
+| `parseNumber(value, fallback)` | Finite number or `fallback`. |
+| `parseList(value)` | Space-separated ID tokens to `string[]`. |
+
+## Other exports
+
+| Export | Role |
+| ------ | ---- |
+| `clamp(value, min, max)` | Numeric clamp. |
+| `throttle(fn, wait)` | Trailing throttle (used by Spinbutton change events). |

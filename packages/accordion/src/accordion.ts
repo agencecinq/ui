@@ -29,16 +29,16 @@ export class Accordion extends HTMLElement {
   init(): void {
     this.options = {
       multiselectable: parseBoolean(
-        this.getAttribute("data-accordion-multiselectable"),
+        this.getAttribute("data-multiselectable"),
       ),
       hash: parseBoolean(
-        this.getAttribute("data-accordion-hash"),
+        this.getAttribute("data-hash"),
         DEFAULTS.hash,
       ),
     };
 
     this.panels = [
-      ...this.querySelectorAll<HTMLElement>("[data-accordion-panel]"),
+      ...this.querySelectorAll<HTMLElement>("[data-panel]"),
     ]
       .filter((panel) => panel.closest("cinq-accordion") === this)
       .map((element, index) => {
@@ -47,7 +47,7 @@ export class Accordion extends HTMLElement {
         return panel;
       });
 
-    this.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.#handlePanelOpen);
+    this.addEventListener(EVENTS.ACCORDION_OPEN, this.#handlePanelOpen);
     this.addEventListener("keydown", this.#handleKeydown);
 
     if (this.options.hash) {
@@ -61,7 +61,7 @@ export class Accordion extends HTMLElement {
   }
 
   destroy(): void {
-    this.removeEventListener(EVENTS.ACCORDION_PANEL_OPEN, this.#handlePanelOpen);
+    this.removeEventListener(EVENTS.ACCORDION_OPEN, this.#handlePanelOpen);
     this.removeEventListener("keydown", this.#handleKeydown);
     window.removeEventListener("hashchange", this.#handleHashChange);
 

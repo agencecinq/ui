@@ -10,8 +10,8 @@ import RegisterComponents from "./RegisterComponents.astro";
       <h3 class="text-lg font-semibold text-gray-900">Replace: open next, close current</h3>
       <p class="text-sm text-gray-600">
         From the first modal, <strong>Continue</strong> targets both ids
-        (<code class="text-xs">aria-controls="…address …confirm"</code>).
-        Toggle order closes the parent then opens the child — not a stack.
+        (<code class="text-xs">aria-controls="...address ...confirm"</code>).
+        Toggle order closes the parent then opens the child. Not a stack.
         Closing confirm returns focus to <strong>Start checkout</strong>.
       </p>
     </div>
@@ -28,7 +28,7 @@ import RegisterComponents from "./RegisterComponents.astro";
     </cinq-modal-button>
 
     <p class="text-xs text-gray-500">
-      Flow: Start checkout → Continue → Cancel/Confirm → focus back on Start checkout.
+      Flow: Start checkout to Continue to Cancel/Confirm to focus back on Start checkout.
     </p>
 
     <cinq-modal id="replace-modal-address">
@@ -86,7 +86,7 @@ import RegisterComponents from "./RegisterComponents.astro";
           <div>
             <h2 class="text-xl font-semibold mb-1">Confirm order</h2>
             <p class="text-sm text-gray-600">
-              Step 2 of 2. The address dialog is closed — only this one is open.
+              Step 2 of 2. The address dialog is closed. Only this one is open.
             </p>
           </div>
           <div class="flex justify-end gap-2">

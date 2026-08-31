@@ -42,7 +42,7 @@ blockier image (`256` is the coarsest).
 ```html
 <cinq-pixelate pixel="256">
   <img
-    src="https://picsum.photos/seed/picsum/960/540"
+    src="/ui/demo/pixelate/scroll.jpg"
     crossorigin="anonymous"
     alt="Mountain landscape"
     width="960"
@@ -61,8 +61,8 @@ stack `<img>` and `<canvas>` in the same box, keep the image at `opacity: 0`
 `<img>` from assistive tech with `aria-hidden="true"` when the canvas is shown.
 
 **CORS**: cross-origin images need CORS headers and `crossorigin="anonymous"`
-on the `<img>`, or the canvas stays tainted. [Lorem Picsum](https://picsum.photos/)
-works in the demos below.
+on the `<img>`, or the canvas stays tainted. The demos below use same-origin
+assets from `/ui/demo/pixelate/`.
 
 ```css
 cinq-pixelate {
@@ -112,10 +112,10 @@ When `prefers-reduced-motion: reduce` is set, hide the canvas and show the
 
 The component draws the bitmap. **You** style how the `<canvas>` is displayed.
 
-1. **JS** (component) — centered **cover** crop, then draw into the canvas buffer.
+1. **JS** (component). Centered **cover** crop, then draw into the canvas buffer.
    When `pixel` > `1`, the buffer is smaller than the host. `imageSmoothingEnabled =
    false` keeps the downsample sharp inside that buffer.
-2. **CSS** (consumer) — stretch the canvas to the host (`width` / `height: 100%`).
+2. **CSS** (consumer). Stretch the canvas to the host (`width` / `height: 100%`).
    Set **`image-rendering: pixelated`** on the canvas for blocky upscale edges
    (typical look). Use `auto` for a softer mosaic, or `crisp-edges` where it
    behaves better in your target browsers.
@@ -125,7 +125,7 @@ for a sharp result). `image-rendering` on the canvas has little effect there.
 
 ## Attributes
 
-- **`pixel`** (default `256`): block size in CSS px. `0` = sharp, `256` = coarsest. Lower is sharper, higher is blockier — not a 0–100 % pixelation slider.
+- **`pixel`** (default `256`): block size in CSS px. `0` = sharp, `256` = coarsest. Lower is sharper, higher is blockier. Not a 0-100 % pixelation slider.
 
 ## Programmatic API
 
@@ -382,13 +382,13 @@ const height = $host.$canvas.clientHeight
 const pixel = Number($host.getAttribute("pixel") ?? 0)
 const dpr = window.devicePixelRatio || 1
 
-// Same cover crop + downsample + upscale as cinq-pixelate, on an offscreen canvas…
+// Same cover crop + downsample + upscale as cinq-pixelate, on an offscreen canvas...
 // use $host.$img as the drawImage source
 const exportCanvas = document.createElement("canvas")
 exportCanvas.width = Math.round(width * dpr)
 exportCanvas.height = Math.round(height * dpr)
 
-// …then:
+// ...then:
 const link = document.createElement("a")
 link.download = `photo-pixel-${pixel}.png`
 link.href = exportCanvas.toDataURL("image/png")

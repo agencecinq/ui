@@ -1,10 +1,11 @@
 # @agencecinq/calendar
 
 [![](https://img.shields.io/npm/v/@agencecinq/calendar)](https://www.npmjs.com/package/@agencecinq/calendar)
+[![](https://img.shields.io/npm/dm/@agencecinq/calendar)](https://www.npmjs.com/package/@agencecinq/calendar)
 
-> Accessible date / range picker as a lightweight Web Component (`<cinq-calendar>`).
+> Accessible, WAI-ARIA date / range picker as a lightweight Web Component.
 
-Markup and CSS are yours — the package fills the grid and handles selection.
+Markup and CSS are yours. The package fills the grid and handles selection.
 Aligned with the
 [WAI-ARIA Authoring Practices date picker grid](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/).
 
@@ -24,7 +25,7 @@ Required hooks:
 | -------- | ---- |
 | `<cinq-calendar>` | Host element |
 | `.js-previous` / `.js-next` | Month navigation (optional) |
-| `.js-title` | Month / year label; click advances to the next month (same as `.js-next`) |
+| `.js-title` | Month / year label. Click advances to the next month (same as `.js-next`) |
 | `.js-days` | Weekday headers row |
 | `.js-body` | Day cells |
 | `.js-day` | Day button (generated) |
@@ -54,13 +55,13 @@ import { EVENTS } from "@agencecinq/utils";
 const el = document.querySelector("cinq-calendar");
 
 el.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
-  // detail.values → string[] (`YYYY-MM-DD`)
+  // detail.values to string[] (`YYYY-MM-DD`)
   console.log(detail.values);
 });
 ```
 
 Importing the package registers the custom element. The calendar mounts on
-`connectedCallback` — no manual `init()` is required.
+`connectedCallback`. No manual `init()` is required.
 
 > **HTML is the source of truth.** Provide `role="grid"`, `aria-labelledby`,
 > `aria-live` on the title, and `aria-label` on nav buttons yourself.
@@ -68,13 +69,13 @@ Importing the package registers the custom element. The calendar mounts on
 ### Single date
 
 ```html
-<cinq-calendar mode="single" deselect>…</cinq-calendar>
+<cinq-calendar mode="single" deselect>...</cinq-calendar>
 ```
 
 ### Date range
 
 ```html
-<cinq-calendar mode="range">…</cinq-calendar>
+<cinq-calendar mode="range">...</cinq-calendar>
 ```
 
 ### Multiple dates
@@ -82,7 +83,7 @@ Importing the package registers the custom element. The calendar mounts on
 Toggle discrete days (no range painting). Click again to remove.
 
 ```html
-<cinq-calendar mode="multiple" allow-past>…</cinq-calendar>
+<cinq-calendar mode="multiple" allow-past>...</cinq-calendar>
 ```
 
 There is no built-in max. Cap the selection in your app (e.g. after
@@ -103,13 +104,13 @@ el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
 ### Locale & week start
 
 `locale` drives labels via `Intl`. Week start defaults from the locale
-(`weekInfo`); pass `first-day` to override.
+(`weekInfo`). Pass `first-day` to override.
 
 ```html
-<cinq-calendar locale="fr">…</cinq-calendar>
-<!-- fr → week starts Monday -->
+<cinq-calendar locale="fr">...</cinq-calendar>
+<!-- fr: week starts Monday -->
 
-<cinq-calendar locale="en" first-day="1">…</cinq-calendar>
+<cinq-calendar locale="en" first-day="1">...</cinq-calendar>
 <!-- force Monday despite en -->
 ```
 
@@ -157,10 +158,10 @@ el.renderInner = (inner, date) => {
 | `mode` | Selection mode: `single` (default), `range`, or `multiple` |
 | `deselect` | Allow clearing the selection in `mode="single"` |
 | `allow-past` | Allow selecting past dates |
-| `first-day` | Week start (`0`=Sun … `6`=Sat); defaults from locale |
+| `first-day` | Week start (`0`=Sun ... `6`=Sat). Defaults from locale |
 | `button-class` | Extra classes on day buttons |
 | `name` | Forwarded in `calendar:change` detail |
-| `data-month` | Initial month (`0`–`11`) |
+| `data-month` | Initial month (`0`-`11`) |
 | `data-year` | Initial year |
 | `data-picked` | JSON array of `YYYY-MM-DD` days to preselect |
 
@@ -205,6 +206,8 @@ pnpm -C packages/calendar build
 
 ## Acknowledgments
 
-- [`@19h47/calendar`](https://github.com/19h47/19h47-calendar) — original implementation
-- [WAI-ARIA APG — Date Picker Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/)
+- [`@19h47/calendar`](https://github.com/19h47/19h47-calendar), original implementation
+- [WAI-ARIA APG, Date Picker Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/)
 - Litepicker
+
+See the [interactive docs](https://agencecinq.github.io/ui/components/calendar/) for live examples.

@@ -950,7 +950,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
         const remote = (await response.json()) as string[];
 
-        // Keep busy/loading visible; honour abort while waiting.
+        // Keep busy/loading visible. Honour abort while waiting.
         await new Promise<void>((resolve, reject) => {
           const timer = window.setTimeout(resolve, 350);
           const onAbort = () => {
@@ -1124,7 +1124,7 @@ import RegisterComponents from './RegisterComponents.astro';
           </dl>
           <p class="docs-combobox-detail__blurb">
             ${escapeHtml(initials)}: ${escapeHtml(name)} indexed from the Undermountain bestiary.
-            Selection came from <code>combobox:submit</code>; the filter field was not overwritten.
+            Selection came from <code>combobox:submit</code>. The filter field was not overwritten.
           </p>
         `;
       };

@@ -3,7 +3,7 @@
 
 # @agencecinq/disclosure-button
 
-> Accessible WAI-ARIA disclosure button Web Component.
+> Accessible, WAI-ARIA disclosure button as a lightweight Web Component.
 
 A disclosure button shows or hides a section of content. `<cinq-disclosure-button>`
 wraps a `<button>`, wires up `aria-expanded` / `aria-controls`, toggles `hidden` on
@@ -84,7 +84,7 @@ After mutating the light DOM while the host stays mounted:
 
 ```js
 $host.destroy();
-// mutate button / aria-controls…
+// mutate button / aria-controls...
 $host.init();
 ```
 

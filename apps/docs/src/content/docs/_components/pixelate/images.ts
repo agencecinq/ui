@@ -1,31 +1,23 @@
-export const scrollImage =
-  "https://picsum.photos/seed/cinq-pixelate-scroll/960/540";
-export const sliderImage =
-  "https://picsum.photos/seed/cinq-pixelate-slider/960/540";
-export const hoverImage =
-  "https://picsum.photos/seed/cinq-pixelate-hover/960/540";
-export const loadImage =
-  "https://picsum.photos/seed/cinq-pixelate-load/960/540";
-export const pointerImage =
-  "https://picsum.photos/seed/cinq-pixelate-pointer/960/540";
-export const splitterImage =
-  "https://picsum.photos/seed/cinq-pixelate-splitter/960/540";
-export const ioImage = "https://picsum.photos/seed/cinq-pixelate-io/960/540";
-export const animateImage =
-  "https://picsum.photos/seed/cinq-pixelate-animate/960/540";
-export const resizeImage =
-  "https://picsum.photos/seed/cinq-pixelate-resize/960/540";
-export const modalImage =
-  "https://picsum.photos/seed/cinq-pixelate-modal/960/540";
-export const drawerImage =
-  "https://picsum.photos/seed/cinq-pixelate-drawer/960/540";
+const base = "/ui/demo/pixelate";
+
+export const scrollImage = `${base}/scroll.jpg`;
+export const sliderImage = `${base}/slider.jpg`;
+export const hoverImage = `${base}/hover.jpg`;
+export const loadImage = `${base}/load.jpg`;
+export const pointerImage = `${base}/pointer.jpg`;
+export const splitterImage = `${base}/splitter.jpg`;
+export const ioImage = `${base}/io.jpg`;
+export const animateImage = `${base}/animate.jpg`;
+export const resizeImage = `${base}/resize.jpg`;
+export const modalImage = `${base}/modal.jpg`;
+export const drawerImage = `${base}/drawer.jpg`;
 export const gridImages = [
-  "https://picsum.photos/seed/cinq-pixelate-grid-a/640/360",
-  "https://picsum.photos/seed/cinq-pixelate-grid-b/640/360",
-  "https://picsum.photos/seed/cinq-pixelate-grid-c/640/360",
+  `${base}/grid-a.jpg`,
+  `${base}/grid-b.jpg`,
+  `${base}/grid-c.jpg`,
 ];
 export const sequenceImages = [
-  "https://picsum.photos/seed/cinq-pixelate-seq-a/960/540",
-  "https://picsum.photos/seed/cinq-pixelate-seq-b/960/540",
-  "https://picsum.photos/seed/cinq-pixelate-seq-c/960/540",
+  `${base}/seq-a.jpg`,
+  `${base}/seq-b.jpg`,
+  `${base}/seq-c.jpg`,
 ];

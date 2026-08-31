@@ -1,5 +1,17 @@
 # @agencecinq/accordion
 
+## 3.0.0
+
+### Major Changes
+
+- Rename data attributes: drop the `accordion` prefix (`data-hash`, `data-multiselectable`, `data-panel`, `data-header`, `data-open`, `data-deselect`, `data-inner`).
+
+## 2.1.0
+
+### Minor Changes
+
+- Rename accordion events to `accordion:open` / `accordion:close` (`EVENTS.ACCORDION_*`).
+
 ## 2.0.2
 
 ### Patch Changes

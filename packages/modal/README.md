@@ -1,14 +1,13 @@
+[![](https://img.shields.io/npm/v/@agencecinq/modal)](https://www.npmjs.com/package/@agencecinq/modal)
+[![](https://img.shields.io/npm/dm/@agencecinq/modal)](https://www.npmjs.com/package/@agencecinq/modal)
+
 # @agencecinq/modal
 
-A lightweight, accessible Web Component wrapper around the native HTML `<dialog>` element, designed for Shopify themes. Part of the **CINQ** internal tools ecosystem.
+> Accessible modal Web Component built on the native `<dialog>` element.
 
-## Features
-
-- **Native `<dialog>`**: Uses `showModal()` / `close()` for a solid baseline behavior.
-- **Backdrop click to close**: Click outside the dialog content to close (on the dialog backdrop).
-- **Event-driven**: Works with the shared `@agencecinq/utils` event names.
-
----
+A modal presents content above the page. `<cinq-modal>` wraps a native
+`<dialog>`, handles open/close via `showModal()` / `close()`, and coordinates
+with `cinq-modal-button` through document-level events.
 
 ## Installation
 
@@ -16,24 +15,13 @@ A lightweight, accessible Web Component wrapper around the native HTML `<dialog>
 pnpm add @agencecinq/modal
 ```
 
----
-
-## Usage (Shopify integration)
-
-### 1. Import the components
-
-In your theme entry (e.g. `theme.ts`, `main.js`):
+## Usage
 
 ```js
 import "@agencecinq/modal";
 ```
 
-### 2. Implementation in Liquid / HTML
-
-Render the markup and wire buttons with `aria-controls`.
-`cinq-modal` must have an `id`, because it toggles itself when `detail.modal` matches its `id`.
-
-```liquid
+```html
 <cinq-modal-button>
   <button aria-controls="newsletter-modal" aria-pressed="false">
     Open modal
@@ -47,98 +35,50 @@ Render the markup and wire buttons with `aria-controls`.
 </cinq-modal>
 ```
 
----
+Importing `@agencecinq/modal` registers the Web Components automatically.
+No manual `init()` call required.
 
-## API reference
+> **HTML is the source of truth.** Provide dialog content, labelling, and focus
+> targets yourself. Use an a11y linter (axe-core, Lighthouse) to catch invalid
+> markup.
 
-### Markup
+### Required markup
 
-`<cinq-modal>` must contain a `<dialog>` (or an element marked with `[data-dialog]`).
-An `id` is required if you want it to react to `modal:toggle` events from `cinq-modal-button`.
+| Selector / attribute | Required | Role |
+| -------------------- | -------- | ---- |
+| `<cinq-modal>` | **Yes** | Modal host. Requires an `id` for event-driven open/close. |
+| `<dialog>` or `[data-dialog]` | **Yes** | Native dialog element inside the host. |
+| `id` on `<cinq-modal>` | **Yes** | Must match button `aria-controls`. |
+| `aria-controls` on trigger | **Yes** | Points to the modal `id`. |
 
-```html
-<cinq-modal id="my-modal">
-  <dialog>...</dialog>
-</cinq-modal>
-```
-
-### Attributes
+### API
 
 | Attribute | Required | Description |
 | --------- | -------- | ----------- |
-| `id`      | Yes      | Modal identifier; must match button `aria-controls`. |
-| `open`    | No       | Reflected state attribute (useful for styling). |
+| `id` | **Yes** | Modal identifier. Must match button `aria-controls`. |
+| `open` | No | Reflected open state. Useful for styling. |
 
-### Methods
+| Method | Description |
+| ------ | ----------- |
+| `show()` | Opens the modal. Returns `false` if already open, aborted, or deferred. |
+| `close()` | Closes the modal. Returns `false` if already closed, aborted, or deferred. |
 
-Interact with the element instance directly:
-
-```js
-const $modal = document.querySelector("cinq-modal#my-modal");
-
-$modal.show(); // returns false if already open, aborted, or deferred
-$modal.close(); // returns false if already closed, aborted, or deferred
-```
-
-### Events
-
-Event names come from `@agencecinq/utils` on `document.documentElement`:
-
-| Event | Constant | Cancelable | Detail | Description |
-| ----- | -------- | ---------- | ------ | ----------- |
-| `modal:toggle` | `MODAL_TOGGLE` | No | `{ modal, trigger, trap }` | Request open/close from a button |
-| `modal:before-open` | `MODAL_BEFORE_OPEN` | Yes | `{ modal, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
-| `modal:before-close` | `MODAL_BEFORE_CLOSE` | Yes | `{ modal, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
-| `modal:open` | `MODAL_OPEN` | No | `{ modal, trigger? }` | Fired after `open` is set |
-| `modal:close` | `MODAL_CLOSE` | No | `{ modal }` | Fired after `open` is removed |
-
-#### Deferring open or close
-
-```js
-import { EVENTS } from '@agencecinq/utils';
-
-document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_OPEN, (event) => {
-  if (event.detail.modal !== 'my-modal') return;
-
-  event.preventDefault();
-
-  void doAsyncWork().then(() => {
-    event.detail.resolve();
-  });
-});
-
-document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {
-  if (event.detail.modal !== 'my-modal') return;
-
-  event.preventDefault();
-
-  void doAsyncWork().then(() => {
-    event.detail.resolve();
-  });
-});
-```
-
-`resolve()` is idempotent. TypeScript: `BeforeOpenDetail` and `BeforeCloseDetail`
-from `@agencecinq/modal`.
-
-**UX:** defer open when the fetch is quick and the dialog would feel empty;
-otherwise open immediately and load on `modal:open`. Defer close for save,
-archive, or exit animation.
-
-### Wiring: handle `modal:toggle`
+### Wiring with `cinq-modal-button`
 
 `cinq-modal-button` dispatches `modal:toggle` on `document.documentElement` with:
 
 - `detail.modal`: the modal id from the button `aria-controls`
 - `detail.trigger`: the button element
-- `detail.trap`: optional element from `data-trap` (if you use it)
+- `detail.trap`: optional element from `data-trap`
 
-`cinq-modal` listens to `modal:toggle` by default and toggles itself when `detail.modal` matches its `id` (so `id` is required for event-driven open/close).
+`cinq-modal` listens to `modal:toggle` and toggles itself when `detail.modal`
+matches its `id`.
 
-### Background scroll (consumer)
+### Background scroll
 
-The package does **not** lock document scroll. Native `showModal()` makes the page
-inert but the backdrop can still scroll underneath. Prefer CSS in the theme:
+The package does **not** lock document scroll. Native `showModal()` makes the
+page inert but the backdrop can still scroll underneath. Prefer CSS in the
+theme:
 
 ```css
 html:has(dialog[open]:modal) {
@@ -147,18 +87,57 @@ html:has(dialog[open]:modal) {
 }
 ```
 
-Or refcount `modal:open` / `modal:close` with `disableScroll` / `enableScroll` from
-`@agencecinq/utils` if the theme already uses those helpers.
+Or refcount `modal:open` / `modal:close` with `disableScroll` / `enableScroll`
+from `@agencecinq/utils` if the theme already uses those helpers.
 
----
+## Events
 
-## Development (monorepo)
+Dispatched on `document.documentElement`. Prefer constants from
+`@agencecinq/utils`:
+
+| Event | Constant | Cancelable | Detail | Description |
+| ----- | -------- | ---------- | ------ | ----------- |
+| `modal:toggle` | `MODAL_TOGGLE` | No | `{ modal, trigger, trap }` | Request open/close from a button. |
+| `modal:before-open` | `MODAL_BEFORE_OPEN` | Yes | `{ modal, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer, then call `resolve()`. |
+| `modal:before-close` | `MODAL_BEFORE_CLOSE` | Yes | `{ modal, instance, resolve }` | Fired before `open` is removed. Cancel to defer, then call `resolve()`. |
+| `modal:open` | `MODAL_OPEN` | No | `{ modal, trigger? }` | Fired after `open` is set. |
+| `modal:close` | `MODAL_CLOSE` | No | `{ modal }` | Fired after `open` is removed. |
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
+  console.log(event.detail.modal);
+});
+```
+
+### Deferring open or close
+
+```js
+document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_OPEN, (event) => {
+  if (event.detail.modal !== "newsletter-modal") return;
+
+  event.preventDefault();
+
+  void doAsyncWork().then(() => {
+    event.detail.resolve();
+  });
+});
+```
+
+`resolve()` is idempotent. TypeScript: `BeforeOpenDetail` and
+`BeforeCloseDetail` from `@agencecinq/modal`.
+
+**UX:** defer open when the fetch is quick and the dialog would feel empty.
+Otherwise open immediately and load on `modal:open`. Defer close for save,
+archive, or exit animation.
+
+## Build setup
 
 ```bash
 pnpm -C packages/modal build
-pnpm -C packages/modal dev
 ```
 
-## License
+## Acknowledgments
 
-Internal tool developed by **CINQ**. All rights reserved.
+See the [interactive docs](https://agencecinq.github.io/ui/components/modal/) for live examples.

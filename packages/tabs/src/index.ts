@@ -34,8 +34,8 @@ export class Tabs extends HTMLElement {
       '[role="tablist"]',
     ) as HTMLElement | null;
 
-    const hash = this.getAttribute("data-tabs-hash");
-    const delayAttr = this.getAttribute("data-tabs-delay");
+    const hash = this.getAttribute("data-hash");
+    const delayAttr = this.getAttribute("data-delay");
 
     this.hash = hash === null ? this.hash : hash !== "false" && hash !== "0";
 

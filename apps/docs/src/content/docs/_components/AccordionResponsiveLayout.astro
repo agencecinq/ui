@@ -10,17 +10,17 @@ import RegisterComponents from './RegisterComponents.astro';
     transition: max-height 0.3s ease;
   }
 
-  .docs-accordion-layout > [data-accordion-panel]:first-child > [data-accordion-header] {
+  .docs-accordion-layout > [data-panel]:first-child > [data-header] {
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
   }
 
-  .docs-accordion-layout > [data-accordion-panel]:last-child > [data-accordion-header][aria-expanded='false'] {
+  .docs-accordion-layout > [data-panel]:last-child > [data-header][aria-expanded='false'] {
     border-bottom-left-radius: 0.75rem;
     border-bottom-right-radius: 0.75rem;
   }
 
-  .docs-accordion-layout > [data-accordion-panel]:last-child [data-accordion-inner] {
+  .docs-accordion-layout > [data-panel]:last-child [data-inner] {
     border-bottom-left-radius: 0.75rem;
     border-bottom-right-radius: 0.75rem;
   }
@@ -37,17 +37,17 @@ import RegisterComponents from './RegisterComponents.astro';
     transition: transform 0.2s ease;
   }
 
-  .docs-accordion-layout [data-accordion-header][aria-expanded='true'] .docs-accordion-layout-chevron {
+  .docs-accordion-layout [data-header][aria-expanded='true'] .docs-accordion-layout-chevron {
     transform: rotate(-135deg);
     margin-top: 0.125rem;
   }
 
-  .docs-accordion-layout [data-accordion-header].focus {
+  .docs-accordion-layout [data-header].focus {
     outline: 2px solid #111827;
     outline-offset: -2px;
   }
 
-  /* List mode (mobile): accordion unbound — every section fully visible */
+  /* List mode (mobile): accordion unbound. Every section fully visible */
   .docs-accordion-layout[data-layout='list'] {
     border-color: transparent;
     border-radius: 0;
@@ -57,18 +57,18 @@ import RegisterComponents from './RegisterComponents.astro';
     border-top-width: 0;
   }
 
-  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel] {
+  .docs-accordion-layout[data-layout='list'] > [data-panel] {
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     margin-bottom: 0.75rem;
     overflow: hidden;
   }
 
-  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel]:last-child {
+  .docs-accordion-layout[data-layout='list'] > [data-panel]:last-child {
     margin-bottom: 0;
   }
 
-  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel] > [data-accordion-header] {
+  .docs-accordion-layout[data-layout='list'] > [data-panel] > [data-header] {
     pointer-events: none;
     cursor: default;
     border-radius: 0;
@@ -76,7 +76,7 @@ import RegisterComponents from './RegisterComponents.astro';
     color: #111827;
   }
 
-  .docs-accordion-layout[data-layout='list'] > [data-accordion-panel] > [data-accordion-header]:hover {
+  .docs-accordion-layout[data-layout='list'] > [data-panel] > [data-header]:hover {
     background: #fff;
   }
 
@@ -124,14 +124,14 @@ import RegisterComponents from './RegisterComponents.astro';
 
     <cinq-accordion
       class="docs-accordion-layout max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
-      data-accordion-hash="false"
+      data-hash="false"
       data-demo="accordion-layout"
       data-layout="accordion"
     >
-      <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+      <div data-panel data-open="true" data-deselect="true">
         <button
           type="button"
-          data-accordion-header
+          data-header
           id="docs-accordion-layout-1-header"
           class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
           aria-expanded="true"
@@ -146,7 +146,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-labelledby="docs-accordion-layout-1-header"
         >
           <div
-            data-accordion-inner
+            data-inner
             class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
           >
             <p class="m-0">
@@ -157,10 +157,10 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
       </div>
 
-      <div data-accordion-panel data-accordion-open="false">
+      <div data-panel data-open="false">
         <button
           type="button"
-          data-accordion-header
+          data-header
           id="docs-accordion-layout-2-header"
           class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
           aria-expanded="false"
@@ -176,7 +176,7 @@ import RegisterComponents from './RegisterComponents.astro';
           hidden
         >
           <div
-            data-accordion-inner
+            data-inner
             class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
           >
             <p class="m-0">
@@ -187,10 +187,10 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
       </div>
 
-      <div data-accordion-panel data-accordion-open="false">
+      <div data-panel data-open="false">
         <button
           type="button"
-          data-accordion-header
+          data-header
           id="docs-accordion-layout-3-header"
           class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
           aria-expanded="false"
@@ -206,7 +206,7 @@ import RegisterComponents from './RegisterComponents.astro';
           hidden
         >
           <div
-            data-accordion-inner
+            data-inner
             class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
           >
             <p class="m-0">
@@ -220,7 +220,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
     <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
       Mode&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-gray-900"
-        >Desktop — accordion bound</span
+        >Desktop. Accordion bound</span
       >
     </p>
   </div>
@@ -238,11 +238,11 @@ import RegisterComponents from './RegisterComponents.astro';
 
     /** Expand every panel so the unbound host reads as a stacked list. */
     const expandAsList = () => {
-      accordion?.querySelectorAll('[data-accordion-panel]').forEach((panel) => {
-        const header = panel.querySelector('[data-accordion-header]');
+      accordion?.querySelectorAll('[data-panel]').forEach((panel) => {
+        const header = panel.querySelector('[data-header]');
         const body = header && document.getElementById(header.getAttribute('aria-controls') || '');
 
-        panel.setAttribute('data-accordion-open', 'true');
+        panel.setAttribute('data-open', 'true');
         header?.setAttribute('aria-expanded', 'true');
         body?.removeAttribute('hidden');
         body?.style.removeProperty('max-height');
@@ -252,12 +252,12 @@ import RegisterComponents from './RegisterComponents.astro';
 
     /** Collapse all but the first panel before re-binding as an accordion. */
     const collapseForAccordion = () => {
-      accordion?.querySelectorAll('[data-accordion-panel]').forEach((panel, index) => {
-        const header = panel.querySelector('[data-accordion-header]');
+      accordion?.querySelectorAll('[data-panel]').forEach((panel, index) => {
+        const header = panel.querySelector('[data-header]');
         const body = header && document.getElementById(header.getAttribute('aria-controls') || '');
         const open = index === 0;
 
-        panel.setAttribute('data-accordion-open', String(open));
+        panel.setAttribute('data-open', String(open));
         header?.setAttribute('aria-expanded', String(open));
 
         if (open) {
@@ -283,12 +283,12 @@ import RegisterComponents from './RegisterComponents.astro';
         collapseForAccordion();
         accordion?.init();
         accordion?.setAttribute('data-layout', 'accordion');
-        if (status) status.textContent = 'Desktop — accordion bound';
+        if (status) status.textContent = 'Desktop, accordion bound';
       } else {
         accordion?.destroy();
         expandAsList();
         accordion?.setAttribute('data-layout', 'list');
-        if (status) status.textContent = 'Mobile — list (destroyed)';
+        if (status) status.textContent = 'Mobile, list (destroyed)';
       }
 
       desktopBtn?.setAttribute('aria-pressed', String(isDesktop));

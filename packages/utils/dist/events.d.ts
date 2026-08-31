@@ -14,8 +14,8 @@ export declare const EVENTS: {
     DISCLOSURE_BUTTON_CLOSE: string;
     SWITCH_ACTIVATE: string;
     SWITCH_DEACTIVATE: string;
-    ACCORDION_PANEL_OPEN: string;
-    ACCORDION_PANEL_CLOSE: string;
+    ACCORDION_OPEN: string;
+    ACCORDION_CLOSE: string;
     COMBOBOX_LOADING: string;
     COMBOBOX_LOADED: string;
     COMBOBOX_UPDATE: string;

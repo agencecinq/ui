@@ -3,12 +3,12 @@
 
 # @agencecinq/windowsplitter
 
-> Accessible WAI-ARIA window splitter as a lightweight Web Component.
+> Accessible, WAI-ARIA window splitter as a lightweight Web Component.
 
 A window splitter lets users resize a primary pane with a focusable separator.
 `<cinq-windowsplitter>` is the **layout wrapper** (bounds + CSS custom
 properties). A nested `[role="separator"]` (or `slider`) is the interactive
-control. You deliver clean markup; the component wires pointer / keyboard
+control. You deliver clean markup. The component wires pointer / keyboard
 resizing and mirrors layout onto the primary pane.
 
 Implementation follows the
@@ -47,8 +47,9 @@ import "@agencecinq/windowsplitter";
 ```
 
 > **HTML is the source of truth.** ARIA values, orientation, labelling, and
-> `aria-controls` live on the separator. The component will not invent missing
-> markup. Use an a11y linter (axe-core, Lighthouse) to catch invalid markup.
+> `aria-controls` live on the separator. The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Use an a11y linter
+> (axe-core, Lighthouse) to catch invalid markup.
 
 The primary pane is resolved live via
 [`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)

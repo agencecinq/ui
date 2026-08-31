@@ -11,7 +11,7 @@ import RegisterComponents from "./RegisterComponents.astro";
       <p class="text-sm text-gray-600">
         A modal can open over another. The lower dialog stays open but inert
         (native <code class="text-xs">showModal()</code> top layer). Closing the top
-        dialog returns focus to the control that opened it — inside the parent
+        dialog returns focus to the control that opened it. Inside the parent
         modal, not the page.
       </p>
     </div>
@@ -29,7 +29,7 @@ import RegisterComponents from "./RegisterComponents.astro";
 
     <p class="text-xs text-gray-500">
       Red ring = <code>aria-pressed="false"</code>, green = <code>aria-pressed="true"</code>.
-      Flow: open address → verify → close verify (focus on Verify) → close address
+      Flow: open address to verify to close verify (focus on Verify) to close address
       (focus on Add delivery address).
     </p>
 
@@ -88,7 +88,7 @@ import RegisterComponents from "./RegisterComponents.astro";
           <div>
             <h2 class="text-xl font-semibold mb-1">Verification result</h2>
             <p class="text-sm text-gray-600">
-              Address looks valid. Close this dialog to return to the form — the
+              Address looks valid. Close this dialog to return to the form. The
               address dialog stays open underneath.
             </p>
           </div>

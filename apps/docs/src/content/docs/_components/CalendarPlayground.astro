@@ -213,7 +213,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Date range</h3>
         <p class="text-sm text-gray-600">
-          <code>mode="range"</code> — pick a start day, then an end day. Hover (or move focus)
+          <code>mode="range"</code>. Pick a start day, then an end day. Hover (or move focus)
           paints the in-between preview. A third click resets the range.
         </p>
       </div>
@@ -255,8 +255,8 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Multiple dates</h3>
         <p class="text-sm text-gray-600">
-          <code>mode="multiple"</code> — toggle discrete days in and out of the
-          selection. No range painting; click a selected day again to remove it.
+          <code>mode="multiple"</code>. Toggle discrete days in and out of the
+          selection. No range painting. Click a selected day again to remove it.
           Cap the count in your app if needed (no built-in max).
         </p>
       </div>
@@ -332,7 +332,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </cinq-calendar>
 
       <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="preselected" class="font-medium text-gray-900">2025-11-10 → 2025-11-18</span>
+        Selection&nbsp;:&nbsp;<span data-calendar-output="preselected" class="font-medium text-gray-900">2025-11-10 to 2025-11-18</span>
       </p>
     </div>
   </section>
@@ -382,7 +382,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Locale & week start</h3>
         <p class="text-sm text-gray-600">
-          Change the locale — labels update via <code>Intl</code>, and week start
+          Change the locale. Labels update via <code>Intl</code>, and week start
           follows <code>getWeekStart(locale)</code> unless you override <code>first-day</code>.
         </p>
       </div>
@@ -404,7 +404,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </label>
         <p class="pb-1.5 font-mono text-xs text-gray-500">
           firstDay&nbsp;=&nbsp;<span data-calendar-first-day>1</span>
-          <span class="text-gray-400">(0=Sun … 6=Sat)</span>
+          <span class="text-gray-400">(0=Sun ... 6=Sat)</span>
         </p>
       </div>
 
@@ -443,11 +443,11 @@ import RegisterComponents from './RegisterComponents.astro';
   <section class="rounded-2xl bg-white p-6 shadow">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Advanced — event markers</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Advanced: event markers</h3>
         <p class="text-sm text-gray-600">
           Override <code>renderInner</code> to wrap each day in <code>&lt;time&gt;</code>,
           mark weekends, and paint dots on days that have events. Only event days are
-          selectable — others get <code>aria-disabled</code>.
+          selectable. Others get <code>aria-disabled</code>.
         </p>
       </div>
 
@@ -525,11 +525,11 @@ import RegisterComponents from './RegisterComponents.astro';
       const { values } = event.detail;
       if (!output) return;
       if (!values.length) {
-        output.textContent = emptyLabels[key] ?? '—';
+        output.textContent = emptyLabels[key] ?? '-';
         return;
       }
       output.textContent =
-        key === 'multiple' ? values.join(', ') : values.join(' → ');
+        key === 'multiple' ? values.join(', ') : values.join(' to ');
     });
   });
 

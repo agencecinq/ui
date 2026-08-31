@@ -26,7 +26,7 @@ Import once:
 import "@agencecinq/modal";
 ```
 
-Then write the markup — a native `<dialog>` inside `<cinq-modal>`, and buttons
+Then write the markup. A native `<dialog>` inside `<cinq-modal>`, and buttons
 with matching `aria-controls`. The component adds interactivity only.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
@@ -47,7 +47,7 @@ with matching `aria-controls`. The component adds interactivity only.
       This is a native <code>&lt;dialog&gt;</code> modal.
     </p>
     <p class="text-gray-800 mb-4">
-      The dracolich is an undead dragon created by forbidden rites; opening this
+      The dracolich is an undead dragon created by forbidden rites. Opening this
       modal feels like leafing through the AD&amp;D Monster Manual.
     </p>
 
@@ -84,7 +84,7 @@ Copy‑paste starter markup:
   >
     <h2 class="text-xl font-semibold mb-2">Dracolich lore</h2>
     <p class="text-gray-800 mb-4">
-      The dracolich is an undead dragon created by forbidden rites; opening this
+      The dracolich is an undead dragon created by forbidden rites. Opening this
       modal feels like leafing through the AD&amp;D Monster Manual.
     </p>
 
@@ -106,7 +106,7 @@ Copy‑paste starter markup:
 
 | Attribute | Required | Description                                      |
 | --------- | -------- | ------------------------------------------------ |
-| `id`      | Yes      | Modal identifier; must match button `aria-controls`. |
+| `id`      | Yes      | Modal identifier (must match button `aria-controls`. |
 | `open`    | No       | Reflected state attribute (useful for styling). |
 
 ### Methods
@@ -124,8 +124,8 @@ dispatched on `document.documentElement`.
 | Event                | Cancelable | Detail payload                            | Description                                                                 |
 | -------------------- | ---------- | ----------------------------------------- | --------------------------------------------------------------------------- |
 | `modal:toggle`       | No         | `{ modal, trigger, trap }`               | Request open/close from a button.                                           |
-| `modal:before-open`  | Yes        | `{ modal, instance, trigger, resolve }`  | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
-| `modal:before-close` | Yes        | `{ modal, instance, resolve }`           | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
+| `modal:before-open`  | Yes        | `{ modal, instance, trigger, resolve }`  | Fired **before** `open` is set. Cancel to defer, then call `resolve()` to commit. |
+| `modal:before-close` | Yes        | `{ modal, instance, resolve }`           | Fired **before** `open` is removed. Cancel to defer, then call `resolve()` to commit. |
 | `modal:open`         | No         | `{ modal, trigger? }`                    | Fired after `open` is set (`showModal()`, focus).                            |
 | `modal:close`        | No         | `{ modal }`                              | Fired after `open` is removed.                                               |
 
@@ -181,7 +181,7 @@ focus / pointer outside the dialog) but does **not** lock document scroll. A
 wheel over the backdrop can still move the page underneath.
 
 That lock is a **document / theme** concern (layout, scrollbar gutter, iOS
-quirks), so the consumer owns it — same idea as styling the backdrop.
+quirks), so the consumer owns it. Same idea as styling the backdrop.
 
 ### Preferred: CSS
 
@@ -217,7 +217,7 @@ document.documentElement.addEventListener(EVENTS.MODAL_CLOSE, () => {
 });
 ```
 
-Keep the dialog content scrollable when it overflows; only lock the page behind.
+Keep the dialog content scrollable when it overflows. Only lock the page behind.
 
 ## Interactive example
 
@@ -266,7 +266,7 @@ Keep the dialog content scrollable when it overflows; only lock the page behind.
 ### Stacked modals (W3C APG)
 
 Following the [Dialog (Modal) pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/):
-a dialog may open over another; content underneath is inert. Closing the top
+a dialog may open over another. Content underneath is inert. Closing the top
 dialog returns focus to its invoker (e.g. **Verify address** inside the parent).
 Closing the parent returns focus to **Add delivery address** on the page.
 

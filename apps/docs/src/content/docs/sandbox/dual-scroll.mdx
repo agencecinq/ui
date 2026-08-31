@@ -99,20 +99,20 @@ keep the effect without inertia. The component does not read that media query.
 
 ## Spring
 
-`spring` is `0.01`–`1` (default `0.1`). Lower = more inertia, `1` = instant.
+`spring` is `0.01`-`1` (default `0.1`). Lower = more inertia, `1` = instant.
 
 <DemoSpring spring="0.04" label="spring=&quot;0.04&quot;: slow, floaty" />
 
 <DemoSpring spring="0.35" label="spring=&quot;0.35&quot;: snappy" />
 
 ```html
-<cinq-dual-scroll spring="0.04">…</cinq-dual-scroll>
-<cinq-dual-scroll spring="0.35">…</cinq-dual-scroll>
+<cinq-dual-scroll spring="0.04">...</cinq-dual-scroll>
+<cinq-dual-scroll spring="0.35">...</cinq-dual-scroll>
 ```
 
 ## API
 
-- **`spring`**: easing factor (`0.01`–`1`, default `0.1`)
+- **`spring`**: easing factor (`0.01`-`1`, default `0.1`)
 - **Methods**: `init()`, `destroy()`, `sync()`
 - **CSS variable**: `--dual-scroll-pane-height` (host height in px, set by `sync()`)
 

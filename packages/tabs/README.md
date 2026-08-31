@@ -3,7 +3,14 @@
 
 # @agencecinq/tabs
 
-> Tabulation partout, tabulation nulle part
+> Accessible, WAI-ARIA tabs as a lightweight Web Component.
+
+Tabs organize content into selectable panels. `<cinq-tabs>` wires tablist
+keyboard navigation, optional hash sync, automatic activation delay, and
+deletable tabs.
+
+Implementation follows the
+[WAI-ARIA Authoring Practices tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
 
 ## Installation
 
@@ -16,8 +23,8 @@ pnpm add @agencecinq/tabs
 ### Web Component (`<cinq-tabs>`)
 
 ```html
-<cinq-tabs class="js-tabs" data-tabs-hash="true">
-  <div role="tablist" aria-label="navigation">
+<cinq-tabs data-hash="true" data-delay="0">
+  <div role="tablist" aria-label="Navigation">
     <button
       type="button"
       class="is-active"
@@ -52,13 +59,13 @@ pnpm add @agencecinq/tabs
   </div>
 
   <section tabindex="0" role="tabpanel" aria-labelledby="home" id="home-tab">
-    …
+    ...
   </section>
   <section tabindex="0" role="tabpanel" aria-labelledby="project" id="project-tab">
-    …
+    ...
   </section>
   <section tabindex="0" role="tabpanel" aria-labelledby="contact" id="contact-tab">
-    …
+    ...
   </section>
 </cinq-tabs>
 ```
@@ -67,177 +74,100 @@ pnpm add @agencecinq/tabs
 import "@agencecinq/tabs";
 ```
 
-#### Why nothing needs to be initialized
+Importing `@agencecinq/tabs` registers the Web Component automatically.
+No manual `init()` call required.
 
-When you import `@agencecinq/tabs`, the module registers the Web Component in the
-**Custom Elements Registry**:
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Use an a11y linter
+> (axe-core, Lighthouse) to catch invalid markup.
+
+### Required markup
+
+| Selector / attribute | Required | Role |
+| -------------------- | -------- | ---- |
+| `<cinq-tabs>` | **Yes** | Tabs container. |
+| `[role="tablist"]` | **Yes** | Container for tab triggers (not on `<ul>`). |
+| `[role="tab"]` | **Yes** | Tab trigger. Direct child of the tablist. |
+| `aria-selected` | **Yes** | Current tab state on each trigger. |
+| `aria-controls` | **Yes** | ID of the associated tabpanel. |
+| `[role="tabpanel"]` | **Yes** | Panel content region. |
+| `aria-labelledby` | **Yes** | On each tabpanel, referencing the tab `id`. |
+| `data-deletable` | Optional | On a tab trigger. Enables Delete / Backspace removal. |
+
+Use `class="is-active"` on the initially selected tab and panel for styling.
+The component reads `aria-selected` to determine the active tab on load.
+
+### Options
+
+Configured via data attributes on `<cinq-tabs>`:
+
+| Attribute | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| `data-hash` | boolean | `true` | Sync the active tab id to `location.hash` on activation. |
+| `data-delay` | number (ms) | `0` | When `> 0`, arrow key navigation activates the focused tab after the delay. `0` is manual activation. |
+
+### Keyboard
+
+| Key | Function |
+| --- | -------- |
+| `Tab` | Move focus into the tablist, then to the active tabpanel. |
+| `Enter` / `Space` | Activate the focused tab. |
+| `ArrowLeft` / `ArrowRight` | Move focus between tabs (follows reading direction in RTL). |
+| `Home` / `End` | Focus the first / last tab. |
+| `Delete` / `Backspace` | Remove the focused tab when `data-deletable` is set. |
+
+### Programmatic API
 
 ```js
-customElements.define('cinq-tabs', Tabs);
+const $tabs = document.querySelector("cinq-tabs");
+
+$tabs.destroy();
+// mutate tablist / panels...
+$tabs.init();
 ```
 
-The browser then automatically “upgrades” every existing `<cinq-tabs>` in the DOM:
-it instantiates the `Tabs` class, calls its `connectedCallback`, which in turn
-calls `init()`.  
-You don’t need to do `new Tabs(...)` or call `init()` manually – writing the
-markup and importing the module is enough.
-
-### Tablist
-
-The element that serves as a container for the set of tabs. The `role="tablist"` attribute is required.  
-The `aria-label=""` attribute provides a label that describes the purpose of the set of tabs.
-
-The `role="tablist"`needs to be on a container element such as a `<div>`, `<nav>`, or `<section>`. It should not be placed on a `<ul>` element. Direct children of the tablist must be the tab elements with `role="tab"`.
-
-```html
-<div role="tablist" aria-label="navigation">
-	<button
-		type="button"
-		class="is-active"
-		role="tab"
-		aria-selected="true"
-		aria-controls="home-tab"
-		id="home"
-	>
-		Home
-	</button>
-	<button
-		type="button"
-		role="tab"
-		aria-selected="false"
-		aria-controls="project-tab"
-		id="project"
-		tabindex="-1"
-	>
-		Project
-	</button>
-	<button
-		type="button"
-		role="tab"
-		aria-selected="false"
-		aria-controls="contact-tab"
-		id="contact"
-		tabindex="-1"
-		data-deletable=""
-	>
-		Contact
-	</button>
-</div>
-```
-
-### Tab
-
-An element in the tab list that serves as a label for one of the tab panels and can be activated to display that panel.
-
-```html
-<button
-	type="button"
-	role="tab"
-	aria-selected="false"
-	aria-controls="foo-tab"
-	id="foo"
-	tabindex="-1"
->
-	Project
-</button>
-```
-
-The `role="tab"` attribute is required.
-
-The `aria-controls="foo-tab"` refers to the id of the tabpanel element associated with the tab.
-
-Since an HTML button element is used for the tab, it is not necessary to set `tabindex="0"` on the selected (active) tab element.
-
-Is the tabulation deletable? You can set up this option by adding the `data-deletable` attribute on button.
-
-To active the button on first load, add a `is-active` class to the button, remove the `tabindex` attribute and switch to `true` the `aria-selected` attribute.
-
-### Tabpanel
-
-The element that contains the content associated with a tab.
-
-```html
-<section tabindex="0" role="tabpanel" aria-labelledby="foo" id="foo-tab">
-	<p>
-		The galeb duhr is a curious boulder-like creature with appendages that act as hands and feet.
-		These intelligent beings are very large and slow-moving. They live in rocky or mountainous
-		areas where they can feel the earth power and control the rocks around them.
-	</p>
-</section>
-```
-
-To active panel on first load, add a `is-active` class to it.
-
-## Keyboard support
-
-| Key                       | Function                                                                                                                                                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Tab                       | <ul><li>When focus moves into the tab list, places focus on the active tab element</li><li>When the tab list contains the focus, moves focus to the next element in the tab sequence, which is the <code>tabpanel</code> element.</li></ul> |
-| Enter<br>Space            | When a tab has focus, activates the tab, causing its associated panel to be displayed.                                                                                                                                         |
-| Right Arrow               | When a tab has focus (LTR): moves focus to the next tab (wraps to first on last). In RTL, Right Arrow moves to the previous tab.                                                                                               |
-| Left Arrow                | When a tab has focus (LTR): moves focus to the previous tab (wraps to last on first). In RTL, Left Arrow moves to the next tab.                                                                                               |
-| Home<br>`fn + left arrow` | When a tab has focus, moves focus to the first tab.                                                                                                                                                                            |
-| End<br>`fn + right arrow` | When a tab has focus, moves focus to the last tab.                                                                                                                                                                             |
-| Delete                    | When focus is on the **Contact** tab, removes the tab from the tab list and places focus on the previous tab.                                                                                                                  |
-
-### RTL (right-to-left)
-
-Navigation with Left/Right arrow keys follows the **reading direction**. If the tablist (or a parent) has `dir="rtl"` or inherits a right-to-left `direction` from CSS, "next" tab is triggered by **Left Arrow** and "previous" by **Right Arrow**, so keyboard behavior matches the visual order (e.g. Arabic, Hebrew).
-
-## Options
-
-Options are configured via **data attributes** on the Web Component:
-
-| Attribute          | Type    | Default | Description                                                                                                      |
-| ------------------ | ------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
-| `data-tabs-hash`   | boolean | `true`  | Enables or disables synchronization of the active tab with `location.hash`.                                      |
-| `data-tabs-delay`  | number  | `0`     | Delay in ms before automatic activation when the user navigates with arrow keys (0 = no delay, i.e. manual mode). |
+Call `destroy()` before mutating light DOM, then `init()` to re-bind.
 
 ## Events
 
-Events are dispatched on the **tab** element (the button with `role="tab"`). Listen on the tab, or use event delegation from `<cinq-tabs>`.
+Events are dispatched on the **tab** element (the button with `role="tab"`).
+Listen on each tab, or use event delegation from `<cinq-tabs>`. Prefer
+constants from `@agencecinq/utils`:
 
-| Event                | Cancelable | Detail                                      | Description                                                                 |
-| -------------------- | ---------- | ------------------------------------------- | --------------------------------------------------------------------------- |
-| `tabs:before-activate`| Yes        | `{ index, controls, element }`              | Fired before activation. Call `preventDefault()` to cancel. For async work, cancel then call `tabs.activateTab(index)` when ready. |
-| `tabs:activate`       | No         | `{ controls, element }`                     | Fired when the tab is activated.                                           |
-| `tabs:delete`         | No         | `{ controls, element }`                      | Fired when the tab is removed.                                             |
+| Event | Constant | Cancelable | Detail | Description |
+| ----- | -------- | ---------- | ------ | ----------- |
+| `tabs:before-activate` | `TABS_BEFORE_ACTIVATE` | Yes | `{ index, controls, element }` | Fired before activation. Cancel to abort. |
+| `tabs:activate` | `TABS_ACTIVATE` | No | `{ controls, element }` | Fired when the tab is activated. |
+| `tabs:delete` | `TABS_DELETE` | No | `{ controls, element }` | Fired when a deletable tab is removed. |
 
-### Method: `activateTab(index)`
+```js
+import { EVENTS } from "@agencecinq/utils";
 
-On the `<cinq-tabs>` element (or the `Tabs` instance). Call after preventing `tabs:before-activate` to complete activation (e.g. after loading data).
+const $tabs = document.querySelector("cinq-tabs");
 
-```javascript
-const tabsEl = document.querySelector('cinq-tabs');
+$tabs.addEventListener(EVENTS.TABS_BEFORE_ACTIVATE, (event) => {
+  event.preventDefault();
 
-tabsEl.addEventListener('tabs:before-activate', (e) => {
-  const { index, controls, element } = e.detail;
-
-  // Optional: cancel and activate later (e.g. after async work)
-  e.preventDefault();
-  fetchData(controls).then(() => {
-    tabsEl.activateTab(index);
+  void fetchData(event.detail.controls).then(() => {
+    $tabs.tabs[event.detail.index].toggle();
   });
 });
 
-// Or: just listen to tabs:activate (no cancel)
-tabsEl.querySelectorAll('[role="tab"]').forEach((tab) => {
-  tab.addEventListener('tabs:activate', ({ detail }) => {
-    console.log('activated', detail.controls, detail.element);
-  });
+$tabs.addEventListener(EVENTS.TABS_ACTIVATE, ({ detail }) => {
+  console.log(detail.controls, detail.element);
 });
 ```
 
-## Build Setup
+## Build setup
 
 ```bash
-# depuis la racine du monorepo CINQ
 pnpm -C packages/tabs build
 ```
 
 ## Acknowledgments
 
--   [Deciding When to Make Selection Automatically Follow Focus](https://www.w3.org/TR/wai-aria-practices/#kbd_selection_follows_focus)
--   [Example of Tabs with Manual Activation](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/examples/tabs-manual/)
--   [Example of Tabs with Automatic Activation](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/examples/tabs-automatic/)
--   [Keycode](https://keycode.info/) by [Wes Bos](https://wesbos.com/)
+- [Tabs Pattern (WAI-ARIA Practices)](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
+- [Manual activation example](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/examples/tabs-manual/)
+- [Automatic activation example](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/examples/tabs-automatic/)
+
+See the [interactive docs](https://agencecinq.github.io/ui/components/tabs/) for live examples.

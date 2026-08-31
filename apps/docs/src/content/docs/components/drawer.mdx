@@ -62,7 +62,7 @@ matching `aria-controls`. The component adds interactivity only.
 
 | Attribute | Required | Description                                      |
 | --------- | -------- | ------------------------------------------------ |
-| `id`      | Yes      | Drawer identifier; must match button `aria-controls`. |
+| `id`      | Yes      | Drawer identifier (must match button `aria-controls`. |
 | `open`    | No       | Reflected state attribute (useful for styling). |
 
 ### Methods
@@ -81,8 +81,8 @@ dispatched on `document.documentElement`.
 | Event                 | Cancelable | Detail payload                         | Description                                                                 |
 | --------------------- | ---------- | -------------------------------------- | --------------------------------------------------------------------------- |
 | `drawer:toggle`       | No         | `{ drawer, trigger, trap }`           | Request open/close from a button.                                           |
-| `drawer:before-open`  | Yes        | `{ drawer, instance, trigger, resolve }` | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
-| `drawer:before-close` | Yes        | `{ drawer, instance, resolve }`       | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
+| `drawer:before-open`  | Yes        | `{ drawer, instance, trigger, resolve }` | Fired **before** `open` is set. Cancel to defer, then call `resolve()` to commit. |
+| `drawer:before-close` | Yes        | `{ drawer, instance, resolve }`       | Fired **before** `open` is removed. Cancel to defer, then call `resolve()` to commit. |
 | `drawer:open`         | No         | `{ drawer, trigger? }`                | Fired after `open` is set (trap, scroll lock, side effects).                |
 | `drawer:close`        | No         | `{ drawer }`                          | Fired after `open` is removed (scroll unlock, focus restore, side effects). |
 
@@ -217,7 +217,7 @@ This copies the package snippet to your theme:
 
 Only one drawer stays open at a time. A shared return-focus target remembers the
 page control that started the chain (triggers inside a drawer are ignored). Open
-notes → switch to bestiary → close: focus lands back on **Open left**.
+notes, switch to bestiary to close: focus lands back on **Open left**.
 
 <DrawerExclusivePlayground />
 

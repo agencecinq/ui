@@ -28,7 +28,7 @@ export class Panel {
 
   init(): void {
     this.$button =
-      this.el.querySelector<HTMLButtonElement>("[data-accordion-header]") ||
+      this.el.querySelector<HTMLButtonElement>("[data-header]") ||
       this.el.querySelector<HTMLButtonElement>("button");
 
     if (!this.$button) {
@@ -49,11 +49,11 @@ export class Panel {
     }
 
     this.$inner =
-      this.$body.querySelector<HTMLElement>("[data-accordion-inner]") ||
+      this.$body.querySelector<HTMLElement>("[data-inner]") ||
       (this.$body.firstElementChild as HTMLElement | null);
 
     this.isDeselect = parseBoolean(
-      this.el.getAttribute("data-accordion-deselect"),
+      this.el.getAttribute("data-deselect"),
     );
     this.isOpen = this.$button.getAttribute("aria-expanded") === "true";
 
@@ -75,13 +75,13 @@ export class Panel {
 
     if (
       emit &&
-      !dispatchEvent(this.el, EVENTS.ACCORDION_PANEL_OPEN, this.#detail)
+      !dispatchEvent(this.el, EVENTS.ACCORDION_OPEN, this.#detail)
     ) {
       return false;
     }
 
     this.$button.setAttribute("aria-expanded", "true");
-    this.el.setAttribute("data-accordion-open", "true");
+    this.el.setAttribute("data-open", "true");
     this.$body.removeAttribute("hidden");
 
     this.#resize();
@@ -113,13 +113,13 @@ export class Panel {
 
     if (
       emit &&
-      !dispatchEvent(this.el, EVENTS.ACCORDION_PANEL_CLOSE, this.#detail)
+      !dispatchEvent(this.el, EVENTS.ACCORDION_CLOSE, this.#detail)
     ) {
       return false;
     }
 
     this.$button.setAttribute("aria-expanded", "false");
-    this.el.setAttribute("data-accordion-open", "false");
+    this.el.setAttribute("data-open", "false");
 
     this.#resize();
     this.$body.style.setProperty("max-height", `${this.height}px`);

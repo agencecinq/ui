@@ -1,11 +1,13 @@
+const base = "/ui/demo/dual-scroll";
+
 export const leftImages = [
-  "https://picsum.photos/seed/cinq-dual-scroll-left-a/640/480",
-  "https://picsum.photos/seed/cinq-dual-scroll-left-b/640/480",
-  "https://picsum.photos/seed/cinq-dual-scroll-left-c/640/480",
+  `${base}/left-a.jpg`,
+  `${base}/left-b.jpg`,
+  `${base}/left-c.jpg`,
 ];
 
 export const rightImages = [
-  "https://picsum.photos/seed/cinq-dual-scroll-right-a/640/480",
-  "https://picsum.photos/seed/cinq-dual-scroll-right-b/640/480",
-  "https://picsum.photos/seed/cinq-dual-scroll-right-c/640/480",
+  `${base}/right-a.jpg`,
+  `${base}/right-b.jpg`,
+  `${base}/right-c.jpg`,
 ];

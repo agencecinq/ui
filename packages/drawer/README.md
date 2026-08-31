@@ -1,15 +1,13 @@
+[![](https://img.shields.io/npm/v/@agencecinq/drawer)](https://www.npmjs.com/package/@agencecinq/drawer)
+[![](https://img.shields.io/npm/dm/@agencecinq/drawer)](https://www.npmjs.com/package/@agencecinq/drawer)
+
 # @agencecinq/drawer
 
-A high-performance, accessible, and lightweight Web Component for creating Drawers (off-canvas sidebars) in Shopify themes. Part of the **CINQ** internal tools ecosystem.
+> Accessible off-canvas drawer Web Component for Shopify themes.
 
-## Features
-
-* **Zero Dependencies**: Ultra-light footprint optimized for Shopify themes performance.
-* **Accessibility First**: Built-in focus trapping, keyboard navigation (ESC key), and ARIA support.
-* **Vite Integration**: Dedicated Vite plugin to automatically sync Liquid snippets with your Shopify theme's `snippets/` folder.
-* **Event-Driven**: Fully controllable via the shared `@agencecinq/utils` event system.
-
----
+A drawer slides content in from the edge of the viewport. `<cinq-drawer>`
+handles open/close state, focus management, and document-level events.
+Includes a Vite plugin to sync Liquid snippets in Shopify projects.
 
 ## Installation
 
@@ -17,36 +15,50 @@ A high-performance, accessible, and lightweight Web Component for creating Drawe
 pnpm add @agencecinq/drawer
 ```
 
----
+## Usage
 
-## Usage (Shopify Integration)
+```js
+import "@agencecinq/drawer";
+```
 
-### 1. Register the Vite Plugin
+```html
+<cinq-drawer id="cart-drawer">
+  <div data-dom="overlay"></div>
+  <div role="dialog" aria-modal="true" aria-labelledby="cart-title">
+    <h2 id="cart-title">Your cart</h2>
+    ...
+  </div>
+</cinq-drawer>
 
-In your Shopify project's `vite.config.ts`, add the CINQ Drawer plugin. This will automatically copy the `cinq-drawer.html.liquid` snippet to your theme during development and build.
+<cinq-drawer-button>
+  <button aria-controls="cart-drawer" aria-expanded="false">
+    View cart
+  </button>
+</cinq-drawer-button>
+```
+
+Importing `@agencecinq/drawer` registers the Web Components automatically.
+No manual `init()` call required.
+
+> **HTML is the source of truth.** Provide dialog semantics, labelling, and
+> overlay markup yourself. Use an a11y linter (axe-core, Lighthouse) to catch
+> invalid markup.
+
+### Shopify integration
+
+Register the Vite plugin in your Shopify project. It copies the
+`cinq-drawer.html.liquid` snippet to your theme during development and build:
 
 ```typescript
-import { defineConfig } from 'vite';
-import { cinqDrawerPlugin } from '@agencecinq/drawer/plugin';
+import { defineConfig } from "vite";
+import { cinqDrawerPlugin } from "@agencecinq/drawer/plugin";
 
 export default defineConfig({
-  plugins: [
-    cinqDrawerPlugin()
-  ]
+  plugins: [cinqDrawerPlugin()],
 });
 ```
 
-### 2. Import the Component
-
-In your main JavaScript entry point (e.g. `theme.ts` or `main.js`):
-
-```javascript
-import '@agencecinq/drawer';
-```
-
-### 3. Implementation in Liquid
-
-Once the plugin has copied the snippet, you can render it in your layout or sections:
+Render the snippet in Liquid:
 
 ```liquid
 {% render 'cinq-drawer.html',
@@ -56,77 +68,59 @@ Once the plugin has copied the snippet, you can render it in your layout or sect
 
 <cinq-drawer-button>
   <button aria-controls="cart-drawer" aria-expanded="false">
-    View Cart
+    View cart
   </button>
 </cinq-drawer-button>
 ```
 
----
+### API
 
-## API Reference
+| Attribute | Required | Description |
+| --------- | -------- | ----------- |
+| `id` | **Yes** | Unique drawer identifier. Must match button `aria-controls`. |
+| `open` | No | Reflected open state. Useful for styling. |
 
-### Attributes
+| Method | Description |
+| ------ | ----------- |
+| `open()` | Opens the drawer. Returns `false` if already open, aborted, or deferred. |
+| `close()` | Closes the drawer. Returns `false` if already closed, aborted, or deferred. |
+| `toggle({ trigger?, trap? })` | Toggles open/close. |
+| `destroy()` | Removes listeners. |
+| `init()` | Re-binds after DOM mutation. Call `destroy()` first. |
 
-| Attribute | Description                                                 | Required |
-| --------- | ----------------------------------------------------------- | -------- |
-| `id`      | Unique identifier for the drawer instance.                  | Yes      |
-| `open`    | Reflects the current state. Can be used for styling in CSS. | No       |
+When you mutate drawer DOM at runtime, re-bind with `destroy()`, mutate,
+`init()`.
 
-### Methods
+## Events
 
-```javascript
-const $drawer = document.querySelector('cinq-drawer#cart-drawer');
-
-$drawer.open(); // returns false if already open, aborted, or deferred
-$drawer.close(); // returns false if already closed, aborted, or deferred
-$drawer.toggle({ trigger: null, trap: null });
-$drawer.destroy(); // unbind
-$drawer.init(); // re-bind
-```
-
-When you mutate the drawer DOM at runtime, re-bind with `destroy()` → mutate → `init()`.
-
-### Events
-
-Use constants from `@agencecinq/utils` (`EVENTS.DRAWER_*`). Events are dispatched on `document.documentElement`.
+Dispatched on `document.documentElement`. Prefer constants from
+`@agencecinq/utils`:
 
 | Event | Constant | Cancelable | Detail | Description |
 | ----- | -------- | ---------- | ------ | ----------- |
-| `drawer:toggle` | `DRAWER_TOGGLE` | No | `{ drawer, trigger, trap }` | Request open/close from a button |
-| `drawer:before-open` | `DRAWER_BEFORE_OPEN` | Yes | `{ drawer, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
-| `drawer:before-close` | `DRAWER_BEFORE_CLOSE` | Yes | `{ drawer, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
-| `drawer:open` | `DRAWER_OPEN` | No | `{ drawer, trigger? }` | Fired after `open` is set |
-| `drawer:close` | `DRAWER_CLOSE` | No | `{ drawer }` | Fired after `open` is removed |
+| `drawer:toggle` | `DRAWER_TOGGLE` | No | `{ drawer, trigger, trap }` | Request open/close from a button. |
+| `drawer:before-open` | `DRAWER_BEFORE_OPEN` | Yes | `{ drawer, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer, then call `resolve()`. |
+| `drawer:before-close` | `DRAWER_BEFORE_CLOSE` | Yes | `{ drawer, instance, resolve }` | Fired before `open` is removed. Cancel to defer, then call `resolve()`. |
+| `drawer:open` | `DRAWER_OPEN` | No | `{ drawer, trigger? }` | Fired after `open` is set. |
+| `drawer:close` | `DRAWER_CLOSE` | No | `{ drawer }` | Fired after `open` is removed. |
 
 ```js
-import { EVENTS } from '@agencecinq/utils';
+import { EVENTS } from "@agencecinq/utils";
 
 document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
   console.log(event.detail.drawer);
 });
 ```
 
-#### Deferring open or close
+### Deferring open or close
 
 Open and close paths dispatch cancelable `drawer:before-open` /
 `drawer:before-close` first. Call `preventDefault()` and commit with
 `detail.resolve()` when async work finishes:
 
 ```js
-import { EVENTS } from '@agencecinq/utils';
-
 document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_OPEN, (event) => {
-  if (event.detail.drawer !== 'cart-drawer') return;
-
-  event.preventDefault();
-
-  void doAsyncWork().then(() => {
-    event.detail.resolve();
-  });
-});
-
-document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
-  if (event.detail.drawer !== 'cart-drawer') return;
+  if (event.detail.drawer !== "cart-drawer") return;
 
   event.preventDefault();
 
@@ -136,34 +130,19 @@ document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) =>
 });
 ```
 
-`resolve()` is idempotent. TypeScript: `BeforeOpenDetail` and `BeforeCloseDetail`
-from `@agencecinq/drawer`.
+`resolve()` is idempotent. TypeScript: `BeforeOpenDetail` and
+`BeforeCloseDetail` from `@agencecinq/drawer`.
 
-**UX:** defer open when the fetch is quick and the panel would feel empty;
-otherwise open immediately and load on `drawer:open`. Defer close for save,
+**UX:** defer open when the fetch is quick and the panel would feel empty.
+Otherwise open immediately and load on `drawer:open`. Defer close for save,
 archive, or exit animation.
 
----
+## Build setup
 
-## Development (Monorepo)
-
-If you are working inside the CINQ monorepo:
-
-1. **Build the package**:
 ```bash
-pnpm build
+pnpm -C packages/drawer build
 ```
 
-2. **Add a version change**:
-```bash
-pnpm change
-```
+## Acknowledgments
 
-3. **Publish to NPM**:
-```bash
-pnpm release
-```
-
-## License
-
-Internal tool developed by **CINQ**. All rights reserved.
+See the [interactive docs](https://agencecinq.github.io/ui/components/drawer/) for live examples.

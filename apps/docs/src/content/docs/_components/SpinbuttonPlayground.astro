@@ -530,7 +530,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           Committed value:{' '}
           <span id="docs-spinbutton-typing-status" class="font-mono font-medium text-gray-900">5</span>
-          {' · '}
+          {', '}
           <code>aria-invalid</code>:{' '}
           <span id="docs-spinbutton-typing-invalid" class="font-mono font-medium text-gray-900">false</span>
         </p>
@@ -602,7 +602,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           Round:{' '}
           <span id="docs-spinbutton-throttle-value" class="font-mono font-medium text-gray-900">1</span>
-          {' · '}
+          {', '}
           Events dispatched:{' '}
           <span id="docs-spinbutton-throttle-events" class="font-mono font-medium text-gray-900">0</span>
         </p>
@@ -772,7 +772,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           Torches lit:{' '}
           <span id="docs-spinbutton-programmatic-status" class="font-mono font-medium text-gray-900">5</span>
-          {' · '}
+          {', '}
           Events:{' '}
           <span id="docs-spinbutton-programmatic-events" class="font-mono font-medium text-gray-900">0</span>
         </p>
@@ -800,7 +800,7 @@ import RegisterComponents from './RegisterComponents.astro';
               Torches
             </p>
             <p class="text-xs text-gray-500">
-              7 gp each ·{' '}
+              7 gp each,{' '}
               <span data-spinbutton-quantity-stock class="font-mono">12</span> in stock
             </p>
           </div>
@@ -846,7 +846,7 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-live="polite"
             aria-atomic="true"
           >
-            1 torch · 7 gp
+            1 torch, 7 gp
           </p>
         </div>
       </div>
@@ -857,7 +857,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Watch duration</h3>
           <p class="text-sm text-gray-600">
-            Camp rest split into hours and minutes. Rollover at the edges (59 → next hour when
+            Camp rest split into hours and minutes. Rollover at the edges (59 to next hour when
             allowed) lives in your app layer, not inside the component.
           </p>
         </div>
@@ -1033,7 +1033,7 @@ import RegisterComponents from './RegisterComponents.astro';
                   Henchmen
                 </h4>
                 <p class="text-xs text-amber-800">
-                  24 gp upkeep each · max{' '}
+                  24 gp upkeep each, max{' '}
                   <span data-spinbutton-ticket-max="henchman" class="font-mono font-medium">9</span>
                 </p>
               </div>
@@ -1083,7 +1083,7 @@ import RegisterComponents from './RegisterComponents.astro';
                   Porters
                 </h4>
                 <p class="text-xs text-violet-800">
-                  No pay · one per adventurer · max{' '}
+                  No pay, one per adventurer, max{' '}
                   <span data-spinbutton-ticket-max="porter" class="font-mono font-medium">2</span>
                 </p>
               </div>
@@ -1148,7 +1148,7 @@ import RegisterComponents from './RegisterComponents.astro';
               aria-live="polite"
               aria-atomic="true"
             >
-              3 in party · 108 gp upkeep · 9 slots open
+              3 in party, 108 gp upkeep, 9 slots open
             </p>
           </div>
         </div>
@@ -1161,7 +1161,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Character sheet</h3>
           <p class="text-sm text-gray-600">
             Six AD&amp;D ability scores, each bound between 3 and 18.{' '}
-            <strong>Roll 3d6</strong> calls <code>setValue()</code>; picking a <strong>class</strong>{' '}
+            <strong>Roll 3d6</strong> calls <code>setValue()</code>, then picking a <strong>class</strong>{' '}
             raises the minimum on the relevant abilities through <code>setMin()</code> (2nd-edition
             requirements). Out-of-range scores are clamped automatically.
           </p>
@@ -1454,7 +1454,7 @@ import RegisterComponents from './RegisterComponents.astro';
         const quantity = host.value.now;
         const lineTotal = quantity * unitPrice;
         const unit = labels[pluralRules.select(quantity)] ?? labels.other ?? 'torches';
-        total.textContent = `${quantity} ${unit} · ${lineTotal} gp`;
+        total.textContent = `${quantity} ${unit}, ${lineTotal} gp`;
       };
 
       host.addEventListener(EVENTS.SPINBUTTON_CHANGE, syncTotal);
@@ -1615,11 +1615,11 @@ import RegisterComponents from './RegisterComponents.astro';
         const porterMax = tickets.porter.value.max;
 
         if (henchmanMaxEl) {
-          henchmanMaxEl.textContent = henchmanMax === false ? '—' : String(henchmanMax);
+          henchmanMaxEl.textContent = henchmanMax === false ? '-' : String(henchmanMax);
         }
 
         if (porterMaxEl) {
-          porterMaxEl.textContent = porterMax === false ? '—' : String(porterMax);
+          porterMaxEl.textContent = porterMax === false ? '-' : String(porterMax);
         }
 
         const total = (['adventurer', 'henchman', 'porter'] as const).reduce((sum, key) => {
@@ -1641,7 +1641,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
         if (summary) {
           const slotsWord = pluralRules.select(left) === 'one' ? 'slot' : 'slots';
-          summary.textContent = `${taken} in party · ${total} gp upkeep · ${left} ${slotsWord} open`;
+          summary.textContent = `${taken} in party, ${total} gp upkeep, ${left} ${slotsWord} open`;
         }
       };
 

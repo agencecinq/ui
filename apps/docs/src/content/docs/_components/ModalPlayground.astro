@@ -32,7 +32,7 @@ import RegisterComponents from './RegisterComponents.astro';
           class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800"
           data-modal-status="confirm"
         >
-          Waiting for your choice…
+          Waiting for your choice...
         </p>
 
         <cinq-modal id="confirm-modal">
@@ -81,7 +81,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <div>
             <h3 class="text-lg font-semibold text-gray-900">Inline form</h3>
             <p class="text-sm text-gray-600">
-              A small form inside the modal — the dialog closes on submit and shows the result
+              A small form inside the modal. The dialog closes on submit and shows the result
               outside.
             </p>
           </div>
@@ -171,7 +171,7 @@ import RegisterComponents from './RegisterComponents.astro';
     const status = document.querySelector('[data-modal-status="confirm"]');
     if (root && status) {
       root.querySelector('[data-action="confirm"]')?.addEventListener('click', () => {
-        status.textContent = 'You memorise the spell — fireball is ready when you need it.';
+        status.textContent = 'You memorise the spell. Fireball is ready when you need it.';
       });
       root.querySelector('[data-action="cancel"]')?.addEventListener('click', () => {
         status.textContent = 'You leave the spell unmemorised and keep the slot free.';

@@ -29,7 +29,7 @@ Import once:
 import "@agencecinq/tabs";
 ```
 
-Then write the WAI-ARIA markup explicitly — the component adds interactivity
+Then write the WAI-ARIA markup explicitly. The component adds interactivity
 only.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
@@ -37,7 +37,7 @@ only.
 > Lighthouse) to catch invalid markup.
 
 ```html
-<cinq-tabs data-tabs-hash="false" data-tabs-delay="0">
+<cinq-tabs data-hash="false" data-delay="0">
   <div role="tablist" aria-label="Bestiary tabs">
     <button
       id="tab-troll"
@@ -64,7 +64,7 @@ only.
     aria-labelledby="tab-troll"
     tabindex="0"
   >
-    …
+    ...
   </section>
   <section
     id="panel-dracolich"
@@ -73,7 +73,7 @@ only.
     tabindex="0"
     hidden
   >
-    …
+    ...
   </section>
 </cinq-tabs>
 ```
@@ -84,8 +84,8 @@ Configure via data attributes:
 
 | Attribute         | Type          | Default | Description                                                                       |
 | ----------------- | ------------- | ------- | --------------------------------------------------------------------------------- |
-| `data-tabs-hash`  | `true/false`  | `true`  | Sync the active tab id to `location.hash` on activation.                          |
-| `data-tabs-delay` | `number (ms)` | `0`     | When `> 0`, arrow key navigation activates the focused tab after the given delay. |
+| `data-hash`  | `true/false`  | `true`  | Sync the active tab id to `location.hash` on activation.                          |
+| `data-delay` | `number (ms)` | `0`     | When `> 0`, arrow key navigation activates the focused tab after the given delay. |
 
 ## API
 
@@ -99,18 +99,18 @@ Configure via data attributes:
 
 | Event                 | Cancelable | Detail payload                 | Description                                                         |
 | --------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------- |
-| `tabs:before-activate` | Yes        | `{ index, controls, element }` | Fired before activation; call `event.preventDefault()` to override. |
+| `tabs:before-activate` | Yes        | `{ index, controls, element }` | Fired before activation. Call `event.preventDefault()` to override. |
 | `tabs:activate`        | No         | `{ controls, element }`        | Fired when a tab has been activated.                                |
 | `tabs:delete`          | No         | `{ controls, element }`        | Fired when a deletable tab has been removed.                        |
 
 ## Examples
 
-### Automatic activation (`data-tabs-delay`)
+### Automatic activation (`data-delay`)
 
-When `data-tabs-delay` is greater than `0`, moving focus with arrow keys will automatically activate the tab after the given delay (in ms):
+When `data-delay` is greater than `0`, moving focus with arrow keys will automatically activate the tab after the given delay (in ms):
 
 ```html
-<cinq-tabs data-tabs-hash="true" data-tabs-delay="300">
+<cinq-tabs data-hash="true" data-delay="300">
   <div role="tablist" aria-label="Monster tabs">
     <button
       id="tab-troll"
@@ -137,7 +137,7 @@ When `data-tabs-delay` is greater than `0`, moving focus with arrow keys will au
     aria-labelledby="tab-troll"
     tabindex="0"
   >
-    …
+    ...
   </section>
   <section
     id="panel-dracolich"
@@ -146,20 +146,20 @@ When `data-tabs-delay` is greater than `0`, moving focus with arrow keys will au
     tabindex="0"
     hidden
   >
-    …
+    ...
   </section>
 </cinq-tabs>
 ```
 
 #### Example
 
-Below, `data-tabs-delay="300"` means that when you move focus with Left/Right arrows, the tab will auto‑activate after 300 ms:
+Below, `data-delay="300"` means that when you move focus with Left/Right arrows, the tab will auto‑activate after 300 ms:
 
 <div class="not-content mt-6">
   <cinq-tabs
     class="block flex flex-col gap-4"
-    data-tabs-hash="true"
-    data-tabs-delay="300"
+    data-hash="true"
+    data-delay="300"
   >
     <div
       role="tablist"
@@ -197,7 +197,7 @@ Below, `data-tabs-delay="300"` means that when you move focus with Left/Right ar
       class="rounded-xl bg-white p-4 shadow"
     >
       <p class="text-gray-700">
-        Trolls regenerate quickly; automatic activation makes cycling through their stats fast with
+        Trolls regenerate quickly. Automatic activation makes cycling through their stats fast with
         only the arrow keys.
       </p>
     </section>
@@ -339,7 +339,7 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
 ## Interactive example
 
 <div class="not-content">
-  <cinq-tabs class="block flex flex-col gap-4" data-tabs-hash="false" data-tabs-delay="0">
+  <cinq-tabs class="block flex flex-col gap-4" data-hash="false" data-delay="0">
     <div
       role="tablist"
       aria-label="Bestiary tabs"
@@ -417,13 +417,13 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
 
 ### Hash syncing
 
-When `data-tabs-hash="true"`, activating a tab updates `location.hash` with the tab id. Reloading the page with that hash will restore the active tab:
+When `data-hash="true"`, activating a tab updates `location.hash` with the tab id. Reloading the page with that hash will restore the active tab:
 
 <div class="not-content mt-6">
   <cinq-tabs
     class="block flex flex-col gap-4"
-    data-tabs-hash="true"
-    data-tabs-delay="0"
+    data-hash="true"
+    data-delay="0"
   >
     <div
       role="tablist"
@@ -461,7 +461,7 @@ When `data-tabs-hash="true"`, activating a tab updates `location.hash` with the 
       class="rounded-xl bg-white p-4 shadow"
     >
       <p class="text-gray-700">
-        The galeb duhr looks like a boulder until it moves; its tab id
+        The galeb duhr looks like a boulder until it moves. Its tab id
         <code>#hash-galeb</code> is reflected in the URL when active.
       </p>
     </section>
@@ -474,7 +474,7 @@ When `data-tabs-hash="true"`, activating a tab updates `location.hash` with the 
       hidden
     >
       <p class="text-gray-700">
-        Cloakers lurk like ordinary cloaks until they unfold; activating this tab sets
+        Cloakers lurk like ordinary cloaks until they unfold. Activating this tab sets
         <code>#hash-cloaker</code> in the address bar.
       </p>
     </section>
@@ -488,7 +488,7 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
 
 <div class="not-content">
   <div class="flex flex-col gap-8">
-    <cinq-tabs class="block flex flex-col gap-4" data-tabs-hash="false" data-tabs-delay="0">
+    <cinq-tabs class="block flex flex-col gap-4" data-hash="false" data-delay="0">
       <div
         role="tablist"
         aria-label="Outer tabs"
@@ -529,7 +529,7 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
           `cinq-tabs` instance.
         </p>
 
-        <cinq-tabs class="block flex flex-col gap-3" data-tabs-hash="false" data-tabs-delay="0">
+        <cinq-tabs class="block flex flex-col gap-3" data-hash="false" data-delay="0">
           <div
             role="tablist"
             aria-label="Inner tabs"
@@ -594,7 +594,7 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
         hidden
       >
         <p class="text-gray-700">
-          Plush golems are every parent’s nightmare; they start as toys and quickly become
+          Plush golems are every parent’s nightmare. They start as toys and quickly become
           full-fledged family members.
         </p>
       </section>
@@ -609,7 +609,7 @@ If the tablist inherits `direction: rtl` (e.g. `dir="rtl"`), left/right arrow na
 
 ```html
 <div dir="rtl">
-  <cinq-tabs data-tabs-hash="false">…</cinq-tabs>
+  <cinq-tabs data-hash="false">...</cinq-tabs>
 </div>
 ```
 

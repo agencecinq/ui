@@ -33,6 +33,10 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Reference',
+          items: [{ label: 'Utils', slug: 'reference/utils' }],
+        },
+        {
           label: 'Sandbox',
           items: [
             { label: 'Overview', slug: 'sandbox' },

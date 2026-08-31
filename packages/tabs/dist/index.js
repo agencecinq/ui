@@ -15,8 +15,8 @@ var e = {
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
 	SWITCH_ACTIVATE: "switch:activate",
 	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_PANEL_OPEN: "accordion-panel:open",
-	ACCORDION_PANEL_CLOSE: "accordion-panel:close",
+	ACCORDION_OPEN: "accordion:open",
+	ACCORDION_CLOSE: "accordion:close",
 	COMBOBOX_LOADING: "combobox:loading",
 	COMBOBOX_LOADED: "combobox:loaded",
 	COMBOBOX_UPDATE: "combobox:update",
@@ -132,7 +132,7 @@ var o = class {
 	}
 	init() {
 		this.$tabList = this.querySelector("[role=\"tablist\"]");
-		let t = this.getAttribute("data-tabs-hash"), n = this.getAttribute("data-tabs-delay");
+		let t = this.getAttribute("data-hash"), n = this.getAttribute("data-delay");
 		if (this.hash = t === null ? this.hash : t !== "false" && t !== "0", n !== null) {
 			let e = parseInt(n, 10);
 			this.delay = Number.isNaN(e) ? 0 : e;

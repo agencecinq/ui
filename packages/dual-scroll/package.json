@@ -2,7 +2,7 @@
   "name": "@agencecinq/dual-scroll",
   "version": "0.0.0",
   "private": true,
-  "description": "Two columns, one scroll — inverted spring scroll inside a host zone (sandbox).",
+  "description": "Two columns, one scroll. Inverted spring scroll inside a host zone (sandbox).",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

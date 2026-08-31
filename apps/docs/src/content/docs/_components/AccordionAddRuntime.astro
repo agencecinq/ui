@@ -10,17 +10,17 @@ import RegisterComponents from './RegisterComponents.astro';
     transition: max-height 0.3s ease;
   }
 
-  .docs-accordion-add > [data-accordion-panel]:first-child > [data-accordion-header] {
+  .docs-accordion-add > [data-panel]:first-child > [data-header] {
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
   }
 
-  .docs-accordion-add > [data-accordion-panel]:last-child > [data-accordion-header][aria-expanded='false'] {
+  .docs-accordion-add > [data-panel]:last-child > [data-header][aria-expanded='false'] {
     border-bottom-left-radius: 0.75rem;
     border-bottom-right-radius: 0.75rem;
   }
 
-  .docs-accordion-add > [data-accordion-panel]:last-child [data-accordion-inner] {
+  .docs-accordion-add > [data-panel]:last-child [data-inner] {
     border-bottom-left-radius: 0.75rem;
     border-bottom-right-radius: 0.75rem;
   }
@@ -37,12 +37,12 @@ import RegisterComponents from './RegisterComponents.astro';
     transition: transform 0.2s ease;
   }
 
-  .docs-accordion-add [data-accordion-header][aria-expanded='true'] .docs-accordion-add-chevron {
+  .docs-accordion-add [data-header][aria-expanded='true'] .docs-accordion-add-chevron {
     transform: rotate(-135deg);
     margin-top: 0.125rem;
   }
 
-  .docs-accordion-add [data-accordion-header].focus {
+  .docs-accordion-add [data-header].focus {
     outline: 2px solid #111827;
     outline-offset: -2px;
   }
@@ -53,7 +53,7 @@ import RegisterComponents from './RegisterComponents.astro';
     <div>
       <h3 class="text-lg font-semibold text-gray-900">Add panels at runtime</h3>
       <p class="text-sm text-gray-600">
-        The pattern is: <code class="font-mono">destroy()</code> → mutate DOM →
+        The pattern is: <code class="font-mono">destroy()</code>, mutate DOM,
         <code class="font-mono">init()</code>.
       </p>
     </div>
@@ -73,7 +73,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <input
           class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
           type="text"
-          placeholder="E.g. Hangs from the ceiling…"
+          placeholder="E.g. Hangs from the ceiling..."
           data-input="content"
         />
       </label>
@@ -105,13 +105,13 @@ import RegisterComponents from './RegisterComponents.astro';
 
     <cinq-accordion
       class="docs-accordion-add max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
-      data-accordion-hash="false"
+      data-hash="false"
       data-demo="accordion-add"
     >
-      <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+      <div data-panel data-open="true" data-deselect="true">
         <button
           type="button"
-          data-accordion-header
+          data-header
           id="docs-accordion-add-galeb-header"
           class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
           aria-expanded="true"
@@ -126,7 +126,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-labelledby="docs-accordion-add-galeb-header"
         >
           <div
-            data-accordion-inner
+            data-inner
             class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
           >
             <p class="m-0">
@@ -137,10 +137,10 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
       </div>
 
-      <div data-accordion-panel data-accordion-open="false">
+      <div data-panel data-open="false">
         <button
           type="button"
-          data-accordion-header
+          data-header
           id="docs-accordion-add-troll-header"
           class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
           aria-expanded="false"
@@ -156,7 +156,7 @@ import RegisterComponents from './RegisterComponents.astro';
           hidden
         >
           <div
-            data-accordion-inner
+            data-inner
             class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
           >
             <p class="m-0">
@@ -226,10 +226,10 @@ import RegisterComponents from './RegisterComponents.astro';
 
       accordion.insertAdjacentHTML(
         'beforeend',
-        `<div data-accordion-panel data-accordion-open="false">
+        `<div data-panel data-open="false">
           <button
             type="button"
-            data-accordion-header
+            data-header
             id="${headerId}"
             class="${headerClass}"
             aria-expanded="false"
@@ -244,7 +244,7 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-labelledby="${headerId}"
             hidden
           >
-            <div data-accordion-inner class="${innerClass}">
+            <div data-inner class="${innerClass}">
               <p class="m-0">${escapeHtml(content)}</p>
             </div>
           </div>

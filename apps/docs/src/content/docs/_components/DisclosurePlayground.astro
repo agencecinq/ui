@@ -11,7 +11,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Basic disclosure</h3>
           <p class="text-sm text-gray-600">
-            A single trigger toggles one region. The button label stays fixed — open/close events are
+            A single trigger toggles one region. The button label stays fixed. Open/close events are
             logged below.
           </p>
         </div>
@@ -41,7 +41,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last event: <span id="docs-disclosure-status" class="font-mono font-medium text-gray-900">—</span>
+          Last event: <span id="docs-disclosure-status" class="font-mono font-medium text-gray-900">-</span>
         </p>
       </div>
     </section>
@@ -52,7 +52,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Updating the button label</h3>
           <p class="text-sm text-gray-600">
             Listen to <code>DISCLOSURE_BUTTON_OPEN</code> / <code>DISCLOSURE_BUTTON_CLOSE</code> and
-            update the trigger text yourself — useful for Show/Hide copy or i18n.
+            update the trigger text yourself. Useful for Show/Hide copy or i18n.
           </p>
         </div>
 
@@ -97,7 +97,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <article class="max-w-prose text-sm leading-relaxed text-gray-700">
           <p class="m-0">
-            The ruined keep broods over the moors — a crumbling fortress built for siege
+            The ruined keep broods over the moors. A crumbling fortress built for siege
             and betrayal.
           </p>
 
@@ -128,7 +128,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div class="flex flex-col gap-3">
           <h3 class="m-0 text-lg font-semibold text-gray-900">One button, multiple targets</h3>
           <p class="m-0 text-sm text-gray-600">
-            <code>aria-controls</code> is an ID reference list — one trigger can open every listed
+            <code>aria-controls</code> is an ID reference list. One trigger can open every listed
             region. Each region can be dismissed on its own, then <code>update()</code> keeps <code>aria-expanded</code> honest.
           </p>
           <p
@@ -222,8 +222,8 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Multiple buttons, one target</h3>
           <p class="text-sm text-gray-600">
             Several triggers can share the same <code>aria-controls</code> ID. Listen to the
-            open/close events and keep each trigger’s <code>aria-expanded</code> in sync yourself —
-            use <code>event.detail.open</code> and <code>event.detail.$button</code>.
+            open/close events and keep each trigger's <code>aria-expanded</code> in sync yourself.
+            Use <code>event.detail.open</code> and <code>event.detail.$button</code>.
           </p>
         </div>
 
@@ -259,7 +259,7 @@ import RegisterComponents from './RegisterComponents.astro';
           hidden
         >
           <p class="m-0">
-            The rune translates to <strong>“Beware the sleeping flame”</strong> — the same warning
+            The rune translates to <strong>“Beware the sleeping flame”</strong>. The same warning
             appears in the adventurer’s journal beside a sketch of the dungeon door.
           </p>
         </div>
@@ -275,7 +275,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Programmatic open &amp; close</h3>
           <p class="text-sm text-gray-600">
-            Call <code>open()</code> or <code>close()</code> on the host element — from an external
+            Call <code>open()</code> or <code>close()</code> on the host element. From an external
             control, a dismiss button inside the region, or your own routing logic.
           </p>
         </div>
@@ -332,7 +332,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Silent updates</h3>
           <p class="text-sm text-gray-600">
             Pass <code>false</code> to <code>open()</code> or <code>close()</code> to mutate{' '}
-            <code>hidden</code> without dispatching an event — useful when your app already owns
+            <code>hidden</code> without dispatching an event. Useful when your app already owns
             the transition or wants to avoid duplicate listeners firing.
           </p>
         </div>
@@ -403,7 +403,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <span id="docs-disclosure-silent-state" class="font-mono font-medium text-gray-900">
             closed
           </span>
-          {' · '}
+          {', '}
           Events dispatched:{' '}
           <span id="docs-disclosure-silent-events" class="font-mono font-medium text-gray-900">
             0
@@ -417,7 +417,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Cancellable events</h3>
           <p class="text-sm text-gray-600">
-            Open and close events fire <em>before</em> the state changes. Call <code>event.preventDefault()</code> to abort — useful for confirmations or gating access.
+            Open and close events fire <em>before</em> the state changes. Call <code>event.preventDefault()</code> to abort. Useful for confirmations or gating access.
           </p>
         </div>
 
@@ -443,11 +443,11 @@ import RegisterComponents from './RegisterComponents.astro';
           class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-700"
           hidden
         >
-          <p class="m-0">X marks a sunken vault beneath the old lighthouse — approach at low tide only.</p>
+          <p class="m-0">X marks a sunken vault beneath the old lighthouse. Approach at low tide only.</p>
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last attempt: <span id="docs-disclosure-cancel-status" class="font-mono font-medium text-gray-900">—</span>
+          Last attempt: <span id="docs-disclosure-cancel-status" class="font-mono font-medium text-gray-900">-</span>
         </p>
       </div>
     </section>
@@ -458,7 +458,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Confirm before close</h3>
           <p class="text-sm text-gray-600">
             Gate the close transition with <code>event.preventDefault()</code> on{' '}
-            <code>DISCLOSURE_BUTTON_CLOSE</code> — for unsaved notes, in-progress reads, or any
+            <code>DISCLOSURE_BUTTON_CLOSE</code>. For unsaved notes, in-progress reads, or any
             dismiss that needs confirmation.
           </p>
         </div>
@@ -487,13 +487,13 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <p class="m-0">
             Retrieve the sigil from the sunken vault before the new moon. The lighthouse keeper
-            knows the tide tables — do not confront him until you have proof of the cult&apos;s pact.
+            knows the tide tables. Do not confront him until you have proof of the cult&apos;s pact.
           </p>
         </div>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           Last close attempt:{' '}
-          <span id="docs-disclosure-confirm-status" class="font-mono font-medium text-gray-900">—</span>
+          <span id="docs-disclosure-confirm-status" class="font-mono font-medium text-gray-900">-</span>
         </p>
       </div>
     </section>
@@ -569,7 +569,7 @@ import RegisterComponents from './RegisterComponents.astro';
       componentsTrigger.textContent = visible > 0 ? labels.open : labels.closed;
     };
 
-    // Events fire before the DOM mutates — refresh after open/close apply.
+    // Events fire before the DOM mutates. Refresh after open/close apply.
     componentsHost.addEventListener(EVENTS.DISCLOSURE_BUTTON_OPEN, () => {
       queueMicrotask(updateMultiUI);
     });

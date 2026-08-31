@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 7.1.0
+
+### Minor Changes
+
+- Rename accordion events to `accordion:open` / `accordion:close`. Rename `EVENTS.ACCORDION_PANEL_*` to `EVENTS.ACCORDION_*`.
+
 ## 7.0.0
 
 ### Major Changes

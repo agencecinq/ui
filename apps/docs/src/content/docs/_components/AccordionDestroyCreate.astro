@@ -10,17 +10,17 @@ import RegisterComponents from './RegisterComponents.astro';
     transition: max-height 0.3s ease;
   }
 
-  .docs-accordion-runtime > [data-accordion-panel]:first-child > [data-accordion-header] {
+  .docs-accordion-runtime > [data-panel]:first-child > [data-header] {
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
   }
 
-  .docs-accordion-runtime > [data-accordion-panel]:last-child > [data-accordion-header][aria-expanded='false'] {
+  .docs-accordion-runtime > [data-panel]:last-child > [data-header][aria-expanded='false'] {
     border-bottom-left-radius: 0.75rem;
     border-bottom-right-radius: 0.75rem;
   }
 
-  .docs-accordion-runtime > [data-accordion-panel]:last-child [data-accordion-inner] {
+  .docs-accordion-runtime > [data-panel]:last-child [data-inner] {
     border-bottom-left-radius: 0.75rem;
     border-bottom-right-radius: 0.75rem;
   }
@@ -37,12 +37,12 @@ import RegisterComponents from './RegisterComponents.astro';
     transition: transform 0.2s ease;
   }
 
-  .docs-accordion-runtime [data-accordion-header][aria-expanded='true'] .docs-accordion-runtime-chevron {
+  .docs-accordion-runtime [data-header][aria-expanded='true'] .docs-accordion-runtime-chevron {
     transform: rotate(-135deg);
     margin-top: 0.125rem;
   }
 
-  .docs-accordion-runtime [data-accordion-header].focus {
+  .docs-accordion-runtime [data-header].focus {
     outline: 2px solid #111827;
     outline-offset: -2px;
   }
@@ -51,7 +51,7 @@ import RegisterComponents from './RegisterComponents.astro';
     opacity: 0.55;
   }
 
-  .docs-accordion-runtime[data-unbound] [data-accordion-header] {
+  .docs-accordion-runtime[data-unbound] [data-header] {
     pointer-events: none;
     cursor: not-allowed;
   }
@@ -64,7 +64,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <h3 class="text-lg font-semibold text-gray-900">Destroy / Create</h3>
         <p class="text-sm text-gray-600">
           Useful when you mutate the DOM and want to re-bind events.
-          Pattern: <code class="font-mono">destroy()</code> → mutate →
+          Pattern: <code class="font-mono">destroy()</code>, mutate,
           <code class="font-mono">init()</code>.
         </p>
       </div>
@@ -88,13 +88,13 @@ import RegisterComponents from './RegisterComponents.astro';
 
     <cinq-accordion
       class="docs-accordion-runtime max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
-      data-accordion-hash="false"
+      data-hash="false"
       data-demo="accordion-destroy"
     >
-      <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+      <div data-panel data-open="true" data-deselect="true">
         <button
           type="button"
-          data-accordion-header
+          data-header
           id="docs-accordion-dc-1-header"
           class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
           aria-expanded="true"
@@ -109,7 +109,7 @@ import RegisterComponents from './RegisterComponents.astro';
           aria-labelledby="docs-accordion-dc-1-header"
         >
           <div
-            data-accordion-inner
+            data-inner
             class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
           >
             <p class="m-0">Trolls regenerate 3 hp per round unless burned or acid-treated.</p>
@@ -117,10 +117,10 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
       </div>
 
-      <div data-accordion-panel data-accordion-open="false">
+      <div data-panel data-open="false">
         <button
           type="button"
-          data-accordion-header
+          data-header
           id="docs-accordion-dc-2-header"
           class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
           aria-expanded="false"
@@ -136,17 +136,17 @@ import RegisterComponents from './RegisterComponents.astro';
           hidden
         >
           <div
-            data-accordion-inner
+            data-inner
             class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
           >
-            <p class="m-0">Looks like a boulder until it animates — then the fists start flying.</p>
+            <p class="m-0">Looks like a boulder until it animates. Then the fists start flying.</p>
           </div>
         </div>
       </div>
     </cinq-accordion>
 
     <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-      Status&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-gray-900">Bound — headers respond</span>
+      Status&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-gray-900">Bound. Headers respond</span>
     </p>
   </div>
 </section>
@@ -160,7 +160,7 @@ import RegisterComponents from './RegisterComponents.astro';
     const createBtn = root?.querySelector('[data-action="create"]');
 
     const setBound = (bound) => {
-      if (status) status.textContent = bound ? 'Bound — headers respond' : 'Destroyed — headers inert';
+      if (status) status.textContent = bound ? 'Bound, headers respond' : 'Destroyed, headers inert';
       accordion?.toggleAttribute('data-unbound', !bound);
       destroyBtn && (destroyBtn.disabled = !bound);
       createBtn && (createBtn.disabled = bound);

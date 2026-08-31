@@ -149,7 +149,7 @@ all ARIA state lives on the focusable `<input>`. The host carries no ARIA state.
 
 ### `formatValue` and plural rules
 
-Pluralisation depends on locale (English: one/other; Polish: one/few/many/other;
+Pluralisation depends on locale (English: one/other, Polish: one/few/many/other;
 Arabic: six categories). Do not hard-code `value === 1` in a Web Component.
 Assign `formatValue` and use `Intl.PluralRules` (or your i18n library) in the
 app layer. Add one `[aria-live]` child inside the host when you want screen
@@ -225,7 +225,7 @@ that node. For a visible readout in your UI, skip `sr-only` or mirror
 
 The input **must** have an accessible name. Use one of:
 
-- `aria-label="…"` on the `<input>`
+- `aria-label="..."` on the `<input>`
 - `aria-labelledby="some-id"` referencing a visible label
 - Visible label text associated with the input (via `<label>` or `aria-labelledby`)
 
@@ -327,7 +327,7 @@ After mutating light DOM, call `destroy()` then `init()`:
 
 ```js
 $spinbutton.destroy();
-// mutate light DOM…
+// mutate light DOM...
 $spinbutton.init();
 ```
 

@@ -15,8 +15,8 @@ var e = {
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
 	SWITCH_ACTIVATE: "switch:activate",
 	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_PANEL_OPEN: "accordion-panel:open",
-	ACCORDION_PANEL_CLOSE: "accordion-panel:close",
+	ACCORDION_OPEN: "accordion:open",
+	ACCORDION_CLOSE: "accordion:close",
 	COMBOBOX_LOADING: "combobox:loading",
 	COMBOBOX_LOADED: "combobox:loaded",
 	COMBOBOX_UPDATE: "combobox:update",
@@ -69,22 +69,22 @@ var o = (e) => {
 		this.el = e, this.index = t;
 	}
 	init() {
-		if (this.$button = this.el.querySelector("[data-accordion-header]") || this.el.querySelector("button"), !this.$button) throw Error("Accordion panel: header button not found");
+		if (this.$button = this.el.querySelector("[data-header]") || this.el.querySelector("button"), !this.$button) throw Error("Accordion panel: header button not found");
 		if (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? document.getElementById(this.$button.getAttribute("aria-controls") || ""), !this.$body) throw Error("Accordion panel: aria-controls target not found");
-		this.$inner = this.$body.querySelector("[data-accordion-inner]") || this.$body.firstElementChild, this.isDeselect = n(this.el.getAttribute("data-accordion-deselect")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.#o(), this.$button.addEventListener("click", this.#r), this.$button.addEventListener("focus", this.#i), this.$button.addEventListener("blur", this.#a), window.addEventListener("resize", this.#o);
+		this.$inner = this.$body.querySelector("[data-inner]") || this.$body.firstElementChild, this.isDeselect = n(this.el.getAttribute("data-deselect")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.#o(), this.$button.addEventListener("click", this.#r), this.$button.addEventListener("focus", this.#i), this.$button.addEventListener("blur", this.#a), window.addEventListener("resize", this.#o);
 	}
 	get open() {
 		return this.$button?.getAttribute("aria-expanded") === "true";
 	}
 	openPanel(n = !0) {
-		return !this.$button || !this.$body || this.open || n && !t(this.el, e.ACCORDION_PANEL_OPEN, this.#s) ? !1 : (this.$button.setAttribute("aria-expanded", "true"), this.el.setAttribute("data-accordion-open", "true"), this.$body.removeAttribute("hidden"), this.#o(), this.$body.style.setProperty("max-height", "0"), this.#n(), this.#e = requestAnimationFrame(() => {
+		return !this.$button || !this.$body || this.open || n && !t(this.el, e.ACCORDION_OPEN, this.#s) ? !1 : (this.$button.setAttribute("aria-expanded", "true"), this.el.setAttribute("data-open", "true"), this.$body.removeAttribute("hidden"), this.#o(), this.$body.style.setProperty("max-height", "0"), this.#n(), this.#e = requestAnimationFrame(() => {
 			this.#e = 0, this.$body && (this.$body.style.setProperty("max-height", `${this.height}px`), this.#t = window.setTimeout(() => {
 				this.#t = 0, this.$body?.style.removeProperty("max-height");
 			}, this.transitionDuration));
 		}), s(this.el), this.isOpen = !0, !0);
 	}
 	close(n = !0) {
-		return !this.$button || !this.$body || !this.open || n && !t(this.el, e.ACCORDION_PANEL_CLOSE, this.#s) ? !1 : (this.$button.setAttribute("aria-expanded", "false"), this.el.setAttribute("data-accordion-open", "false"), this.#o(), this.$body.style.setProperty("max-height", `${this.height}px`), this.#n(), this.#e = requestAnimationFrame(() => {
+		return !this.$button || !this.$body || !this.open || n && !t(this.el, e.ACCORDION_CLOSE, this.#s) ? !1 : (this.$button.setAttribute("aria-expanded", "false"), this.el.setAttribute("data-open", "false"), this.#o(), this.$body.style.setProperty("max-height", `${this.height}px`), this.#n(), this.#e = requestAnimationFrame(() => {
 			this.#e = 0, this.$body?.style.setProperty("max-height", "0");
 		}), this.#t = window.setTimeout(() => {
 			this.#t = 0, this.$body?.setAttribute("hidden", "");
@@ -138,18 +138,18 @@ var o = (e) => {
 	}
 	init() {
 		this.options = {
-			multiselectable: n(this.getAttribute("data-accordion-multiselectable")),
-			hash: n(this.getAttribute("data-accordion-hash"), u.hash)
-		}, this.panels = [...this.querySelectorAll("[data-accordion-panel]")].filter((e) => e.closest("cinq-accordion") === this).map((e, t) => {
+			multiselectable: n(this.getAttribute("data-multiselectable")),
+			hash: n(this.getAttribute("data-hash"), u.hash)
+		}, this.panels = [...this.querySelectorAll("[data-panel]")].filter((e) => e.closest("cinq-accordion") === this).map((e, t) => {
 			let n = new l(e, t);
 			return n.init(), n;
-		}), this.addEventListener(e.ACCORDION_PANEL_OPEN, this.#e), this.addEventListener("keydown", this.#n), this.options.hash && (window.addEventListener("hashchange", this.#t), this.#t());
+		}), this.addEventListener(e.ACCORDION_OPEN, this.#e), this.addEventListener("keydown", this.#n), this.options.hash && (window.addEventListener("hashchange", this.#t), this.#t());
 	}
 	closeAll() {
 		this.panels.forEach((e) => e.close(!1));
 	}
 	destroy() {
-		this.removeEventListener(e.ACCORDION_PANEL_OPEN, this.#e), this.removeEventListener("keydown", this.#n), window.removeEventListener("hashchange", this.#t), this.panels.forEach((e) => e.destroy()), this.panels = [];
+		this.removeEventListener(e.ACCORDION_OPEN, this.#e), this.removeEventListener("keydown", this.#n), window.removeEventListener("hashchange", this.#t), this.panels.forEach((e) => e.destroy()), this.panels = [];
 	}
 	#e = (e) => {
 		let { el: t, index: n } = e.detail;

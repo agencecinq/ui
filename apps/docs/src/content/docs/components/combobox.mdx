@@ -190,13 +190,13 @@ host.search = (query) =>
   );
 
 host.addEventListener(EVENTS.COMBOBOX_SUBMIT, ({ detail }) => {
-  // detail.value = chosen monster; input still holds the filter ("be", etc.)
+  // detail.value = chosen monster. Input still holds the filter ("be", etc.)
   picked.textContent = detail.value;
 });
 ```
 
 Try it in the **Custom select** playground section: type `be`, pick **Beholder**. Query
-stays `be`; Picked shows `Beholder`.
+stays `be`. Picked shows `Beholder`.
 
 For a fuller UI (rich external options, detail panel, empty state), see **Compendium (advanced)** in the playground.
 
@@ -206,7 +206,7 @@ Combine **external** mode, **custom** select, and your own markup to build comma
 compendium UIs:
 
 - `search` returns grouped HTML (`{ html }`) with avatars, badges, metadata on each `[role="option"]`
-- `data-select-mode="custom"` keeps the filter in the input; `combobox:submit` drives a detail panel
+- `data-select-mode="custom"` keeps the filter in the input. `combobox:submit` drives a detail panel
 - `data-*` on options (`data-cr`, `data-type`, etc.) are read in the submit handler
 - pair `combobox:empty` with a visible empty state and `data-debounce` for async feel
 
@@ -337,7 +337,7 @@ cinq-combobox [role="listbox"] {
 }
 ```
 
-`position: fixed` + anchor keeps the list aligned to the input; `flip-block` opens upward when there is not enough space below.
+`position: fixed` + anchor keeps the list aligned to the input. `flip-block` opens upward when there is not enough space below.
 
 ## Playground (live)
 

@@ -51,9 +51,7 @@ pnpm add @agencecinq/spinbutton
 import "@agencecinq/spinbutton";
 ```
 
-Importing `@agencecinq/spinbutton` registers the Web Component in the
-**Custom Elements Registry** (`customElements.define('cinq-spinbutton', Spinbutton)`).
-The browser upgrades every existing `<cinq-spinbutton>` in the DOM automatically.
+Importing `@agencecinq/spinbutton` registers the Web Component automatically.
 No manual `init()` call required.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
@@ -97,7 +95,7 @@ See the [interactive docs](https://agencecinq.github.io/ui/components/spinbutton
 ### `formatValue` and plural rules
 
 Assign `formatValue` in JS. Use `Intl.PluralRules` (or your i18n library) for
-locale-aware pluralisation (English: one/other; Polish: one/few/many/other;
+locale-aware pluralisation (English: one/other, Polish: one/few/many/other;
 Arabic: up to six categories):
 
 ```js
@@ -185,7 +183,7 @@ After mutating light DOM (e.g. swapping the input), call `destroy()` then
 
 ```js
 $spinbutton.destroy();
-// mutate light DOM…
+// mutate light DOM...
 $spinbutton.init();
 ```
 

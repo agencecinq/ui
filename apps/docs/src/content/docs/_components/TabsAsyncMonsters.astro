@@ -31,8 +31,8 @@
 
     <cinq-tabs
       class="block flex flex-col gap-4"
-      data-tabs-hash="false"
-      data-tabs-delay="0"
+      data-hash="false"
+      data-delay="0"
       data-demo="async-monsters"
     >
     <div
@@ -72,7 +72,7 @@
         class="rounded-xl bg-white p-4 shadow"
       >
         <h3 class="text-lg font-semibold text-gray-900" data-monster-name>Adult Black Dragon</h3>
-        <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary…</p>
+        <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary...</p>
         <p class="mt-2 text-gray-700" data-monster-desc>
           This panel is populated from a public monster reference API on first activation.
         </p>
@@ -87,7 +87,7 @@
         hidden
       >
         <h3 class="text-lg font-semibold text-gray-900" data-monster-name>Ancient Gold Dragon</h3>
-        <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary…</p>
+        <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary...</p>
         <p class="mt-2 text-gray-700" data-monster-desc>
           Open this tab to fetch another creature entry.
         </p>
@@ -116,7 +116,7 @@
       const hp = data.hit_points;
       const type = data.type;
       const cr = data.challenge_rating;
-      metaEl.textContent = `${hp} HP · ${type} · CR ${cr}`;
+      metaEl.textContent = `${hp} HP, ${type}, CR ${cr}`;
     }
 
     if (descEl && Array.isArray(data.desc) && data.desc.length > 0) {
@@ -163,7 +163,7 @@
       }
     }
 
-    // For activations, just fetch and hydrate the panel; let `<cinq-tabs>` handle switching.
+    // For activations, just fetch and hydrate the panel. Let `<cinq-tabs>` handle switching.
     tabsEl.addEventListener(EVENTS.TABS_BEFORE_ACTIVATE, (event) => {
       const detail = event.detail;
       if (!detail) return;
@@ -230,7 +230,7 @@
           hidden
         >
           <h3 class="text-lg font-semibold text-gray-900" data-monster-name>${label}</h3>
-          <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary…</p>
+          <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary...</p>
           <p class="mt-2 text-gray-700" data-monster-desc>
             This panel is populated from a public monster reference API on activation.
           </p>

@@ -28,7 +28,7 @@ Import once:
 import "@agencecinq/accordion";
 ```
 
-Then write the WAI-ARIA markup explicitly — the component adds interactivity
+Then write the WAI-ARIA markup explicitly. The component adds interactivity
 only.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
@@ -37,10 +37,10 @@ only.
 
 ```html
 <cinq-accordion>
-  <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+  <div data-panel data-open="true" data-deselect="true">
     <button
       type="button"
-      data-accordion-header
+      data-header
       id="scores-header"
       aria-expanded="true"
       aria-controls="scores-body"
@@ -49,14 +49,14 @@ only.
     </button>
 
     <div id="scores-body" role="region" aria-labelledby="scores-header">
-      <div data-accordion-inner>Roll 3d6 for each ability and assign the results.</div>
+      <div data-inner>Roll 3d6 for each ability and assign the results.</div>
     </div>
   </div>
 
-  <div data-accordion-panel data-accordion-open="false">
+  <div data-panel data-open="false">
     <button
       type="button"
-      data-accordion-header
+      data-header
       id="class-header"
       aria-expanded="false"
       aria-controls="class-body"
@@ -65,7 +65,7 @@ only.
     </button>
 
     <div id="class-body" role="region" aria-labelledby="class-header" hidden>
-      <div data-accordion-inner>Check minimum ability scores, then pick a kit for starting gear.</div>
+      <div data-inner>Check minimum ability scores, then pick a kit for starting gear.</div>
     </div>
   </div>
 </cinq-accordion>
@@ -76,43 +76,43 @@ only.
 | Selector / attribute | Required | Role |
 | -------------------- | -------- | ---- |
 | `<cinq-accordion>` | **Yes** | Accordion container. |
-| `[data-accordion-panel]` | **Yes** | Panel wrapper for each section. |
-| `[data-accordion-header]` ‖ `button` | **Yes** | Focusable trigger inside each panel. |
+| `[data-panel]` | **Yes** | Panel wrapper for each section. |
+| `[data-header]` or `button` | **Yes** | Focusable trigger inside each panel. |
 | `aria-expanded` | **Yes** | Current panel state on the trigger. |
 | `aria-controls` | **Yes** | ID of the controlled region. |
 | `role="region"` | **Yes** | On each panel body element. |
 | `aria-labelledby` | **Yes** | On each region, referencing the header `id`. |
 | `hidden` | **Yes** | On collapsed regions in their initial state. |
-| `[data-accordion-inner]` | Recommended | Inner wrapper used for height measurement. |
+| `[data-inner]` | Recommended | Inner wrapper used for height measurement. |
 
 ## Options
 
 | Attribute | Default | Description |
 | --------- | ------- | ----------- |
-| `data-accordion-multiselectable` | `false` | Allow multiple panels open at once. |
-| `data-accordion-hash` | `true` | Open the panel whose region `id` matches the URL hash. |
+| `data-multiselectable` | `false` | Allow multiple panels open at once. |
+| `data-hash` | `true` | Open the panel whose region `id` matches the URL hash. |
 
 Per panel:
 
 | Attribute | Default | Description |
 | --------- | ------- | ----------- |
-| `data-accordion-deselect` | `false` | Allow collapsing when already open. |
-| `data-accordion-open` | — | Reflected open state for styling. |
+| `data-deselect` | `false` | Allow collapsing when already open. |
+| `data-open` | - | Reflected open state for styling. |
 
 ## Nested accordion
 
 You can nest a `<cinq-accordion>` inside a panel body. Each instance only
-controls its own direct panels — inner headers are excluded from the outer
+controls its own direct panels. Inner headers are excluded from the outer
 keyboard group, and arrow keys stay scoped to the focused accordion.
 
-Set `data-accordion-hash="false"` on nested hosts to avoid hash collisions.
+Set `data-hash="false"` on nested hosts to avoid hash collisions.
 
 ```html
-<cinq-accordion data-accordion-hash="false">
-  <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+<cinq-accordion data-hash="false">
+  <div data-panel data-open="true" data-deselect="true">
     <button
       type="button"
-      data-accordion-header
+      data-header
       id="character-header"
       aria-expanded="true"
       aria-controls="character-body"
@@ -121,14 +121,14 @@ Set `data-accordion-hash="false"` on nested hosts to avoid hash collisions.
     </button>
 
     <div id="character-body" role="region" aria-labelledby="character-header">
-      <div data-accordion-inner>
+      <div data-inner>
         <p>Roll ability scores, pick a class, then flesh out your adventurer.</p>
 
-        <cinq-accordion data-accordion-hash="false">
-          <div data-accordion-panel data-accordion-open="true" data-accordion-deselect="true">
+        <cinq-accordion data-hash="false">
+          <div data-panel data-open="true" data-deselect="true">
             <button
               type="button"
-              data-accordion-header
+              data-header
               id="scores-header"
               aria-expanded="true"
               aria-controls="scores-body"
@@ -137,7 +137,7 @@ Set `data-accordion-hash="false"` on nested hosts to avoid hash collisions.
             </button>
 
             <div id="scores-body" role="region" aria-labelledby="scores-header">
-              <div data-accordion-inner>Roll 3d6 for each ability…</div>
+              <div data-inner>Roll 3d6 for each ability...</div>
             </div>
           </div>
         </cinq-accordion>
@@ -170,20 +170,20 @@ Set `data-accordion-hash="false"` on nested hosts to avoid hash collisions.
 | `panels` | Internal panel controller instances. |
 | `options` | Resolved `multiselectable` and `hash` options. |
 
-When you mutate the panel DOM at runtime, re-bind with `destroy()` → mutate →
+When you mutate the panel DOM at runtime, re-bind with `destroy()`, mutate,
 `init()` (same pattern as tabs).
 
 ## Events
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `accordion-panel:open` | Yes | `{ el, index }` | Fired before a panel opens. |
-| `accordion-panel:close` | Yes | `{ el, index }` | Fired before a panel closes. |
+| `accordion:open` | Yes | `{ el, index }` | Fired before a panel opens. |
+| `accordion:close` | Yes | `{ el, index }` | Fired before a panel closes. |
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
 
-$accordion.addEventListener(EVENTS.ACCORDION_PANEL_OPEN, (event) => {
+$accordion.addEventListener(EVENTS.ACCORDION_OPEN, (event) => {
   console.log(event.detail.index);
 });
 ```
@@ -205,9 +205,9 @@ accordion.init(); // re-bind
 
 ### Responsive layout (list ↔ accordion)
 
-On narrow viewports you may want every section visible as a stacked list; on
+On narrow viewports you may want every section visible as a stacked list. On
 desktop, the same markup becomes an accordion. Toggle with `destroy()` /
-`init()` (here emulated by buttons — production code usually uses
+`init()` (here emulated by buttons. Production code usually uses
 `matchMedia`).
 
 ```js
@@ -215,10 +215,10 @@ const accordion = document.querySelector("cinq-accordion");
 const mq = window.matchMedia("(min-width: 768px)");
 
 const expandAsList = () => {
-  accordion.querySelectorAll("[data-accordion-panel]").forEach((panel) => {
-    const header = panel.querySelector("[data-accordion-header]");
+  accordion.querySelectorAll("[data-panel]").forEach((panel) => {
+    const header = panel.querySelector("[data-header]");
     const body = document.getElementById(header.getAttribute("aria-controls"));
-    panel.setAttribute("data-accordion-open", "true");
+    panel.setAttribute("data-open", "true");
     header.setAttribute("aria-expanded", "true");
     body.removeAttribute("hidden");
   });
@@ -248,10 +248,10 @@ accordion.destroy();
 
 accordion.insertAdjacentHTML(
   "beforeend",
-  `<div data-accordion-panel data-accordion-open="false">
+  `<div data-panel data-open="false">
     <button
       type="button"
-      data-accordion-header
+      data-header
       id="cloaker-header"
       aria-expanded="false"
       aria-controls="cloaker-body"
@@ -259,7 +259,7 @@ accordion.insertAdjacentHTML(
       Cloaker
     </button>
     <div id="cloaker-body" role="region" aria-labelledby="cloaker-header" hidden>
-      <div data-accordion-inner>Hangs from the ceiling like a shadow.</div>
+      <div data-inner>Hangs from the ceiling like a shadow.</div>
     </div>
   </div>`,
 );

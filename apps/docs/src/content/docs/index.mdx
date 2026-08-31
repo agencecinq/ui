@@ -61,6 +61,16 @@ import RegisterComponents from './_components/RegisterComponents.astro';
   </Card>
 </CardGrid>
 
+## Reference
+
+<CardGrid stagger>
+  <Card title="Utils" icon="document">
+    Event constants, `dispatchEvent`, focus trap, scroll lock, and attribute parsers shared across CINQ UI.
+
+    [Read the Utils reference](reference/utils/)
+  </Card>
+</CardGrid>
+
 ## Sandbox
 
 <CardGrid stagger>
@@ -70,7 +80,7 @@ import RegisterComponents from './_components/RegisterComponents.astro';
     [Try Pixelate](sandbox/pixelate/)
   </Card>
   <Card title="Dual scroll" icon="rocket">
-    Two columns, one inverted scroll inside a sized zone — spring easing, no full-page hijack.
+    Two columns, one inverted scroll inside a sized zone. Spring easing, no full-page hijack.
 
     [Try Dual scroll](sandbox/dual-scroll/)
   </Card>
@@ -79,7 +89,7 @@ import RegisterComponents from './_components/RegisterComponents.astro';
 ## Philosophy
 
 - **Web Components first**: import once, drop the markup, the browser instantiates it.
-- **HTML is the source of truth**: you write the markup (native `<dialog>`, `<input>`, `role="tab"`, `aria-expanded`, and the rest). Each package wires interactivity to that DOM; it extends HTML, it does not generate structure or silently replace semantics.
+- **HTML is the source of truth**: you write the markup (native `<dialog>`, `<input>`, `role="tab"`, `aria-expanded`, and the rest). Each package wires interactivity to that DOM. It extends HTML, it does not generate structure or silently replace semantics.
 - **Event-driven**: integrate with your app by listening to events and dispatching intents.
 - **WAI‑ARIA aligned**: keyboard navigation and ARIA states follow APG patterns.
 
