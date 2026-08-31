@@ -23,9 +23,9 @@ export declare const EVENTS: {
     COMBOBOX_EMPTY: string;
     WINDOWSPLITTER_CHANGE: string;
     CALENDAR_CHANGE: string;
-    TAB_BEFORE_ACTIVATE: string;
-    TAB_ACTIVATE: string;
-    TAB_DELETE: string;
+    TABS_BEFORE_ACTIVATE: string;
+    TABS_ACTIVATE: string;
+    TABS_DELETE: string;
     CART_BEFORE_ADD: string;
     CART_BEFORE_UPDATE: string;
     CART_UPDATE: string;

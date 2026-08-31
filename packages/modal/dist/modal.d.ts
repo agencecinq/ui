@@ -14,14 +14,14 @@ export declare class Modal extends HTMLElement {
     /** Detaches listeners. Safe to call from outside while the host stays mounted. */
     destroy(): void;
     /**
-     * Opens the modal. Dispatches cancelable `modal-before-open` with
+     * Opens the modal. Dispatches cancelable `modal:before-open` with
      * `detail.resolve()` to commit after async work.
      *
      * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
      */
     show(): boolean;
     /**
-     * Closes the modal. Dispatches cancelable `modal-before-close` with
+     * Closes the modal. Dispatches cancelable `modal:before-close` with
      * `detail.resolve()` to commit after async work.
      *
      * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.

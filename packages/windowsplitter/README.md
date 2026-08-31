@@ -8,7 +8,7 @@
 A window splitter lets users resize a primary pane with a focusable separator.
 `<cinq-windowsplitter>` is the **layout wrapper** (bounds + CSS custom
 properties). A nested `[role="separator"]` (or `slider`) is the interactive
-control — you deliver clean markup; the component wires pointer / keyboard
+control. You deliver clean markup; the component wires pointer / keyboard
 resizing and mirrors layout onto the primary pane.
 
 Implementation follows the
@@ -48,7 +48,7 @@ import "@agencecinq/windowsplitter";
 
 > **HTML is the source of truth.** ARIA values, orientation, labelling, and
 > `aria-controls` live on the separator. The component will not invent missing
-> markup — use an a11y linter (axe-core, Lighthouse) to catch invalid markup.
+> markup. Use an a11y linter (axe-core, Lighthouse) to catch invalid markup.
 
 The primary pane is resolved live via
 [`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)
@@ -70,13 +70,13 @@ on the separator.
 
 | Attribute / property | Description |
 | -------------------- | ----------- |
-| `data-windowsplitter-mode` | `resize` (default) \| `clip` \| `none` |
-| `data-windowsplitter-step` | Arrow key step (default `1`) |
-| `data-windowsplitter-page` | Page / Shift+Arrow step (default `10`) |
-| `data-windowsplitter-fixed` | Enter / pointer toggle only |
+| `data-mode` | `resize` (default) \| `clip` \| `none` |
+| `data-step` | Arrow key step (default `1`) |
+| `data-page` | Page / Shift+Arrow step (default `10`) |
+| `data-fixed` | Enter / pointer toggle only |
 | `disabled` / `aria-disabled` | Disable interaction (host and/or separator) |
-| `formatSize` | `FormatSize` — CSS size for the primary pane in `resize` mode |
-| `formatValue` | `FormatValue` — `aria-valuetext` formatter |
+| `formatSize` | `FormatSize`: CSS size for the primary pane in `resize` mode |
+| `formatValue` | `FormatValue`: `aria-valuetext` formatter |
 
 ### API
 
@@ -123,20 +123,20 @@ host.addEventListener(EVENTS.WINDOWSPLITTER_CHANGE, ({ detail }) => {
 | `[dragging]` | Pointer drag in progress (on the host) |
 | `[disabled]` / `[aria-disabled="true"]` | Interaction disabled |
 | `:focus-visible` on `[role="separator"]` | Keyboard focus on the separator |
-| `--windowsplitter-value` / `--windowsplitter-ratio` / `--windowsplitter-offset` | On the host |
+| `--value` / `--ratio` / `--offset` | On the host |
 
 ## Keyboard
 
 | Key | Function |
 | --- | -------- |
-| `←` / `→` | Move a **vertical** splitter |
-| `↑` / `↓` | Move a **horizontal** splitter |
+| `ArrowLeft` / `ArrowRight` | Move a **vertical** splitter |
+| `ArrowUp` / `ArrowDown` | Move a **horizontal** splitter |
 | `Enter` | Collapse / restore |
 | `Home` / `End` | Jump to min / max |
 | `PageUp` / `PageDown` | Step by `page` |
 | `Shift` + Arrow | Step by `page` |
 
-A fixed splitter (`data-windowsplitter-fixed`) omits arrow keys and only
+A fixed splitter (`data-fixed`) omits arrow keys and only
 implements Enter (and pointer toggle).
 
 ## Build setup
@@ -148,6 +148,6 @@ pnpm -C packages/windowsplitter build
 ## Acknowledgments
 
 - [Window Splitter Pattern (WAI-ARIA Practices)](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/)
-- [`@19h47/windowsplitter`](https://github.com/19h47/19h47-windowsplitter) — original implementation
+- [`@19h47/windowsplitter`](https://github.com/19h47/19h47-windowsplitter): original implementation
 
 See the [interactive docs](https://agencecinq.github.io/ui/components/windowsplitter/) for live examples.

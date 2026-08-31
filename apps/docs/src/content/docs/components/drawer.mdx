@@ -80,17 +80,17 @@ dispatched on `document.documentElement`.
 
 | Event                 | Cancelable | Detail payload                         | Description                                                                 |
 | --------------------- | ---------- | -------------------------------------- | --------------------------------------------------------------------------- |
-| `drawer-toggle`       | No         | `{ drawer, trigger, trap }`           | Request open/close from a button.                                           |
-| `drawer-before-open`  | Yes        | `{ drawer, instance, trigger, resolve }` | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
-| `drawer-before-close` | Yes        | `{ drawer, instance, resolve }`       | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
-| `drawer-open`         | No         | `{ drawer, trigger? }`                | Fired after `open` is set (trap, scroll lock, side effects).                |
-| `drawer-close`        | No         | `{ drawer }`                          | Fired after `open` is removed (scroll unlock, focus restore, side effects). |
+| `drawer:toggle`       | No         | `{ drawer, trigger, trap }`           | Request open/close from a button.                                           |
+| `drawer:before-open`  | Yes        | `{ drawer, instance, trigger, resolve }` | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
+| `drawer:before-close` | Yes        | `{ drawer, instance, resolve }`       | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
+| `drawer:open`         | No         | `{ drawer, trigger? }`                | Fired after `open` is set (trap, scroll lock, side effects).                |
+| `drawer:close`        | No         | `{ drawer }`                          | Fired after `open` is removed (scroll unlock, focus restore, side effects). |
 
 ### Deferring open or close
 
-Every open path (toggle or `open()`) dispatches cancelable `drawer-before-open`
+Every open path (toggle or `open()`) dispatches cancelable `drawer:before-open`
 first. Every close path (toggle, overlay click, Escape, or `close()`) dispatches
-cancelable `drawer-before-close` first. Without a listener (or without
+cancelable `drawer:before-close` first. Without a listener (or without
 `preventDefault()`), the drawer opens or closes immediately. To run async work,
 cancel the event and call `detail.resolve()` when ready:
 
@@ -118,13 +118,13 @@ document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) =>
 });
 ```
 
-`resolve()` is idempotent: safe to call more than once. `drawer-open` and
-`drawer-close` fire only after the matching `resolve()`, when side effects run.
+`resolve()` is idempotent: safe to call more than once. `drawer:open` and
+`drawer:close` fire only after the matching `resolve()`, when side effects run.
 
 **UX:** defer **open** with `before-open` when the fetch is short (roughly under
 500 ms) and the panel would feel broken if empty: show loading on the trigger
 while you wait, then call `resolve()`. For slower or unpredictable loads, skip
-the defer: let the drawer open immediately and fetch on `drawer-open` with a
+the defer: let the drawer open immediately and fetch on `drawer:open` with a
 skeleton or spinner inside the panel. Defer **close** with `before-close` when
 you need to save, archive, or run an exit animation before dismissing.
 
@@ -224,7 +224,7 @@ notes → switch to bestiary → close: focus lands back on **Open left**.
 ### Multiple buttons, one drawer
 
 Several triggers can share the same `aria-controls` id. Each
-`<cinq-drawer-button>` listens for `drawer-open` / `drawer-close` and updates its
+`<cinq-drawer-button>` listens for `drawer:open` / `drawer:close` and updates its
 own `aria-expanded`. Open or close from any control and they all stay in sync
 (red ring when collapsed, green when expanded).
 

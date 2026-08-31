@@ -38,7 +38,8 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #f9fafb;
   }
 
-  .docs-panes > [role='separator'] {
+  .docs-panes > [role='separator'],
+  .docs-panes > [role='slider'] {
     flex: 0 0 auto;
     position: absolute;
     z-index: 2;
@@ -50,7 +51,8 @@ import RegisterComponents from './RegisterComponents.astro';
     user-select: none;
   }
 
-  .docs-panes > [role='separator'][aria-orientation='vertical'] {
+  .docs-panes > [role='separator'][aria-orientation='vertical'],
+  .docs-panes > [role='slider'][aria-orientation='vertical'] {
     top: 0;
     bottom: 0;
     left: 0;
@@ -59,7 +61,8 @@ import RegisterComponents from './RegisterComponents.astro';
     cursor: col-resize;
   }
 
-  .docs-panes > [role='separator'][aria-orientation='horizontal'] {
+  .docs-panes > [role='separator'][aria-orientation='horizontal'],
+  .docs-panes > [role='slider'][aria-orientation='horizontal'] {
     left: 0;
     right: 0;
     top: 0;
@@ -68,23 +71,33 @@ import RegisterComponents from './RegisterComponents.astro';
     cursor: row-resize;
   }
 
-  .docs-panes > [role='separator']:focus {
+  .docs-panes > [role='separator']:focus,
+  .docs-panes > [role='slider']:focus {
     outline: none;
   }
 
-  .docs-panes > [role='separator']:focus-visible {
+  .docs-panes > [role='separator']:focus-visible,
+  .docs-panes > [role='slider']:focus-visible {
     outline: 2px solid #111827;
     outline-offset: 2px;
   }
 
-  .docs-panes[dragging] > [role='separator'] {
+  .docs-panes[dragging] > [role='separator'],
+  .docs-panes[dragging] > [role='slider'] {
     background: #374151;
   }
 
   .docs-panes[disabled] > [role='separator'],
-  .docs-panes[aria-disabled='true'] > [role='separator'] {
+  .docs-panes[disabled] > [role='slider'],
+  .docs-panes[aria-disabled='true'] > [role='separator'],
+  .docs-panes[aria-disabled='true'] > [role='slider'] {
     opacity: 0.35;
     pointer-events: none;
+  }
+
+  .docs-panes[data-fixed='true'] > [role='separator'],
+  .docs-panes[data-fixed='true'] > [role='slider'] {
+    cursor: pointer;
   }
 
   .docs-comparison {
@@ -190,7 +203,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Dungeon map (vertical)</h3>
           <p class="text-sm text-gray-600">
-            <code>mode: 'resize'</code> — drag or arrow keys resize the primary pane.
+            <code>mode: 'resize'</code>: drag or arrow keys resize the primary pane.
             <kbd>Enter</kbd> collapses / restores.
           </p>
         </div>
@@ -201,7 +214,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div id="docs-ws-toc" class="docs-pane docs-pane--primary" style="width: 30%">
             <strong id="docs-ws-toc-label">Party roster</strong>
-            <p class="mt-2 mb-0">Primary pane — sized by the splitter value.</p>
+            <p class="mt-2 mb-0">Primary pane, sized by the splitter value.</p>
           </div>
           <div
             role="separator"
@@ -219,9 +232,7 @@ import RegisterComponents from './RegisterComponents.astro';
           </div>
         </cinq-windowsplitter>
 
-        <p class="docs-windowsplitter-state" data-windowsplitter-state="vertical" aria-live="polite">
-          —
-        </p>
+        <p class="docs-windowsplitter-state" data-windowsplitter-state="vertical" aria-live="polite"></p>
       </div>
     </section>
 
@@ -231,7 +242,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Spellbook (horizontal)</h3>
           <p class="text-sm text-gray-600">
-            <code>aria-orientation="horizontal"</code> — Up / Down move the bar;
+            <code>aria-orientation="horizontal"</code>: Up / Down move the bar;
             <kbd>Enter</kbd> collapses the top pane.
           </p>
         </div>
@@ -242,7 +253,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div id="docs-ws-notes" class="docs-pane docs-pane--primary" style="height: 40%">
             <strong id="docs-ws-notes-label">Prepared spells</strong>
-            <p class="mt-2 mb-0">Primary pane — height follows the splitter value.</p>
+            <p class="mt-2 mb-0">Primary pane; height follows the splitter value.</p>
           </div>
           <div
             role="separator"
@@ -260,9 +271,7 @@ import RegisterComponents from './RegisterComponents.astro';
           </div>
         </cinq-windowsplitter>
 
-        <p class="docs-windowsplitter-state" data-windowsplitter-state="horizontal" aria-live="polite">
-          —
-        </p>
+        <p class="docs-windowsplitter-state" data-windowsplitter-state="horizontal" aria-live="polite"></p>
       </div>
     </section>
 
@@ -272,7 +281,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Before / after (clip)</h3>
           <p class="text-sm text-gray-600">
-            <code>data-windowsplitter-mode="clip"</code> — overlay panes and clip the primary
+            <code>data-mode="clip"</code>: overlay panes and clip the primary
             layer (same interaction as a comparison slider).
           </p>
         </div>
@@ -280,9 +289,9 @@ import RegisterComponents from './RegisterComponents.astro';
         <cinq-windowsplitter
           class="docs-comparison"
           data-windowsplitter-demo="clip"
-          data-windowsplitter-mode="clip"
-          data-windowsplitter-step="5"
-          data-windowsplitter-page="20"
+          data-mode="clip"
+          data-step="5"
+          data-page="20"
           role="region"
           aria-label="Before and after comparison"
         >
@@ -314,9 +323,7 @@ import RegisterComponents from './RegisterComponents.astro';
           </div>
         </cinq-windowsplitter>
 
-        <p class="docs-windowsplitter-state" data-windowsplitter-state="clip" aria-live="polite">
-          —
-        </p>
+        <p class="docs-windowsplitter-state" data-windowsplitter-state="clip" aria-live="polite"></p>
       </div>
     </section>
   </div>

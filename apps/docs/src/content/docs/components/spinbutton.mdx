@@ -259,7 +259,7 @@ Configured via data attributes on the host:
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
 | `data-step` | number | `1` | Increment used by buttons and arrow keys. |
-| `data-delay` | number | `100` | Minimum interval (ms) between `spinbutton-change` dispatches during rapid value changes. DOM updates are not throttled. |
+| `data-delay` | number | `100` | Minimum interval (ms) between `spinbutton:change` dispatches during rapid value changes. DOM updates are not throttled. |
 
 ### Methods
 
@@ -287,7 +287,7 @@ Configured via data attributes on the host:
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `spinbutton-change` | Yes | value: number | Throttled notification when the value changes (see `data-delay`). |
+| `spinbutton:change` | Yes | value: number | Throttled notification when the value changes (see `data-delay`). |
 
 The event is dispatched on `<cinq-spinbutton>` (bubbles). The typed value is
 committed on `change` (blur / Enter), not on every keystroke, so the user can
@@ -303,7 +303,7 @@ $spinbutton?.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
 });
 ```
 
-`spinbutton-change` is a throttled notification fired **after** the value is
+`spinbutton:change` is a throttled notification fired **after** the value is
 committed to the DOM. It does not gate the update: calling
 `event.preventDefault()` does not revert the value.
 

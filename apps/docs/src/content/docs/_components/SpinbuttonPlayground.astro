@@ -72,7 +72,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <p class="text-sm text-gray-600">
             Basic usage on a wizard&apos;s spell picker. Use the buttons or keyboard (<kbd>↑</kbd>/<kbd>↓</kbd>,{' '}
             <kbd>Page Up</kbd>/<kbd>Page Down</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>).{' '}
-            <code>spinbutton-change</code> events are logged below.
+            <code>spinbutton:change</code> events are logged below.
           </p>
         </div>
 
@@ -543,7 +543,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Combat round</h3>
           <p class="text-sm text-gray-600">
             Initiative tracker with <code>data-delay</code> throttling{' '}
-            <code>spinbutton-change</code> only. DOM updates (round number, button disabled state)
+            <code>spinbutton:change</code> only. DOM updates (round number, button disabled state)
             stay immediate. Hold + or mash the arrow keys to compare round count vs. events logged.
           </p>
         </div>
@@ -785,7 +785,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Shop: torches</h3>
           <p class="text-sm text-gray-600">
             General store line item before the delve: minimum 1, maximum stock,{' '}
-            <code>formatValue</code> for screen readers, and a <code>spinbutton-change</code>{' '}
+            <code>formatValue</code> for screen readers, and a <code>spinbutton:change</code>{' '}
             listener to refresh the gp total.
           </p>
         </div>

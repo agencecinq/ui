@@ -199,18 +199,18 @@ Events are dispatched on the **tab** element (the button with `role="tab"`). Lis
 
 | Event                | Cancelable | Detail                                      | Description                                                                 |
 | -------------------- | ---------- | ------------------------------------------- | --------------------------------------------------------------------------- |
-| `tab-before-activate`| Yes        | `{ index, controls, element }`              | Fired before activation. Call `preventDefault()` to cancel. For async work, cancel then call `tabs.activateTab(index)` when ready. |
-| `tab-activate`       | No         | `{ controls, element }`                     | Fired when the tab is activated.                                           |
-| `tab-delete`         | No         | `{ controls, element }`                      | Fired when the tab is removed.                                             |
+| `tabs:before-activate`| Yes        | `{ index, controls, element }`              | Fired before activation. Call `preventDefault()` to cancel. For async work, cancel then call `tabs.activateTab(index)` when ready. |
+| `tabs:activate`       | No         | `{ controls, element }`                     | Fired when the tab is activated.                                           |
+| `tabs:delete`         | No         | `{ controls, element }`                      | Fired when the tab is removed.                                             |
 
 ### Method: `activateTab(index)`
 
-On the `<cinq-tabs>` element (or the `Tabs` instance). Call after preventing `tab-before-activate` to complete activation (e.g. after loading data).
+On the `<cinq-tabs>` element (or the `Tabs` instance). Call after preventing `tabs:before-activate` to complete activation (e.g. after loading data).
 
 ```javascript
 const tabsEl = document.querySelector('cinq-tabs');
 
-tabsEl.addEventListener('tab-before-activate', (e) => {
+tabsEl.addEventListener('tabs:before-activate', (e) => {
   const { index, controls, element } = e.detail;
 
   // Optional: cancel and activate later (e.g. after async work)
@@ -220,9 +220,9 @@ tabsEl.addEventListener('tab-before-activate', (e) => {
   });
 });
 
-// Or: just listen to tab-activate (no cancel)
+// Or: just listen to tabs:activate (no cancel)
 tabsEl.querySelectorAll('[role="tab"]').forEach((tab) => {
-  tab.addEventListener('tab-activate', ({ detail }) => {
+  tab.addEventListener('tabs:activate', ({ detail }) => {
     console.log('activated', detail.controls, detail.element);
   });
 });

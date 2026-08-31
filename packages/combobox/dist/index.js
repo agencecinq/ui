@@ -1,16 +1,16 @@
 //#region ../utils/dist/index.js
 var e = {
-	DRAWER_BEFORE_CLOSE: "drawer-before-close",
-	DRAWER_BEFORE_OPEN: "drawer-before-open",
-	DRAWER_CLOSE: "drawer-close",
-	DRAWER_OPEN: "drawer-open",
-	DRAWER_TOGGLE: "drawer-toggle",
-	MODAL_BEFORE_CLOSE: "modal-before-close",
-	MODAL_BEFORE_OPEN: "modal-before-open",
-	MODAL_CLOSE: "modal-close",
-	MODAL_OPEN: "modal-open",
-	MODAL_TOGGLE: "modal-toggle",
-	SPINBUTTON_CHANGE: "spinbutton-change",
+	DRAWER_BEFORE_CLOSE: "drawer:before-close",
+	DRAWER_BEFORE_OPEN: "drawer:before-open",
+	DRAWER_CLOSE: "drawer:close",
+	DRAWER_OPEN: "drawer:open",
+	DRAWER_TOGGLE: "drawer:toggle",
+	MODAL_BEFORE_CLOSE: "modal:before-close",
+	MODAL_BEFORE_OPEN: "modal:before-open",
+	MODAL_CLOSE: "modal:close",
+	MODAL_OPEN: "modal:open",
+	MODAL_TOGGLE: "modal:toggle",
+	SPINBUTTON_CHANGE: "spinbutton:change",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
 	SWITCH_ACTIVATE: "switch:activate",
@@ -24,13 +24,13 @@ var e = {
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
 	CALENDAR_CHANGE: "calendar:change",
-	TAB_BEFORE_ACTIVATE: "tab-before-activate",
-	TAB_ACTIVATE: "tab-activate",
-	TAB_DELETE: "tab-delete",
-	CART_BEFORE_ADD: "cart-before-add",
-	CART_BEFORE_UPDATE: "cart-before-update",
-	CART_UPDATE: "cart-update",
-	VARIANT_CHANGE: "variant-change"
+	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
+	TABS_ACTIVATE: "tabs:activate",
+	TABS_DELETE: "tabs:delete",
+	CART_BEFORE_ADD: "cart:before-add",
+	CART_BEFORE_UPDATE: "cart:before-update",
+	CART_UPDATE: "cart:update",
+	VARIANT_CHANGE: "variant:change"
 }, t = (e, t, n, r = {}) => {
 	let { bubbles: i = !0, cancelable: a = !0 } = r;
 	return e.dispatchEvent(new CustomEvent(t, {
@@ -241,7 +241,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	}
 	setValue(e, { reflect: t = !0 } = {}) {
 		let n = e ?? "";
-		this.#e = n, this.$input && this.$input.value !== n && this.write(this.$input, n), t && this.#R();
+		this.#e = n, this.$input && this.$input.value !== n && this.write(this.$input, n), t && this.#I();
 	}
 	get search() {
 		return this.#n;
@@ -267,7 +267,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		return this.$listbox;
 	}
 	show() {
-		!this.$input || !this.$listbox || this.disabled || (this.#u.removeAttribute("hidden"), this.#k(!0));
+		!this.$input || !this.$listbox || this.disabled || (this.#u.removeAttribute("hidden"), this.#D(!0));
 	}
 	hide({ force: e = !1, clear: t = !0 } = {}) {
 		if (!this.$input || !this.$listbox || !e && !this.#t) return;
@@ -276,26 +276,26 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			let { value: e } = n;
 			this.setValue(e);
 		}
-		this.index = -1, t ? this.#F() : this.options.forEach(({ element: e }) => {
+		this.index = -1, t ? this.#N() : this.options.forEach(({ element: e }) => {
 			e.setAttribute("aria-selected", "false");
-		}), this.#E(), this.#u.setAttribute("hidden", ""), this.#k(!1);
+		}), this.$input?.removeAttribute("aria-activedescendant"), this.#u.setAttribute("hidden", ""), this.#D(!1);
 	}
 	select = () => {
 		if (!this.$input || !this.$listbox || this.disabled) return;
-		let t = this.options[this.index] ?? null, n = this.#A(t, this.index);
+		let t = this.options[this.index] ?? null, n = this.#O(t, this.index);
 		if (t && this.selectMode === "value") {
 			let { value: e } = t;
 			this.setValue(e);
 		}
-		this.onSelect?.(n), this.#D(e.COMBOBOX_SUBMIT, n), this.hide({ force: !0 });
+		this.onSelect?.(n), this.#T(e.COMBOBOX_SUBMIT, n), this.hide({ force: !0 });
 	};
 	destroy() {
-		this.#i += 1, this.#I(), this.#L(), this.#c && this.$input && this.$listbox && this.#s && (this.$input.removeEventListener("input", this.#_), this.$input.removeEventListener("keydown", this.#s.handle), this.$input.removeEventListener("click", this.#v), this.$input.removeEventListener("focus", this.#b), this.$input.removeEventListener("blur", this.#x), this.$listbox.removeEventListener("mousedown", this.#g), this.$listbox.removeEventListener("click", this.#y), document.removeEventListener("click", this.#h)), this.#s = null, this.#c = !1;
+		this.#i += 1, this.#P(), this.#F(), this.#c && this.$input && this.$listbox && this.#s && (this.$input.removeEventListener("input", this.#g), this.$input.removeEventListener("keydown", this.#s.handle), this.$input.removeEventListener("click", this.#_), this.$input.removeEventListener("focus", this.#y), this.$input.removeEventListener("blur", this.#b), this.$listbox.removeEventListener("mousedown", this.#h), this.$listbox.removeEventListener("click", this.#v), document.removeEventListener("click", this.#m)), this.#s = null, this.#c = !1;
 	}
 	blurOption() {
 		if (!(!this.$input || !this.$listbox)) {
 			if (!this.focused) {
-				this.#E();
+				this.$input?.removeAttribute("aria-activedescendant");
 				return;
 			}
 			this.index = -1, this.refresh(this.index);
@@ -303,9 +303,9 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	}
 	refresh(t) {
 		if (!this.$input || !this.$listbox) return;
-		this.#w(t), this.#T(t);
+		this.#C(t), this.#w(t);
 		let { options: n, value: r } = this;
-		this.#D(e.COMBOBOX_UPDATE, {
+		this.#T(e.COMBOBOX_UPDATE, {
 			options: n,
 			index: t,
 			value: r
@@ -315,13 +315,13 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		if (!this.$input || !this.$listbox || this.disabled) return !1;
 		if (this.#t && 0 < this.options.length) return !0;
 		let { value: e } = this.input;
-		return await this.#M(e, { openWhenEmpty: !0 }), this.#t && 0 < this.options.length;
+		return await this.#A(e, { openWhenEmpty: !0 }), this.#t && 0 < this.options.length;
 	}
 	init() {
 		if (this.$input = this.querySelector("[role=\"combobox\"]") || this.querySelector("input"), this.$listbox = this.querySelector("[role=\"listbox\"]"), !this.isConnected || !this.$input || !this.$listbox || !this.#n) return;
 		this.#d(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list";
 		let e = this.getAttribute("value");
-		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new s(this), this.#w(-1), this.hide({
+		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new s(this), this.#C(-1), this.hide({
 			force: !0,
 			clear: !1
 		}), this.#p(), this.#c = !0;
@@ -335,41 +335,38 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		this.$input && (this.$input.disabled = e, e ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled")), e && this.#t && this.hide({ force: !0 });
 	}
 	#p() {
-		!this.$input || !this.$listbox || !this.#s || (this.$input.addEventListener("input", this.#_), this.$input.addEventListener("keydown", this.#s.handle), this.$input.addEventListener("click", this.#v), this.$input.addEventListener("focus", this.#b), this.$input.addEventListener("blur", this.#x), this.$listbox.addEventListener("mousedown", this.#g), this.$listbox.addEventListener("click", this.#y), document.addEventListener("click", this.#h));
+		!this.$input || !this.$listbox || !this.#s || (this.$input.addEventListener("input", this.#g), this.$input.addEventListener("keydown", this.#s.handle), this.$input.addEventListener("click", this.#_), this.$input.addEventListener("focus", this.#y), this.$input.addEventListener("blur", this.#b), this.$listbox.addEventListener("mousedown", this.#h), this.$listbox.addEventListener("click", this.#v), document.addEventListener("click", this.#m));
 	}
-	#m(e) {
-		return e instanceof Node && this.contains(e);
-	}
-	#h = ({ target: e }) => {
-		this.#m(e) || this.hide({ force: !0 });
+	#m = ({ target: e }) => {
+		e instanceof Node && this.contains(e) || this.hide({ force: !0 });
 	};
-	#g = (e) => {
+	#h = (e) => {
 		e.preventDefault();
 	};
-	#_ = ({ target: e }) => {
+	#g = ({ target: e }) => {
 		if (!(e instanceof HTMLInputElement) || this.disabled) return;
 		let { value: t } = e;
-		this.setValue(t), this.blurOption(), this.#j(t);
+		this.setValue(t), this.blurOption(), this.#k(t);
 	};
-	#v = (e) => {
-		this.disabled || (e.stopPropagation(), this.#S());
+	#_ = (e) => {
+		this.disabled || (e.stopPropagation(), this.#x());
 	};
-	#y = ({ target: e }) => {
+	#v = ({ target: e }) => {
 		if (this.disabled || !(e instanceof Element) || !this.$listbox) return;
 		let t = e.closest("[role=\"option\"]");
 		if (!t || !this.$listbox.contains(t)) return;
 		let n = this.options.findIndex(({ element: e }) => e === t);
-		0 > n && (this.#w(-1), n = this.options.findIndex(({ element: e }) => e === t), 0 > n) || (this.index = n, this.select());
+		0 > n && (this.#C(-1), n = this.options.findIndex(({ element: e }) => e === t), 0 > n) || (this.index = n, this.select());
 	};
-	#b = ({ target: e }) => {
+	#y = ({ target: e }) => {
 		if (!(e instanceof HTMLInputElement)) return;
 		let { value: t } = e;
 		this.setValue(t), this.blurOption();
 	};
-	#x = ({ relatedTarget: e }) => {
-		this.#m(e);
+	#b = ({ relatedTarget: e }) => {
+		e instanceof Node && this.contains(e);
 	};
-	async #S() {
+	async #x() {
 		if (!this.disabled) {
 			if (this.#t) {
 				this.hide({ force: !0 });
@@ -378,15 +375,15 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			await this.ensureOpen() && this.blurOption();
 		}
 	}
-	#C(e, t) {
+	#S(e, t) {
 		this.#u.innerHTML = "";
 		let { length: n } = t, { id: r } = this.#u;
 		t.forEach((t, i) => {
 			let a = l(i, e, r, n);
 			this.#u.insertAdjacentHTML("beforeend", this.#r(t, a));
-		}), this.#w(e);
+		}), this.#C(e);
 	}
-	#w(e) {
+	#C(e) {
 		if (!this.$listbox) return;
 		let t = [...this.$listbox.querySelectorAll("[role=\"option\"]")];
 		this.options = t.map((t, n) => {
@@ -400,7 +397,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			};
 		});
 	}
-	#T(e) {
+	#w(e) {
 		if (-1 < e && this.options[e]) {
 			let { id: t, element: n } = this.options[e];
 			if (t) {
@@ -408,25 +405,22 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 				return;
 			}
 		}
-		this.#E();
-	}
-	#E() {
 		this.$input?.removeAttribute("aria-activedescendant");
 	}
-	#D(e, n) {
+	#T(e, n) {
 		t(this, e, n, { cancelable: !1 });
 	}
-	#O(e) {
+	#E(e) {
 		if (this.loading = e, e) {
-			this.$listbox?.setAttribute("aria-busy", "true"), this.#B(!0);
+			this.$listbox?.setAttribute("aria-busy", "true"), this.#R(!0);
 			return;
 		}
-		this.$listbox?.removeAttribute("aria-busy"), this.#B(!1);
+		this.$listbox?.removeAttribute("aria-busy"), this.#R(!1);
 	}
-	#k(e) {
-		this.#t = e, this.$input && this.$input.setAttribute("aria-expanded", e ? "true" : "false"), this.#z();
+	#D(e) {
+		this.#t = e, this.$input && this.$input.setAttribute("aria-expanded", e ? "true" : "false"), this.#L();
 	}
-	#A(e, t) {
+	#O(e, t) {
 		let { value: n = "" } = e ?? {};
 		return {
 			option: e,
@@ -434,36 +428,36 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			value: n
 		};
 	}
-	#j(t) {
+	#k(t) {
 		if (!this.disabled) {
-			if (this.#I(), t.trim().length < this.minLength) {
-				this.#L(), this.#i += 1, this.#F(), this.#D(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 });
+			if (this.#P(), t.trim().length < this.minLength) {
+				this.#F(), this.#i += 1, this.#N(), this.#T(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 });
 				return;
 			}
 			if (0 < this.debounce) {
 				this.#a = setTimeout(() => {
-					this.#a = null, this.#M(t);
+					this.#a = null, this.#A(t);
 				}, this.debounce);
 				return;
 			}
-			this.#M(t);
+			this.#A(t);
 		}
 	}
-	async #M(t, { openWhenEmpty: n = !1 } = {}) {
+	async #A(t, { openWhenEmpty: n = !1 } = {}) {
 		if (!this.#n || this.disabled) return;
-		this.#L(), this.#o = new AbortController();
+		this.#F(), this.#o = new AbortController();
 		let r = ++this.#i, { signal: i } = this.#o;
-		this.#D(e.COMBOBOX_LOADING), this.#O(!0);
+		this.#T(e.COMBOBOX_LOADING), this.#E(!0);
 		let a;
 		try {
 			a = await this.#n(t, { signal: i });
 		} catch (e) {
 			if (i.aborted || r !== this.#i) return;
-			throw this.#O(!1), e;
+			throw this.#E(!1), e;
 		}
 		if (r === this.#i) {
-			if (this.#N(a), this.#D(e.COMBOBOX_LOADED), this.#O(!1), this.options.length === 0) {
-				if (this.#D(e.COMBOBOX_EMPTY, { value: t }), this.openOnEmpty) {
+			if (this.#j(a), this.#T(e.COMBOBOX_LOADED), this.#E(!1), this.options.length === 0) {
+				if (this.#T(e.COMBOBOX_EMPTY, { value: t }), this.openOnEmpty) {
 					this.show();
 					return;
 				}
@@ -480,63 +474,63 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			this.index = this.autoselect ? 0 : -1, this.refresh(this.index), this.show();
 		}
 	}
-	#N(e) {
+	#j(e) {
 		if (Array.isArray(e)) {
 			if (e.length === 0) {
-				this.#F({ clearDom: this.mode === "managed" });
+				this.#N({ clearDom: this.mode === "managed" });
 				return;
 			}
 			if (typeof e[0] == "string") {
-				this.#C(-1, e);
+				this.#S(-1, e);
 				return;
 			}
-			this.#P(e);
+			this.#M(e);
 			return;
 		}
 		let { html: t, options: n } = e;
 		if (t != null && this.mode === "external") {
-			this.#u.innerHTML = t, this.#w(-1);
+			this.#u.innerHTML = t, this.#C(-1);
 			return;
 		}
 		if (n) {
 			if (n.length === 0) {
-				this.#F({ clearDom: !0 });
+				this.#N({ clearDom: !0 });
 				return;
 			}
 			if (typeof n[0] == "string") {
-				this.#C(-1, n);
+				this.#S(-1, n);
 				return;
 			}
-			this.#P(n);
+			this.#M(n);
 			return;
 		}
 		if (this.mode === "external") {
-			this.#w(-1);
+			this.#C(-1);
 			return;
 		}
-		this.#F({ clearDom: !0 });
+		this.#N({ clearDom: !0 });
 	}
-	#P(e) {
+	#M(e) {
 		this.#u.innerHTML = "", e.forEach((e) => {
 			this.#u.appendChild(e);
-		}), this.#w(-1);
+		}), this.#C(-1);
 	}
-	#F({ clearDom: e = !0 } = {}) {
+	#N({ clearDom: e = !0 } = {}) {
 		this.options = [], this.index = -1, e && this.$listbox && (this.$listbox.innerHTML = "");
 	}
-	#I() {
+	#P() {
 		this.#a &&= (clearTimeout(this.#a), null);
 	}
-	#L() {
+	#F() {
 		this.#o?.abort(), this.#o = null;
 	}
-	#R() {
+	#I() {
 		this.#l = !0, this.#e ? this.setAttribute("value", this.#e) : this.removeAttribute("value"), this.#l = !1;
 	}
-	#z() {
+	#L() {
 		this.#l = !0, this.#t ? this.setAttribute("expanded", "") : this.removeAttribute("expanded"), this.#l = !1;
 	}
-	#B(e) {
+	#R(e) {
 		this.#l = !0, e ? this.setAttribute("busy", "") : this.removeAttribute("busy"), this.#l = !1;
 	}
 };

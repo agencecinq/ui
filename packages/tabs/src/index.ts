@@ -65,7 +65,7 @@ export class Tabs extends HTMLElement {
 
       tab.init();
 
-      tab.el.addEventListener(EVENTS.TAB_ACTIVATE, () => {
+      tab.el.addEventListener(EVENTS.TABS_ACTIVATE, () => {
         this.current = index;
 
         this.deactivateTabs();

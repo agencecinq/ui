@@ -92,11 +92,11 @@ Use constants from `@agencecinq/utils` (`EVENTS.DRAWER_*`). Events are dispatche
 
 | Event | Constant | Cancelable | Detail | Description |
 | ----- | -------- | ---------- | ------ | ----------- |
-| `drawer-toggle` | `DRAWER_TOGGLE` | No | `{ drawer, trigger, trap }` | Request open/close from a button |
-| `drawer-before-open` | `DRAWER_BEFORE_OPEN` | Yes | `{ drawer, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
-| `drawer-before-close` | `DRAWER_BEFORE_CLOSE` | Yes | `{ drawer, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
-| `drawer-open` | `DRAWER_OPEN` | No | `{ drawer, trigger? }` | Fired after `open` is set |
-| `drawer-close` | `DRAWER_CLOSE` | No | `{ drawer }` | Fired after `open` is removed |
+| `drawer:toggle` | `DRAWER_TOGGLE` | No | `{ drawer, trigger, trap }` | Request open/close from a button |
+| `drawer:before-open` | `DRAWER_BEFORE_OPEN` | Yes | `{ drawer, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
+| `drawer:before-close` | `DRAWER_BEFORE_CLOSE` | Yes | `{ drawer, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
+| `drawer:open` | `DRAWER_OPEN` | No | `{ drawer, trigger? }` | Fired after `open` is set |
+| `drawer:close` | `DRAWER_CLOSE` | No | `{ drawer }` | Fired after `open` is removed |
 
 ```js
 import { EVENTS } from '@agencecinq/utils';
@@ -108,8 +108,8 @@ document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
 
 #### Deferring open or close
 
-Open and close paths dispatch cancelable `drawer-before-open` /
-`drawer-before-close` first. Call `preventDefault()` and commit with
+Open and close paths dispatch cancelable `drawer:before-open` /
+`drawer:before-close` first. Call `preventDefault()` and commit with
 `detail.resolve()` when async work finishes:
 
 ```js
@@ -140,7 +140,7 @@ document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) =>
 from `@agencecinq/drawer`.
 
 **UX:** defer open when the fetch is quick and the panel would feel empty;
-otherwise open immediately and load on `drawer-open`. Defer close for save,
+otherwise open immediately and load on `drawer:open`. Defer close for save,
 archive, or exit animation.
 
 ---

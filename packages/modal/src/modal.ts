@@ -95,7 +95,7 @@ export class Modal extends HTMLElement {
   }
 
   /**
-   * Opens the modal. Dispatches cancelable `modal-before-open` with
+   * Opens the modal. Dispatches cancelable `modal:before-open` with
    * `detail.resolve()` to commit after async work.
    *
    * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
@@ -128,7 +128,7 @@ export class Modal extends HTMLElement {
   }
 
   /**
-   * Closes the modal. Dispatches cancelable `modal-before-close` with
+   * Closes the modal. Dispatches cancelable `modal:before-close` with
    * `detail.resolve()` to commit after async work.
    *
    * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.

@@ -615,7 +615,7 @@ sharp `<img>` underneath, fixed blocky `<cinq-pixelate>` on top, clipped by the
 separator.
 
 ```html
-<cinq-windowsplitter data-windowsplitter-mode="clip" role="region" aria-label="Photo comparison">
+<cinq-windowsplitter data-mode="clip" role="region" aria-label="Photo comparison">
   <div class="comparison__after">
     <img src="photo.jpg" crossorigin="anonymous" alt="" aria-hidden="true" />
   </div>
@@ -677,7 +677,7 @@ $host.sync()
 
 **CINQ UI:** [`cinq-modal`](../components/modal/), [`cinq-modal-button`](../components/modal/).
 
-**Open:** listen for `modal-open`, then reveal. Uses the
+**Open:** listen for `modal:open`, then reveal. Uses the
 [animation helper](#animation-helper):
 
 ```js
@@ -694,7 +694,7 @@ document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
 })
 ```
 
-**Close:** listen for `modal-before-close`, `preventDefault()`, pixelate, then
+**Close:** listen for `modal:before-close`, `preventDefault()`, pixelate, then
 `event.detail.resolve()`. Same `$host` and `animate` as above.
 
 ```js
@@ -737,7 +737,7 @@ document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
 })
 ```
 
-**Close:** listen for `drawer-before-close`, `preventDefault()`, depixelate, then
+**Close:** listen for `drawer:before-close`, `preventDefault()`, depixelate, then
 `event.detail.resolve()`. Same `$host` and `animate` as above.
 
 ```js

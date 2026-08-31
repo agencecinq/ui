@@ -29,7 +29,7 @@ Import once:
 import "@agencecinq/windowsplitter";
 ```
 
-Then wrap panes and a separator — the host owns layout context; ARIA lives on
+Then wrap panes and a separator. The host owns layout context; ARIA lives on
 the separator.
 
 > **HTML is the source of truth.** The component will not invent missing
@@ -65,7 +65,7 @@ primary pane. If the pane cannot fully collapse, set min above `0`.
 
 > **Note on `role`:** the APG documents `role="separator"`. Some screen readers
 > handle a focusable `role="slider"` more reliably. The component accepts either
-> on the nested control — pick what works for your AT testing.
+> on the nested control. Pick what works for your AT testing.
 
 ## Required markup
 
@@ -83,12 +83,12 @@ primary pane. If the pane cannot fully collapse, set min above `0`.
 
 | Attribute / property | Type | Default | Description |
 | -------------------- | ---- | ------- | ----------- |
-| `data-windowsplitter-mode` | `resize` \| `clip` \| `none` | `resize` | How the primary pane is updated |
-| `data-windowsplitter-step` | number | `1` | Arrow key increment |
-| `data-windowsplitter-page` | number | `10` | PageUp / PageDown / Shift+Arrow |
-| `data-windowsplitter-fixed` | boolean | `false` | Enter / pointer toggle only |
+| `data-mode` | `resize` \| `clip` \| `none` | `resize` | How the primary pane is updated |
+| `data-step` | number | `1` | Arrow key increment |
+| `data-page` | number | `10` | PageUp / PageDown / Shift+Arrow |
+| `data-fixed` | boolean | `false` | Enter / pointer toggle only |
 | `disabled` / `aria-disabled` | boolean | `false` | Disable interaction (host) |
-| `formatSize` (property) | `FormatSize` | `` `${value}%` `` | CSS size in `resize` mode |
+| `formatSize` (property) | `FormatSize` | `` `${ratio * 100}%` `` | CSS size in `resize` mode |
 | `formatValue` (property) | `FormatValue` | `String(value)` | `aria-valuetext` |
 
 ```js
@@ -131,7 +131,10 @@ host.formatValue = (value) => `${value} %`;
 | `[dragging]` | Pointer drag in progress (host) |
 | `[disabled]` / `[aria-disabled="true"]` | Interaction disabled |
 | `:focus-visible` on the separator | Keyboard focus |
-| `--windowsplitter-value` / `--windowsplitter-ratio` / `--windowsplitter-offset` | On the host |
+| `--value` / `--ratio` / `--offset` | On the host (inherit to children for CSS-driven layouts) |
+
+The host also observes its own size via `ResizeObserver` and recalculates
+`--offset` when the container is resized.
 
 ## Events
 
@@ -154,14 +157,14 @@ $host.addEventListener(EVENTS.WINDOWSPLITTER_CHANGE, ({ detail }) => {
 
 | Key | Function |
 | --- | -------- |
-| `←` / `→` | Move a **vertical** splitter |
-| `↑` / `↓` | Move a **horizontal** splitter |
+| `ArrowLeft` / `ArrowRight` | Move a **vertical** splitter |
+| `ArrowUp` / `ArrowDown` | Move a **horizontal** splitter |
 | `Enter` | Collapse / restore |
 | `Home` / `End` | Jump to min / max |
 | `PageUp` / `PageDown` | Step by `page` |
 | `Shift` + Arrow | Step by `page` |
 
-A fixed splitter (`data-windowsplitter-fixed`) omits arrow keys and only
+A fixed splitter (`data-fixed`) omits arrow keys and only
 implements Enter (and pointer toggle).
 
 ## Playground (live)

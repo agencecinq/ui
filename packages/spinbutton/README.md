@@ -122,7 +122,7 @@ who do reach them via swipe gestures still get a meaningful name.
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
 | `data-step` | number | `1` | Increment used by buttons and arrow keys. |
-| `data-delay` | number | `100` | Minimum interval (ms) between `spinbutton-change` dispatches during rapid value changes. DOM updates are not throttled. |
+| `data-delay` | number | `100` | Minimum interval (ms) between `spinbutton:change` dispatches during rapid value changes. DOM updates are not throttled. |
 
 | Property | Description |
 | -------- | ----------- |
@@ -193,7 +193,7 @@ $spinbutton.init();
 
 | Event | Cancelable | Detail | Description |
 | ----- | ---------- | ------ | ----------- |
-| `spinbutton-change` | Yes | value: number | Throttled notification when the value changes (see `data-delay`). |
+| `spinbutton:change` | Yes | value: number | Throttled notification when the value changes (see `data-delay`). |
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
@@ -203,7 +203,7 @@ $spinbutton.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
 });
 ```
 
-`spinbutton-change` is a throttled notification fired after the value is
+`spinbutton:change` is a throttled notification fired after the value is
 committed to the DOM. Calling `event.preventDefault()` does not revert the value.
 
 ## Build setup

@@ -93,15 +93,15 @@ Configure via data attributes:
 
 | Method                       | Description                                                                      |
 | ---------------------------- | -------------------------------------------------------------------------------- |
-| `activateTab(index: number)` | Activates a tab programmatically (useful after canceling `tab-before-activate`). |
+| `activateTab(index: number)` | Activates a tab programmatically (useful after canceling `tabs:before-activate`). |
 
 ### Events
 
 | Event                 | Cancelable | Detail payload                 | Description                                                         |
 | --------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------- |
-| `tab-before-activate` | Yes        | `{ index, controls, element }` | Fired before activation; call `event.preventDefault()` to override. |
-| `tab-activate`        | No         | `{ controls, element }`        | Fired when a tab has been activated.                                |
-| `tab-delete`          | No         | `{ controls, element }`        | Fired when a deletable tab has been removed.                        |
+| `tabs:before-activate` | Yes        | `{ index, controls, element }` | Fired before activation; call `event.preventDefault()` to override. |
+| `tabs:activate`        | No         | `{ controls, element }`        | Fired when a tab has been activated.                                |
+| `tabs:delete`          | No         | `{ controls, element }`        | Fired when a deletable tab has been removed.                        |
 
 ## Examples
 
@@ -217,12 +217,12 @@ Below, `data-tabs-delay="300"` means that when you move focus with Left/Right ar
   </cinq-tabs>
 </div>
 
-### Async loading with `tab-before-activate`
+### Async loading with `tabs:before-activate`
 
 ```js
 const tabsEl = document.querySelector("cinq-tabs");
 
-tabsEl.addEventListener("tab-before-activate", event => {
+tabsEl.addEventListener("tabs:before-activate", event => {
   const { index, controls } = event.detail;
 
   // Cancel the built-in activation
@@ -240,7 +240,7 @@ tabsEl.addEventListener("tab-before-activate", event => {
 
 #### Example
 
-The live demo below wires `tab-before-activate` to a public monster reference API and only activates the tab once the creature data has been fetched and rendered:
+The live demo below wires `tabs:before-activate` to a public monster reference API and only activates the tab once the creature data has been fetched and rendered:
 
 <TabsAsyncMonsters />
 
@@ -318,18 +318,18 @@ addBtn?.addEventListener("click", () => {
 
 <TabsAddRuntime />
 
-### Listening to `tab-activate` and `tab-delete`
+### Listening to `tabs:activate` and `tabs:delete`
 
 ```js
 const tabsEl = document.querySelector("cinq-tabs");
 
 tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
-  tab.addEventListener("tab-activate", ({ detail }) => {
+  tab.addEventListener("tabs:activate", ({ detail }) => {
     const { controls, element } = detail;
     console.log("Activated tab:", controls, element);
   });
 
-  tab.addEventListener("tab-delete", ({ detail }) => {
+  tab.addEventListener("tabs:delete", ({ detail }) => {
     const { controls, element } = detail;
     console.log("Deleted tab:", controls, element);
   });

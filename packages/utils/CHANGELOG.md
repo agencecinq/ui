@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 7.0.0
+
+### Major Changes
+
+- Harmonize all custom event names to `{package}:{action}` (e.g. `drawer:before-open`, `tabs:activate`, `spinbutton:change`). Rename `EVENTS.TAB_*` to `EVENTS.TABS_*`.
+
 ## 6.1.0
 
 ### Minor Changes

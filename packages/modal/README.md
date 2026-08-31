@@ -54,7 +54,7 @@ Render the markup and wire buttons with `aria-controls`.
 ### Markup
 
 `<cinq-modal>` must contain a `<dialog>` (or an element marked with `[data-dialog]`).
-An `id` is required if you want it to react to `modal-toggle` events from `cinq-modal-button`.
+An `id` is required if you want it to react to `modal:toggle` events from `cinq-modal-button`.
 
 ```html
 <cinq-modal id="my-modal">
@@ -86,11 +86,11 @@ Event names come from `@agencecinq/utils` on `document.documentElement`:
 
 | Event | Constant | Cancelable | Detail | Description |
 | ----- | -------- | ---------- | ------ | ----------- |
-| `modal-toggle` | `MODAL_TOGGLE` | No | `{ modal, trigger, trap }` | Request open/close from a button |
-| `modal-before-open` | `MODAL_BEFORE_OPEN` | Yes | `{ modal, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
-| `modal-before-close` | `MODAL_BEFORE_CLOSE` | Yes | `{ modal, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
-| `modal-open` | `MODAL_OPEN` | No | `{ modal, trigger? }` | Fired after `open` is set |
-| `modal-close` | `MODAL_CLOSE` | No | `{ modal }` | Fired after `open` is removed |
+| `modal:toggle` | `MODAL_TOGGLE` | No | `{ modal, trigger, trap }` | Request open/close from a button |
+| `modal:before-open` | `MODAL_BEFORE_OPEN` | Yes | `{ modal, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer; call `resolve()` to commit |
+| `modal:before-close` | `MODAL_BEFORE_CLOSE` | Yes | `{ modal, instance, resolve }` | Fired before `open` is removed. Cancel to defer; call `resolve()` to commit |
+| `modal:open` | `MODAL_OPEN` | No | `{ modal, trigger? }` | Fired after `open` is set |
+| `modal:close` | `MODAL_CLOSE` | No | `{ modal }` | Fired after `open` is removed |
 
 #### Deferring open or close
 
@@ -122,18 +122,18 @@ document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => 
 from `@agencecinq/modal`.
 
 **UX:** defer open when the fetch is quick and the dialog would feel empty;
-otherwise open immediately and load on `modal-open`. Defer close for save,
+otherwise open immediately and load on `modal:open`. Defer close for save,
 archive, or exit animation.
 
-### Wiring: handle `modal-toggle`
+### Wiring: handle `modal:toggle`
 
-`cinq-modal-button` dispatches `modal-toggle` on `document.documentElement` with:
+`cinq-modal-button` dispatches `modal:toggle` on `document.documentElement` with:
 
 - `detail.modal`: the modal id from the button `aria-controls`
 - `detail.trigger`: the button element
 - `detail.trap`: optional element from `data-trap` (if you use it)
 
-`cinq-modal` listens to `modal-toggle` by default and toggles itself when `detail.modal` matches its `id` (so `id` is required for event-driven open/close).
+`cinq-modal` listens to `modal:toggle` by default and toggles itself when `detail.modal` matches its `id` (so `id` is required for event-driven open/close).
 
 ### Background scroll (consumer)
 
@@ -147,7 +147,7 @@ html:has(dialog[open]:modal) {
 }
 ```
 
-Or refcount `modal-open` / `modal-close` with `disableScroll` / `enableScroll` from
+Or refcount `modal:open` / `modal:close` with `disableScroll` / `enableScroll` from
 `@agencecinq/utils` if the theme already uses those helpers.
 
 ---

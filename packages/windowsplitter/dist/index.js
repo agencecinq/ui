@@ -1,16 +1,16 @@
 //#region ../utils/dist/index.js
 var e = {
-	DRAWER_BEFORE_CLOSE: "drawer-before-close",
-	DRAWER_BEFORE_OPEN: "drawer-before-open",
-	DRAWER_CLOSE: "drawer-close",
-	DRAWER_OPEN: "drawer-open",
-	DRAWER_TOGGLE: "drawer-toggle",
-	MODAL_BEFORE_CLOSE: "modal-before-close",
-	MODAL_BEFORE_OPEN: "modal-before-open",
-	MODAL_CLOSE: "modal-close",
-	MODAL_OPEN: "modal-open",
-	MODAL_TOGGLE: "modal-toggle",
-	SPINBUTTON_CHANGE: "spinbutton-change",
+	DRAWER_BEFORE_CLOSE: "drawer:before-close",
+	DRAWER_BEFORE_OPEN: "drawer:before-open",
+	DRAWER_CLOSE: "drawer:close",
+	DRAWER_OPEN: "drawer:open",
+	DRAWER_TOGGLE: "drawer:toggle",
+	MODAL_BEFORE_CLOSE: "modal:before-close",
+	MODAL_BEFORE_OPEN: "modal:before-open",
+	MODAL_CLOSE: "modal:close",
+	MODAL_OPEN: "modal:open",
+	MODAL_TOGGLE: "modal:toggle",
+	SPINBUTTON_CHANGE: "spinbutton:change",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
 	SWITCH_ACTIVATE: "switch:activate",
@@ -24,13 +24,13 @@ var e = {
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
 	CALENDAR_CHANGE: "calendar:change",
-	TAB_BEFORE_ACTIVATE: "tab-before-activate",
-	TAB_ACTIVATE: "tab-activate",
-	TAB_DELETE: "tab-delete",
-	CART_BEFORE_ADD: "cart-before-add",
-	CART_BEFORE_UPDATE: "cart-before-update",
-	CART_UPDATE: "cart-update",
-	VARIANT_CHANGE: "variant-change"
+	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
+	TABS_ACTIVATE: "tabs:activate",
+	TABS_DELETE: "tabs:delete",
+	CART_BEFORE_ADD: "cart:before-add",
+	CART_BEFORE_UPDATE: "cart:before-update",
+	CART_UPDATE: "cart:update",
+	VARIANT_CHANGE: "variant:change"
 }, t = (e, t, n, r = {}) => {
 	let { bubbles: i = !0, cancelable: a = !0 } = r;
 	return e.dispatchEvent(new CustomEvent(t, {
@@ -101,12 +101,12 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 			n === "ArrowDown" && s(a + i);
 		}
 	};
-}, l = ({ value: e }) => `${e}%`, u = (e) => String(e), d = (e) => e === "clip" || e === "none" || e === "resize" ? e : "resize", f = class extends HTMLElement {
+}, l = ({ ratio: e }) => `${e * 100}%`, u = (e) => String(e), d = (e) => e === "clip" || e === "none" || e === "resize" ? e : "resize", f = class extends HTMLElement {
 	static observedAttributes = [
-		"data-windowsplitter-mode",
-		"data-windowsplitter-step",
-		"data-windowsplitter-page",
-		"data-windowsplitter-fixed"
+		"data-mode",
+		"data-step",
+		"data-page",
+		"data-fixed"
 	];
 	$separator = null;
 	mode = "resize";
@@ -135,19 +135,19 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 	}
 	attributeChangedCallback(e, t, i) {
 		if (this.#r) {
-			if (e === "data-windowsplitter-mode") {
+			if (e === "data-mode") {
 				this.mode = d(i), this.sync();
 				return;
 			}
-			if (e === "data-windowsplitter-step") {
+			if (e === "data-step") {
 				this.step = n(i, 1);
 				return;
 			}
-			if (e === "data-windowsplitter-page") {
+			if (e === "data-page") {
 				this.page = n(i, 10);
 				return;
 			}
-			e === "data-windowsplitter-fixed" && (this.fixed = r(i));
+			e === "data-fixed" && (this.fixed = r(i));
 		}
 	}
 	get orientation() {
@@ -205,7 +205,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 		return this.collapsed ? this.restore(e) : this.collapse(e);
 	}
 	#a() {
-		this.mode = d(this.getAttribute("data-windowsplitter-mode")), this.step = n(this.getAttribute("data-windowsplitter-step"), 1), this.page = n(this.getAttribute("data-windowsplitter-page"), 10), this.fixed = r(this.getAttribute("data-windowsplitter-fixed"));
+		this.mode = d(this.getAttribute("data-mode")), this.step = n(this.getAttribute("data-step"), 1), this.page = n(this.getAttribute("data-page"), 10), this.fixed = r(this.getAttribute("data-fixed"));
 	}
 	#o() {
 		this.#t?.disconnect(), this.#t = new ResizeObserver(() => this.#s(this.value, !1)), this.#t.observe(this);
@@ -218,7 +218,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 			a = this.orientation === "vertical" ? e : t;
 		}
 		let o = Math.round((e - n) / i * a), s = (e - n) / i;
-		this.style.setProperty("--windowsplitter-value", String(e)), this.style.setProperty("--windowsplitter-ratio", String(s)), this.style.setProperty("--windowsplitter-offset", `${o}px`), this.orientation === "vertical" ? this.$separator.style.setProperty("transform", `translate3d(${o}px, 0, 0)`) : this.$separator.style.setProperty("transform", `translate3d(0, ${o}px, 0)`), this.collapsed ? this.setAttribute("collapsed", "") : this.removeAttribute("collapsed"), this.#c(e, s, a, o), this.#l(t, e, s);
+		this.style.setProperty("--value", String(e)), this.style.setProperty("--ratio", String(s)), this.style.setProperty("--offset", `${o}px`), this.orientation === "vertical" ? this.$separator.style.setProperty("transform", `translate3d(${o}px, 0, 0)`) : this.$separator.style.setProperty("transform", `translate3d(0, ${o}px, 0)`), this.collapsed ? this.setAttribute("collapsed", "") : this.removeAttribute("collapsed"), this.#c(e, s, a, o), this.#l(t, e, s);
 	}
 	#c(e, t, n, r) {
 		if (!this.$primary || this.mode === "none") return;

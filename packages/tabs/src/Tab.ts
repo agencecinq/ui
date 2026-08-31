@@ -44,7 +44,7 @@ export default class Tab {
 		if (
 			!dispatchEvent(
 				this.el,
-				EVENTS.TAB_BEFORE_ACTIVATE,
+				EVENTS.TABS_BEFORE_ACTIVATE,
 				{ index: this.index, controls: this.controls, element: this.el },
 			)
 		) {
@@ -53,7 +53,7 @@ export default class Tab {
 
 		dispatchEvent(
 			this.el,
-			EVENTS.TAB_ACTIVATE,
+			EVENTS.TABS_ACTIVATE,
 			{ controls: this.controls, element: this.el },
 			{ cancelable: false },
 		);
@@ -110,7 +110,7 @@ export default class Tab {
 	delete = () => {
 		dispatchEvent(
 			this.el,
-			EVENTS.TAB_DELETE,
+			EVENTS.TABS_DELETE,
 			{ controls: this.controls, element: this.el },
 			{ cancelable: false },
 		);

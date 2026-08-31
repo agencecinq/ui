@@ -6,7 +6,8 @@ import { FormatSize, FormatValue, Mode } from './types.js';
  * custom properties). A nested separator (`role="separator"` or `slider`) is
  * the focusable control: ARIA value attributes and `aria-controls` live there.
  * Style the host via `[collapsed]` / `[dragging]` / `[disabled]`, or the
- * separator via `[role="separator"]`.
+ * separator via `[role="separator"]`. Host CSS variables: `--value`, `--ratio`,
+ * `--offset`.
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
  * @see https://github.com/19h47/19h47-windowsplitter

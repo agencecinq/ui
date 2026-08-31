@@ -123,17 +123,17 @@ dispatched on `document.documentElement`.
 
 | Event                | Cancelable | Detail payload                            | Description                                                                 |
 | -------------------- | ---------- | ----------------------------------------- | --------------------------------------------------------------------------- |
-| `modal-toggle`       | No         | `{ modal, trigger, trap }`               | Request open/close from a button.                                           |
-| `modal-before-open`  | Yes        | `{ modal, instance, trigger, resolve }`  | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
-| `modal-before-close` | Yes        | `{ modal, instance, resolve }`           | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
-| `modal-open`         | No         | `{ modal, trigger? }`                    | Fired after `open` is set (`showModal()`, focus).                            |
-| `modal-close`        | No         | `{ modal }`                              | Fired after `open` is removed.                                               |
+| `modal:toggle`       | No         | `{ modal, trigger, trap }`               | Request open/close from a button.                                           |
+| `modal:before-open`  | Yes        | `{ modal, instance, trigger, resolve }`  | Fired **before** `open` is set. Cancel to defer; call `resolve()` to commit. |
+| `modal:before-close` | Yes        | `{ modal, instance, resolve }`           | Fired **before** `open` is removed. Cancel to defer; call `resolve()` to commit. |
+| `modal:open`         | No         | `{ modal, trigger? }`                    | Fired after `open` is set (`showModal()`, focus).                            |
+| `modal:close`        | No         | `{ modal }`                              | Fired after `open` is removed.                                               |
 
 ### Deferring open or close
 
-Every open path (toggle or `show()`) dispatches cancelable `modal-before-open`
+Every open path (toggle or `show()`) dispatches cancelable `modal:before-open`
 first. Every close path (backdrop click, Escape, or `close()`) dispatches
-cancelable `modal-before-close` first. Without a listener (or without
+cancelable `modal:before-close` first. Without a listener (or without
 `preventDefault()`), the modal opens or closes immediately. To run async work,
 cancel the event and call `detail.resolve()` when ready:
 
@@ -161,13 +161,13 @@ document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => 
 });
 ```
 
-`resolve()` is idempotent: safe to call more than once. `modal-open` and
-`modal-close` fire only after the matching `resolve()`.
+`resolve()` is idempotent: safe to call more than once. `modal:open` and
+`modal:close` fire only after the matching `resolve()`.
 
 **UX:** defer **open** with `before-open` when the fetch is short (roughly under
 500 ms) and the dialog would feel broken if empty: show loading on the trigger
 while you wait, then call `resolve()`. For slower or unpredictable loads, skip
-the defer: let the modal open immediately and fetch on `modal-open` with a
+the defer: let the modal open immediately and fetch on `modal:open` with a
 skeleton or spinner inside the dialog. Defer **close** with `before-close` when
 you need to save, archive, or run an exit animation before dismissing.
 

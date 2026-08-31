@@ -31,14 +31,14 @@ export declare class Drawer extends HTMLElement {
         trap: HTMLElement | null;
     }): boolean;
     /**
-     * Opens the drawer. Dispatches cancelable `drawer-before-open` with
+     * Opens the drawer. Dispatches cancelable `drawer:before-open` with
      * `detail.resolve()` to commit after async work.
      *
      * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
      */
     open(): boolean;
     /**
-     * Closes the drawer. Dispatches cancelable `drawer-before-close` with
+     * Closes the drawer. Dispatches cancelable `drawer:before-close` with
      * `detail.resolve()` to commit after async work.
      *
      * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.

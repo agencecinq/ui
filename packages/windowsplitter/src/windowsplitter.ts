@@ -8,7 +8,7 @@ import type {
   Detail,
 } from "./types.js";
 
-const defaultFormatSize = ({ value }: Size) => `${value}%`;
+const defaultFormatSize = ({ ratio }: Size) => `${ratio * 100}%`;
 const defaultFormatValue = (value: number) => String(value);
 
 const parseMode = (value: string | null | undefined): Mode =>
@@ -22,17 +22,18 @@ const parseMode = (value: string | null | undefined): Mode =>
  * custom properties). A nested separator (`role="separator"` or `slider`) is
  * the focusable control: ARIA value attributes and `aria-controls` live there.
  * Style the host via `[collapsed]` / `[dragging]` / `[disabled]`, or the
- * separator via `[role="separator"]`.
+ * separator via `[role="separator"]`. Host CSS variables: `--value`, `--ratio`,
+ * `--offset`.
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
  * @see https://github.com/19h47/19h47-windowsplitter
  */
 export class WindowSplitter extends HTMLElement {
   static observedAttributes = [
-    "data-windowsplitter-mode",
-    "data-windowsplitter-step",
-    "data-windowsplitter-page",
-    "data-windowsplitter-fixed",
+    "data-mode",
+    "data-step",
+    "data-page",
+    "data-fixed",
   ];
 
   /** Focusable separator control inside the host. */
@@ -130,23 +131,23 @@ export class WindowSplitter extends HTMLElement {
   ): void {
     if (!this.#bound) return;
 
-    if (name === "data-windowsplitter-mode") {
+    if (name === "data-mode") {
       this.mode = parseMode(newValue);
       this.sync();
       return;
     }
 
-    if (name === "data-windowsplitter-step") {
+    if (name === "data-step") {
       this.step = parseNumber(newValue, 1);
       return;
     }
 
-    if (name === "data-windowsplitter-page") {
+    if (name === "data-page") {
       this.page = parseNumber(newValue, 10);
       return;
     }
 
-    if (name === "data-windowsplitter-fixed") {
+    if (name === "data-fixed") {
       this.fixed = parseBoolean(newValue);
     }
   }
@@ -269,10 +270,10 @@ export class WindowSplitter extends HTMLElement {
   }
 
   #read(): void {
-    this.mode = parseMode(this.getAttribute("data-windowsplitter-mode"));
-    this.step = parseNumber(this.getAttribute("data-windowsplitter-step"), 1);
-    this.page = parseNumber(this.getAttribute("data-windowsplitter-page"), 10);
-    this.fixed = parseBoolean(this.getAttribute("data-windowsplitter-fixed"));
+    this.mode = parseMode(this.getAttribute("data-mode"));
+    this.step = parseNumber(this.getAttribute("data-step"), 1);
+    this.page = parseNumber(this.getAttribute("data-page"), 10);
+    this.fixed = parseBoolean(this.getAttribute("data-fixed"));
   }
 
   #observe(): void {
@@ -302,9 +303,9 @@ export class WindowSplitter extends HTMLElement {
     const offset = Math.round(((value - min) / span) * length);
     const ratio = (value - min) / span;
 
-    this.style.setProperty("--windowsplitter-value", String(value));
-    this.style.setProperty("--windowsplitter-ratio", String(ratio));
-    this.style.setProperty("--windowsplitter-offset", `${offset}px`);
+    this.style.setProperty("--value", String(value));
+    this.style.setProperty("--ratio", String(ratio));
+    this.style.setProperty("--offset", `${offset}px`);
 
     if (this.orientation === "vertical") {
       this.$separator.style.setProperty(

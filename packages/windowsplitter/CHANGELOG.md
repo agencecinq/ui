@@ -1,5 +1,12 @@
 # @agencecinq/windowsplitter
 
+## 3.0.0
+
+### Major Changes
+
+- Rename host data attributes: drop the `windowsplitter` prefix (`data-mode`, `data-step`, `data-page`, `data-fixed`).
+- Rename host CSS custom properties: `--value`, `--ratio`, `--offset` (was `--windowsplitter-*`).
+
 ## 2.0.1
 
 ### Patch Changes

@@ -1,16 +1,16 @@
 //#region ../utils/dist/index.js
 var e = {
-	DRAWER_BEFORE_CLOSE: "drawer-before-close",
-	DRAWER_BEFORE_OPEN: "drawer-before-open",
-	DRAWER_CLOSE: "drawer-close",
-	DRAWER_OPEN: "drawer-open",
-	DRAWER_TOGGLE: "drawer-toggle",
-	MODAL_BEFORE_CLOSE: "modal-before-close",
-	MODAL_BEFORE_OPEN: "modal-before-open",
-	MODAL_CLOSE: "modal-close",
-	MODAL_OPEN: "modal-open",
-	MODAL_TOGGLE: "modal-toggle",
-	SPINBUTTON_CHANGE: "spinbutton-change",
+	DRAWER_BEFORE_CLOSE: "drawer:before-close",
+	DRAWER_BEFORE_OPEN: "drawer:before-open",
+	DRAWER_CLOSE: "drawer:close",
+	DRAWER_OPEN: "drawer:open",
+	DRAWER_TOGGLE: "drawer:toggle",
+	MODAL_BEFORE_CLOSE: "modal:before-close",
+	MODAL_BEFORE_OPEN: "modal:before-open",
+	MODAL_CLOSE: "modal:close",
+	MODAL_OPEN: "modal:open",
+	MODAL_TOGGLE: "modal:toggle",
+	SPINBUTTON_CHANGE: "spinbutton:change",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
 	SWITCH_ACTIVATE: "switch:activate",
@@ -24,13 +24,13 @@ var e = {
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
 	CALENDAR_CHANGE: "calendar:change",
-	TAB_BEFORE_ACTIVATE: "tab-before-activate",
-	TAB_ACTIVATE: "tab-activate",
-	TAB_DELETE: "tab-delete",
-	CART_BEFORE_ADD: "cart-before-add",
-	CART_BEFORE_UPDATE: "cart-before-update",
-	CART_UPDATE: "cart-update",
-	VARIANT_CHANGE: "variant-change"
+	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
+	TABS_ACTIVATE: "tabs:activate",
+	TABS_DELETE: "tabs:delete",
+	CART_BEFORE_ADD: "cart:before-add",
+	CART_BEFORE_UPDATE: "cart:before-update",
+	CART_UPDATE: "cart:update",
+	VARIANT_CHANGE: "variant:change"
 }, t = (e, t, n, r = {}) => {
 	let { bubbles: i = !0, cancelable: a = !0 } = r;
 	return e.dispatchEvent(new CustomEvent(t, {

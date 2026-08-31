@@ -98,6 +98,8 @@
 </div>
 
 <script>
+  import { EVENTS } from '@agencecinq/utils';
+
   const API_BASE = 'https://www.dnd5eapi.co/api/monsters';
 
   function populatePanel(panelId, data) {
@@ -162,7 +164,7 @@
     }
 
     // For activations, just fetch and hydrate the panel; let `<cinq-tabs>` handle switching.
-    tabsEl.addEventListener('tab-before-activate', (event) => {
+    tabsEl.addEventListener(EVENTS.TABS_BEFORE_ACTIVATE, (event) => {
       const detail = event.detail;
       if (!detail) return;
 

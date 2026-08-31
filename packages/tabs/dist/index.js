@@ -1,16 +1,16 @@
 //#region ../utils/dist/index.js
 var e = {
-	DRAWER_BEFORE_CLOSE: "drawer-before-close",
-	DRAWER_BEFORE_OPEN: "drawer-before-open",
-	DRAWER_CLOSE: "drawer-close",
-	DRAWER_OPEN: "drawer-open",
-	DRAWER_TOGGLE: "drawer-toggle",
-	MODAL_BEFORE_CLOSE: "modal-before-close",
-	MODAL_BEFORE_OPEN: "modal-before-open",
-	MODAL_CLOSE: "modal-close",
-	MODAL_OPEN: "modal-open",
-	MODAL_TOGGLE: "modal-toggle",
-	SPINBUTTON_CHANGE: "spinbutton-change",
+	DRAWER_BEFORE_CLOSE: "drawer:before-close",
+	DRAWER_BEFORE_OPEN: "drawer:before-open",
+	DRAWER_CLOSE: "drawer:close",
+	DRAWER_OPEN: "drawer:open",
+	DRAWER_TOGGLE: "drawer:toggle",
+	MODAL_BEFORE_CLOSE: "modal:before-close",
+	MODAL_BEFORE_OPEN: "modal:before-open",
+	MODAL_CLOSE: "modal:close",
+	MODAL_OPEN: "modal:open",
+	MODAL_TOGGLE: "modal:toggle",
+	SPINBUTTON_CHANGE: "spinbutton:change",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
 	SWITCH_ACTIVATE: "switch:activate",
@@ -24,13 +24,13 @@ var e = {
 	COMBOBOX_EMPTY: "combobox:empty",
 	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
 	CALENDAR_CHANGE: "calendar:change",
-	TAB_BEFORE_ACTIVATE: "tab-before-activate",
-	TAB_ACTIVATE: "tab-activate",
-	TAB_DELETE: "tab-delete",
-	CART_BEFORE_ADD: "cart-before-add",
-	CART_BEFORE_UPDATE: "cart-before-update",
-	CART_UPDATE: "cart-update",
-	VARIANT_CHANGE: "variant-change"
+	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
+	TABS_ACTIVATE: "tabs:activate",
+	TABS_DELETE: "tabs:delete",
+	CART_BEFORE_ADD: "cart:before-add",
+	CART_BEFORE_UPDATE: "cart:before-update",
+	CART_UPDATE: "cart:update",
+	VARIANT_CHANGE: "variant:change"
 }, t = (e, t, n, r = {}) => {
 	let { bubbles: i = !0, cancelable: a = !0 } = r;
 	return e.dispatchEvent(new CustomEvent(t, {
@@ -88,11 +88,11 @@ var o = class {
 	initEvents = () => this.el.addEventListener("click", this.handleClick);
 	handleClick = () => this.toggle();
 	toggle(n = !0) {
-		this.active || t(this.el, e.TAB_BEFORE_ACTIVATE, {
+		this.active || t(this.el, e.TABS_BEFORE_ACTIVATE, {
 			index: this.index,
 			controls: this.controls,
 			element: this.el
-		}) && (t(this.el, e.TAB_ACTIVATE, {
+		}) && (t(this.el, e.TABS_ACTIVATE, {
 			controls: this.controls,
 			element: this.el
 		}, { cancelable: !1 }), this.activate(n));
@@ -105,7 +105,7 @@ var o = class {
 	}
 	focus = () => this.el.focus();
 	delete = () => {
-		t(this.el, e.TAB_DELETE, {
+		t(this.el, e.TABS_DELETE, {
 			controls: this.controls,
 			element: this.el
 		}, { cancelable: !1 }), this.el.parentElement?.removeChild(this.el);
@@ -139,7 +139,7 @@ var o = class {
 		}
 		if (this.href = this.hash && a(window.location.hash) || "", !this.$tabList) return;
 		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new s(e, t)), this.tabs.forEach((t, n) => {
-			this.tabPanels.push(new o(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TAB_ACTIVATE, () => {
+			this.tabPanels.push(new o(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TABS_ACTIVATE, () => {
 				this.current = n, this.deactivateTabs(), this.deactivateTabPanels(), t.activate(!1), this.tabPanels.find((e) => e.id === t.controls)?.activate(), this.hash && (this.href = t.id, window.location.hash = t.id);
 			});
 		}), this.href) {
