@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 7.3.0
+
+### Minor Changes
+
+- Add `SNAKE_EAT`, `SNAKE_OVER`, and `SNAKE_REPLAY` event constants for `@agencecinq/snake`.
+
 ## 7.2.0
 
 ### Minor Changes

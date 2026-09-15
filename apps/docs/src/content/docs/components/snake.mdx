@@ -1,6 +1,6 @@
 ---
 title: Snake
-description: Canvas Snake game with a requestAnimationFrame loop (sandbox).
+description: Canvas Snake game with a requestAnimationFrame loop.
 ---
 
 import RegisterComponents from '../_components/RegisterComponents.astro';
@@ -14,10 +14,6 @@ import DemoColors from '../_components/snake/DemoColors.astro';
 <SnakeStyles />
 <SnakeScript />
 
-:::note[Sandbox]
-Experimental demo, not published on npm. API may change or move.
-:::
-
 `<cinq-snake>` is a canvas Snake host. **Markup supplies the canvas.** The
 component runs the game loop, draws squares, and handles collisions. Score,
 overlay, and replay stay in your page. Read `$host.score`, listen for
@@ -25,6 +21,16 @@ overlay, and replay stay in your page. Read `$host.score`, listen for
 
 The loop uses `requestAnimationFrame` with a fixed timestep. It does not use
 `setInterval`.
+
+## Install
+
+```bash
+pnpm add @agencecinq/snake
+```
+
+```js
+import "@agencecinq/snake"
+```
 
 ## Markup
 
@@ -193,28 +199,32 @@ the light DOM.
 
 ## Events
 
-| Event | Detail |
-| ----- | ------ |
-| `snake:eat` | `{ score }` after food |
-| `snake:over` | `{ score }` after a wall or self hit |
-| `snake:replay` | `{ score }` after `replay()`, or after `cols` / `rows` change |
+Prefer constants from `@agencecinq/utils`.
+
+| Event | Constant | Detail |
+| ----- | -------- | ------ |
+| `snake:eat` | `SNAKE_EAT` | `{ score }` after food |
+| `snake:over` | `SNAKE_OVER` | `{ score }` after a wall or self hit |
+| `snake:replay` | `SNAKE_REPLAY` | `{ score }` after `replay()`, or after `cols` / `rows` change |
 
 ```js
+import { EVENTS } from "@agencecinq/utils"
+
 const $host = document.querySelector("cinq-snake")
 const $score = $host.querySelector("[data-score]")
 const $overlay = $host.querySelector("[data-overlay]")
 const $replay = $host.querySelector("[data-replay]")
 
-$host.addEventListener("snake:eat", (event) => {
+$host.addEventListener(EVENTS.SNAKE_EAT, (event) => {
   $score.textContent = String(event.detail.score)
 })
 
-$host.addEventListener("snake:over", () => {
+$host.addEventListener(EVENTS.SNAKE_OVER, () => {
   $overlay.hidden = false
   $replay.focus()
 })
 
-$host.addEventListener("snake:replay", (event) => {
+$host.addEventListener(EVENTS.SNAKE_REPLAY, (event) => {
   $overlay.hidden = true
   $score.textContent = String(event.detail.score)
 })

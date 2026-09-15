@@ -11,12 +11,13 @@
 | drawer | `cinq-drawer` | (overlay, app-level) |
 | modal | `cinq-modal` | Dialog (Modal) |
 | spinbutton | `cinq-spinbutton` | Spinbutton |
+| snake | `cinq-snake` | Canvas Snake |
 | switch | `cinq-switch` | Switch |
 | tabs | `cinq-tabs` | Tabs |
 | windowsplitter | `cinq-windowsplitter` | Window Splitter |
 | utils | `@agencecinq/utils` | EVENTS, DOM helpers |
 
-Sandbox (not npm): `pixelate`, `dual-scroll`, `snake`.
+Sandbox (not npm): `pixelate`, `dual-scroll`.
 
 Draft spec: `packages/slider/SPEC.md` (validated).
 

@@ -1,4 +1,4 @@
-import { dispatchEvent, parseNumber } from "@agencecinq/utils";
+import { dispatchEvent, EVENTS, parseNumber } from "@agencecinq/utils";
 import { color, COLS, ROWS, STEP_MS, STEP_MS_MIN } from "./config.js";
 import Game from "./game.js";
 import Keyboard from "./keyboard.js";
@@ -128,7 +128,12 @@ export class Snake extends HTMLElement {
     this.sync();
     this.#loop?.start();
     this.$canvas?.focus();
-    dispatchEvent(this, "snake:replay", { score: this.#game.score });
+    dispatchEvent(
+      this,
+      EVENTS.SNAKE_REPLAY,
+      { score: this.#game.score },
+      { cancelable: false },
+    );
   }
 
   get score(): number {
@@ -169,7 +174,12 @@ export class Snake extends HTMLElement {
     this.#loop?.start();
 
     if (emit) {
-      dispatchEvent(this, "snake:replay", { score: this.#game.score });
+      dispatchEvent(
+        this,
+        EVENTS.SNAKE_REPLAY,
+        { score: this.#game.score },
+        { cancelable: false },
+      );
     }
   }
 
@@ -194,7 +204,12 @@ export class Snake extends HTMLElement {
 
     if (result === "eat") {
       this.#syncSpeed();
-      dispatchEvent(this, "snake:eat", { score: this.#game.score });
+      dispatchEvent(
+        this,
+        EVENTS.SNAKE_EAT,
+        { score: this.#game.score },
+        { cancelable: false },
+      );
       return;
     }
 
@@ -224,7 +239,12 @@ export class Snake extends HTMLElement {
   #end(): void {
     this.#loop?.stop();
     this.#draw();
-    dispatchEvent(this, "snake:over", { score: this.#game.score });
+    dispatchEvent(
+      this,
+      EVENTS.SNAKE_OVER,
+      { score: this.#game.score },
+      { cancelable: false },
+    );
   }
 
   /** Shorten the step interval as the score climbs, down to STEP_MS_MIN. */

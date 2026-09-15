@@ -23,6 +23,9 @@ export declare const EVENTS: {
     COMBOBOX_EMPTY: string;
     WINDOWSPLITTER_CHANGE: string;
     SLIDER_CHANGE: string;
+    SNAKE_EAT: string;
+    SNAKE_OVER: string;
+    SNAKE_REPLAY: string;
     CALENDAR_CHANGE: string;
     TABS_BEFORE_ACTIVATE: string;
     TABS_ACTIVATE: string;

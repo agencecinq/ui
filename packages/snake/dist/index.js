@@ -1,32 +1,11 @@
-//#region ../utils/dist/index.js
-var e = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, t = (e, t) => {
-	if (e == null || e === "") return t;
-	let n = Number(e);
-	return Number.isFinite(n) ? n : t;
-}, n = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-//#endregion
+import { EVENTS as e, dispatchEvent as t, parseNumber as n } from "@agencecinq/utils";
 //#region src/config.ts
-var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
+var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 	up: "down",
 	down: "up",
 	left: "right",
 	right: "left"
-}, u = {
+}, c = {
 	up: {
 		x: 0,
 		y: -1
@@ -43,7 +22,7 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		x: 1,
 		y: 0
 	}
-}, d = class {
+}, l = class {
 	#e;
 	#t;
 	#n = [];
@@ -92,13 +71,13 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		this.#n = r, this.#r = "right", this.#i = "right", this.#o = 0, this.#s = !0, this.#c = !1, this.#d();
 	}
 	setDirection(e) {
-		e !== l[this.#r] && (this.#i = e, !this.#c && this.#s && (this.#c = !0));
+		e !== s[this.#r] && (this.#i = e, !this.#c && this.#s && (this.#c = !0));
 	}
 	tick() {
 		if (!this.#s) return "dead";
 		if (!this.#c) return "idle";
 		this.#r = this.#i;
-		let { x: e, y: t } = u[this.#r], n = this.#n[0], r = {
+		let { x: e, y: t } = c[this.#r], n = this.#n[0], r = {
 			x: n.x + e,
 			y: n.y + t
 		};
@@ -125,19 +104,19 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		});
 		t.length !== 0 && (this.#a = t[Math.floor(Math.random() * t.length)]);
 	}
-}, f = {
+}, u = {
 	ArrowUp: "up",
 	ArrowDown: "down",
 	ArrowLeft: "left",
 	ArrowRight: "right"
-}, p = 24, m = class {
+}, d = 24, f = class {
 	#e;
 	#t = null;
 	constructor(e) {
 		this.#e = e;
 	}
 	handle = (e) => {
-		let t = f[e.key];
+		let t = u[e.key];
 		t && (e.preventDefault(), this.#e(t));
 	};
 	handlePointerDown = (e) => {
@@ -150,7 +129,7 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		let t = this.#t;
 		if (this.#t = null, !t) return;
 		let { clientX: n, clientY: r } = e, i = n - t.x, a = r - t.y;
-		if (!(Math.hypot(i, a) < p)) {
+		if (!(Math.hypot(i, a) < d)) {
 			if (Math.abs(i) > Math.abs(a)) {
 				this.#e(i > 0 ? "right" : "left");
 				return;
@@ -161,7 +140,7 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 	handlePointerCancel = () => {
 		this.#t = null;
 	};
-}, h = class {
+}, p = class {
 	#e;
 	#t;
 	#n;
@@ -197,7 +176,7 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		for (this.#i = e, this.#a += t; this.#o && this.#a >= this.#e;) this.#t(), this.#a -= this.#e;
 		this.#o && this.#n();
 	};
-}, g = class {
+}, m = class {
 	#e;
 	#t;
 	constructor(e, t) {
@@ -230,10 +209,10 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		let { width: a, height: o, cols: s, rows: c } = n, l = e * a / s, u = t * o / c, d = (e + 1) * a / s - l, f = (t + 1) * o / c - u, p = Math.max(1, Math.round(Math.min(d, f) * i)), m = d - p * 2, h = f - p * 2;
 		m <= 0 || h <= 0 || (this.#t.fillStyle = r, this.#t.fillRect(l + p, u + p, m, h));
 	}
-}, _ = class extends HTMLElement {
+}, h = class extends HTMLElement {
 	static observedAttributes = ["cols", "rows"];
 	$canvas = null;
-	#e = new d();
+	#e = new l();
 	#t = null;
 	#n = null;
 	#r = null;
@@ -251,7 +230,7 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		if (this.$canvas = this.querySelector("canvas"), !this.$canvas) throw Error("Snake must contain a canvas element");
 		let e = this.$canvas.getContext("2d");
 		if (!e) throw Error("Snake could not get a 2d canvas context");
-		this.#n = new g(this.$canvas, e), this.#r = new m(this.#o), this.#t = new h(130, this.#s, this.#c), this.addEventListener("keydown", this.#f), this.$canvas.addEventListener("pointerdown", this.#p), this.$canvas.addEventListener("pointerup", this.#r.handlePointerUp), this.$canvas.addEventListener("pointercancel", this.#r.handlePointerCancel), this.#a(!1), this.sync(), this.#t.start();
+		this.#n = new m(this.$canvas, e), this.#r = new f(this.#o), this.#t = new p(130, this.#s, this.#c), this.addEventListener("keydown", this.#f), this.$canvas.addEventListener("pointerdown", this.#p), this.$canvas.addEventListener("pointerup", this.#r.handlePointerUp), this.$canvas.addEventListener("pointercancel", this.#r.handlePointerCancel), this.#a(!1), this.sync(), this.#t.start();
 	}
 	destroy() {
 		if (!this.#t) return;
@@ -262,7 +241,7 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		this.#n?.resize(), this.#c();
 	}
 	replay() {
-		this.#e.reset(), this.#u(), this.sync(), this.#t?.start(), this.$canvas?.focus(), e(this, "snake:replay", { score: this.#e.score });
+		this.#e.reset(), this.#u(), this.sync(), this.#t?.start(), this.$canvas?.focus(), t(this, e.SNAKE_REPLAY, { score: this.#e.score }, { cancelable: !1 });
 	}
 	get score() {
 		return this.#e.score;
@@ -275,13 +254,13 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 	}
 	#i() {
 		return {
-			cols: Math.max(1, Math.floor(t(this.getAttribute("cols"), 21))),
-			rows: Math.max(1, Math.floor(t(this.getAttribute("rows"), 15)))
+			cols: Math.max(1, Math.floor(n(this.getAttribute("cols"), 21))),
+			rows: Math.max(1, Math.floor(n(this.getAttribute("rows"), 15)))
 		};
 	}
-	#a(t) {
-		let { cols: n, rows: r } = this.#i();
-		(n !== this.#e.cols || r !== this.#e.rows) && (this.#e.setSize(n, r), this.#u(), this.sync(), this.#t?.start(), t && e(this, "snake:replay", { score: this.#e.score }));
+	#a(n) {
+		let { cols: r, rows: i } = this.#i();
+		(r !== this.#e.cols || i !== this.#e.rows) && (this.#e.setSize(r, i), this.#u(), this.sync(), this.#t?.start(), n && t(this, e.SNAKE_REPLAY, { score: this.#e.score }, { cancelable: !1 }));
 	}
 	#o = (e) => {
 		if (!this.#e.alive) return;
@@ -289,12 +268,12 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		this.#e.setDirection(e), t && this.#e.started && (this.#s(), this.#t?.hold());
 	};
 	#s = () => {
-		let t = this.#e.tick();
-		if (t === "eat") {
-			this.#u(), e(this, "snake:eat", { score: this.#e.score });
+		let n = this.#e.tick();
+		if (n === "eat") {
+			this.#u(), t(this, e.SNAKE_EAT, { score: this.#e.score }, { cancelable: !1 });
 			return;
 		}
-		t === "dead" && this.#l();
+		n === "dead" && this.#l();
 	};
 	#c = () => {
 		this.#n && this.$canvas && this.#n.draw({
@@ -305,14 +284,14 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		}, this.#d());
 	};
 	#l() {
-		this.#t?.stop(), this.#c(), e(this, "snake:over", { score: this.#e.score });
+		this.#t?.stop(), this.#c(), t(this, e.SNAKE_OVER, { score: this.#e.score }, { cancelable: !1 });
 	}
 	#u() {
 		this.#t && (this.#t.stepMs = Math.max(70, 130 - this.#e.score * 5));
 	}
 	#d() {
 		let { $canvas: e } = this;
-		return e ? getComputedStyle(e).color || "#2a2a2a" : a;
+		return e ? getComputedStyle(e).color || "#2a2a2a" : r;
 	}
 	#f = (e) => {
 		let { key: t, target: n } = e;
@@ -328,6 +307,6 @@ var a = "#2a2a2a", o = 21, s = 15, c = 130, l = {
 		t && (t.focus(), t.setPointerCapture(e.pointerId), this.#r?.handlePointerDown(e));
 	};
 };
-customElements.get("cinq-snake") || customElements.define("cinq-snake", _);
+customElements.get("cinq-snake") || customElements.define("cinq-snake", h);
 //#endregion
-export { o as COLS, s as ROWS, c as STEP_MS, _ as Snake, a as color };
+export { i as COLS, a as ROWS, o as STEP_MS, h as Snake, r as color };

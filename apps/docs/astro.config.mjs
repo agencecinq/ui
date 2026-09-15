@@ -31,6 +31,7 @@ export default defineConfig({
             { label: 'Combobox', slug: 'components/combobox' },
             { label: 'Window Splitter', slug: 'components/windowsplitter' },
             { label: 'Calendar', slug: 'components/calendar' },
+            { label: 'Snake', slug: 'components/snake' },
           ],
         },
         {
@@ -43,7 +44,6 @@ export default defineConfig({
             { label: 'Overview', slug: 'sandbox' },
             { label: 'Pixelate', slug: 'sandbox/pixelate' },
             { label: 'Dual scroll', slug: 'sandbox/dual-scroll' },
-            { label: 'Snake', slug: 'sandbox/snake' },
           ],
         },
       ],

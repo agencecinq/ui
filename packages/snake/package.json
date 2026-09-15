@@ -1,8 +1,7 @@
 {
   "name": "@agencecinq/snake",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Canvas Snake game. requestAnimationFrame loop, square cells, host-tinted colors (sandbox).",
+  "version": "1.0.0",
+  "description": "Canvas Snake as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
@@ -28,11 +27,14 @@
     "dev": "vite build --watch"
   },
   "peerDependencies": {
-    "@agencecinq/utils": "*"
+    "@agencecinq/utils": ">=7.3.0"
   },
   "devDependencies": {
     "@agencecinq/utils": "workspace:*",
     "vite": "^8.2.0",
     "vite-plugin-dts": "^5.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
