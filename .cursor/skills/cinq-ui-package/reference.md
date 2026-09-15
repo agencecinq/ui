@@ -16,7 +16,7 @@
 | windowsplitter | `cinq-windowsplitter` | Window Splitter |
 | utils | `@agencecinq/utils` | EVENTS, DOM helpers |
 
-Sandbox (not npm): `pixelate`, `dual-scroll`.
+Sandbox (not npm): `pixelate`, `dual-scroll`, `snake`.
 
 Draft spec: `packages/slider/SPEC.md` (validated).
 

@@ -1,0 +1,79 @@
+---
+---
+<script>
+  const CELL = 24;
+  const $hosts = document.querySelectorAll("cinq-snake");
+
+  $hosts.forEach(($host) => {
+    const $canvas = $host.querySelector("canvas");
+    const $score = $host.querySelector("[data-score]");
+    const $overlay = $host.querySelector("[data-overlay]");
+    const $replay = $host.querySelector("[data-replay]");
+    const $grid = $host.querySelector("[data-grid]");
+
+    if (!$canvas || typeof $host.sync !== "function") {
+      return;
+    }
+
+    const writeScore = ({ detail }) => {
+      if ($score) {
+        $score.textContent = String(detail.score);
+      }
+    };
+
+    const fitGrid = () => {
+      if (!$host.hasAttribute("data-snake-fill")) {
+        $host.sync();
+        return;
+      }
+
+      const cols = Math.max(8, Math.floor($canvas.clientWidth / CELL));
+      const rows = Math.max(8, Math.round((cols * 15) / 21));
+      const nextCols = String(cols);
+      const nextRows = String(rows);
+
+      $host.style.setProperty("--cols", nextCols);
+      $host.style.setProperty("--rows", nextRows);
+
+      if ($grid) {
+        $grid.textContent = `Grid ${cols} x ${rows}`;
+      }
+
+      if (
+        $host.getAttribute("cols") === nextCols &&
+        $host.getAttribute("rows") === nextRows
+      ) {
+        $host.sync();
+        return;
+      }
+
+      $host.setAttribute("cols", nextCols);
+      $host.setAttribute("rows", nextRows);
+    };
+
+    new ResizeObserver(fitGrid).observe($canvas);
+    fitGrid();
+
+    $host.addEventListener("snake:eat", writeScore);
+
+    $host.addEventListener("snake:over", () => {
+      if ($overlay) {
+        $overlay.hidden = false;
+      }
+
+      $replay?.focus();
+    });
+
+    $host.addEventListener("snake:replay", (event) => {
+      if ($overlay) {
+        $overlay.hidden = true;
+      }
+
+      writeScore(event);
+    });
+
+    $replay?.addEventListener("click", () => {
+      $host.replay();
+    });
+  });
+</script>

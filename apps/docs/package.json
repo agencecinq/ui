@@ -5,8 +5,8 @@
   "private": true,
   "description": "CINQ UI components documentation site (Starlight).",
   "scripts": {
-    "predev": "pnpm --filter @agencecinq/pixelate --filter @agencecinq/dual-scroll build",
-    "prebuild": "pnpm --filter @agencecinq/pixelate --filter @agencecinq/dual-scroll build",
+    "predev": "pnpm --filter @agencecinq/pixelate --filter @agencecinq/dual-scroll --filter @agencecinq/snake build",
+    "prebuild": "pnpm --filter @agencecinq/pixelate --filter @agencecinq/dual-scroll --filter @agencecinq/snake build",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
@@ -19,6 +19,7 @@
     "@agencecinq/pixelate": "workspace:*",
     "@agencecinq/combobox": "workspace:*",
     "@agencecinq/dual-scroll": "workspace:*",
+    "@agencecinq/snake": "workspace:*",
     "@agencecinq/disclosure-button": "workspace:*",
     "@agencecinq/drawer": "workspace:*",
     "@agencecinq/modal": "workspace:*",

@@ -1,0 +1,225 @@
+---
+title: Snake
+description: Canvas Snake game with a requestAnimationFrame loop (sandbox).
+---
+
+import RegisterComponents from '../_components/RegisterComponents.astro';
+import SnakeStyles from '../_components/snake/SnakeStyles.astro';
+import SnakeScript from '../_components/snake/SnakeScript.astro';
+import DemoPlay from '../_components/snake/DemoPlay.astro';
+import DemoFill from '../_components/snake/DemoFill.astro';
+import DemoColors from '../_components/snake/DemoColors.astro';
+
+<RegisterComponents />
+<SnakeStyles />
+<SnakeScript />
+
+:::note[Sandbox]
+Experimental demo, not published on npm. API may change or move.
+:::
+
+`<cinq-snake>` is a canvas Snake host. **Markup supplies the canvas.** The
+component runs the game loop, draws squares, and handles collisions. Score,
+overlay, and replay stay in your page. Read `$host.score`, listen for
+`snake:eat`, `snake:over`, and `snake:replay`, then call `$host.replay()`.
+
+The loop uses `requestAnimationFrame` with a fixed timestep. It does not use
+`setInterval`.
+
+## Markup
+
+```html
+<cinq-snake cols="21" rows="15">
+  <p>Score <span data-score aria-live="polite">0</span></p>
+  <div class="snake-stage">
+    <canvas tabindex="0" aria-label="Snake. Arrow keys to move."></canvas>
+    <div data-overlay hidden>
+      <p data-status>Game over</p>
+      <button type="button" data-replay>Play again</button>
+    </div>
+  </div>
+</cinq-snake>
+```
+
+The `[data-score]` span, overlay, and replay button are yours. The host does
+not query them or write to them.
+
+**Layout** is your responsibility: size the host and the canvas. Use
+`width: 100%` and `aspect-ratio: 21 / 15` (or `cols / rows`) for square
+tiles. After the canvas box changes, call `sync()` (a `ResizeObserver` on
+the canvas is enough). To change density, set `cols` and `rows` yourself.
+Changing them resets the board.
+
+**Focus** lives on the canvas. Give it `tabindex="0"` so arrow keys reach it.
+The component will not invent that attribute. Style `:focus-visible` yourself.
+Never rely on a JS `.focus` class.
+
+```css
+cinq-snake {
+  display: block;
+}
+
+.snake-stage {
+  position: relative;
+}
+
+cinq-snake canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 21 / 15;
+  touch-action: none;
+  image-rendering: pixelated;
+  background-color: #c5d0b8;
+  color: #2a2a2a;
+  border: 2px dotted currentColor;
+}
+
+cinq-snake [data-overlay]:not([hidden]) {
+  position: absolute;
+  inset: 0;
+}
+```
+
+## Play
+
+<DemoPlay />
+
+## Fill the parent
+
+`cols` and `rows` stay under your control. The fill demo maps a target cell
+size onto the canvas box, writes `cols` / `rows`, and sets
+`aspect-ratio: var(--cols) / var(--rows)` so tiles stay square while the
+board fills the parent width.
+
+```js
+const CELL = 24
+const cols = Math.max(8, Math.floor($canvas.clientWidth / CELL))
+const rows = Math.max(8, Math.round((cols * 15) / 21))
+
+$host.setAttribute("cols", String(cols))
+$host.setAttribute("rows", String(rows))
+$host.style.setProperty("--cols", String(cols))
+$host.style.setProperty("--rows", String(rows))
+```
+
+```css
+cinq-snake canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--cols, 21) / var(--rows, 15);
+}
+```
+
+<DemoFill />
+
+## Colors
+
+`color` on the canvas (or an ancestor, it inherits) tints the snake and the
+food. `background-color` and any frame (`border`, `outline`, etc.) are yours.
+The component clears the bitmap each frame so that fill shows through.
+
+```css
+cinq-snake canvas {
+  background-color: #c5d0b8;
+  color: #2a2a2a;
+  aspect-ratio: 21 / 15;
+  border: 2px dotted currentColor;
+}
+```
+
+If CSS `color` is missing, the package falls back to `#2a2a2a`.
+
+<DemoColors />
+
+## Rendering
+
+The component draws into the `<canvas>` 2D context.
+
+1. **JS.** `sync()` maps the current `cols` by `rows` grid onto the whole
+   canvas. Cells stretch with the box. Snake and food are filled rects.
+2. **CSS.** Size the canvas with `width: 100%` and `aspect-ratio: 21 / 15`
+   (or `cols / rows`) so cells stay square while the board fills the parent
+   width. `image-rendering: pixelated` keeps the upscale blocky.
+
+The animation loop is `requestAnimationFrame`. Simulation steps accumulate
+time and advance one cell when the timestep elapses. Drawing runs once per
+frame. The component does not observe size. Wire that yourself:
+
+```js
+const $host = document.querySelector("cinq-snake")
+const $canvas = $host.querySelector("canvas")
+
+new ResizeObserver(() => {
+  $host.sync()
+}).observe($canvas)
+```
+
+## Attributes
+
+| Attribute | Default | Description |
+| --------- | ------- | ----------- |
+| `cols` | `21` | Horizontal cell count. Observed. Resets the board when it changes. |
+| `rows` | `15` | Vertical cell count. Observed. Resets the board when it changes. |
+
+## Keyboard
+
+| Key | Function |
+| --- | --- |
+| Arrow keys | Turn. 180-degree reverses are ignored. The first arrow starts the game. |
+| Enter or Space | After a collision, start again (when the canvas still holds focus). |
+
+The replay button is yours. Listen for `snake:over`, show your overlay, and
+call `$host.replay()` from the button. On a touch screen, swipe on the board
+to turn.
+
+## Programmatic API
+
+```js
+const $host = document.querySelector("cinq-snake")
+
+$host.init()
+$host.sync()
+$host.replay()
+$host.destroy()
+$host.score
+$host.cols
+$host.rows
+$host.$canvas
+```
+
+Call `destroy()` before `init()` if the host is already bound and you mutated
+the light DOM.
+
+## Events
+
+| Event | Detail |
+| ----- | ------ |
+| `snake:eat` | `{ score }` after food |
+| `snake:over` | `{ score }` after a wall or self hit |
+| `snake:replay` | `{ score }` after `replay()`, or after `cols` / `rows` change |
+
+```js
+const $host = document.querySelector("cinq-snake")
+const $score = $host.querySelector("[data-score]")
+const $overlay = $host.querySelector("[data-overlay]")
+const $replay = $host.querySelector("[data-replay]")
+
+$host.addEventListener("snake:eat", (event) => {
+  $score.textContent = String(event.detail.score)
+})
+
+$host.addEventListener("snake:over", () => {
+  $overlay.hidden = false
+  $replay.focus()
+})
+
+$host.addEventListener("snake:replay", (event) => {
+  $overlay.hidden = true
+  $score.textContent = String(event.detail.score)
+})
+
+$replay.addEventListener("click", () => {
+  $host.replay()
+})
+```

@@ -1,0 +1,25 @@
+---
+---
+<div class="not-content my-6 flex flex-col gap-3">
+  <p class="text-sm text-gray-600 m-0">
+    The host is 100% of this parent. The demo writes `cols` and `rows` from
+    the canvas size so cells stay about 24px and square.
+  </p>
+  <div class="snake-demo snake-demo--fill">
+    <div class="snake-bezel">
+      <cinq-snake cols="21" rows="15" data-snake-fill>
+        <p class="snake-hud">
+          <span data-grid>Grid 21 x 15</span>
+          <span data-score aria-live="polite">0</span>
+        </p>
+        <div class="snake-stage">
+          <canvas tabindex="0" aria-label="Snake filling the parent. Arrow keys to move."></canvas>
+          <div data-overlay hidden>
+            <p data-status>Game over</p>
+            <button type="button" data-replay>Play again</button>
+          </div>
+        </div>
+      </cinq-snake>
+    </div>
+  </div>
+</div>

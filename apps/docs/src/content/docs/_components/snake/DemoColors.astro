@@ -1,0 +1,24 @@
+---
+---
+<div class="not-content my-6 flex flex-col gap-3">
+  <p class="text-sm text-gray-600 m-0">
+    Same game, different ink. Set `background-color` and `color` on the canvas.
+  </p>
+  <div class="snake-demo">
+    <div class="snake-bezel snake-bezel--dungeon">
+      <cinq-snake cols="21" rows="15">
+        <p class="snake-hud snake-hud--dungeon">
+          <span>Score</span>
+          <span data-score aria-live="polite">0</span>
+        </p>
+        <div class="snake-stage">
+          <canvas tabindex="0" aria-label="Snake. Arrow keys to move."></canvas>
+          <div data-overlay hidden>
+            <p data-status>Game over</p>
+            <button type="button" data-replay>Play again</button>
+          </div>
+        </div>
+      </cinq-snake>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,143 @@
+---
+---
+<style is:global>
+  .snake-demo {
+    width: min(100%, 28rem);
+    margin-inline: auto;
+  }
+
+  .snake-demo--fill {
+    width: 100%;
+  }
+
+  .snake-demo--fill cinq-snake canvas {
+    aspect-ratio: var(--cols, 21) / var(--rows, 15);
+  }
+
+  .snake-bezel {
+    padding: 0.9rem 1rem 1.1rem;
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, #d8d9d6, #8c918c);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 45%),
+      0 10px 24px rgb(0 0 0 / 16%);
+  }
+
+  .snake-hud {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0 0 0.55rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #2a2a2a;
+  }
+
+  .snake-hud span {
+    font-variant-numeric: tabular-nums;
+  }
+
+  cinq-snake {
+    display: block;
+  }
+
+  .snake-stage {
+    position: relative;
+  }
+
+  cinq-snake canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 21 / 15;
+    touch-action: none;
+    user-select: none;
+    background-color: #c5d0b8;
+    color: #2a2a2a;
+    border: 2px dotted currentColor;
+    box-sizing: border-box;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  cinq-snake canvas:focus {
+    outline: none;
+  }
+
+  cinq-snake canvas:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  cinq-snake [data-overlay]:not([hidden]) {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    background: rgb(42 42 42 / 28%);
+    color: #1a1a1a;
+  }
+
+  cinq-snake [data-status] {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  cinq-snake [data-replay] {
+    justify-self: center;
+    padding: 0.45rem 0.9rem;
+    border: 0;
+    border-radius: 0.35rem;
+    background: #2a2a2a;
+    color: #c5d0b8;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  cinq-snake [data-replay]:focus {
+    outline: none;
+  }
+
+  cinq-snake [data-replay]:focus-visible {
+    outline: 2px solid #2a2a2a;
+    outline-offset: 3px;
+  }
+
+  .snake-bezel--dungeon {
+    background: linear-gradient(180deg, #3a342c, #1c1915);
+  }
+
+  .snake-hud--dungeon,
+  .snake-bezel--dungeon cinq-snake [data-status] {
+    color: #e2c56e;
+  }
+
+  .snake-bezel--dungeon cinq-snake canvas {
+    background-color: #1a1814;
+    color: #e2c56e;
+  }
+
+  .snake-bezel--dungeon cinq-snake [data-overlay]:not([hidden]) {
+    background: rgb(26 24 20 / 45%);
+    color: #e2c56e;
+  }
+
+  .snake-bezel--dungeon cinq-snake [data-replay] {
+    background: #e2c56e;
+    color: #1a1814;
+  }
+
+  .snake-bezel--dungeon cinq-snake [data-replay]:focus-visible {
+    outline-color: #e2c56e;
+  }
+</style>

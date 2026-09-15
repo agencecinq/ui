@@ -43,6 +43,7 @@ export default defineConfig({
             { label: 'Overview', slug: 'sandbox' },
             { label: 'Pixelate', slug: 'sandbox/pixelate' },
             { label: 'Dual scroll', slug: 'sandbox/dual-scroll' },
+            { label: 'Snake', slug: 'sandbox/snake' },
           ],
         },
       ],

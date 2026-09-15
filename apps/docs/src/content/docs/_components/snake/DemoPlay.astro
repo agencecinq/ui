@@ -1,0 +1,25 @@
+---
+---
+<div class="not-content my-6 flex flex-col gap-3">
+  <p class="text-sm text-gray-600 m-0">
+    Click the board, then steer with the arrow keys. Eat food to grow.
+    Hit a wall or your own tail and the game ends.
+  </p>
+  <div class="snake-demo">
+    <div class="snake-bezel">
+      <cinq-snake cols="21" rows="15">
+        <p class="snake-hud">
+          <span>Score</span>
+          <span data-score aria-live="polite">0</span>
+        </p>
+        <div class="snake-stage">
+          <canvas tabindex="0" aria-label="Snake. Arrow keys to move."></canvas>
+          <div data-overlay hidden>
+            <p data-status>Game over</p>
+            <button type="button" data-replay>Play again</button>
+          </div>
+        </div>
+      </cinq-snake>
+    </div>
+  </div>
+</div>
