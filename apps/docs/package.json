@@ -26,6 +26,7 @@
     "@agencecinq/spinbutton": "workspace:*",
     "@agencecinq/slider": "workspace:*",
     "@agencecinq/switch": "workspace:*",
+    "@agencecinq/toast": "workspace:*",
     "@agencecinq/tabs": "workspace:*",
     "@agencecinq/utils": "workspace:*",
     "@agencecinq/windowsplitter": "workspace:*",

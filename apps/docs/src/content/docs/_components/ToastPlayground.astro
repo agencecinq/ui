@@ -1,0 +1,543 @@
+---
+import PortalToBody from './PortalToBody.astro';
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+<PortalToBody selector="[data-toast-stack]" />
+
+<style is:global>
+  .docs-toast {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 4.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: #fff;
+    color: #111827;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(0.5rem);
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease,
+      visibility 0.2s ease;
+  }
+
+  .docs-toast[open] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .docs-toast::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    transform-origin: left;
+    transform: scaleX(var(--toast-progress, 0%));
+    background: #111827;
+  }
+
+  .docs-toast [data-content] {
+    flex: 1;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: #1f2937;
+  }
+
+  .docs-toast [data-dismiss] {
+    display: inline-flex;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 9999px;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .docs-toast [data-dismiss]:hover {
+    background: #f3f4f6;
+  }
+
+  .docs-toast [data-dismiss]:focus {
+    outline: none;
+  }
+
+  .docs-toast [data-dismiss]:focus-visible {
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 0.2);
+  }
+
+  .docs-toast-field[aria-invalid='true'] {
+    border-color: #111827;
+    outline: 2px solid #111827;
+    outline-offset: 1px;
+  }
+
+  .docs-toast-sheet-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  /* Shared viewport stack (consumer layout). Portaled to body via PortalToBody. */
+  .docs-toast-stack {
+    position: fixed;
+    inset-block-end: 1.5rem;
+    inset-inline-end: 1.5rem;
+    z-index: 2147483646;
+    display: flex;
+    width: min(24rem, calc(100vw - 2rem));
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+  }
+
+  .docs-toast-stack .docs-toast {
+    pointer-events: none;
+  }
+
+  .docs-toast-stack .docs-toast:not([open]) {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    border-width: 0;
+    box-shadow: none;
+  }
+
+  .docs-toast-stack .docs-toast[open] {
+    position: relative;
+    min-height: 4.5rem;
+    pointer-events: auto;
+  }
+</style>
+
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Failed saving throw</h3>
+          <p class="text-sm text-gray-600">
+            Urgent feedback with <code>role="alert"</code> and
+            <code>data-duration="4000"</code>. Wires
+            <code>pause()</code> / <code>resume()</code> on pointer and focus. Appears in the
+            shared bottom-right stack.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-toast-show-alert"
+            class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          >
+            Show alert
+          </button>
+          <button
+            type="button"
+            id="docs-toast-close-alert"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last event:
+          <span id="docs-toast-alert-events" class="font-mono font-medium text-gray-900">-</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Spell memorized</h3>
+          <p class="text-sm text-gray-600">
+            Quiet confirmation with <code>role="status"</code>. No auto-dismiss. Close it yourself
+            or leave it until the next <code>show()</code>. Same shared stack.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-toast-show-status"
+            class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          >
+            Show status
+          </button>
+          <button
+            type="button"
+            id="docs-toast-close-status"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last event:
+          <span id="docs-toast-status-events" class="font-mono font-medium text-gray-900">-</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Initiative tick</h3>
+          <p class="text-sm text-gray-600">
+            Auto-dismiss (<code>data-duration="3000"</code>) with
+            <strong>no</strong> consumer <code>pause()</code> wiring. Hover or Tab into the toast:
+            the timer keeps running.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-toast-show-nopause"
+            class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          >
+            Show tick
+          </button>
+          <button
+            type="button"
+            id="docs-toast-close-nopause"
+            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last event:
+          <span id="docs-toast-nopause-events" class="font-mono font-medium text-gray-900">-</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Save character sheet</h3>
+          <p class="text-sm text-gray-600">
+            Validation errors use <code>role="alert"</code> without moving focus. Empty fields
+            stack one alert each. Success uses <code>role="status"</code>. Same fixed stack;
+            alerts wire consumer pause on pointer / focus.
+          </p>
+        </div>
+
+        <form id="docs-toast-sheet-form" class="flex flex-col gap-4" novalidate>
+          <label class="block max-w-sm">
+            <span class="docs-toast-sheet-label">Name</span>
+            <input
+              id="docs-toast-sheet-name"
+              name="name"
+              type="text"
+              class="docs-toast-field w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900"
+              placeholder="Mialee"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="block max-w-sm">
+            <span class="docs-toast-sheet-label">Armor class</span>
+            <input
+              id="docs-toast-sheet-ac"
+              name="ac"
+              type="number"
+              inputmode="numeric"
+              class="docs-toast-field w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900"
+              placeholder="14"
+              min="1"
+              max="30"
+            />
+          </label>
+
+          <div>
+            <button
+              type="submit"
+              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+            >
+              Save sheet
+            </button>
+          </div>
+        </form>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Focus stays on:
+          <span id="docs-toast-sheet-focus" class="font-mono font-medium text-gray-900">-</span>
+        </p>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          Last event:
+          <span id="docs-toast-sheet-events" class="font-mono font-medium text-gray-900">-</span>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div class="docs-toast-stack" data-toast-stack aria-label="Toast notifications">
+    <cinq-toast
+      id="docs-toast-alert"
+      class="docs-toast"
+      role="alert"
+      aria-atomic="true"
+      data-duration="4000"
+    >
+      <div data-content></div>
+      <button type="button" data-dismiss aria-label="Dismiss">×</button>
+    </cinq-toast>
+
+    <cinq-toast
+      id="docs-toast-status"
+      class="docs-toast"
+      role="status"
+      aria-atomic="true"
+    >
+      <div data-content></div>
+      <button type="button" data-dismiss aria-label="Dismiss">×</button>
+    </cinq-toast>
+
+    <cinq-toast
+      id="docs-toast-nopause"
+      class="docs-toast"
+      role="status"
+      aria-atomic="true"
+      data-duration="3000"
+    >
+      <div data-content></div>
+      <button type="button" data-dismiss aria-label="Dismiss">×</button>
+    </cinq-toast>
+
+    <cinq-toast
+      id="docs-toast-sheet-alert-name"
+      class="docs-toast"
+      role="alert"
+      aria-atomic="true"
+      data-duration="5000"
+    >
+      <div data-content></div>
+      <button type="button" data-dismiss aria-label="Dismiss">×</button>
+    </cinq-toast>
+
+    <cinq-toast
+      id="docs-toast-sheet-alert-ac"
+      class="docs-toast"
+      role="alert"
+      aria-atomic="true"
+      data-duration="5000"
+    >
+      <div data-content></div>
+      <button type="button" data-dismiss aria-label="Dismiss">×</button>
+    </cinq-toast>
+
+    <cinq-toast
+      id="docs-toast-sheet-status"
+      class="docs-toast"
+      role="status"
+      aria-atomic="true"
+    >
+      <div data-content></div>
+      <button type="button" data-dismiss aria-label="Dismiss">×</button>
+    </cinq-toast>
+  </div>
+</div>
+
+<script>
+  import { EVENTS } from '@agencecinq/utils';
+  import type { Toast } from '@agencecinq/toast';
+
+  /** Consumer-owned pause: pointer + keyboard focus (including dismiss). */
+  const wirePause = (host: Toast | null) => {
+    if (!host) return;
+
+    host.addEventListener('pointerenter', () => host.pause());
+    host.addEventListener('pointerleave', () => host.resume());
+    host.addEventListener('focusin', () => host.pause());
+    host.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget;
+      if (next instanceof Node && host.contains(next)) return;
+      host.resume();
+    });
+  };
+
+  const wire = (id: string, showId: string, closeId: string, eventsId: string, message: string) => {
+    const host = document.getElementById(id) as Toast | null;
+    const showBtn = document.getElementById(showId);
+    const closeBtn = document.getElementById(closeId);
+    const events = document.getElementById(eventsId);
+
+    showBtn?.addEventListener('click', () => {
+      if (!host) return;
+      if (host.open) {
+        host.close();
+        requestAnimationFrame(() => host.show(message));
+        return;
+      }
+      host.show(message);
+    });
+
+    closeBtn?.addEventListener('click', () => {
+      host?.close();
+    });
+
+    host?.addEventListener(EVENTS.TOAST_OPEN, () => {
+      if (events) events.textContent = EVENTS.TOAST_OPEN;
+    });
+
+    host?.addEventListener(EVENTS.TOAST_CLOSE, () => {
+      if (events) events.textContent = EVENTS.TOAST_CLOSE;
+    });
+
+    return host;
+  };
+
+  wirePause(
+    wire(
+      'docs-toast-alert',
+      'docs-toast-show-alert',
+      'docs-toast-close-alert',
+      'docs-toast-alert-events',
+      'Saving throw failed. The gelatinous cube engulfs your torch.',
+    ),
+  );
+
+  wire(
+    'docs-toast-status',
+    'docs-toast-show-status',
+    'docs-toast-close-status',
+    'docs-toast-status-events',
+    'Fireball memorized. One 3rd-level slot remaining.',
+  );
+
+  // Duration only: no pause() wiring.
+  wire(
+    'docs-toast-nopause',
+    'docs-toast-show-nopause',
+    'docs-toast-close-nopause',
+    'docs-toast-nopause-events',
+    'Round 3. Goblin 2 takes its turn.',
+  );
+
+  {
+    const form = document.getElementById('docs-toast-sheet-form') as HTMLFormElement | null;
+    const nameInput = document.getElementById('docs-toast-sheet-name') as HTMLInputElement | null;
+    const acInput = document.getElementById('docs-toast-sheet-ac') as HTMLInputElement | null;
+    const nameAlert = document.getElementById('docs-toast-sheet-alert-name') as Toast | null;
+    const acAlert = document.getElementById('docs-toast-sheet-alert-ac') as Toast | null;
+    const statusToast = document.getElementById('docs-toast-sheet-status') as Toast | null;
+    const focusLabel = document.getElementById('docs-toast-sheet-focus');
+    const events = document.getElementById('docs-toast-sheet-events');
+
+    wirePause(nameAlert);
+    wirePause(acAlert);
+
+    const describeFocus = () => {
+      if (!focusLabel) return;
+      const el = document.activeElement;
+      if (!(el instanceof HTMLElement)) {
+        focusLabel.textContent = 'document';
+        return;
+      }
+      focusLabel.textContent = el.id || el.tagName.toLowerCase();
+    };
+
+    const setEvent = (name: string) => {
+      if (events) events.textContent = name;
+    };
+
+    const resetInvalid = () => {
+      nameInput?.removeAttribute('aria-invalid');
+      acInput?.removeAttribute('aria-invalid');
+    };
+
+    const reveal = (host: Toast | null, message: string) => {
+      if (!host) return;
+      if (host.open) {
+        host.close();
+        requestAnimationFrame(() => {
+          host.show(message);
+        });
+        return;
+      }
+      host.show(message);
+    };
+
+    const hide = (host: Toast | null) => {
+      if (host?.open) host.close();
+    };
+
+    const showStatus = (message: string) => {
+      hide(nameAlert);
+      hide(acAlert);
+      reveal(statusToast, message);
+      queueMicrotask(describeFocus);
+    };
+
+    for (const host of [nameAlert, acAlert, statusToast]) {
+      host?.addEventListener(EVENTS.TOAST_OPEN, () => setEvent(EVENTS.TOAST_OPEN));
+      host?.addEventListener(EVENTS.TOAST_CLOSE, () => setEvent(EVENTS.TOAST_CLOSE));
+    }
+
+    form?.addEventListener('focusin', describeFocus);
+    form?.addEventListener('focusout', () => queueMicrotask(describeFocus));
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      resetInvalid();
+      hide(statusToast);
+
+      const name = nameInput?.value.trim() ?? '';
+      const acRaw = acInput?.value.trim() ?? '';
+      const ac = Number(acRaw);
+
+      const nameInvalid = !name || name.length < 2;
+      const acInvalid = !acRaw || !Number.isInteger(ac) || ac < 1 || ac > 30;
+
+      if (nameInvalid) {
+        nameInput?.setAttribute('aria-invalid', 'true');
+        reveal(nameAlert, 'Name required (at least 2 characters).');
+      } else {
+        hide(nameAlert);
+      }
+
+      if (acInvalid) {
+        acInput?.setAttribute('aria-invalid', 'true');
+        reveal(acAlert, 'Armor class must be an integer from 1 to 30.');
+      } else {
+        hide(acAlert);
+      }
+
+      if (nameInvalid || acInvalid) {
+        (nameInvalid ? nameInput : acInput)?.focus();
+        queueMicrotask(describeFocus);
+        return;
+      }
+
+      showStatus(`${name} saved. AC ${ac}. Ready for the dungeon.`);
+    });
+  }
+</script>

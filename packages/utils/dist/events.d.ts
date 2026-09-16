@@ -10,6 +10,8 @@ export declare const EVENTS: {
     MODAL_OPEN: string;
     MODAL_TOGGLE: string;
     SPINBUTTON_CHANGE: string;
+    TOAST_OPEN: string;
+    TOAST_CLOSE: string;
     DISCLOSURE_BUTTON_OPEN: string;
     DISCLOSURE_BUTTON_CLOSE: string;
     SWITCH_ACTIVATE: string;

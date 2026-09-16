@@ -27,6 +27,7 @@ export default defineConfig({
             { label: 'Slider', slug: 'components/slider' },
             { label: 'Disclosure Button', slug: 'components/disclosure-button' },
             { label: 'Switch', slug: 'components/switch' },
+            { label: 'Toast', slug: 'components/toast' },
             { label: 'Accordion', slug: 'components/accordion' },
             { label: 'Combobox', slug: 'components/combobox' },
             { label: 'Window Splitter', slug: 'components/windowsplitter' },

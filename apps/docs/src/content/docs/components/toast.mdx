@@ -1,0 +1,75 @@
+---
+title: Toast
+description: Transient live-region notifications (`<cinq-toast>`). Consumer sets role="alert" or role="status".
+---
+
+import ToastPlayground from "../_components/ToastPlayground.astro";
+
+`<cinq-toast>` shows a brief on-screen notice without moving focus. It does not
+set ARIA roles. Choose `role="alert"` (urgent) or `role="status"` (polite) in
+markup. Auto-dismiss is opt-in via `data-duration`. Pausing that timer is
+consumer-owned (`pause()` / `resume()`).
+
+Behavior follows the spirit of the
+[WAI-ARIA Alert pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alert/).
+
+## Install
+
+```bash
+pnpm add @agencecinq/toast
+```
+
+## Usage
+
+```js
+import "@agencecinq/toast";
+```
+
+```html
+<cinq-toast role="alert" aria-atomic="true" data-duration="5000">
+  <div data-content></div>
+  <button type="button" data-dismiss aria-label="Close">×</button>
+</cinq-toast>
+```
+
+```js
+const toast = document.querySelector("cinq-toast");
+
+toast?.addEventListener("pointerenter", () => toast.pause());
+toast?.addEventListener("pointerleave", () => toast.resume());
+toast?.show("Something went wrong");
+```
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Use an a11y linter
+> (axe-core, Lighthouse) to catch invalid markup.
+
+## Playground
+
+Includes a shared fixed viewport stack for every example, plus a character-sheet
+form that keeps focus on the invalid field.
+
+<ToastPlayground />
+
+## Required markup
+
+| Attribute / element | Required | Role |
+| ------------------- | -------- | ---- |
+| `<cinq-toast>` | **Yes** | Host. Set `role` yourself. |
+| `[data-content]` | **Yes** | Message node. |
+| `[data-dismiss]` | Optional | Close control. |
+| `data-duration` | Optional | Auto-dismiss in ms. |
+
+## API
+
+| Method | Description |
+| ------ | ----------- |
+| `pause()` | Freeze auto-dismiss + `--toast-progress`. |
+| `resume()` | Continue after `pause()`. |
+
+## Events
+
+| Constant | Name |
+| -------- | ---- |
+| `EVENTS.TOAST_OPEN` | `toast:open` |
+| `EVENTS.TOAST_CLOSE` | `toast:close` |
