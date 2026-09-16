@@ -1,5 +1,12 @@
 # @agencecinq/utils
 
+## 7.4.0
+
+### Minor Changes
+
+- Add `TOAST_OPEN` / `TOAST_CLOSE` (`toast:open` / `toast:close`) for `@agencecinq/toast`.
+
+
 ## 7.3.0
 
 ### Minor Changes

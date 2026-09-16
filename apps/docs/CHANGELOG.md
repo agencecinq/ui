@@ -1,5 +1,13 @@
 # @agencecinq/docs
 
+## 4.4.14
+
+### Patch Changes
+
+- Updated dependencies
+  - @agencecinq/toast@1.0.0
+  - @agencecinq/utils@7.4.0
+
 ## 4.4.13
 
 ### Patch Changes

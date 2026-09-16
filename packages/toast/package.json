@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/toast",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Accessible toast notifications as a lightweight Web Component (live region; role set by the consumer).",
   "type": "module",
   "license": "MIT",
