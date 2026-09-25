@@ -1,11 +1,16 @@
 # @agencecinq/utils
 
+## 7.5.0
+
+### Minor Changes
+
+- Add `debounce(fn, wait)` alongside `throttle` for trailing delayed callbacks.
+
 ## 7.4.0
 
 ### Minor Changes
 
 - Add `TOAST_OPEN` / `TOAST_CLOSE` (`toast:open` / `toast:close`) for `@agencecinq/toast`.
-
 
 ## 7.3.0
 

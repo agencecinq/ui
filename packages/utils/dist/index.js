@@ -82,12 +82,19 @@ function h(e = 0) {
 	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), o.style.removeProperty("overflow"), o.style.removeProperty("height"), o.style.removeProperty("scroll-padding-top"), t && p(l.x, n);
 }
 //#endregion
-//#region src/focus.ts
-var g = {}, _ = null;
-function v(e) {
+//#region src/debounce.ts
+var g = (e, t) => {
+	let n = null;
+	return (...r) => {
+		n && clearTimeout(n), n = setTimeout(() => {
+			n = null, e(...r);
+		}, t);
+	};
+}, _ = {}, v = null;
+function y(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function y(e) {
+function b(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -101,40 +108,40 @@ function y(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => v(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => y(e) && e.getAttribute("tabindex") !== "-1");
 }
-function b(e) {
-	if (_) return;
+function x(e) {
+	if (v) return;
 	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-	!t || t === document.body || !t.isConnected || (_ = t);
+	!t || t === document.body || !t.isConnected || (v = t);
 }
-function x() {
-	_?.focus(), _ = null;
+function S() {
+	v?.focus(), v = null;
 }
-function S(e) {
+function C(e) {
 	queueMicrotask(() => {
 		let t = document.activeElement;
-		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || x();
+		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || S();
 	});
 }
-function C(e, t = e) {
-	let n = y(e);
+function w(e, t = e) {
+	let n = b(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	b(), w(), g.keydown = (t) => {
+	x(), T(), _.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", g.keydown), t.focus(), t instanceof HTMLInputElement && [
+	}, document.addEventListener("keydown", _.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
 		"text",
 		"email",
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function w(e = null) {
-	g.keydown && document.removeEventListener("keydown", g.keydown), e && e.focus();
+function T(e = null) {
+	_.keydown && document.removeEventListener("keydown", _.keydown), e && e.focus();
 }
 //#endregion
 //#region src/clamp.ts
-var T = (e, t, n) => Math.min(Math.max(e, t), n);
+var E = (e, t, n) => Math.min(Math.max(e, t), n);
 //#endregion
-export { e as EVENTS, C as addTrapFocus, s as body, d as breakpoints, T as clamp, m as disableScroll, t as dispatchEvent, h as enableScroll, y as getFocusableElements, o as html, c as isDebug, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, b as rememberReturnFocus, w as removeTrapFocus, x as restoreReturnFocus, S as scheduleRestoreReturnFocus, l as scroll, a as throttle };
+export { e as EVENTS, w as addTrapFocus, s as body, d as breakpoints, E as clamp, g as debounce, m as disableScroll, t as dispatchEvent, h as enableScroll, b as getFocusableElements, o as html, c as isDebug, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, x as rememberReturnFocus, T as removeTrapFocus, S as restoreReturnFocus, C as scheduleRestoreReturnFocus, l as scroll, a as throttle };

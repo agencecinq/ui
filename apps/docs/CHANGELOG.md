@@ -1,5 +1,27 @@
 # @agencecinq/docs
 
+## 4.4.15
+
+### Patch Changes
+
+- Updated dependencies
+  - @agencecinq/utils@7.5.0
+  - @agencecinq/accordion@3.0.0
+  - @agencecinq/calendar@3.0.0
+  - @agencecinq/combobox@2.0.0
+  - @agencecinq/disclosure-button@3.0.1
+  - @agencecinq/drawer@7.0.1
+  - @agencecinq/dual-scroll@0.0.0
+  - @agencecinq/modal@4.0.1
+  - @agencecinq/pixelate@0.0.0
+  - @agencecinq/slider@6.0.0
+  - @agencecinq/snake@1.0.0
+  - @agencecinq/spinbutton@4.0.0
+  - @agencecinq/switch@3.0.1
+  - @agencecinq/tabs@11.0.0
+  - @agencecinq/toast@1.0.0
+  - @agencecinq/windowsplitter@3.0.0
+
 ## 4.4.14
 
 ### Patch Changes
