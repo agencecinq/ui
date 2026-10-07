@@ -21,7 +21,7 @@ type Drag = {
 };
 
 export class Sheet extends HTMLElement {
-  static observedAttributes = ["open", "modal", "dismissible"];
+  static observedAttributes = ["open"];
 
   /** Element that last requested the sheet to open. */
   trigger: HTMLElement | null = null;
@@ -31,11 +31,12 @@ export class Sheet extends HTMLElement {
   #drag: Drag | null = null;
 
   get modal(): boolean {
-    return this.getAttribute("modal") !== "false";
+    return this.dataset.modal !== "false";
   }
 
+  /** Pulls dismiss unless the dialog opts out with `closedby="none"`. */
   get dismissible(): boolean {
-    return this.getAttribute("dismissible") !== "false";
+    return this.$dialog?.getAttribute("closedby") !== "none";
   }
 
   connectedCallback(): void {
@@ -81,8 +82,6 @@ export class Sheet extends HTMLElement {
       this.#handleSheetOpen as EventListener,
     );
 
-    this.#syncClosedBy();
-
     if (this.hasAttribute("open")) {
       this.#present();
     }
@@ -125,13 +124,21 @@ export class Sheet extends HTMLElement {
     this.$handle = null;
   }
 
+  /** @returns Whether the sheet is open after the toggle. */
   toggle(trigger: HTMLElement | null = null): boolean {
-    return this.hasAttribute("open") ? this.close() : this.open(trigger);
+    if (this.hasAttribute("open")) {
+      this.close();
+      return this.hasAttribute("open");
+    }
+
+    return this.open(trigger);
   }
 
   /**
    * Dispatches cancelable `sheet:before-open`. A listener can call
    * `preventDefault()` then `detail.resolve()` once async work is done.
+   *
+   * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
    */
   open(trigger: HTMLElement | null = null): boolean {
     if (this.hasAttribute("open")) {
@@ -151,7 +158,7 @@ export class Sheet extends HTMLElement {
     );
 
     if (!proceed) {
-      return false;
+      return this.hasAttribute("open");
     }
 
     resolve();
@@ -161,6 +168,8 @@ export class Sheet extends HTMLElement {
   /**
    * Dispatches cancelable `sheet:before-close`. A listener can call
    * `preventDefault()` then `detail.resolve()` once async work is done.
+   *
+   * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
    */
   close(): boolean {
     if (!this.hasAttribute("open")) {
@@ -178,7 +187,7 @@ export class Sheet extends HTMLElement {
     );
 
     if (!proceed) {
-      return false;
+      return !this.hasAttribute("open");
     }
 
     resolve();
@@ -190,12 +199,7 @@ export class Sheet extends HTMLElement {
     oldValue: string | null,
     newValue: string | null,
   ): void {
-    if (!this.$dialog || oldValue === newValue) {
-      return;
-    }
-
-    if (name !== "open") {
-      this.#syncClosedBy();
+    if (!this.$dialog || name !== "open" || oldValue === newValue) {
       return;
     }
 
@@ -238,26 +242,10 @@ export class Sheet extends HTMLElement {
     this.$dialog.show();
   }
 
-  #syncClosedBy(): void {
-    if (!this.$dialog) {
-      return;
-    }
-
-    if (!this.dismissible) {
-      this.$dialog.setAttribute("closedby", "none");
-      return;
-    }
-
-    this.$dialog.setAttribute("closedby", this.modal ? "any" : "closerequest");
-  }
-
   /** Routes Escape and light dismiss through `close()` and its before-event. */
   #handleCancel = (event: Event): void => {
     event.preventDefault();
-
-    if (this.dismissible) {
-      this.close();
-    }
+    this.close();
   };
 
   /** Native close that bypassed `close()`, e.g. `<form method="dialog">`. */

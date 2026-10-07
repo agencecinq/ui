@@ -1,20 +1,16 @@
 import { EVENTS as e, dispatchEvent as t } from "@agencecinq/utils";
 //#region src/sheet.ts
 var n = 80, r = .5, i = class extends HTMLElement {
-	static observedAttributes = [
-		"open",
-		"modal",
-		"dismissible"
-	];
+	static observedAttributes = ["open"];
 	trigger = null;
 	$dialog = null;
 	$handle = null;
 	#e = null;
 	get modal() {
-		return this.getAttribute("modal") !== "false";
+		return this.dataset.modal !== "false";
 	}
 	get dismissible() {
-		return this.getAttribute("dismissible") !== "false";
+		return this.$dialog?.getAttribute("closedby") !== "none";
 	}
 	connectedCallback() {
 		this.init();
@@ -25,13 +21,13 @@ var n = 80, r = .5, i = class extends HTMLElement {
 	init() {
 		if (!this.id) throw Error("Sheet: id attribute is required");
 		if (this.$dialog = this.querySelector("dialog"), !this.$dialog) throw Error("Sheet: dialog element not found");
-		this.$handle = this.$dialog.querySelector("[data-dom=\"drag-indicator\"]"), this.$dialog.addEventListener("cancel", this.#r), this.$dialog.addEventListener("close", this.#i), this.$handle && (this.$handle.addEventListener("pointerdown", this.#s), this.$handle.addEventListener("pointermove", this.#c), this.$handle.addEventListener("pointerup", this.#l), this.$handle.addEventListener("pointercancel", this.#l), this.$handle.addEventListener("lostpointercapture", this.#l)), document.documentElement.addEventListener(e.SHEET_TOGGLE, this.#a), document.documentElement.addEventListener(e.SHEET_OPEN, this.#o), this.#n(), this.hasAttribute("open") && this.#t();
+		this.$handle = this.$dialog.querySelector("[data-dom=\"drag-indicator\"]"), this.$dialog.addEventListener("cancel", this.#n), this.$dialog.addEventListener("close", this.#r), this.$handle && (this.$handle.addEventListener("pointerdown", this.#o), this.$handle.addEventListener("pointermove", this.#s), this.$handle.addEventListener("pointerup", this.#c), this.$handle.addEventListener("pointercancel", this.#c), this.$handle.addEventListener("lostpointercapture", this.#c)), document.documentElement.addEventListener(e.SHEET_TOGGLE, this.#i), document.documentElement.addEventListener(e.SHEET_OPEN, this.#a), this.hasAttribute("open") && this.#t();
 	}
 	destroy() {
-		this.#u(), this.$dialog && (this.$dialog.removeEventListener("cancel", this.#r), this.$dialog.removeEventListener("close", this.#i), this.$dialog.open && this.$dialog.close()), this.$handle && (this.$handle.removeEventListener("pointerdown", this.#s), this.$handle.removeEventListener("pointermove", this.#c), this.$handle.removeEventListener("pointerup", this.#l), this.$handle.removeEventListener("pointercancel", this.#l), this.$handle.removeEventListener("lostpointercapture", this.#l)), document.documentElement.removeEventListener(e.SHEET_TOGGLE, this.#a), document.documentElement.removeEventListener(e.SHEET_OPEN, this.#o), this.$dialog = null, this.$handle = null;
+		this.#l(), this.$dialog && (this.$dialog.removeEventListener("cancel", this.#n), this.$dialog.removeEventListener("close", this.#r), this.$dialog.open && this.$dialog.close()), this.$handle && (this.$handle.removeEventListener("pointerdown", this.#o), this.$handle.removeEventListener("pointermove", this.#s), this.$handle.removeEventListener("pointerup", this.#c), this.$handle.removeEventListener("pointercancel", this.#c), this.$handle.removeEventListener("lostpointercapture", this.#c)), document.documentElement.removeEventListener(e.SHEET_TOGGLE, this.#i), document.documentElement.removeEventListener(e.SHEET_OPEN, this.#a), this.$dialog = null, this.$handle = null;
 	}
 	toggle(e = null) {
-		return this.hasAttribute("open") ? this.close() : this.open(e);
+		return this.hasAttribute("open") ? (this.close(), this.hasAttribute("open")) : this.open(e);
 	}
 	open(n = null) {
 		if (this.hasAttribute("open")) return !1;
@@ -44,7 +40,7 @@ var n = 80, r = .5, i = class extends HTMLElement {
 			instance: this,
 			trigger: n,
 			resolve: r
-		}, { bubbles: !1 }) ? (r(), !0) : !1;
+		}, { bubbles: !1 }) ? (r(), !0) : this.hasAttribute("open");
 	}
 	close() {
 		if (!this.hasAttribute("open")) return !1;
@@ -55,14 +51,10 @@ var n = 80, r = .5, i = class extends HTMLElement {
 			sheet: this.id,
 			instance: this,
 			resolve: n
-		}, { bubbles: !1 }) ? (n(), !0) : !1;
+		}, { bubbles: !1 }) ? (n(), !0) : !this.hasAttribute("open");
 	}
 	attributeChangedCallback(n, r, i) {
-		if (this.$dialog && r !== i) {
-			if (n !== "open") {
-				this.#n();
-				return;
-			}
+		if (this.$dialog && n === "open" && r !== i) {
 			if (i !== null) {
 				this.#t(), t(document.documentElement, e.SHEET_OPEN, {
 					sheet: this.id,
@@ -73,7 +65,7 @@ var n = 80, r = .5, i = class extends HTMLElement {
 				});
 				return;
 			}
-			this.#u(), this.#d(0), this.$dialog.open && this.$dialog.close(), t(document.documentElement, e.SHEET_CLOSE, { sheet: this.id }, {
+			this.#l(), this.#u(0), this.$dialog.open && this.$dialog.close(), t(document.documentElement, e.SHEET_CLOSE, { sheet: this.id }, {
 				bubbles: !1,
 				cancelable: !1
 			});
@@ -88,28 +80,19 @@ var n = 80, r = .5, i = class extends HTMLElement {
 			this.$dialog.show();
 		}
 	}
-	#n() {
-		if (this.$dialog) {
-			if (!this.dismissible) {
-				this.$dialog.setAttribute("closedby", "none");
-				return;
-			}
-			this.$dialog.setAttribute("closedby", this.modal ? "any" : "closerequest");
-		}
-	}
-	#r = (e) => {
-		e.preventDefault(), this.dismissible && this.close();
+	#n = (e) => {
+		e.preventDefault(), this.close();
 	};
-	#i = () => {
+	#r = () => {
 		this.$dialog?.open || this.toggleAttribute("open", !1);
 	};
-	#a = (e) => {
+	#i = (e) => {
 		e.detail.sheet === this.id && this.toggle(e.detail.trigger);
 	};
-	#o = (e) => {
+	#a = (e) => {
 		e.detail.sheet !== this.id && this.modal && this.close();
 	};
-	#s = (e) => {
+	#o = (e) => {
 		e.button === 0 && this.hasAttribute("open") && this.$handle && (this.#e = {
 			pointerId: e.pointerId,
 			startY: e.clientY,
@@ -118,29 +101,29 @@ var n = 80, r = .5, i = class extends HTMLElement {
 			velocity: 0
 		}, this.$handle.setPointerCapture(e.pointerId), this.toggleAttribute("dragging", !0));
 	};
-	#c = (e) => {
+	#s = (e) => {
 		let t = this.#e;
 		if (!t || e.pointerId !== t.pointerId) return;
 		let n = Math.max(e.timeStamp - t.lastTime, 1);
 		t.velocity = (e.clientY - t.lastY) / n, t.lastY = e.clientY, t.lastTime = e.timeStamp;
 		let r = t.lastY - t.startY;
-		this.#d(r > 0 ? r : -Math.sqrt(-r));
+		this.#u(r > 0 ? r : -Math.sqrt(-r));
 	};
-	#l = (e) => {
+	#c = (e) => {
 		let t = this.#e;
 		if (t && e.pointerId === t.pointerId) {
 			if (e.clientY !== t.lastY) {
 				let n = Math.max(e.timeStamp - t.lastTime, 1);
 				t.velocity = (e.clientY - t.lastY) / n, t.lastY = e.clientY;
 			}
-			this.#u(), (!(this.dismissible && (t.lastY - t.startY >= n || t.velocity >= r)) || !this.close()) && this.#d(0);
+			this.#l(), (!(this.dismissible && (t.lastY - t.startY >= n || t.velocity >= r)) || !this.close()) && this.#u(0);
 		}
 	};
-	#u() {
+	#l() {
 		let e = this.#e;
 		e && (this.#e = null, this.toggleAttribute("dragging", !1), this.$handle?.hasPointerCapture(e.pointerId) && this.$handle.releasePointerCapture(e.pointerId));
 	}
-	#d(e) {
+	#u(e) {
 		if (e !== 0) {
 			this.style.setProperty("--cinq-sheet-drag-offset", `${e}px`);
 			return;

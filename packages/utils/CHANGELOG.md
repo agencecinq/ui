@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 7.6.0
+
+### Minor Changes
+
+- 19c183f: Add `SHEET_*` event constants for `@agencecinq/sheet`, and document the new Sheet component.
+
 ## 7.5.0
 
 ### Minor Changes

@@ -9,11 +9,11 @@ const colors = [
 ];
 
 const sizes = [
-  { name: "Halfling", soldOut: false },
-  { name: "Gnome", soldOut: false },
-  { name: "Elf", soldOut: false },
-  { name: "Human", soldOut: false },
-  { name: "Ogre", soldOut: true },
+  { name: "Halfling", price: 3500, soldOut: false },
+  { name: "Gnome", price: 4200, soldOut: false },
+  { name: "Elf", price: 6000, soldOut: false },
+  { name: "Human", price: 6500, soldOut: false },
+  { name: "Ogre", price: 15000, soldOut: true },
 ];
 
 const selectedColor = colors[1];
@@ -26,33 +26,16 @@ const selectedColor = colors[1];
     translate: 0 max(-1rem, var(--cinq-sheet-drag-offset, 0px));
     transition:
       translate 300ms ease-out,
-      display 300ms allow-discrete,
-      overlay 300ms allow-discrete;
+      display 300ms allow-discrete;
   }
 
   #cloak-sheet-demo dialog:not([open]) {
     translate: 0 100%;
   }
 
-  #cloak-sheet-demo dialog::backdrop {
-    background-color: rgb(23 23 23 / 0.3);
-    transition:
-      background-color 300ms ease-out,
-      display 300ms allow-discrete,
-      overlay 300ms allow-discrete;
-  }
-
-  #cloak-sheet-demo dialog:not([open])::backdrop {
-    background-color: transparent;
-  }
-
   @starting-style {
     #cloak-sheet-demo dialog[open] {
       translate: 0 100%;
-    }
-
-    #cloak-sheet-demo dialog[open]::backdrop {
-      background-color: transparent;
     }
   }
 
@@ -60,9 +43,20 @@ const selectedColor = colors[1];
     transition: none;
   }
 
+  #cloak-scrim {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease-out;
+  }
+
+  #cloak-card:has(#cloak-sheet-demo[open]) #cloak-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     #cloak-sheet-demo dialog,
-    #cloak-sheet-demo dialog::backdrop {
+    #cloak-scrim {
       transition: none;
     }
   }
@@ -70,7 +64,8 @@ const selectedColor = colors[1];
 
 <div class="not-content flex justify-center">
   <div
-    class="relative flex h-[34rem] w-full max-w-[24.375rem] flex-col overflow-hidden rounded-[2rem] border border-[#e9e9e9] bg-[#efece6] text-[#2a343a] shadow-xl"
+    id="cloak-card"
+    class="relative flex h-[34rem] w-full max-w-[24.375rem] flex-col overflow-clip rounded-[2rem] border border-[#e9e9e9] bg-[#efece6] text-[#2a343a] shadow-xl"
   >
     <div class="flex flex-1 items-center justify-center p-8 text-center">
       <p class="font-serif text-sm italic opacity-60">
@@ -96,14 +91,13 @@ const selectedColor = colors[1];
       </div>
 
       <div class="flex items-center justify-between gap-3">
-        <p class="text-[0.844rem]">6 000 gp</p>
-        <ul class="flex items-center gap-3" aria-label="Colors">
+        <p data-dom="summary-price" class="text-[0.844rem]">6 000 gp</p>
+        <ul data-dom="summary-colors" class="flex items-center gap-3" aria-label="Colors">
           {colors.map((color) => (
             <li
-              class:list={[
-                "rounded-full border border-[#e9e9e9]",
-                color === selectedColor ? "size-5.5 p-0.5 ring-1 ring-[#2a343a] ring-inset" : "size-4",
-              ]}
+              data-color={color.name}
+              aria-current={color === selectedColor ? "true" : undefined}
+              class="size-4 rounded-full border border-[#e9e9e9] aria-[current=true]:size-5.5 aria-[current=true]:p-0.5 aria-[current=true]:ring-1 aria-[current=true]:ring-[#2a343a] aria-[current=true]:ring-inset"
             >
               <span class="block size-full rounded-full" style={`background: ${color.value}`}></span>
               <span class="sr-only">{color.name}</span>
@@ -123,122 +117,144 @@ const selectedColor = colors[1];
         </button>
       </cinq-sheet-button>
     </div>
-  </div>
 
-  <cinq-sheet id="cloak-sheet-demo" class="contents">
-    <dialog
-      aria-labelledby="cloak-sheet-title"
-      class="fixed inset-x-[max(0px,calc(50%-12.1875rem))] top-auto -bottom-4 m-0 w-auto max-w-none max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-0 border-t border-[#e9e9e9] bg-white p-0 pb-4 text-[#2a343a]"
-    >
-      <div
-        data-dom="drag-indicator"
-        class="flex cursor-grab touch-none justify-center pt-2 pb-3 active:cursor-grabbing"
-        aria-hidden="true"
+    <div id="cloak-scrim" class="absolute inset-0 bg-[#171717]/30" aria-hidden="true"></div>
+
+    <cinq-sheet id="cloak-sheet-demo" data-modal="false" class="contents">
+      <dialog
+        aria-labelledby="cloak-sheet-title"
+        closedby="closerequest"
+        class="absolute inset-x-0 top-auto -bottom-4 m-0 w-auto max-w-none max-h-[calc(100%-2rem)] overflow-y-auto overscroll-contain border-0 border-t border-[#e9e9e9] bg-white p-0 pb-4 text-[#2a343a]"
       >
-        <span class="h-0.75 w-9 rounded-full bg-[#e9e9e9]"></span>
-      </div>
-
-      <form method="dialog" class="flex flex-col gap-4 px-5 pb-6">
-        <div class="flex flex-col gap-2">
-          <div class="flex items-center justify-between gap-3">
-            <h2 id="cloak-sheet-title" class="font-serif text-[0.984rem] leading-snug font-normal italic">
-              Cloak of Elvenkind
-            </h2>
-            <button type="button" class="text-lg leading-none" aria-label="Add to wishlist">&#9825;</button>
-          </div>
-          <p class="text-[0.844rem]">6 000 gp</p>
-        </div>
-
-        <hr class="border-[#e9e9e9]" />
-
-        <fieldset>
-          <legend class="mb-3 flex gap-2 text-[0.844rem]">
-            Color: <span data-dom="color" class="font-serif italic">{selectedColor.name}</span>
-          </legend>
-          <div class="flex items-center gap-3">
-            {colors.map((color) => (
-              <label
-                class="grid size-5.5 cursor-pointer place-items-center rounded-full has-checked:ring-1 has-checked:ring-[#2a343a] has-focus-visible:outline-2 has-focus-visible:outline-[#171717]"
-              >
-                <input
-                  type="radio"
-                  name="color"
-                  value={color.name}
-                  checked={color === selectedColor}
-                  class="sr-only"
-                />
-                <span class="size-4 rounded-full border border-[#e9e9e9]" style={`background: ${color.value}`}></span>
-                <span class="sr-only">{color.name}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        <hr class="border-[#e9e9e9]" />
-
-        <div class="flex flex-col gap-4">
-          <div class="flex items-center justify-between gap-3 text-[0.844rem]">
-            <p id="cloak-size-label" class="flex gap-2">
-              Size: <span class="font-serif italic">Wearer sizes</span>
-            </p>
-            <a href="#size-guide" class="underline underline-offset-4">Size guide</a>
-          </div>
-          <div
-            role="radiogroup"
-            aria-labelledby="cloak-size-label"
-            class="flex flex-wrap items-center gap-x-5.5 gap-y-2 text-[0.844rem]"
-          >
-            {sizes.map((size) => (
-              <label
-                class:list={[
-                  "cursor-pointer has-checked:font-serif has-checked:italic has-checked:underline has-checked:underline-offset-4 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-[#171717]",
-                  size.soldOut && "cursor-not-allowed text-[#9a9a9a] line-through",
-                ]}
-              >
-                <input
-                  type="radio"
-                  name="size"
-                  value={size.name}
-                  disabled={size.soldOut}
-                  class="sr-only"
-                />
-                {size.name}
-                {size.soldOut && <span class="sr-only">, sold out</span>}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <button
-          data-dom="add"
-          type="submit"
-          disabled
-          class="h-11.25 w-full bg-[#171717] text-[0.844rem] text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171717]"
+        <div
+          data-dom="drag-indicator"
+          class="flex cursor-grab touch-none justify-center pt-2 pb-3 active:cursor-grabbing"
+          aria-hidden="true"
         >
-          Select a size
-        </button>
-
-        <div class="flex flex-col items-start gap-3 text-[0.844rem]">
-          <a href="#fitting" class="underline underline-offset-4">Book a fitting at the guildhall</a>
-          <a href="#delivery" class="underline underline-offset-4">Delivery by griffon</a>
+          <span class="h-0.75 w-9 rounded-full bg-[#e9e9e9]"></span>
         </div>
-      </form>
-    </dialog>
-  </cinq-sheet>
+
+        <form method="dialog" autocomplete="off" class="flex flex-col gap-4 px-5 pb-6">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-3">
+              <h2 id="cloak-sheet-title" class="font-serif text-[0.984rem] leading-snug font-normal italic">
+                Cloak of Elvenkind
+              </h2>
+              <button type="button" class="text-lg leading-none" aria-label="Add to wishlist">&#9825;</button>
+            </div>
+            <p data-dom="price" class="text-[0.844rem]">6 000 gp</p>
+          </div>
+
+          <hr class="border-[#e9e9e9]" />
+
+          <fieldset>
+            <legend class="mb-3 flex gap-2 text-[0.844rem]">
+              Color: <span data-dom="color" class="font-serif italic">{selectedColor.name}</span>
+            </legend>
+            <div class="flex items-center gap-3">
+              {colors.map((color) => (
+                <label
+                  class="grid size-5.5 cursor-pointer place-items-center rounded-full has-checked:ring-1 has-checked:ring-[#2a343a] has-focus-visible:outline-2 has-focus-visible:outline-[#171717]"
+                >
+                  <input
+                    type="radio"
+                    name="color"
+                    value={color.name}
+                    checked={color === selectedColor}
+                    class="sr-only"
+                  />
+                  <span class="size-4 rounded-full border border-[#e9e9e9]" style={`background: ${color.value}`}></span>
+                  <span class="sr-only">{color.name}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <hr class="border-[#e9e9e9]" />
+
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between gap-3 text-[0.844rem]">
+              <p id="cloak-size-label" class="flex gap-2">
+                Size: <span class="font-serif italic">Wearer sizes</span>
+              </p>
+              <a href="#size-guide" class="underline underline-offset-4">Size guide</a>
+            </div>
+            <div
+              role="radiogroup"
+              aria-labelledby="cloak-size-label"
+              class="flex flex-wrap items-center gap-x-5.5 gap-y-2 text-[0.844rem]"
+            >
+              {sizes.map((size) => (
+                <label
+                  class:list={[
+                    "cursor-pointer has-checked:font-serif has-checked:italic has-checked:underline has-checked:underline-offset-4 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-[#171717]",
+                    size.soldOut && "cursor-not-allowed text-[#9a9a9a] line-through",
+                  ]}
+                >
+                  <input
+                    type="radio"
+                    name="size"
+                    value={size.name}
+                    data-price={size.price}
+                    disabled={size.soldOut}
+                    class="sr-only"
+                  />
+                  {size.name}
+                  {size.soldOut && <span class="sr-only">, sold out</span>}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <button
+            data-dom="add"
+            type="submit"
+            disabled
+            class="h-11.25 w-full bg-[#171717] text-[0.844rem] text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171717]"
+          >
+            Select a size
+          </button>
+
+          <div class="flex flex-col items-start gap-3 text-[0.844rem]">
+            <a href="#fitting" class="underline underline-offset-4">Book a fitting at the guildhall</a>
+            <a href="#delivery" class="underline underline-offset-4">Delivery by griffon</a>
+          </div>
+        </form>
+      </dialog>
+    </cinq-sheet>
+  </div>
 </div>
 
 <script>
-  const sheet = document.getElementById("cloak-sheet-demo");
+  const sheet = document.getElementById("cloak-sheet-demo") as (HTMLElement & { close(): boolean }) | null;
+  const scrim = document.getElementById("cloak-scrim");
   const form = sheet?.querySelector("form");
   const add = sheet?.querySelector<HTMLButtonElement>('[data-dom="add"]');
   const color = sheet?.querySelector('[data-dom="color"]');
   const summary = document.querySelector<HTMLButtonElement>('[data-dom="summary"]');
+  const price = sheet?.querySelector('[data-dom="price"]');
+  const summaryPrice = document.querySelector('[data-dom="summary-price"]');
+  const summaryColors = document.querySelectorAll<HTMLElement>('[data-dom="summary-colors"] [data-color]');
+
+  const formatPrice = (value: string) => `${value.replace(/\B(?=(\d{3})+(?!\d))/g, " ")} gp`;
+
+  scrim?.addEventListener("click", () => sheet?.close());
 
   form?.addEventListener("change", (event) => {
     const input = event.target as HTMLInputElement;
 
-    if (input.name === "color" && color) {
-      color.textContent = input.value;
+    if (input.name === "color") {
+      if (color) {
+        color.textContent = input.value;
+      }
+
+      summaryColors.forEach((swatch) => {
+        if (swatch.dataset.color === input.value) {
+          swatch.setAttribute("aria-current", "true");
+        } else {
+          swatch.removeAttribute("aria-current");
+        }
+      });
       return;
     }
 
@@ -248,6 +264,10 @@ const selectedColor = colors[1];
 
     add.disabled = false;
     add.textContent = `Add to hoard (${input.value})`;
+
+    if (price && input.dataset.price) {
+      price.textContent = formatPrice(input.dataset.price);
+    }
   });
 
   form?.addEventListener("submit", () => {
@@ -255,6 +275,10 @@ const selectedColor = colors[1];
 
     if (summary && size) {
       summary.textContent = `In your hoard (${size})`;
+    }
+
+    if (summaryPrice && price) {
+      summaryPrice.textContent = price.textContent;
     }
   });
 </script>

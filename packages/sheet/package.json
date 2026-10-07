@@ -30,7 +30,7 @@
     "dev": "vite build --watch"
   },
   "peerDependencies": {
-    "@agencecinq/utils": ">=7.5.0"
+    "@agencecinq/utils": ">=7.6.0"
   },
   "repository": {
     "type": "git",

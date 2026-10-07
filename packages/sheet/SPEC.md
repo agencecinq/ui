@@ -58,7 +58,7 @@
 </cinq-sheet-button>
 
 <cinq-sheet id="loot-sheet">
-  <dialog aria-labelledby="loot-title">
+  <dialog aria-labelledby="loot-title" closedby="any">
     <div data-dom="drag-indicator"></div>
     <h2 id="loot-title">Loot</h2>
   </dialog>
@@ -79,7 +79,7 @@
 | Target | Attributes / properties |
 | ------ | ----------------------- |
 | Host | `open`, `dragging`, `--cinq-sheet-drag-offset` |
-| `dialog` | `closedby`, native `open` |
+| `dialog` | native `open` |
 | Trigger `button` | `aria-expanded` |
 
 ### 3.4 HTML is the source of truth
@@ -93,10 +93,20 @@ The component does not invent roles, labels or classes.
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
 | `open` | boolean | absent | Reflected state |
-| `modal` | `"false"` | modal | `false` opens with `show()` |
-| `dismissible` | `"false"` | dismissible | `false` blocks Escape, light dismiss and drag dismiss |
+| `data-modal` | `"false"` | modal | `false` opens with `show()` |
 
-`modal` is read on open. Changing it while open applies on the next open.
+`data-modal` is read on open. Changing it while open applies on the next open.
+
+Dismissal is the native `closedby` attribute on the `<dialog>`, written by the
+consumer. The component reads it once more for the handle: `closedby="none"`
+also disables drag dismiss.
+
+| `closedby` | Escape | Backdrop press | Handle pull |
+| ---------- | ------ | -------------- | ----------- |
+| `any` | Yes | Yes | Yes |
+| `closerequest` | Yes | No | Yes |
+| absent | Modal only | No | Yes |
+| `none` | No | No | No |
 
 ---
 
@@ -106,12 +116,12 @@ The component does not invent roles, labels or classes.
 
 | Key | Function |
 | --- | -------- |
-| Escape | Closes when dismissible |
+| Escape | Closes unless `closedby="none"` (non-modal needs an explicit `closedby`) |
 | Tab | Native modal dialog containment |
 
 ### Pointer
 
-- Backdrop press closes a dismissible modal sheet (`closedby="any"`)
+- Backdrop press closes a modal sheet with `closedby="any"`
 - Button pull: a `cinq-sheet-button` opens its closed sheet on a pull up past 40 px or an upward flick. A tap toggles through the native click, a short pull does nothing
 - Handle drag: offset follows the pointer downward, damped (square root) upward. Release past 80 px or with a downward flick closes, otherwise snaps back
 - Focus on open and restore on close are native `<dialog>` behaviors
@@ -163,7 +173,7 @@ Dispatched on `document.documentElement`, not bubbling.
 | `init()` / `destroy()` | Bind and unbind listeners |
 | `open(trigger?)` | Request open, returns `true` when committed |
 | `close()` | Request close, returns `true` when committed |
-| `toggle(trigger?)` | Open or close |
+| `toggle(trigger?)` | Open or close, returns whether the sheet is open |
 | `trigger` | Element that last requested open |
 | `$dialog`, `$handle` | DOM refs |
 
@@ -188,7 +198,7 @@ packages/sheet/
 ## 11. Acceptance criteria
 
 - [ ] Opens from a `cinq-sheet-button`, `aria-expanded` follows
-- [ ] Escape, backdrop and drag close when dismissible, none when `dismissible="false"`
+- [ ] Escape, backdrop and drag follow the dialog `closedby`, none of them close with `closedby="none"`
 - [ ] Before-events can veto and defer with `resolve()`
 - [ ] Opening a modal sheet closes the other open modal sheet
 - [ ] README and docs aligned with this spec
