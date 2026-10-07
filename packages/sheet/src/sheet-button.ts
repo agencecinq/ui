@@ -23,8 +23,6 @@ export class SheetButton extends HTMLElement {
 
   #pull: Pull | null = null;
   #ignoreClick = false;
-  /** True when move/up are bound on `window` because capture did not stick. */
-  #windowBound = false;
 
   connectedCallback(): void {
     this.init();
@@ -51,10 +49,6 @@ export class SheetButton extends HTMLElement {
     this.$button.addEventListener("pointermove", this.#handlePointerMove);
     this.$button.addEventListener("pointerup", this.#handlePointerUp);
     this.$button.addEventListener("pointercancel", this.#handlePointerCancel);
-    this.$button.addEventListener(
-      "lostpointercapture",
-      this.#handleLostCapture,
-    );
     document.documentElement.addEventListener(
       EVENTS.SHEET_OPEN,
       this.#handleSheetOpen as EventListener,
@@ -66,7 +60,6 @@ export class SheetButton extends HTMLElement {
   }
 
   destroy(): void {
-    this.#unbindWindow();
     this.#pull = null;
 
     if (this.$button) {
@@ -77,10 +70,6 @@ export class SheetButton extends HTMLElement {
       this.$button.removeEventListener(
         "pointercancel",
         this.#handlePointerCancel,
-      );
-      this.$button.removeEventListener(
-        "lostpointercapture",
-        this.#handleLostCapture,
       );
     }
 
@@ -110,28 +99,6 @@ export class SheetButton extends HTMLElement {
     );
   }
 
-  #bindWindow(): void {
-    if (this.#windowBound) {
-      return;
-    }
-
-    this.#windowBound = true;
-    window.addEventListener("pointermove", this.#handlePointerMove);
-    window.addEventListener("pointerup", this.#handlePointerUp);
-    window.addEventListener("pointercancel", this.#handlePointerCancel);
-  }
-
-  #unbindWindow(): void {
-    if (!this.#windowBound) {
-      return;
-    }
-
-    this.#windowBound = false;
-    window.removeEventListener("pointermove", this.#handlePointerMove);
-    window.removeEventListener("pointerup", this.#handlePointerUp);
-    window.removeEventListener("pointercancel", this.#handlePointerCancel);
-  }
-
   #handleClick = (): void => {
     if (this.#ignoreClick) {
       this.#ignoreClick = false;
@@ -155,15 +122,7 @@ export class SheetButton extends HTMLElement {
       velocity: 0,
     };
 
-    try {
-      this.$button.setPointerCapture(event.pointerId);
-    } catch {
-      // Some hosts reject capture. Fall through to the window fallback.
-    }
-
-    if (!this.$button.hasPointerCapture(event.pointerId)) {
-      this.#bindWindow();
-    }
+    this.$button.setPointerCapture(event.pointerId);
   };
 
   #handlePointerMove = (event: PointerEvent): void => {
@@ -187,16 +146,14 @@ export class SheetButton extends HTMLElement {
       return;
     }
 
-    // Prefer the release point: some paths skip intermediate moves.
-    const elapsed = Math.max(event.timeStamp - pull.lastTime, 1);
+    // A pull can end with no pointermove in between.
     if (event.clientY !== pull.lastY) {
+      const elapsed = Math.max(event.timeStamp - pull.lastTime, 1);
       pull.velocity = (event.clientY - pull.lastY) / elapsed;
       pull.lastY = event.clientY;
-      pull.lastTime = event.timeStamp;
     }
 
     this.#pull = null;
-    this.#unbindWindow();
 
     const delta = pull.lastY - pull.startY;
 
@@ -215,21 +172,8 @@ export class SheetButton extends HTMLElement {
       .forEach((sheet) => this.#toggle(sheet));
   };
 
-  #handlePointerCancel = (event: PointerEvent): void => {
-    if (this.#pull && event.pointerId === this.#pull.pointerId) {
-      this.#ignoreClick = Math.abs(this.#pull.lastY - this.#pull.startY) >= TAP_SLOP;
-      this.#pull = null;
-      this.#unbindWindow();
-    }
-  };
-
-  #handleLostCapture = (event: PointerEvent): void => {
-    if (!this.#pull || event.pointerId !== this.#pull.pointerId) {
-      return;
-    }
-
-    // Capture dropped mid-gesture. Keep tracking on the window.
-    this.#bindWindow();
+  #handlePointerCancel = (): void => {
+    this.#pull = null;
   };
 
   #handleSheetOpen = (event: CustomEvent<SheetDetail>): void => {

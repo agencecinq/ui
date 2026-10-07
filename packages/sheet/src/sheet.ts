@@ -69,10 +69,7 @@ export class Sheet extends HTMLElement {
       this.$handle.addEventListener("pointermove", this.#handlePointerMove);
       this.$handle.addEventListener("pointerup", this.#handlePointerUp);
       this.$handle.addEventListener("pointercancel", this.#handlePointerUp);
-      this.$handle.addEventListener(
-        "lostpointercapture",
-        this.#handleLostCapture,
-      );
+      this.$handle.addEventListener("lostpointercapture", this.#handlePointerUp);
     }
 
     document.documentElement.addEventListener(
@@ -111,7 +108,7 @@ export class Sheet extends HTMLElement {
       this.$handle.removeEventListener("pointercancel", this.#handlePointerUp);
       this.$handle.removeEventListener(
         "lostpointercapture",
-        this.#handleLostCapture,
+        this.#handlePointerUp,
       );
     }
 
@@ -282,30 +279,6 @@ export class Sheet extends HTMLElement {
     }
   };
 
-  #windowBound = false;
-
-  #bindWindow(): void {
-    if (this.#windowBound) {
-      return;
-    }
-
-    this.#windowBound = true;
-    window.addEventListener("pointermove", this.#handlePointerMove);
-    window.addEventListener("pointerup", this.#handlePointerUp);
-    window.addEventListener("pointercancel", this.#handlePointerUp);
-  }
-
-  #unbindWindow(): void {
-    if (!this.#windowBound) {
-      return;
-    }
-
-    this.#windowBound = false;
-    window.removeEventListener("pointermove", this.#handlePointerMove);
-    window.removeEventListener("pointerup", this.#handlePointerUp);
-    window.removeEventListener("pointercancel", this.#handlePointerUp);
-  }
-
   #handlePointerDown = (event: PointerEvent): void => {
     if (event.button !== 0 || !this.hasAttribute("open") || !this.$handle) {
       return;
@@ -319,16 +292,7 @@ export class Sheet extends HTMLElement {
       velocity: 0,
     };
 
-    try {
-      this.$handle.setPointerCapture(event.pointerId);
-    } catch {
-      // Some hosts reject capture. Fall through to the window fallback.
-    }
-
-    if (!this.$handle.hasPointerCapture(event.pointerId)) {
-      this.#bindWindow();
-    }
-
+    this.$handle.setPointerCapture(event.pointerId);
     this.toggleAttribute("dragging", true);
   };
 
@@ -355,12 +319,11 @@ export class Sheet extends HTMLElement {
       return;
     }
 
-    // Prefer the release point: some paths skip intermediate moves.
-    const elapsed = Math.max(event.timeStamp - drag.lastTime, 1);
+    // A pull can end with no pointermove in between.
     if (event.clientY !== drag.lastY) {
+      const elapsed = Math.max(event.timeStamp - drag.lastTime, 1);
       drag.velocity = (event.clientY - drag.lastY) / elapsed;
       drag.lastY = event.clientY;
-      drag.lastTime = event.timeStamp;
     }
 
     this.#endDrag();
@@ -375,14 +338,6 @@ export class Sheet extends HTMLElement {
     }
   };
 
-  #handleLostCapture = (event: PointerEvent): void => {
-    if (!this.#drag || event.pointerId !== this.#drag.pointerId) {
-      return;
-    }
-
-    this.#bindWindow();
-  };
-
   #endDrag(): void {
     const drag = this.#drag;
 
@@ -392,7 +347,6 @@ export class Sheet extends HTMLElement {
 
     this.#drag = null;
     this.toggleAttribute("dragging", false);
-    this.#unbindWindow();
 
     if (this.$handle?.hasPointerCapture(drag.pointerId)) {
       this.$handle.releasePointerCapture(drag.pointerId);
