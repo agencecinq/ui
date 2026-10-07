@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node", "vite/client"]
+  },
+  "references": [
+    {
+      "path": "../utils"
+    }
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.liquid"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

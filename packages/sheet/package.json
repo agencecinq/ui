@@ -1,0 +1,48 @@
+{
+  "name": "@agencecinq/sheet",
+  "version": "1.0.0",
+  "description": "Accessible bottom sheet Web Component on native <dialog>, content-sized with drag-to-dismiss.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
+  "engines": {
+    "node": ">=18"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "import": "./dist/plugin.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src/sheet.html.liquid"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "@agencecinq/utils": ">=7.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agencecinq/ui.git",
+    "directory": "packages/sheet"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@agencecinq/utils": "workspace:*",
+    "vite": "^8.2.0",
+    "vite-plugin-dts": "^5.0.3"
+  }
+}

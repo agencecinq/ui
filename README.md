@@ -103,6 +103,7 @@ pnpm release
 
 - `packages/utils`: Shared logic, event bus, and helpers (`EVENTS`, `clamp`, `throttle`, `focus`, …).
 - `packages/drawer`: The Drawer Web Component and its Vite Plugin.
+- `packages/sheet`: The Sheet Web Component (`<cinq-sheet>`) with content-sized bottom sheet and drag-to-dismiss.
 - `packages/modal`: The Modal Web Components (Modal + ModalButton).
 - `packages/tabs`: The Tabs Web Component (`<cinq-tabs>`) and related utilities.
 - `packages/spinbutton`: The Spinbutton Web Component (`<cinq-spinbutton>`), WAI-ARIA APG-compliant.
