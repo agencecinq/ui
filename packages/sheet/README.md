@@ -243,9 +243,15 @@ archive, or exit animation.
 ## Accessibility
 
 - Label the dialog (`aria-labelledby`)
-- Hide the handle from assistive tech (`aria-hidden="true"`). Keep a visible
-  close path for keyboard users (Escape, a close button or a submit)
-- Focus on open and restore on close are native `<dialog>` behaviors
+- Hide the handle from assistive tech (`aria-hidden="true"`)
+- Provide a visible close button. Escape is not discoverable, and the button is
+  the only way out with `closedby="none"`
+- Focus on open and restore on close are native `<dialog>` behaviors. Put
+  `autofocus` on the control the user came for
+- With `data-modal="false"` the page stays interactive. Set `inert` on the
+  content the sheet covers while it is open, and lift it on `beforetoggle` so
+  focus can return to the trigger
+- Announce values the sheet updates elsewhere with `aria-live="polite"`
 - Style focus with `:focus-visible`
 
 ## Build setup

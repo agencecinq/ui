@@ -17,6 +17,7 @@ const sizes = [
 ];
 
 const selectedColor = colors[1];
+const firstAvailableSize = sizes.find((size) => !size.soldOut);
 ---
 
 <RegisterComponents />
@@ -73,7 +74,7 @@ const selectedColor = colors[1];
       </p>
     </div>
 
-    <div class="flex flex-col gap-3 border-t border-[#e9e9e9] bg-white px-5 pt-2 pb-5">
+    <div data-dom="bar" class="flex flex-col gap-3 border-t border-[#e9e9e9] bg-white px-5 pt-2 pb-5">
       <cinq-sheet-button class="flex justify-center">
         <button
           class="flex w-full cursor-grab touch-none justify-center py-3 active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-[#171717]"
@@ -91,7 +92,7 @@ const selectedColor = colors[1];
       </div>
 
       <div class="flex items-center justify-between gap-3">
-        <p data-dom="summary-price" class="text-[0.844rem]">6 000 gp</p>
+        <p data-dom="summary-price" class="text-[0.844rem]" aria-live="polite">6 000 gp</p>
         <ul data-dom="summary-colors" class="flex items-center gap-3" aria-label="Colors">
           {colors.map((color) => (
             <li
@@ -140,7 +141,19 @@ const selectedColor = colors[1];
               <h2 id="cloak-sheet-title" class="font-serif text-[0.984rem] leading-snug font-normal italic">
                 Cloak of Elvenkind
               </h2>
-              <button type="button" class="text-lg leading-none" aria-label="Add to wishlist">&#9825;</button>
+              <div class="flex items-center gap-4">
+                <button type="button" class="text-lg leading-none" aria-label="Add to wishlist">&#9825;</button>
+                <button
+                  data-dom="close"
+                  type="button"
+                  class="grid size-6 place-items-center focus-visible:outline-2 focus-visible:outline-[#171717]"
+                  aria-label="Close"
+                >
+                  <svg class="size-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M1 1l12 12M13 1L1 13" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <p data-dom="price" class="text-[0.844rem]">6 000 gp</p>
           </div>
@@ -197,6 +210,7 @@ const selectedColor = colors[1];
                     value={size.name}
                     data-price={size.price}
                     disabled={size.soldOut}
+                    autofocus={size === firstAvailableSize}
                     class="sr-only"
                   />
                   {size.name}
@@ -238,7 +252,18 @@ const selectedColor = colors[1];
 
   const formatPrice = (value: string) => `${value.replace(/\B(?=(\d{3})+(?!\d))/g, " ")} gp`;
 
+  const bar = document.querySelector<HTMLElement>('[data-dom="bar"]');
+  const dialog = sheet?.querySelector("dialog");
+
   scrim?.addEventListener("click", () => sheet?.close());
+  sheet?.querySelector('[data-dom="close"]')?.addEventListener("click", () => sheet?.close());
+
+  // Before the close, so the dialog can still return focus to its trigger in the bar.
+  dialog?.addEventListener("beforetoggle", (event) => {
+    if (bar) {
+      bar.inert = (event as ToggleEvent).newState === "open";
+    }
+  });
 
   form?.addEventListener("change", (event) => {
     const input = event.target as HTMLInputElement;
@@ -262,6 +287,8 @@ const selectedColor = colors[1];
       return;
     }
 
+    form?.querySelector("[autofocus]")?.removeAttribute("autofocus");
+    input.autofocus = true;
     add.disabled = false;
     add.textContent = `Add to hoard (${input.value})`;
 

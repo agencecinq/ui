@@ -137,6 +137,9 @@ also disables drag dismiss.
 - `prefers-reduced-motion` handled by the consumer
 - `touch-action: none` on the handle so touch drags are not eaten by scroll
 - Hide the handle from assistive tech (`aria-hidden="true"`)
+- A visible close button, required with `closedby="none"`
+- `autofocus` on the control the user came for
+- Non-modal: `inert` on the covered content while open, lifted on `beforetoggle` so focus restore reaches the trigger
 - `:focus-visible` on interactive content
 
 ---

@@ -7,6 +7,8 @@ const OPEN_DISTANCE = 40;
 const OPEN_VELOCITY = 0.5;
 /** Movement in px under which a press still counts as a tap. */
 const TAP_SLOP = 8;
+/** Time in ms after a pull during which its trailing click is ignored. */
+const PULL_CLICK_WINDOW = 300;
 
 type Pull = {
   pointerId: number;
@@ -22,7 +24,7 @@ export class SheetButton extends HTMLElement {
   $button: HTMLButtonElement | null = null;
 
   #pull: Pull | null = null;
-  #ignoreClick = false;
+  #ignoreClickUntil = 0;
 
   connectedCallback(): void {
     this.init();
@@ -99,9 +101,9 @@ export class SheetButton extends HTMLElement {
     );
   }
 
-  #handleClick = (): void => {
-    if (this.#ignoreClick) {
-      this.#ignoreClick = false;
+  #handleClick = (event: MouseEvent): void => {
+    if (event.timeStamp < this.#ignoreClickUntil) {
+      this.#ignoreClickUntil = 0;
       return;
     }
 
@@ -113,7 +115,7 @@ export class SheetButton extends HTMLElement {
       return;
     }
 
-    this.#ignoreClick = false;
+    this.#ignoreClickUntil = 0;
     this.#pull = {
       pointerId: event.pointerId,
       startY: event.clientY,
@@ -161,7 +163,7 @@ export class SheetButton extends HTMLElement {
       return;
     }
 
-    this.#ignoreClick = true;
+    this.#ignoreClickUntil = event.timeStamp + PULL_CLICK_WINDOW;
 
     if (delta > -OPEN_DISTANCE && pull.velocity > -OPEN_VELOCITY) {
       return;

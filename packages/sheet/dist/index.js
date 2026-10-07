@@ -134,11 +134,11 @@ var n = 80, r = .5, i = class extends HTMLElement {
 customElements.get("cinq-sheet") || customElements.define("cinq-sheet", i);
 //#endregion
 //#region src/sheet-button.ts
-var a = 8, o = class extends HTMLElement {
+var a = 8, o = 300, s = class extends HTMLElement {
 	controls = [];
 	$button = null;
 	#e = null;
-	#t = !1;
+	#t = 0;
 	connectedCallback() {
 		this.init();
 	}
@@ -165,15 +165,15 @@ var a = 8, o = class extends HTMLElement {
 			cancelable: !1
 		});
 	}
-	#i = () => {
-		if (this.#t) {
-			this.#t = !1;
+	#i = (e) => {
+		if (e.timeStamp < this.#t) {
+			this.#t = 0;
 			return;
 		}
 		this.controls.forEach((e) => this.#r(e));
 	};
 	#a = (e) => {
-		e.button === 0 && this.$button && (this.#t = !1, this.#e = {
+		e.button === 0 && this.$button && (this.#t = 0, this.#e = {
 			pointerId: e.pointerId,
 			startY: e.clientY,
 			lastY: e.clientY,
@@ -196,7 +196,7 @@ var a = 8, o = class extends HTMLElement {
 		}
 		this.#e = null;
 		let n = t.lastY - t.startY;
-		Math.abs(n) < a || (this.#t = !0, !(n > -40 && t.velocity > -.5) && this.controls.filter((e) => !document.getElementById(e)?.hasAttribute("open")).forEach((e) => this.#r(e)));
+		Math.abs(n) < a || (this.#t = e.timeStamp + o, !(n > -40 && t.velocity > -.5) && this.controls.filter((e) => !document.getElementById(e)?.hasAttribute("open")).forEach((e) => this.#r(e)));
 	};
 	#c = () => {
 		this.#e = null;
@@ -208,6 +208,6 @@ var a = 8, o = class extends HTMLElement {
 		this.controls.includes(e.detail.sheet) && this.#n(!1);
 	};
 };
-customElements.get("cinq-sheet-button") || customElements.define("cinq-sheet-button", o);
+customElements.get("cinq-sheet-button") || customElements.define("cinq-sheet-button", s);
 //#endregion
-export { i as Sheet, o as SheetButton };
+export { i as Sheet, s as SheetButton };

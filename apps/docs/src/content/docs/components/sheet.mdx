@@ -215,6 +215,24 @@ html:has(cinq-sheet[open] dialog:modal) {
 }
 ```
 
+## Accessibility
+
+Focus on open and restore on close are native `<dialog>` behaviors. The rest is
+markup:
+
+- A visible close button. Escape is not discoverable, and the button is the
+  only way out with `closedby="none"`
+- `autofocus` on the control the user came for, such as the first size
+- With `data-modal="false"`, `inert` on the content the sheet covers. Lift it on
+  the dialog `beforetoggle`, before the close, so focus can return to the
+  trigger
+
+```js
+dialog.addEventListener('beforetoggle', (event) => {
+  covered.inert = event.newState === 'open';
+});
+```
+
 ## Shopify (Liquid snippet)
 
 If you are integrating in a Shopify theme, you can use the provided snippet and
@@ -261,7 +279,8 @@ The snippet sets `closedby="any"` and ships the motion classes. Pass
 
 A compact purchase bar stays in the card. Tap its button, or tap or pull up its
 handle, to open the sheet on the sizes. Pick a size to see the price change,
-then pull the handle down, tap outside or press Escape to close. The demo uses
-`data-modal="false"` so the panel stays inside the card.
+then pull the handle down, tap outside, press Escape or use the close button.
+The demo uses `data-modal="false"` so the panel stays inside the card, and makes
+the bar inert while the sheet is open.
 
 <SheetPlayground />
