@@ -22,6 +22,7 @@
     "@agencecinq/snake": "workspace:*",
     "@agencecinq/disclosure-button": "workspace:*",
     "@agencecinq/drawer": "workspace:*",
+    "@agencecinq/sheet": "workspace:*",
     "@agencecinq/modal": "workspace:*",
     "@agencecinq/spinbutton": "workspace:*",
     "@agencecinq/slider": "workspace:*",

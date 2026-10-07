@@ -1,0 +1,174 @@
+---
+title: Sheet
+description: Bottom sheet Web Component (`<cinq-sheet>`) on native `<dialog>` with drag to dismiss.
+---
+
+import SheetPlayground from "../_components/SheetPlayground.astro";
+
+A sheet presents content from the bottom edge. `<cinq-sheet>` wraps a native
+`<dialog>`, opens it with `showModal()`, closes it on Escape, backdrop press or
+a pull on the handle, and dispatches open and close events.
+`<cinq-sheet-button>` connects triggers through `aria-controls`.
+
+Open height follows content. Position, motion and scroll lock stay in your CSS.
+
+## Playground (live)
+
+A compact purchase bar stays on the page. Tap its button, or tap or pull up its
+handle, to open the sheet on the sizes. Pick a size to enable the button, then pull the handle down, tap
+outside or press Escape to close.
+
+<SheetPlayground />
+
+## Install
+
+```bash
+pnpm add @agencecinq/sheet
+```
+
+## Usage
+
+Import once:
+
+```js
+import "@agencecinq/sheet";
+```
+
+```html
+<cinq-sheet-button>
+  <button aria-controls="cloak-sheet" aria-expanded="false">Select a size</button>
+</cinq-sheet-button>
+
+<cinq-sheet id="cloak-sheet">
+  <dialog
+    aria-labelledby="cloak-title"
+    class="fixed inset-x-0 top-auto -bottom-4 m-0 w-auto max-w-none max-h-[calc(100dvh-4rem)] overflow-y-auto border-0 bg-white p-0 pb-4"
+  >
+    <div data-dom="drag-indicator" class="touch-none" aria-hidden="true"></div>
+    <h2 id="cloak-title">Cloak of Elvenkind</h2>
+    ...
+  </dialog>
+</cinq-sheet>
+```
+
+> **HTML is the source of truth.** `<cinq-sheet>` must contain a `<dialog>`.
+> Label it and run an a11y linter (axe, Lighthouse).
+
+Anchor the dialog with `top-auto` to override the UA `top: 0`. A small
+overhang (`-bottom-4` with `pb-4`) keeps the bottom edge hidden while the panel
+moves. Cap the height with `max-height`.
+
+## API
+
+### Attributes
+
+| Attribute | Required | Description |
+| --------- | -------- | ----------- |
+| `id` | Yes | Sheet identifier, matched by `aria-controls`. |
+| `open` | No | Reflected open state. |
+| `dragging` | No | Set while the handle is pulled. |
+| `dismissible` | No | `false` ignores Escape, backdrop press and pulls. |
+| `modal` | No | `false` opens with `show()`. Read on open. |
+
+`[data-dom="drag-indicator"]` inside the dialog is the optional drag handle.
+Release it past 80 px, or with a quick downward flick, to close. Otherwise the
+sheet snaps back. A pull upward gives a damped rubber band.
+
+### Pull up to open
+
+A `<cinq-sheet-button>` opens its sheet on a pull up past 40 px, or a quick
+upward flick. A tap still toggles. A pull that falls short does nothing. On
+touch screens, set `touch-action: none` on the button that should take the
+gesture, typically a handle outside the sheet. Buttons without it keep page
+scroll.
+
+```html
+<cinq-sheet-button>
+  <button
+    class="touch-none"
+    aria-controls="cloak-sheet"
+    aria-expanded="false"
+    aria-label="Show sizes"
+  >
+    <span class="h-0.75 w-9 rounded-full bg-[#e9e9e9]"></span>
+  </button>
+</cinq-sheet-button>
+```
+
+### Methods
+
+| Method | Description |
+| ------ | ----------- |
+| `open(trigger?)` | Opens. Returns `true` when committed. |
+| `close()` | Closes. Returns `true` when committed. |
+| `toggle(trigger?)` | Opens or closes. |
+| `init()` / `destroy()` | Bind and unbind listeners. |
+
+A `<form method="dialog">` submit closes the sheet too.
+
+### Events
+
+Dispatched on `document.documentElement`. Prefer the constants from
+`@agencecinq/utils` (`EVENTS.SHEET_*`).
+
+| Event | Cancelable | Detail |
+| ----- | ---------- | ------ |
+| `sheet:toggle` | No | `{ sheet, trigger }` |
+| `sheet:before-open` | Yes | `{ sheet, instance, trigger, resolve }` |
+| `sheet:before-close` | Yes | `{ sheet, instance, resolve }` |
+| `sheet:open` | No | `{ sheet, trigger }` |
+| `sheet:close` | No | `{ sheet }` |
+
+Call `preventDefault()` on a before-event to veto, then `detail.resolve()` to
+commit once async work is done. Opening a modal sheet closes the other open
+modal sheet.
+
+## Motion
+
+While the handle is pulled, the host sets `--cinq-sheet-drag-offset` in px. It
+is negative and damped on an upward pull. Apply it, and the enter and exit
+motion, in your CSS. `max(-1rem, ...)` caps the rubber band at the overhang so
+no gap shows under the panel:
+
+```css
+cinq-sheet dialog {
+  translate: 0 max(-1rem, var(--cinq-sheet-drag-offset, 0px));
+  transition:
+    translate 300ms ease-out,
+    display 300ms allow-discrete,
+    overlay 300ms allow-discrete;
+}
+
+cinq-sheet dialog:not([open]) {
+  translate: 0 100%;
+}
+
+@starting-style {
+  cinq-sheet dialog[open] {
+    translate: 0 100%;
+  }
+}
+
+cinq-sheet[dragging] dialog {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  cinq-sheet dialog {
+    transition: none;
+  }
+}
+```
+
+Style the scrim with `dialog::backdrop`. Set `touch-action: none` on the
+handle so touch pulls are not taken by page scroll.
+
+## Scroll lock
+
+`showModal()` makes the page inert but does not lock scroll:
+
+```css
+html:has(cinq-sheet[open] dialog:modal) {
+  overflow: hidden;
+}
+```
