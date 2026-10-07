@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.17
+
+### Patch Changes
+
+- Updated dependencies
+  - @agencecinq/sheet@1.0.1
+
 ## 4.4.16
 
 ### Patch Changes
