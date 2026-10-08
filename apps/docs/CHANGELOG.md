@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.18
+
+### Patch Changes
+
+- Updated dependencies [32aa7fb]
+  - @agencecinq/combobox@2.0.1
+
 ## 4.4.17
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @agencecinq/combobox
 
+## 2.0.1
+
+### Patch Changes
+
+- 32aa7fb: Restore `UpdateDetail` and `EmptyDetail` exports for `combobox:update` / `combobox:empty` listeners (dropped by mistake in 2.0.0).
+
 ## 2.0.0
 
 ### Major Changes
