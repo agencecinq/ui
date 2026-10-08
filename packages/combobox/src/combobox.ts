@@ -1,7 +1,7 @@
 import { EVENTS, dispatchEvent, parseBoolean, parseNumber } from "@agencecinq/utils";
 import Keyboard from "./keyboard.js";
 import type {
-  Detail,
+  EmptyDetail,
   HideOptions,
   Mode,
   OnSelect,
@@ -13,6 +13,7 @@ import type {
   SearchResult,
   SelectDetail,
   SelectMode,
+  UpdateDetail,
   Write,
 } from "./types.js";
 
@@ -325,7 +326,7 @@ export class Combobox extends HTMLElement {
 
     const { options, value } = this;
 
-    this.#emit(EVENTS.COMBOBOX_UPDATE, { options, index, value });
+    this.#emit(EVENTS.COMBOBOX_UPDATE, { options, index, value } satisfies UpdateDetail);
   }
 
   /** Open the listbox if needed (runs search when closed / empty). */
@@ -625,7 +626,7 @@ export class Combobox extends HTMLElement {
       this.#abort();
       this.#searchId += 1;
       this.#clear();
-      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies Detail);
+      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
       this.hide({ force: true });
       return;
     }
@@ -678,7 +679,7 @@ export class Combobox extends HTMLElement {
     this.#setLoading(false);
 
     if (0 === this.options.length) {
-      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies Detail);
+      this.#emit(EVENTS.COMBOBOX_EMPTY, { value } satisfies EmptyDetail);
 
       if (this.openOnEmpty) {
         this.show();

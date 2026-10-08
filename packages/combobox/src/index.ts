@@ -7,6 +7,7 @@ import {
 export { Combobox, optionRenderProps, serializeOptionAttrs };
 export type {
   Detail,
+  EmptyDetail,
   HideOptions,
   Mode,
   OnSelect,
@@ -19,5 +20,6 @@ export type {
   SearchResult,
   SelectDetail,
   SelectMode,
+  UpdateDetail,
   Write,
 } from "./types.js";

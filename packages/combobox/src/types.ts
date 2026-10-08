@@ -62,6 +62,15 @@ export type SelectDetail = Detail & {
   index: number;
 };
 
+/** `combobox:update` detail. */
+export type UpdateDetail = Detail & {
+  options: Option[];
+  index: number;
+};
+
+/** `combobox:empty` detail. */
+export type EmptyDetail = Detail;
+
 export type OnSelect = (detail: SelectDetail) => void;
 
 export type HideOptions = {
