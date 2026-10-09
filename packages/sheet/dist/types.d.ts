@@ -1,3 +1,4 @@
+import { WaitUntil } from '@agencecinq/utils';
 import { Sheet } from './sheet.js';
 export type SheetDetail = {
     sheet: string;
@@ -11,12 +12,12 @@ export type OpenDetail = SheetDetail & {
 export type BeforeOpenDetail = SheetDetail & {
     instance: Sheet;
     trigger: HTMLElement | null;
-    /** Commits the open after async work. Idempotent. */
-    resolve: () => void;
+    /** Defers the open until `promise` settles. A rejection cancels it. */
+    waitUntil: WaitUntil;
 };
 export type BeforeCloseDetail = SheetDetail & {
     instance: Sheet;
-    /** Commits the close after async work. Idempotent. */
-    resolve: () => void;
+    /** Defers the close until `promise` settles. A rejection cancels it. */
+    waitUntil: WaitUntil;
 };
 //# sourceMappingURL=types.d.ts.map

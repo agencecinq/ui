@@ -122,11 +122,11 @@ Dismissal is set on the `<dialog>` with the native `closedby` attribute:
 
 | Method | Description |
 | ------ | ----------- |
-| `open(trigger?)` | Opens the sheet. Returns `false` if already open, aborted, or deferred. |
-| `close()` | Closes the sheet. Returns `false` if already closed, aborted, or deferred. |
-| `toggle(trigger?)` | Toggles open/close. Returns whether the sheet is open. |
-| `destroy()` | Removes listeners. |
-| `init()` | Re-binds after DOM mutation. Call `destroy()` first. |
+| `open(trigger?)` | Opens the sheet. Resolves `true` if this call opened it, `false` if already open or canceled. |
+| `close()` | Closes the sheet. Resolves `true` if this call closed it, `false` if already closed or canceled. |
+| `toggle(trigger?)` | Toggles open/close. Resolves whether the sheet is open. |
+| `destroy()` | Removes listeners and closes the dialog. Called on disconnect. |
+| `init()` | Binds listeners and opens the dialog if `open` is already set. Called on connect; call `destroy()` first to re-bind. |
 
 A `<form method="dialog">` submit closes the sheet too.
 
@@ -183,6 +183,13 @@ cinq-sheet[dragging] dialog {
 }
 ```
 
+A non-modal sheet laid out in the page flow (`position: absolute` inside a
+container) can scroll the page as it opens: the browser moves focus into the
+dialog while it still sits at its `@starting-style` offset, below the fold, and
+scrolls to reveal it. A `fixed` sheet never does: scrolling the page does not
+bring it closer. Prefer `position: fixed` unless the sheet must stay inside a
+container.
+
 ### Background scroll
 
 The package does **not** lock document scroll. Native `showModal()` makes the
@@ -202,8 +209,8 @@ Dispatched on `document.documentElement`. Prefer constants from
 | Event | Constant | Cancelable | Detail | Description |
 | ----- | -------- | ---------- | ------ | ----------- |
 | `sheet:toggle` | `SHEET_TOGGLE` | No | `{ sheet, trigger }` | Request open/close from a button. |
-| `sheet:before-open` | `SHEET_BEFORE_OPEN` | Yes | `{ sheet, instance, trigger, resolve }` | Fired before `open` is set. Cancel to defer, then call `resolve()`. |
-| `sheet:before-close` | `SHEET_BEFORE_CLOSE` | Yes | `{ sheet, instance, resolve }` | Fired before `open` is removed. Cancel to defer, then call `resolve()`. |
+| `sheet:before-open` | `SHEET_BEFORE_OPEN` | Yes | `{ sheet, instance, trigger, waitUntil }` | Fired before `open` is set. `preventDefault()` cancels, `waitUntil(promise)` defers. |
+| `sheet:before-close` | `SHEET_BEFORE_CLOSE` | Yes | `{ sheet, instance, waitUntil }` | Fired before `open` is removed. `preventDefault()` cancels, `waitUntil(promise)` defers. |
 | `sheet:open` | `SHEET_OPEN` | No | `{ sheet, trigger }` | Fired after `open` is set. |
 | `sheet:close` | `SHEET_CLOSE` | No | `{ sheet }` | Fired after `open` is removed. |
 
@@ -215,7 +222,7 @@ document.documentElement.addEventListener(EVENTS.SHEET_OPEN, (event) => {
 });
 ```
 
-Opening a modal sheet closes the other open modal sheet.
+Opening a sheet closes any other open modal sheet.
 
 ### Deferring open or close
 
@@ -223,15 +230,12 @@ Opening a modal sheet closes the other open modal sheet.
 document.documentElement.addEventListener(EVENTS.SHEET_BEFORE_CLOSE, (event) => {
   if (event.detail.sheet !== "cloak-sheet") return;
 
-  event.preventDefault();
-
-  void doAsyncWork().then(() => {
-    event.detail.resolve();
-  });
+  event.detail.waitUntil(doAsyncWork());
 });
 ```
 
-`resolve()` is idempotent. A vetoed handle pull snaps back. A
+Several listeners can defer the same action; a rejected promise cancels it.
+Call `waitUntil()` synchronously in the listener. A vetoed handle pull snaps back. A
 `<form method="dialog">` submit closes natively and skips `sheet:before-close`.
 TypeScript: `BeforeOpenDetail` and `BeforeCloseDetail` from
 `@agencecinq/sheet`.
@@ -253,6 +257,44 @@ archive, or exit animation.
   focus can return to the trigger
 - Announce values the sheet updates elsewhere with `aria-live="polite"`
 - Style focus with `:focus-visible`
+
+## Migration
+
+### From 1.x to 2.0
+
+Requires `@agencecinq/utils` >= 7.7.0.
+
+**1. Deferring.** Replace `resolve()` with `waitUntil(promise)`:
+
+```js
+// Before
+document.documentElement.addEventListener(EVENTS.SHEET_BEFORE_CLOSE, (event) => {
+  if (event.detail.sheet !== "cloak-sheet") return;
+  event.preventDefault();
+  doAsyncWork().then(() => event.detail.resolve());
+});
+
+// After
+document.documentElement.addEventListener(EVENTS.SHEET_BEFORE_CLOSE, (event) => {
+  if (event.detail.sheet !== "cloak-sheet") return;
+  event.detail.waitUntil(doAsyncWork());
+});
+```
+
+`preventDefault()` now only cancels. A rejected promise cancels too.
+
+**2. API.** `open()`, `close()` and `toggle()` return `Promise<boolean>`:
+
+```js
+// Before
+if (sheet.close()) { ... }
+
+// After
+if (await sheet.close()) { ... }
+```
+
+**3. Handle pull.** A deferred pull keeps its offset until the close commits,
+and snaps back if it is canceled. Markup and styling are unchanged.
 
 ## Build setup
 

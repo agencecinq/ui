@@ -4,6 +4,7 @@ description: Bottom sheet Web Component (`<cinq-sheet>`) on native `<dialog>` wi
 ---
 
 import SheetPlayground from "../_components/SheetPlayground.astro";
+import SheetSpellbookPlayground from "../_components/SheetSpellbookPlayground.astro";
 
 A sheet presents content from the bottom edge. `<cinq-sheet>` wraps a native
 `<dialog>`, opens it with `showModal()`, closes it on Escape, backdrop press or
@@ -106,10 +107,11 @@ scroll.
 
 | Method             | Description                                                                |
 | ------------------ | -------------------------------------------------------------------------- |
-| `open(trigger?)`   | Opens the sheet. Returns `false` if already open, aborted, or deferred.    |
-| `close()`          | Closes the sheet. Returns `false` if already closed, aborted, or deferred. |
-| `toggle(trigger?)` | Toggles between open and closed. Returns whether the sheet is open.       |
-| `init()` / `destroy()` | Bind and unbind listeners.                                             |
+| `open(trigger?)`   | Opens the sheet. Resolves `true` if this call opened it, `false` if already open or canceled.    |
+| `close()`          | Closes the sheet. Resolves `true` if this call closed it, `false` if already closed or canceled. |
+| `toggle(trigger?)` | Toggles between open and closed. Resolves whether the sheet is open.       |
+| `init()`           | Binds listeners and opens the dialog if `open` is already set. Called on connect. |
+| `destroy()`        | Removes listeners and closes the dialog. Called on disconnect.             |
 
 A `<form method="dialog">` submit closes the sheet too.
 
@@ -121,21 +123,21 @@ dispatched on `document.documentElement`.
 | Event                | Cancelable | Detail payload                          | Description                                                                 |
 | -------------------- | ---------- | --------------------------------------- | --------------------------------------------------------------------------- |
 | `sheet:toggle`       | No         | `{ sheet, trigger }`                    | Request open/close from a button.                                           |
-| `sheet:before-open`  | Yes        | `{ sheet, instance, trigger, resolve }` | Fired **before** `open` is set. Cancel to defer, then call `resolve()` to commit. |
-| `sheet:before-close` | Yes        | `{ sheet, instance, resolve }`          | Fired **before** `open` is removed. Cancel to defer, then call `resolve()` to commit. |
+| `sheet:before-open`  | Yes        | `{ sheet, instance, trigger, waitUntil }` | Fired **before** `open` is set. `preventDefault()` cancels, `waitUntil(promise)` defers. |
+| `sheet:before-close` | Yes        | `{ sheet, instance, waitUntil }`          | Fired **before** `open` is removed. `preventDefault()` cancels, `waitUntil(promise)` defers. |
 | `sheet:open`         | No         | `{ sheet, trigger }`                    | Fired after `open` is set (`showModal()` or `show()`).                      |
 | `sheet:close`        | No         | `{ sheet }`                             | Fired after `open` is removed.                                              |
 
-Opening a modal sheet closes the other open modal sheet.
+Opening a sheet closes any other open modal sheet.
 
 ### Deferring open or close
 
 Every open path (toggle, pull up or `open()`) dispatches cancelable
-`sheet:before-open` first. Every close path (Escape, backdrop press, handle
-pull or `close()`) dispatches cancelable `sheet:before-close` first. Without a
-listener (or without `preventDefault()`), the sheet opens or closes
-immediately. To run async work, cancel the event and call `detail.resolve()`
-when ready:
+`sheet:before-open` first. Every close path (toggle, Escape, backdrop press,
+handle pull or `close()`) dispatches cancelable `sheet:before-close` first.
+Without a listener, the sheet opens or closes immediately. Call
+`preventDefault()` to cancel, or pass a promise to `detail.waitUntil()` to
+defer until async work finishes:
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
@@ -143,17 +145,14 @@ import { EVENTS } from "@agencecinq/utils";
 document.documentElement.addEventListener(EVENTS.SHEET_BEFORE_CLOSE, (event) => {
   if (event.detail.sheet !== "cloak-sheet") return;
 
-  event.preventDefault();
-
-  void doAsyncWork().then(() => {
-    event.detail.resolve();
-  });
+  event.detail.waitUntil(doAsyncWork());
 });
 ```
 
-`resolve()` is idempotent: safe to call more than once. `sheet:open` and
-`sheet:close` fire only after the matching `resolve()`. A vetoed handle pull
-snaps back. A `<form method="dialog">` submit closes natively and skips
+Several listeners can defer the same action: the sheet waits for every
+promise, and a rejected one cancels the action. Call `waitUntil()`
+synchronously in the listener. `sheet:open` and `sheet:close` fire only once
+the action commits. A vetoed handle pull snaps back. A `<form method="dialog">` submit closes natively and skips
 `sheet:before-close`.
 
 **UX:** defer **open** with `before-open` when the fetch is short (roughly under
@@ -203,6 +202,13 @@ cinq-sheet[dragging] dialog {
 
 Style the scrim with `dialog::backdrop`. Set `touch-action: none` on the
 handle so touch pulls are not taken by page scroll.
+
+A non-modal sheet laid out in the page flow (`position: absolute` inside a
+container) can scroll the page as it opens: the browser moves focus into the
+dialog while it still sits at its `@starting-style` offset, below the fold, and
+scrolls to reveal it. A `fixed` sheet never does: scrolling the page does not
+bring it closer. Prefer `position: fixed` unless the sheet must stay inside a
+container.
 
 ## Background scroll
 
@@ -275,12 +281,31 @@ This copies the package snippet to your theme:
 The snippet sets `closedby="any"` and ships the motion classes. Pass
 `closedby: 'none'` to block every dismissal but your own close control.
 
+## Migration from 1.x
+
+Version 2.0 swaps `detail.resolve()` for `detail.waitUntil(promise)` and makes
+`open()`, `close()` and `toggle()` return `Promise<boolean>`. Markup is
+unchanged. Details in the
+[README](https://github.com/agencecinq/ui/tree/main/packages/sheet#migration).
+
 ## Playground (live)
+
+### Modal, fixed to the viewport
+
+The usual setup: a modal sheet `fixed` to the bottom of the viewport. Prepare
+up to three spells; the first one gets focus on open and the page does not
+move. Pull the handle down, press Escape, tap the backdrop or memorize to
+close.
+
+<SheetSpellbookPlayground />
+
+### Non-modal, inside a card
 
 A compact purchase bar stays in the card. Tap its button, or tap or pull up its
 handle, to open the sheet on the sizes. Pick a size to see the price change,
 then pull the handle down, tap outside, press Escape or use the close button.
 The demo uses `data-modal="false"` so the panel stays inside the card, and makes
-the bar inert while the sheet is open.
+the bar inert while the sheet is open. The panel is `absolute` in the card, so
+opening it scrolls the page a little (see [Motion](#motion)).
 
 <SheetPlayground />

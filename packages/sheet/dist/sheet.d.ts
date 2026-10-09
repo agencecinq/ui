@@ -13,22 +13,22 @@ export declare class Sheet extends HTMLElement {
     init(): void;
     /** Removes listeners and closes the native dialog. Leaves `open` as is. */
     destroy(): void;
-    /** @returns Whether the sheet is open after the toggle. */
-    toggle(trigger?: HTMLElement | null): boolean;
+    /** @returns Whether the sheet is open once the request settles. */
+    toggle(trigger?: HTMLElement | null): Promise<boolean>;
     /**
-     * Dispatches cancelable `sheet:before-open`. A listener can call
-     * `preventDefault()` then `detail.resolve()` once async work is done.
+     * Dispatches cancelable `sheet:before-open`: listeners cancel with
+     * `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
-     * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+     * @returns Whether this call opened the sheet.
      */
-    open(trigger?: HTMLElement | null): boolean;
+    open(trigger?: HTMLElement | null): Promise<boolean>;
     /**
-     * Dispatches cancelable `sheet:before-close`. A listener can call
-     * `preventDefault()` then `detail.resolve()` once async work is done.
+     * Dispatches cancelable `sheet:before-close`: listeners cancel with
+     * `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
-     * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+     * @returns Whether this call closed the sheet.
      */
-    close(): boolean;
+    close(): Promise<boolean>;
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 //# sourceMappingURL=sheet.d.ts.map

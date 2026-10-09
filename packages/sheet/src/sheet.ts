@@ -1,4 +1,4 @@
-import { EVENTS, dispatchEvent } from "@agencecinq/utils";
+import { EVENTS, dispatchBeforeEvent, dispatchEvent } from "@agencecinq/utils";
 import type {
   BeforeCloseDetail,
   BeforeOpenDetail,
@@ -29,6 +29,7 @@ export class Sheet extends HTMLElement {
   $handle: HTMLElement | null = null;
 
   #drag: Drag | null = null;
+  #pending: Promise<boolean> | null = null;
 
   get modal(): boolean {
     return this.dataset.modal !== "false";
@@ -124,74 +125,79 @@ export class Sheet extends HTMLElement {
     this.$handle = null;
   }
 
-  /** @returns Whether the sheet is open after the toggle. */
-  toggle(trigger: HTMLElement | null = null): boolean {
+  /** @returns Whether the sheet is open once the request settles. */
+  toggle(trigger: HTMLElement | null = null): Promise<boolean> {
     if (this.hasAttribute("open")) {
-      this.close();
-      return this.hasAttribute("open");
+      return this.close().then(() => this.hasAttribute("open"));
     }
 
-    return this.open(trigger);
+    return this.open(trigger).then(() => this.hasAttribute("open"));
   }
 
   /**
-   * Dispatches cancelable `sheet:before-open`. A listener can call
-   * `preventDefault()` then `detail.resolve()` once async work is done.
+   * Dispatches cancelable `sheet:before-open`: listeners cancel with
+   * `preventDefault()` or defer with `detail.waitUntil(promise)`.
    *
-   * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+   * @returns Whether this call opened the sheet.
    */
-  open(trigger: HTMLElement | null = null): boolean {
+  open(trigger: HTMLElement | null = null): Promise<boolean> {
     if (this.hasAttribute("open")) {
-      return false;
+      return Promise.resolve(false);
     }
 
     this.trigger = trigger;
 
-    const resolve = (): void => {
-      this.toggleAttribute("open", true);
-    };
-    const proceed = dispatchEvent<BeforeOpenDetail>(
-      document.documentElement,
+    return this.#request<Omit<BeforeOpenDetail, "waitUntil">>(
       EVENTS.SHEET_BEFORE_OPEN,
-      { sheet: this.id, instance: this, trigger, resolve },
-      { bubbles: false },
+      { sheet: this.id, instance: this, trigger },
+      true,
     );
-
-    if (!proceed) {
-      return this.hasAttribute("open");
-    }
-
-    resolve();
-    return true;
   }
 
   /**
-   * Dispatches cancelable `sheet:before-close`. A listener can call
-   * `preventDefault()` then `detail.resolve()` once async work is done.
+   * Dispatches cancelable `sheet:before-close`: listeners cancel with
+   * `preventDefault()` or defer with `detail.waitUntil(promise)`.
    *
-   * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+   * @returns Whether this call closed the sheet.
    */
-  close(): boolean {
+  close(): Promise<boolean> {
     if (!this.hasAttribute("open")) {
-      return false;
+      return Promise.resolve(false);
     }
 
-    const resolve = (): void => {
-      this.toggleAttribute("open", false);
-    };
-    const proceed = dispatchEvent<BeforeCloseDetail>(
-      document.documentElement,
+    return this.#request<Omit<BeforeCloseDetail, "waitUntil">>(
       EVENTS.SHEET_BEFORE_CLOSE,
-      { sheet: this.id, instance: this, resolve },
-      { bubbles: false },
+      { sheet: this.id, instance: this },
+      false,
     );
+  }
 
-    if (!proceed) {
-      return !this.hasAttribute("open");
+  /** Commits `open` after the before-event; joins a request already deferred. */
+  #request<T extends object>(name: string, detail: T, open: boolean): Promise<boolean> {
+    if (this.#pending) {
+      return this.#pending;
     }
 
-    resolve();
-    return true;
+    const commit = (proceed: boolean): boolean => {
+      if (!proceed || this.hasAttribute("open") === open) {
+        return false;
+      }
+
+      this.toggleAttribute("open", open);
+      return true;
+    };
+
+    const result = dispatchBeforeEvent(document.documentElement, name, detail);
+
+    if (typeof result === "boolean") {
+      return Promise.resolve(commit(result));
+    }
+
+    this.#pending = result.then(commit).finally(() => {
+      this.#pending = null;
+    });
+
+    return this.#pending;
   }
 
   attributeChangedCallback(
@@ -321,9 +327,16 @@ export class Sheet extends HTMLElement {
       (drag.lastY - drag.startY >= DISMISS_DISTANCE ||
         drag.velocity >= DISMISS_VELOCITY);
 
-    if (!shouldDismiss || !this.close()) {
+    if (!shouldDismiss) {
       this.#setDragOffset(0);
+      return;
     }
+
+    void this.close().then((closed) => {
+      if (!closed) {
+        this.#setDragOffset(0);
+      }
+    });
   };
 
   #endDrag(): void {

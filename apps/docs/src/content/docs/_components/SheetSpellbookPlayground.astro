@@ -1,0 +1,194 @@
+---
+import RegisterComponents from "./RegisterComponents.astro";
+
+const spells = [
+  { name: "Fireball", school: "Evocation" },
+  { name: "Lightning Bolt", school: "Evocation" },
+  { name: "Haste", school: "Alteration" },
+  { name: "Hold Person", school: "Enchantment" },
+  { name: "Dispel Magic", school: "Abjuration" },
+];
+---
+
+<RegisterComponents />
+
+<style is:global>
+  #spellbook-sheet dialog {
+    margin: 0 auto;
+    translate: 0 max(-1rem, var(--cinq-sheet-drag-offset, 0px));
+    transition:
+      translate 300ms ease-out,
+      display 300ms allow-discrete,
+      overlay 300ms allow-discrete;
+  }
+
+  #spellbook-sheet dialog:not([open]) {
+    translate: 0 100%;
+  }
+
+  @starting-style {
+    #spellbook-sheet dialog[open] {
+      translate: 0 100%;
+    }
+  }
+
+  #spellbook-sheet dialog::backdrop {
+    background: rgb(23 23 23 / 0.4);
+    opacity: 0;
+    transition:
+      opacity 300ms ease-out,
+      display 300ms allow-discrete,
+      overlay 300ms allow-discrete;
+  }
+
+  #spellbook-sheet dialog[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    #spellbook-sheet dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  #spellbook-sheet[dragging] dialog {
+    transition: none;
+  }
+
+  html:has(#spellbook-sheet[open] dialog:modal) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #spellbook-sheet dialog,
+    #spellbook-sheet dialog::backdrop {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="not-content">
+  <section class="flex flex-col gap-4 rounded-2xl bg-white p-6 text-gray-900 shadow">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold">Spellbook</h3>
+        <p class="text-sm text-gray-600">
+          Elminster rests for the night. Prepare tomorrow's 3rd-level spells: three slots, five spells
+          in the book.
+        </p>
+      </div>
+      <cinq-sheet-button class="block">
+        <button
+          class="whitespace-nowrap rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
+          aria-controls="spellbook-sheet"
+          aria-expanded="false"
+        >
+          Prepare spells
+        </button>
+      </cinq-sheet-button>
+    </div>
+
+    <p
+      class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800"
+      data-spellbook-status
+      aria-live="polite"
+    >
+      No spells memorized yet.
+    </p>
+  </section>
+
+  <cinq-sheet id="spellbook-sheet">
+    <dialog
+      aria-labelledby="spellbook-sheet-title"
+      closedby="any"
+      class="fixed inset-x-0 top-auto -bottom-4 w-full max-w-lg max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-0 bg-white p-0 pb-4 text-gray-900 shadow-2xl"
+    >
+      <div
+        data-dom="drag-indicator"
+        class="flex cursor-grab touch-none justify-center pt-2 pb-3 active:cursor-grabbing"
+        aria-hidden="true"
+      >
+        <span class="h-1 w-9 rounded-full bg-gray-200"></span>
+      </div>
+
+      <form method="dialog" class="flex flex-col gap-4 px-6 pb-6" data-spellbook-form>
+        <div class="flex items-center justify-between gap-3">
+          <h2 id="spellbook-sheet-title" class="text-lg font-semibold">3rd-level spells</h2>
+          <button
+            type="button"
+            class="inline-flex size-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+            aria-label="Close"
+            data-spellbook-close
+          >
+            ✕
+          </button>
+        </div>
+
+        <fieldset class="flex flex-col gap-2">
+          <legend class="mb-2 text-sm text-gray-600">
+            Slots used: <span data-spellbook-count>0</span> / 3
+          </legend>
+          {spells.map((spell, index) => (
+            <label class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-gray-200 px-3 py-2 has-checked:border-gray-900 has-disabled:cursor-not-allowed has-disabled:opacity-50">
+              <span class="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  name="spell"
+                  value={spell.name}
+                  autofocus={index === 0}
+                  class="size-4 accent-black"
+                />
+                <span class="font-medium">{spell.name}</span>
+              </span>
+              <span class="text-xs text-gray-500">{spell.school}</span>
+            </label>
+          ))}
+        </fieldset>
+
+        <button
+          type="submit"
+          class="h-11 w-full rounded-lg bg-black text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+          data-spellbook-submit
+          disabled
+        >
+          Memorize
+        </button>
+      </form>
+    </dialog>
+  </cinq-sheet>
+</div>
+
+<script>
+  const sheet = document.getElementById("spellbook-sheet") as (HTMLElement & { close(): Promise<boolean> }) | null;
+  const form = sheet?.querySelector<HTMLFormElement>("[data-spellbook-form]");
+  const count = sheet?.querySelector("[data-spellbook-count]");
+  const submit = sheet?.querySelector<HTMLButtonElement>("[data-spellbook-submit]");
+  const status = document.querySelector("[data-spellbook-status]");
+  const inputs = form ? [...form.querySelectorAll<HTMLInputElement>('input[name="spell"]')] : [];
+
+  sheet?.querySelector("[data-spellbook-close]")?.addEventListener("click", () => sheet.close());
+
+  form?.addEventListener("change", () => {
+    const checked = inputs.filter((input) => input.checked);
+
+    inputs.forEach((input) => {
+      input.disabled = !input.checked && checked.length >= 3;
+    });
+
+    if (count) {
+      count.textContent = String(checked.length);
+    }
+
+    if (submit) {
+      submit.disabled = checked.length === 0;
+    }
+  });
+
+  form?.addEventListener("submit", () => {
+    const names = inputs.filter((input) => input.checked).map((input) => input.value);
+
+    if (status && names.length > 0) {
+      status.textContent = `Memorized: ${names.join(", ")}.`;
+    }
+  });
+</script>
