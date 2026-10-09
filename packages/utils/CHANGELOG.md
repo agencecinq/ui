@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 7.7.0
+
+### Minor Changes
+
+- Add `dispatchBeforeEvent(target, name, detail)`: cancelable, non-bubbling before-event whose `detail.waitUntil(promise)` defers the action. `preventDefault()` or a rejected promise cancels it. Returns a boolean when nothing deferred, otherwise a promise. Types `WaitUntil` and `BeforeEventDetail<T>`.
+
 ## 7.6.0
 
 ### Minor Changes

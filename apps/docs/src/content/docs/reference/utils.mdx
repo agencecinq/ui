@@ -34,21 +34,22 @@ Prefer `EVENTS.*` over string literals so renames stay centralized.
 
 | Target | Packages | Notes |
 | ------ | -------- | ----- |
-| `document.documentElement` | Drawer, Modal | Open/close/toggle and before-hooks. `before-*` events use `bubbles: false`. |
+| `document.documentElement` | Drawer, Modal, Sheet | Open/close/toggle and before-hooks. `before-*` events use `bubbles: false`. |
 | Host custom element | Spinbutton, Switch, Combobox, Window Splitter, Calendar | Listen on the `<cinq-*>` instance. |
 | Panel / tab child (bubbles) | Accordion, Tabs | Fired on `[data-panel]` or `[role="tab"]`. Listen on `<cinq-accordion>` / `<cinq-tabs>` or the child. |
 | Trigger button | Disclosure Button | Fired on the slotted `<button>`. |
 
 ### Cancelable hooks
 
-Several packages dispatch a **before** event with `detail.resolve()` (Drawer,
-Modal) or rely on `preventDefault()` (Accordion, Tabs, Disclosure Button).
-When `dispatchEvent` returns `false`, the component aborts the state change.
+Drawer, Modal and Sheet dispatch a **before** event with
+[`dispatchBeforeEvent`](#dispatchbeforeevent): `preventDefault()` cancels the
+action, `detail.waitUntil(promise)` defers it. Accordion, Tabs and Disclosure
+Button rely on `preventDefault()` only: when `dispatchEvent` returns `false`,
+the component aborts the state change.
 
 ```js
 document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_OPEN, (event) => {
-  event.preventDefault();
-  loadBestiary().then(() => event.detail.resolve());
+  event.detail.waitUntil(loadBestiary());
 });
 ```
 
@@ -110,14 +111,32 @@ const proceed = dispatchEvent(host, EVENTS.ACCORDION_OPEN, { el, index });
 if (!proceed) return; // a listener called preventDefault()
 ```
 
-Defaults: `bubbles: true`, `cancelable: true`. Drawer/Modal before-events and
-some notifications pass `{ bubbles: false }` or `{ cancelable: false }`.
+Defaults: `bubbles: true`, `cancelable: true`. Notifications such as
+`drawer:open` pass `{ bubbles: false, cancelable: false }`.
 
 Returns `false` when a listener cancels, otherwise `true`.
 
+## `dispatchBeforeEvent`
+
+```js
+import { EVENTS, dispatchBeforeEvent } from "@agencecinq/utils";
+
+const result = dispatchBeforeEvent(document.documentElement, EVENTS.DRAWER_BEFORE_OPEN, {
+  drawer: id,
+});
+```
+
+Dispatches a cancelable, non-bubbling event whose `detail` gets a
+`waitUntil(promise)` method. Returns a boolean when no listener deferred, so
+the caller can commit synchronously, otherwise a promise. The action proceeds
+once every deferred promise fulfills, and is canceled by `preventDefault()` or a
+rejected promise. `waitUntil()` throws if called after dispatch. Types:
+`WaitUntil`, `BeforeEventDetail<T>`.
+
 ## Focus helpers
 
-Used internally by Drawer and Modal, exported for custom overlays:
+Drawer uses the return-focus helpers. The trap helpers are for non-modal
+overlays (a modal `<dialog>` already contains focus):
 
 | Export | Role |
 | ------ | ---- |
@@ -135,7 +154,7 @@ Used internally by Drawer and Modal, exported for custom overlays:
 | `disableScroll()` | Lock `document` scroll and preserve position for restore. |
 | `enableScroll(position?)` | Unlock and resume previous Y unless `position` is a number or `false`. |
 
-Drawer and Modal call these while open. You can reuse them for other full-screen overlays.
+Drawer calls these while open. You can reuse them for other full-screen overlays.
 
 ## Attribute parsers
 

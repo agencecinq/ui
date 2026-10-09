@@ -1,5 +1,6 @@
 export * from './events.js';
 export * from './dispatch-event.js';
+export * from './before-event.js';
 export * from './parse.js';
 export * from './scroll.js';
 export * from './throttle.js';

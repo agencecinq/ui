@@ -49,57 +49,66 @@ var e = {
 		cancelable: a,
 		detail: n
 	}));
-}, n = (e) => e ? e.trim().split(/\s+/).filter(Boolean) : [], r = (e, t) => {
+}, n = (e, n, r) => {
+	let i = [], a = !0, o = (e) => {
+		if (!a) throw Error(`${n}: call waitUntil() synchronously in the listener`);
+		i.push(e);
+	}, s = t(e, n, {
+		...r,
+		waitUntil: o
+	}, { bubbles: !1 });
+	return a = !1, s ? i.length === 0 || Promise.allSettled(i).then((e) => e.every((e) => e.status === "fulfilled")) : !1;
+}, r = (e) => e ? e.trim().split(/\s+/).filter(Boolean) : [], i = (e, t) => {
 	if (e == null || e === "") return t;
 	let n = Number(e);
 	return Number.isFinite(n) ? n : t;
-}, i = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", a = (e, t) => {
+}, a = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", o = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, o = document.documentElement, { body: s } = document, c = o.hasAttribute("data-debug"), l = {
+}, s = document.documentElement, { body: c } = document, l = s.hasAttribute("data-debug"), u = {
 	y: 0,
 	x: 0
-}, u = {
+}, d = {
 	x: 0,
 	y: 0
 };
-window.addEventListener("pointermove", a(({ x: e, y: t }) => {
-	u.x = e, u.y = t;
+window.addEventListener("pointermove", o(({ x: e, y: t }) => {
+	d.x = e, d.y = t;
 }, 100), { passive: !0 });
-var d = {
+var f = {
 	lg: window.matchMedia("(width >= 64rem)"),
 	xl: window.matchMedia("(min-width: 1280px)"),
 	"2xl": window.matchMedia("(min-width: 1440px)"),
 	"3xl": window.matchMedia("(min-width: 1920px)")
-}, f = !0, p = (e, t) => {
-	e !== void 0 && (l.x = e), t !== void 0 && (l.y = t), window.scrollTo(l.x, l.y);
+}, p = !0, m = (e, t) => {
+	e !== void 0 && (u.x = e), t !== void 0 && (u.y = t), window.scrollTo(u.x, u.y);
 };
-function m() {
-	let e = o.scrollLeft, t = o.scrollTop, n = s.scrollLeft, r = s.scrollTop;
-	l.x = window.scrollX || e || n, l.y = window.scrollY || t || r || 0, o.style.setProperty("overflow", "hidden"), o.style.setProperty("height", "100%"), o.style.setProperty("scroll-padding-top", "0px"), p(l.x, l.y);
+function h() {
+	let e = s.scrollLeft, t = s.scrollTop, n = c.scrollLeft, r = c.scrollTop;
+	u.x = window.scrollX || e || n, u.y = window.scrollY || t || r || 0, s.style.setProperty("overflow", "hidden"), s.style.setProperty("height", "100%"), s.style.setProperty("scroll-padding-top", "0px"), m(u.x, u.y);
 }
-function h(e = 0) {
-	let t = !0, n = l.y;
-	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), o.style.removeProperty("overflow"), o.style.removeProperty("height"), o.style.removeProperty("scroll-padding-top"), t && p(l.x, n);
+function g(e = 0) {
+	let t = !0, n = u.y;
+	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), s.style.removeProperty("overflow"), s.style.removeProperty("height"), s.style.removeProperty("scroll-padding-top"), t && m(u.x, n);
 }
 //#endregion
 //#region src/debounce.ts
-var g = (e, t) => {
+var _ = (e, t) => {
 	let n = null;
 	return (...r) => {
 		n && clearTimeout(n), n = setTimeout(() => {
 			n = null, e(...r);
 		}, t);
 	};
-}, _ = {}, v = null;
-function y(e) {
+}, v = {}, y = null;
+function b(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function b(e) {
+function x(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -113,40 +122,40 @@ function b(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => y(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => b(e) && e.getAttribute("tabindex") !== "-1");
 }
-function x(e) {
-	if (v) return;
+function S(e) {
+	if (y) return;
 	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-	!t || t === document.body || !t.isConnected || (v = t);
+	!t || t === document.body || !t.isConnected || (y = t);
 }
-function S() {
-	v?.focus(), v = null;
+function C() {
+	y?.focus(), y = null;
 }
-function C(e) {
+function w(e) {
 	queueMicrotask(() => {
 		let t = document.activeElement;
-		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || S();
+		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || C();
 	});
 }
-function w(e, t = e) {
-	let n = b(e);
+function T(e, t = e) {
+	let n = x(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	x(), T(), _.keydown = (t) => {
+	S(), E(), v.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", _.keydown), t.focus(), t instanceof HTMLInputElement && [
+	}, document.addEventListener("keydown", v.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
 		"text",
 		"email",
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function T(e = null) {
-	_.keydown && document.removeEventListener("keydown", _.keydown), e && e.focus();
+function E(e = null) {
+	v.keydown && document.removeEventListener("keydown", v.keydown), e && e.focus();
 }
 //#endregion
 //#region src/clamp.ts
-var E = (e, t, n) => Math.min(Math.max(e, t), n);
+var D = (e, t, n) => Math.min(Math.max(e, t), n);
 //#endregion
-export { e as EVENTS, w as addTrapFocus, s as body, d as breakpoints, E as clamp, g as debounce, m as disableScroll, t as dispatchEvent, h as enableScroll, b as getFocusableElements, o as html, c as isDebug, u as mouse, i as parseBoolean, n as parseList, r as parseNumber, f as production, x as rememberReturnFocus, T as removeTrapFocus, S as restoreReturnFocus, C as scheduleRestoreReturnFocus, l as scroll, a as throttle };
+export { e as EVENTS, T as addTrapFocus, c as body, f as breakpoints, D as clamp, _ as debounce, h as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, g as enableScroll, x as getFocusableElements, s as html, l as isDebug, d as mouse, a as parseBoolean, r as parseList, i as parseNumber, p as production, S as rememberReturnFocus, E as removeTrapFocus, C as restoreReturnFocus, w as scheduleRestoreReturnFocus, u as scroll, o as throttle };
