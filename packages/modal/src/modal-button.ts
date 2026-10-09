@@ -58,10 +58,8 @@ export class ModalButton extends HTMLElement {
     if (!this.$button) return;
 
     this.controls.forEach((control) => {
-      const trapId = this.$button?.getAttribute("data-trap");
       const detail = {
         trigger: this.$button,
-        trap: trapId ? document.getElementById(trapId) : null,
         modal: control,
       };
 

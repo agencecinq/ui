@@ -1,10 +1,17 @@
-import { EVENTS, dispatchEvent, getFocusableElements } from "@agencecinq/utils";
+import {
+  EVENTS,
+  dispatchBeforeEvent,
+  dispatchEvent,
+  getFocusableElements,
+} from "@agencecinq/utils";
 
 export type { BeforeCloseDetail, BeforeOpenDetail } from "./types.js";
 
 export class Modal extends HTMLElement {
   trigger: HTMLElement | null = null;
   $modal: HTMLDialogElement | null = null;
+
+  #pending: Promise<boolean> | null = null;
 
   #handleClick = (event: MouseEvent) => {
     if (event.target === event.currentTarget) {
@@ -15,6 +22,11 @@ export class Modal extends HTMLElement {
   #handleCancel = (event: Event) => {
     event.preventDefault();
     this.close();
+  };
+
+  /** Native close (`form[method=dialog]`, `dialog.close()`): sync the host. */
+  #handleClose = () => {
+    this.removeAttribute("open");
   };
 
   #handleModalToggle = (event: CustomEvent) => {
@@ -71,6 +83,7 @@ export class Modal extends HTMLElement {
 
     this.$modal.addEventListener("click", this.#handleClick);
     this.$modal.addEventListener("cancel", this.#handleCancel);
+    this.$modal.addEventListener("close", this.#handleClose);
     document.documentElement.addEventListener(
       EVENTS.MODAL_TOGGLE,
       this.#handleModalToggle as EventListener,
@@ -82,6 +95,7 @@ export class Modal extends HTMLElement {
     if (this.$modal) {
       this.$modal.removeEventListener("click", this.#handleClick);
       this.$modal.removeEventListener("cancel", this.#handleCancel);
+      this.$modal.removeEventListener("close", this.#handleClose);
 
       if (this.hasAttribute("open") && this.$modal.open) {
         this.$modal.close();
@@ -95,64 +109,67 @@ export class Modal extends HTMLElement {
   }
 
   /**
-   * Opens the modal. Dispatches cancelable `modal:before-open` with
-   * `detail.resolve()` to commit after async work.
+   * Opens the modal. Dispatches cancelable `modal:before-open`: listeners
+   * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
    *
-   * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+   * @returns Whether this call opened the modal.
    */
-  show(): boolean {
+  show(): Promise<boolean> {
     if (this.hasAttribute("open")) {
-      return false;
+      return Promise.resolve(false);
     }
 
-    const resolve = (): void => this.setAttribute("open", "");
-
-    const proceed = dispatchEvent(
-      document.documentElement,
+    return this.#request(
       EVENTS.MODAL_BEFORE_OPEN,
-      {
-        modal: this.id,
-        instance: this,
-        trigger: this.trigger,
-        resolve,
-      },
-      { bubbles: false },
+      { modal: this.id, instance: this, trigger: this.trigger },
+      true,
     );
-
-    if (!proceed) {
-      return this.hasAttribute("open");
-    }
-
-    resolve();
-    return true;
   }
 
   /**
-   * Closes the modal. Dispatches cancelable `modal:before-close` with
-   * `detail.resolve()` to commit after async work.
+   * Closes the modal. Dispatches cancelable `modal:before-close`: listeners
+   * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
    *
-   * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+   * @returns Whether this call closed the modal.
    */
-  close(): boolean {
+  close(): Promise<boolean> {
     if (!this.hasAttribute("open")) {
-      return false;
+      return Promise.resolve(false);
     }
 
-    const resolve = (): void => this.removeAttribute("open");
-
-    const proceed = dispatchEvent(
-      document.documentElement,
+    return this.#request(
       EVENTS.MODAL_BEFORE_CLOSE,
-      { modal: this.id, instance: this, resolve },
-      { bubbles: false },
+      { modal: this.id, instance: this },
+      false,
     );
+  }
 
-    if (!proceed) {
-      return !this.hasAttribute("open");
+  /** Commits `open` after the before-event; joins a request already deferred. */
+  #request(name: string, detail: object, open: boolean): Promise<boolean> {
+    if (this.#pending) {
+      return this.#pending;
     }
 
-    resolve();
-    return true;
+    const commit = (proceed: boolean): boolean => {
+      if (!proceed || this.hasAttribute("open") === open) {
+        return false;
+      }
+
+      this.toggleAttribute("open", open);
+      return true;
+    };
+
+    const result = dispatchBeforeEvent(document.documentElement, name, detail);
+
+    if (typeof result === "boolean") {
+      return Promise.resolve(commit(result));
+    }
+
+    this.#pending = result.then(commit).finally(() => {
+      this.#pending = null;
+    });
+
+    return this.#pending;
   }
 
   attributeChangedCallback(

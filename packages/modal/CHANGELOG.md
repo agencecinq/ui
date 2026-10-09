@@ -1,5 +1,17 @@
 # @agencecinq/modal
 
+## 5.0.0
+
+### Major Changes
+
+- Replace `detail.resolve()` with `detail.waitUntil(promise)` on `modal:before-open` / `modal:before-close`. `preventDefault()` now only cancels; pass a promise to defer. Several listeners can defer the same action, and a rejected promise cancels it. Requires `@agencecinq/utils` >= 7.7.0.
+- `show()` and `close()` return `Promise<boolean>` (whether the call changed the state). A request made while another is deferred joins it instead of dispatching a second before-event.
+- `modal:toggle` no longer carries `trap`: `data-trap` on buttons had no effect since the move to `<dialog>`.
+
+### Patch Changes
+
+- Sync the host `open` attribute when the dialog closes natively (`form[method=dialog]`, `dialog.close()`), so buttons and the next toggle stay in step.
+
 ## 4.0.1
 
 ### Patch Changes

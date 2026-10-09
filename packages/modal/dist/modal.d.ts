@@ -14,19 +14,19 @@ export declare class Modal extends HTMLElement {
     /** Detaches listeners. Safe to call from outside while the host stays mounted. */
     destroy(): void;
     /**
-     * Opens the modal. Dispatches cancelable `modal:before-open` with
-     * `detail.resolve()` to commit after async work.
+     * Opens the modal. Dispatches cancelable `modal:before-open`: listeners
+     * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
-     * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+     * @returns Whether this call opened the modal.
      */
-    show(): boolean;
+    show(): Promise<boolean>;
     /**
-     * Closes the modal. Dispatches cancelable `modal:before-close` with
-     * `detail.resolve()` to commit after async work.
+     * Closes the modal. Dispatches cancelable `modal:before-close`: listeners
+     * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
-     * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+     * @returns Whether this call closed the modal.
      */
-    close(): boolean;
+    close(): Promise<boolean>;
     attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void;
 }
 //# sourceMappingURL=modal.d.ts.map

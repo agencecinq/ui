@@ -34,13 +34,13 @@ import RegisterComponents from "./RegisterComponents.astro";
     </p>
 
     <cinq-modal id="stacked-modal-address">
-      <dialog
+      <dialog aria-labelledby="add-delivery-address-title"
         class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
       >
         <div class="flex flex-col gap-4">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <h2 class="text-xl font-semibold mb-1">Add delivery address</h2>
+              <h2 id="add-delivery-address-title" class="text-xl font-semibold mb-1">Add delivery address</h2>
               <p class="text-sm text-gray-600">
                 Street and city for the next encounter drop.
               </p>
@@ -81,12 +81,12 @@ import RegisterComponents from "./RegisterComponents.astro";
     </cinq-modal>
 
     <cinq-modal id="stacked-modal-verify">
-      <dialog
+      <dialog aria-labelledby="verification-result-title"
         class="fixed left-1/2 top-1/2 w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
       >
         <div class="flex flex-col gap-4">
           <div>
-            <h2 class="text-xl font-semibold mb-1">Verification result</h2>
+            <h2 id="verification-result-title" class="text-xl font-semibold mb-1">Verification result</h2>
             <p class="text-sm text-gray-600">
               Address looks valid. Close this dialog to return to the form. The
               address dialog stays open underneath.
