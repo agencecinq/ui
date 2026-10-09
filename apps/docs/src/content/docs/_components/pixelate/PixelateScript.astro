@@ -389,7 +389,7 @@
           void drawer.offsetWidth;
           drawer.classList.add('is-closing');
 
-          const $panel = drawer.querySelector('[role="dialog"]');
+          const $panel = drawer.querySelector('dialog');
 
           return $panel instanceof HTMLElement ? $panel : drawer;
         }
@@ -434,11 +434,7 @@
           return;
         }
 
-        event.preventDefault();
-
-        void runCloseAnimation().then(() => {
-          detail.resolve();
-        });
+        detail.waitUntil(runCloseAnimation());
       });
 
       document.documentElement.addEventListener(
@@ -473,16 +469,13 @@
 
           if (detail?.trigger) {
             drawer.trigger = detail.trigger;
-          }
-
-          drawer.trap = detail?.trap || drawer;
-        }
+          }        }
 
         drawer.classList.remove('is-closing');
         drawer.classList.add('is-opening');
         drawer.setAttribute('open', '');
 
-        const $panel = drawer.querySelector('[role="dialog"]');
+        const $panel = drawer.querySelector('dialog');
         void ($panel ?? drawer).offsetWidth;
 
         setPixel($host, PIXEL_MAX);

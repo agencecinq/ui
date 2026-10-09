@@ -70,12 +70,9 @@ export class DrawerButton extends HTMLElement {
   }
 
   #handleClick = () => {
-    const trapId = this.$button?.getAttribute("data-trap");
-
     this.controls.forEach(control => {
       const detail = {
         trigger: this.$button,
-        trap: trapId ? document.getElementById(trapId) : null,
         drawer: control,
       };
 

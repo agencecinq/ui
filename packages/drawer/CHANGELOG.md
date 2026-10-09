@@ -1,5 +1,19 @@
 # @agencecinq/drawer
 
+## 8.0.0
+
+### Major Changes
+
+- Build on a native `<dialog>` opened with `showModal()`. Replace `[role="dialog"]` with a `<dialog>` inside `<cinq-drawer>`; drop `aria-modal` (implicit).
+- Replace `[data-dom="overlay"]` with the dialog `::backdrop`. Backdrop click closes the drawer.
+- Stop writing inline `opacity` / `visibility` and drop the `transitionend` listener. Animate from CSS with `[open]`, `@starting-style` and `transition-behavior: allow-discrete` (see README > Styling). Older browsers open and close without animation.
+- Drop the JS focus trap and the `trap` option (`toggle({ trap })`, `data-trap`, `drawer:toggle` detail). The modal dialog makes the page inert. Escape goes through the native `cancel` event, still routed through `drawer:before-close`.
+- A host rendered with `open` in the markup now opens its dialog on connect.
+- `data-modal="false"` opens the dialog with `show()`, so controls outside it (a header burger) stay usable. Escape, outside press, scroll lock and focus return are handled by the component. Snippet `modal: false` adds a scrim.
+- Liquid snippet: `<dialog>` markup, Tailwind animation classes, new `label` param (ID of the labelling element, as in `@agencecinq/sheet`); `classes` now applies to the dialog.
+- Replace `detail.resolve()` with `detail.waitUntil(promise)` on `drawer:before-open` / `drawer:before-close`. `preventDefault()` now only cancels; pass a promise to defer. Several listeners can defer the same action, and a rejected promise cancels it. Requires `@agencecinq/utils` >= 7.7.0.
+- `open()`, `close()` and `toggle()` return `Promise<boolean>` (whether the call changed the state). A request made while another is deferred joins it instead of dispatching a second before-event.
+
 ## 7.0.1
 
 ### Patch Changes

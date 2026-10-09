@@ -37,16 +37,10 @@ import RegisterComponents from "./RegisterComponents.astro";
       </cinq-drawer-button>
     </div>
 
-    <cinq-drawer id="exclusive-drawer-left" class="group">
-      <div
-        data-dom="overlay"
-        class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
-      ></div>
-      <div
-        role="dialog"
-        aria-modal="true"
+    <cinq-drawer id="exclusive-drawer-left">
+      <dialog
         aria-labelledby="exclusive-drawer-left-title"
-        class="fixed left-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl -translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
+        class="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 -translate-x-full starting:open:-translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
@@ -87,19 +81,13 @@ import RegisterComponents from "./RegisterComponents.astro";
             </p>
           </div>
         </div>
-      </div>
+      </dialog>
     </cinq-drawer>
 
-    <cinq-drawer id="exclusive-drawer-right" class="group">
-      <div
-        data-dom="overlay"
-        class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
-      ></div>
-      <div
-        role="dialog"
-        aria-modal="true"
+    <cinq-drawer id="exclusive-drawer-right">
+      <dialog
         aria-labelledby="exclusive-drawer-right-title"
-        class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
@@ -135,7 +123,7 @@ import RegisterComponents from "./RegisterComponents.astro";
             </cinq-drawer-button>
           </div>
         </div>
-      </div>
+      </dialog>
     </cinq-drawer>
 
     <PortalToBody selector="#exclusive-drawer-left" />

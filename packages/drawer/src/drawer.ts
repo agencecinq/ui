@@ -2,10 +2,9 @@ import {
   EVENTS,
   disableScroll,
   enableScroll,
-  addTrapFocus,
-  removeTrapFocus,
   getFocusableElements,
   dispatchEvent,
+  dispatchBeforeEvent,
   rememberReturnFocus,
   scheduleRestoreReturnFocus,
 } from "@agencecinq/utils";
@@ -14,13 +13,13 @@ export type { BeforeCloseDetail, BeforeOpenDetail } from "./types.js";
 
 export class Drawer extends HTMLElement {
   trigger: HTMLElement | null = null;
-  trap: HTMLElement | null = null;
-  $overlay: Element | null = null;
-  $panel: HTMLElement | null = null;
+  $dialog: HTMLDialogElement | null = null;
 
-  constructor() {
-    super();
-    this.trap = this;
+  #pending: Promise<boolean> | null = null;
+
+  /** `data-modal="false"` opens with `show()`: the page stays interactive. Read on open. */
+  get modal(): boolean {
+    return this.dataset.modal !== "false";
   }
 
   static get observedAttributes() {
@@ -36,27 +35,25 @@ export class Drawer extends HTMLElement {
   }
 
   /**
-   * Bind overlay + document listeners. Call {@link destroy} first if already bound.
+   * Bind dialog + document listeners. Call {@link destroy} first if already bound.
+   * Shows the dialog when the host is already `open` in the markup.
    */
   init(): void {
     if (!this.id) {
       throw new Error("Drawer: id attribute is required");
     }
 
-    this.$panel = this.querySelector<HTMLElement>('[role="dialog"]');
+    this.$dialog = this.querySelector("dialog");
 
-    if (!this.$panel) {
-      throw new Error('Drawer: No [role="dialog"] panel found');
-    }
-    this.$overlay =
-      this.querySelector('[data-dom="overlay"]') ||
-      this.querySelector("[overlay]");
-
-    if (this.$overlay) {
-      this.$overlay.addEventListener("click", this.#handleClick);
+    if (!this.$dialog) {
+      throw new Error("Drawer: No <dialog> found");
     }
 
-    document.documentElement.addEventListener("keyup", this.#handleKeyUp);
+    this.$dialog.addEventListener("click", this.#handleClick);
+    this.$dialog.addEventListener("cancel", this.#handleCancel);
+    this.$dialog.addEventListener("close", this.#handleClose);
+    document.addEventListener("keydown", this.#handleKeydown);
+    document.addEventListener("pointerdown", this.#handlePointerDown);
     document.documentElement.addEventListener(
       EVENTS.DRAWER_OPEN,
       this.#handleDrawerOpen as EventListener,
@@ -65,24 +62,26 @@ export class Drawer extends HTMLElement {
       EVENTS.DRAWER_TOGGLE,
       this.#handleDrawerToggle as EventListener,
     );
+
+    if (this.hasAttribute("open")) {
+      this.#show();
+    }
   }
 
   /**
-   * Detaches listeners. Clears trap/scroll/inline styles if still open;
-   * leaves the `open` attribute (HTML is source of truth).
+   * Detaches listeners. Releases scroll lock and focus if still open;
+   * leaves the `open` attribute and the dialog state (HTML is source of truth).
    * Safe to call from outside while the host stays mounted.
    */
   destroy(): void {
-    this.$panel?.removeEventListener(
-      "transitionend",
-      this.#onCloseTransitionEnd,
-    );
-
-    if (this.$overlay) {
-      this.$overlay.removeEventListener("click", this.#handleClick);
+    if (this.$dialog) {
+      this.$dialog.removeEventListener("click", this.#handleClick);
+      this.$dialog.removeEventListener("cancel", this.#handleCancel);
+      this.$dialog.removeEventListener("close", this.#handleClose);
     }
 
-    document.documentElement.removeEventListener("keyup", this.#handleKeyUp);
+    document.removeEventListener("keydown", this.#handleKeydown);
+    document.removeEventListener("pointerdown", this.#handlePointerDown);
     document.documentElement.removeEventListener(
       EVENTS.DRAWER_OPEN,
       this.#handleDrawerOpen as EventListener,
@@ -93,26 +92,82 @@ export class Drawer extends HTMLElement {
     );
 
     if (this.hasAttribute("open")) {
-      removeTrapFocus();
       enableScroll(false);
-      this.style.setProperty("opacity", "0");
-      this.style.setProperty("visibility", "hidden");
 
       // Defer: another overlay may take focus before we restore.
       scheduleRestoreReturnFocus(this);
     }
 
-    this.$overlay = null;
-    this.$panel = null;
+    this.$dialog = null;
   }
 
-  #handleClick = (): boolean => {
-    return this.toggle({ trigger: null, trap: null });
+  /** Backdrop click: the event targets the dialog, outside its box. */
+  #handleClick = (event: MouseEvent): void => {
+    if (!this.$dialog || event.target !== this.$dialog) {
+      return;
+    }
+
+    const rect = this.$dialog.getBoundingClientRect();
+    const inside =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+
+    if (!inside) {
+      this.close();
+    }
   };
 
-  #handleKeyUp = (event: KeyboardEvent): void => {
-    if (event.key === "Escape" && this.hasAttribute("open")) {
-      this.close();
+  /** Escape: route through `close()` so `drawer:before-close` can defer it. */
+  #handleCancel = (event: Event): void => {
+    event.preventDefault();
+    this.close();
+  };
+
+  /** Non-modal Escape: `cancel` only fires for modal dialogs. */
+  #handleKeydown = (event: KeyboardEvent): void => {
+    if (
+      event.key !== "Escape" ||
+      event.defaultPrevented ||
+      this.modal ||
+      !this.hasAttribute("open")
+    ) {
+      return;
+    }
+
+    this.close();
+  };
+
+  /**
+   * Non-modal light dismiss: a press outside the dialog closes it. Triggers are
+   * skipped so their click toggles. `pointerdown` runs before the click that
+   * may open the drawer, so that click never closes it.
+   */
+  #handlePointerDown = (event: PointerEvent): void => {
+    if (this.modal || !this.$dialog || !this.hasAttribute("open")) {
+      return;
+    }
+
+    const target = event.target as Element | null;
+
+    if (!target || this.$dialog.contains(target)) {
+      return;
+    }
+
+    const control = target.closest("[aria-controls]");
+
+    if (control?.getAttribute("aria-controls")?.split(/\s+/).includes(this.id)) {
+      return;
+    }
+
+    this.close();
+  };
+
+  /** Dialog closed natively (`form[method=dialog]`, forced Escape): sync the host. */
+  #handleClose = (): void => {
+    if (this.hasAttribute("open")) {
+      this.removeAttribute("open");
     }
   };
 
@@ -131,123 +186,116 @@ export class Drawer extends HTMLElement {
   };
 
   #handleDrawerToggle = (event: CustomEvent): void => {
-    const { trigger, trap, drawer } = event.detail;
+    const { trigger, drawer } = event.detail;
 
     if (drawer !== this.id) {
       return;
     }
 
-    this.toggle({ trigger, trap });
+    this.toggle({ trigger });
   };
+
+  #show(): void {
+    if (!this.$dialog) {
+      return;
+    }
+
+    if (!this.$dialog.open) {
+      if (this.modal) {
+        this.$dialog.showModal();
+      } else {
+        this.$dialog.show();
+      }
+    }
+
+    if (!this.$dialog.querySelector("[autofocus]")) {
+      getFocusableElements(this.$dialog)[0]?.focus();
+    }
+
+    disableScroll();
+  }
 
   /**
    * Toggles the drawer between open and closed.
    *
    * @param trigger - Element that triggered the toggle, or null.
-   * @param trap - Focus-trap root when open (defaults to the drawer).
-   * @returns Whether the drawer is open after the toggle.
+   * @returns Whether the drawer is open once the request settles.
    */
-  toggle({
-    trigger,
-    trap,
-  }: {
-    trigger: HTMLElement | null;
-    trap: HTMLElement | null;
-  }): boolean {
-    const opening = !this.hasAttribute("open");
+  toggle({ trigger = null }: { trigger?: HTMLElement | null } = {}): Promise<boolean> {
+    if (this.hasAttribute("open")) {
+      return this.close().then(() => this.hasAttribute("open"));
+    }
 
     // Only remember the opener — a close control must not replace it.
-    if (opening && trigger) {
+    if (trigger) {
       this.trigger = trigger;
     }
 
-    this.trap = trap || this;
-
-    if (!opening) {
-      this.close();
-      return this.hasAttribute("open");
-    }
-
-    return this.open();
+    return this.open().then(() => this.hasAttribute("open"));
   }
 
-  #onCloseTransitionEnd = (event: TransitionEvent): void => {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
-    this.$panel?.removeEventListener(
-      "transitionend",
-      this.#onCloseTransitionEnd,
-    );
-
-    if (this.hasAttribute("open")) {
-      return;
-    }
-
-    this.style.setProperty("opacity", "0");
-    this.style.setProperty("visibility", "hidden");
-  };
-
   /**
-   * Opens the drawer. Dispatches cancelable `drawer:before-open` with
-   * `detail.resolve()` to commit after async work.
+   * Opens the drawer. Dispatches cancelable `drawer:before-open`: listeners
+   * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
    *
-   * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+   * @returns Whether this call opened the drawer.
    */
-  open(): boolean {
+  open(): Promise<boolean> {
     if (this.hasAttribute("open")) {
-      return false;
+      return Promise.resolve(false);
     }
 
-    const resolve = (): void => this.setAttribute("open", "");
-
-    const proceed = dispatchEvent(
-      document.documentElement,
+    return this.#request(
       EVENTS.DRAWER_BEFORE_OPEN,
-      {
-        drawer: this.id,
-        instance: this,
-        trigger: this.trigger,
-        resolve,
-      },
-      { bubbles: false },
+      { drawer: this.id, instance: this, trigger: this.trigger },
+      true,
     );
-
-    if (!proceed) {
-      return this.hasAttribute("open");
-    }
-
-    resolve();
-    return true;
   }
 
   /**
-   * Closes the drawer. Dispatches cancelable `drawer:before-close` with
-   * `detail.resolve()` to commit after async work.
+   * Closes the drawer. Dispatches cancelable `drawer:before-close`: listeners
+   * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
    *
-   * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+   * @returns Whether this call closed the drawer.
    */
-  close(): boolean {
+  close(): Promise<boolean> {
     if (!this.hasAttribute("open")) {
-      return false;
+      return Promise.resolve(false);
     }
 
-    const resolve = (): void => this.removeAttribute("open");
-
-    const proceed = dispatchEvent(
-      document.documentElement,
+    return this.#request(
       EVENTS.DRAWER_BEFORE_CLOSE,
-      { drawer: this.id, instance: this, resolve },
-      { bubbles: false },
+      { drawer: this.id, instance: this },
+      false,
     );
+  }
 
-    if (!proceed) {
-      return !this.hasAttribute("open");
+  /** Commits `open` after the before-event; joins a request already deferred. */
+  #request(name: string, detail: object, open: boolean): Promise<boolean> {
+    if (this.#pending) {
+      return this.#pending;
     }
 
-    resolve();
-    return true;
+    const commit = (proceed: boolean): boolean => {
+      if (!proceed || this.hasAttribute("open") === open) {
+        return false;
+      }
+
+      this.toggleAttribute("open", open);
+      return true;
+    };
+
+    const result = dispatchBeforeEvent(document.documentElement, name, detail);
+
+    if (typeof result === "boolean") {
+      return Promise.resolve(commit(result));
+    }
+
+    this.#pending = result.then(commit).finally(() => {
+      this.#pending = null;
+    });
+
+    return this.#pending;
   }
 
   attributeChangedCallback(
@@ -255,22 +303,15 @@ export class Drawer extends HTMLElement {
     _oldValue: string | null,
     newValue: string | null,
   ): void {
-    // Upgrade-time ACC runs before connectedCallback — leave markup alone.
-    if (!this.isConnected || name !== "open") {
+    // Upgrade-time ACC runs before connectedCallback — init() handles markup state.
+    if (!this.isConnected || name !== "open" || !this.$dialog) {
       return;
     }
 
     if (newValue !== null) {
-      this.$panel?.removeEventListener(
-        "transitionend",
-        this.#onCloseTransitionEnd,
-      );
-
-      this.style.setProperty("opacity", "1");
-      this.style.setProperty("visibility", "visible");
-
       rememberReturnFocus(this.trigger);
 
+      // Exclusive drawers close on this event, before this one locks scroll.
       dispatchEvent(
         document.documentElement,
         EVENTS.DRAWER_OPEN,
@@ -278,22 +319,14 @@ export class Drawer extends HTMLElement {
         { bubbles: false, cancelable: false },
       );
 
-      const container = this.trap || this;
-      const focusables = getFocusableElements(container);
-      if (focusables.length > 0) {
-        addTrapFocus(container, focusables[0]);
-      }
-
-      disableScroll();
+      this.#show();
       return;
     }
 
-    this.$panel?.removeEventListener(
-      "transitionend",
-      this.#onCloseTransitionEnd,
-    );
+    if (this.$dialog.open) {
+      this.$dialog.close();
+    }
 
-    removeTrapFocus();
     enableScroll(false);
 
     // Defer: another overlay may take focus before we restore.
@@ -305,8 +338,6 @@ export class Drawer extends HTMLElement {
       { drawer: this.id },
       { bubbles: false, cancelable: false },
     );
-
-    this.$panel?.addEventListener("transitionend", this.#onCloseTransitionEnd);
   }
 }
 

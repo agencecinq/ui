@@ -694,23 +694,21 @@ document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
 })
 ```
 
-**Close:** listen for `modal:before-close`, `preventDefault()`, pixelate, then
-`event.detail.resolve()`. Same `$host` and `animate` as above.
+**Close:** listen for `modal:before-close` and pass the pixelate animation to
+`event.detail.waitUntil()`. Same `$host` and `animate` as above.
 
 ```js
 document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {
   if (event.detail.modal !== "photo-modal") return
 
-  event.preventDefault()
-
-  animate(
-    $host,
-    Number($host.getAttribute("pixel") ?? PIXEL_MIN),
-    PIXEL_MAX,
-    700,
-  ).then(() => {
-    event.detail.resolve()
-  })
+  event.detail.waitUntil(
+    animate(
+      $host,
+      Number($host.getAttribute("pixel") ?? PIXEL_MIN),
+      PIXEL_MAX,
+      700,
+    ),
+  )
 })
 ```
 
@@ -737,23 +735,21 @@ document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
 })
 ```
 
-**Close:** listen for `drawer:before-close`, `preventDefault()`, depixelate, then
-`event.detail.resolve()`. Same `$host` and `animate` as above.
+**Close:** listen for `drawer:before-close` and pass the pixelate animation to
+`event.detail.waitUntil()`. Same `$host` and `animate` as above.
 
 ```js
 document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
   if (event.detail.drawer !== "photo-drawer") return
 
-  event.preventDefault()
-
-  animate(
-    $host,
-    Number($host.getAttribute("pixel") ?? PIXEL_MIN),
-    PIXEL_MAX,
-    700,
-  ).then(() => {
-    event.detail.resolve()
-  })
+  event.detail.waitUntil(
+    animate(
+      $host,
+      Number($host.getAttribute("pixel") ?? PIXEL_MIN),
+      PIXEL_MAX,
+      700,
+    ),
+  )
 })
 ```
 

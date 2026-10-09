@@ -2,20 +2,20 @@ export type { BeforeCloseDetail, BeforeOpenDetail } from './types.js';
 export declare class Drawer extends HTMLElement {
     #private;
     trigger: HTMLElement | null;
-    trap: HTMLElement | null;
-    $overlay: Element | null;
-    $panel: HTMLElement | null;
-    constructor();
+    $dialog: HTMLDialogElement | null;
+    /** `data-modal="false"` opens with `show()`: the page stays interactive. Read on open. */
+    get modal(): boolean;
     static get observedAttributes(): string[];
     connectedCallback(): void;
     disconnectedCallback(): void;
     /**
-     * Bind overlay + document listeners. Call {@link destroy} first if already bound.
+     * Bind dialog + document listeners. Call {@link destroy} first if already bound.
+     * Shows the dialog when the host is already `open` in the markup.
      */
     init(): void;
     /**
-     * Detaches listeners. Clears trap/scroll/inline styles if still open;
-     * leaves the `open` attribute (HTML is source of truth).
+     * Detaches listeners. Releases scroll lock and focus if still open;
+     * leaves the `open` attribute and the dialog state (HTML is source of truth).
      * Safe to call from outside while the host stays mounted.
      */
     destroy(): void;
@@ -23,27 +23,25 @@ export declare class Drawer extends HTMLElement {
      * Toggles the drawer between open and closed.
      *
      * @param trigger - Element that triggered the toggle, or null.
-     * @param trap - Focus-trap root when open (defaults to the drawer).
-     * @returns Whether the drawer is open after the toggle.
+     * @returns Whether the drawer is open once the request settles.
      */
-    toggle({ trigger, trap, }: {
-        trigger: HTMLElement | null;
-        trap: HTMLElement | null;
-    }): boolean;
+    toggle({ trigger }?: {
+        trigger?: HTMLElement | null;
+    }): Promise<boolean>;
     /**
-     * Opens the drawer. Dispatches cancelable `drawer:before-open` with
-     * `detail.resolve()` to commit after async work.
+     * Opens the drawer. Dispatches cancelable `drawer:before-open`: listeners
+     * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
-     * @returns `false` if already open, still closed after abort, or waiting on `resolve()`.
+     * @returns Whether this call opened the drawer.
      */
-    open(): boolean;
+    open(): Promise<boolean>;
     /**
-     * Closes the drawer. Dispatches cancelable `drawer:before-close` with
-     * `detail.resolve()` to commit after async work.
+     * Closes the drawer. Dispatches cancelable `drawer:before-close`: listeners
+     * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
-     * @returns `false` if already closed, still open after abort, or waiting on `resolve()`.
+     * @returns Whether this call closed the drawer.
      */
-    close(): boolean;
+    close(): Promise<boolean>;
     attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void;
 }
 //# sourceMappingURL=drawer.d.ts.map

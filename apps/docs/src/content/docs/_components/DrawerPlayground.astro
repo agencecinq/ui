@@ -11,7 +11,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Bestiary drawer</h3>
         <p class="text-sm text-gray-600">
-          A slide-in bestiary panel: overlay, scroll lock, and a tally of creatures
+          A slide-in bestiary panel: backdrop, scroll lock, and a tally of creatures
           catalogued from your AD&amp;D campaign.
         </p>
       </div>
@@ -33,18 +33,14 @@ import RegisterComponents from './RegisterComponents.astro';
       <span class="font-semibold" data-cart-count>3 creatures</span>
     </div>
 
-    <cinq-drawer id="bestiary-drawer-demo" class="group">
-      <div
-        data-dom="overlay"
-        class="fixed inset-0 z-[2147483646] bg-black/50 opacity-0 pointer-events-none transition-opacity group-[[open]]:opacity-100 group-[[open]]:pointer-events-auto"
-      ></div>
-      <div
-        role="dialog"
-        class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform duration-300 group-[[open]]:translate-x-0"
+    <cinq-drawer id="bestiary-drawer-demo">
+      <dialog
+        aria-labelledby="bestiary-drawer-demo-title"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
-            <h2 class="text-lg font-semibold text-gray-900">Bestiary</h2>
+            <h2 id="bestiary-drawer-demo-title" class="text-lg font-semibold text-gray-900">Bestiary</h2>
             <cinq-drawer-button class="block">
               <button
                 class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -98,7 +94,7 @@ import RegisterComponents from './RegisterComponents.astro';
             </button>
           </footer>
         </div>
-      </div>
+      </dialog>
     </cinq-drawer>
 
     <PortalToBody selector="#bestiary-drawer-demo" />

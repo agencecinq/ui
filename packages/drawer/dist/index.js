@@ -1,12 +1,11 @@
-import { EVENTS as e, addTrapFocus as t, disableScroll as n, dispatchEvent as r, enableScroll as i, getFocusableElements as a, rememberReturnFocus as o, removeTrapFocus as s, scheduleRestoreReturnFocus as c } from "@agencecinq/utils";
+import { EVENTS as e, disableScroll as t, dispatchBeforeEvent as n, dispatchEvent as r, enableScroll as i, getFocusableElements as a, rememberReturnFocus as o, scheduleRestoreReturnFocus as s } from "@agencecinq/utils";
 //#region src/drawer.ts
-var l = class extends HTMLElement {
+var c = class extends HTMLElement {
 	trigger = null;
-	trap = null;
-	$overlay = null;
-	$panel = null;
-	constructor() {
-		super(), this.trap = this;
+	$dialog = null;
+	#e = null;
+	get modal() {
+		return this.dataset.modal !== "false";
 	}
 	static get observedAttributes() {
 		return ["open"];
@@ -19,84 +18,91 @@ var l = class extends HTMLElement {
 	}
 	init() {
 		if (!this.id) throw Error("Drawer: id attribute is required");
-		if (this.$panel = this.querySelector("[role=\"dialog\"]"), !this.$panel) throw Error("Drawer: No [role=\"dialog\"] panel found");
-		this.$overlay = this.querySelector("[data-dom=\"overlay\"]") || this.querySelector("[overlay]"), this.$overlay && this.$overlay.addEventListener("click", this.#e), document.documentElement.addEventListener("keyup", this.#t), document.documentElement.addEventListener(e.DRAWER_OPEN, this.#n), document.documentElement.addEventListener(e.DRAWER_TOGGLE, this.#r);
+		if (this.$dialog = this.querySelector("dialog"), !this.$dialog) throw Error("Drawer: No <dialog> found");
+		this.$dialog.addEventListener("click", this.#t), this.$dialog.addEventListener("cancel", this.#n), this.$dialog.addEventListener("close", this.#a), document.addEventListener("keydown", this.#r), document.addEventListener("pointerdown", this.#i), document.documentElement.addEventListener(e.DRAWER_OPEN, this.#o), document.documentElement.addEventListener(e.DRAWER_TOGGLE, this.#s), this.hasAttribute("open") && this.#c();
 	}
 	destroy() {
-		this.$panel?.removeEventListener("transitionend", this.#i), this.$overlay && this.$overlay.removeEventListener("click", this.#e), document.documentElement.removeEventListener("keyup", this.#t), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.#n), document.documentElement.removeEventListener(e.DRAWER_TOGGLE, this.#r), this.hasAttribute("open") && (s(), i(!1), this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden"), c(this)), this.$overlay = null, this.$panel = null;
+		this.$dialog && (this.$dialog.removeEventListener("click", this.#t), this.$dialog.removeEventListener("cancel", this.#n), this.$dialog.removeEventListener("close", this.#a)), document.removeEventListener("keydown", this.#r), document.removeEventListener("pointerdown", this.#i), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.#o), document.documentElement.removeEventListener(e.DRAWER_TOGGLE, this.#s), this.hasAttribute("open") && (i(!1), s(this)), this.$dialog = null;
 	}
-	#e = () => this.toggle({
-		trigger: null,
-		trap: null
-	});
 	#t = (e) => {
-		e.key === "Escape" && this.hasAttribute("open") && this.close();
+		if (!this.$dialog || e.target !== this.$dialog) return;
+		let t = this.$dialog.getBoundingClientRect();
+		e.clientX >= t.left && e.clientX <= t.right && e.clientY >= t.top && e.clientY <= t.bottom || this.close();
 	};
 	#n = (e) => {
+		e.preventDefault(), this.close();
+	};
+	#r = (e) => {
+		e.key !== "Escape" || e.defaultPrevented || this.modal || !this.hasAttribute("open") || this.close();
+	};
+	#i = (e) => {
+		if (this.modal || !this.$dialog || !this.hasAttribute("open")) return;
+		let t = e.target;
+		!t || this.$dialog.contains(t) || t.closest("[aria-controls]")?.getAttribute("aria-controls")?.split(/\s+/).includes(this.id) || this.close();
+	};
+	#a = () => {
+		this.hasAttribute("open") && this.removeAttribute("open");
+	};
+	#o = (e) => {
 		if (e.detail.drawer !== this.id && this.hasAttribute("open")) {
 			this.close();
 			return;
 		}
 		e.detail.drawer === this.id && !this.hasAttribute("open") && (e.detail.trigger && (this.trigger = e.detail.trigger), this.open());
 	};
-	#r = (e) => {
-		let { trigger: t, trap: n, drawer: r } = e.detail;
-		r === this.id && this.toggle({
-			trigger: t,
-			trap: n
-		});
+	#s = (e) => {
+		let { trigger: t, drawer: n } = e.detail;
+		n === this.id && this.toggle({ trigger: t });
 	};
-	toggle({ trigger: e, trap: t }) {
-		let n = !this.hasAttribute("open");
-		return n && e && (this.trigger = e), this.trap = t || this, n ? this.open() : (this.close(), this.hasAttribute("open"));
+	#c() {
+		this.$dialog && (this.$dialog.open || (this.modal ? this.$dialog.showModal() : this.$dialog.show()), this.$dialog.querySelector("[autofocus]") || a(this.$dialog)[0]?.focus(), t());
 	}
-	#i = (e) => {
-		e.target === e.currentTarget && (this.$panel?.removeEventListener("transitionend", this.#i), !this.hasAttribute("open") && (this.style.setProperty("opacity", "0"), this.style.setProperty("visibility", "hidden")));
-	};
+	toggle({ trigger: e = null } = {}) {
+		return this.hasAttribute("open") ? this.close().then(() => this.hasAttribute("open")) : (e && (this.trigger = e), this.open().then(() => this.hasAttribute("open")));
+	}
 	open() {
-		if (this.hasAttribute("open")) return !1;
-		let t = () => this.setAttribute("open", "");
-		return r(document.documentElement, e.DRAWER_BEFORE_OPEN, {
+		return this.hasAttribute("open") ? Promise.resolve(!1) : this.#l(e.DRAWER_BEFORE_OPEN, {
 			drawer: this.id,
 			instance: this,
-			trigger: this.trigger,
-			resolve: t
-		}, { bubbles: !1 }) ? (t(), !0) : this.hasAttribute("open");
+			trigger: this.trigger
+		}, !0);
 	}
 	close() {
-		if (!this.hasAttribute("open")) return !1;
-		let t = () => this.removeAttribute("open");
-		return r(document.documentElement, e.DRAWER_BEFORE_CLOSE, {
+		return this.hasAttribute("open") ? this.#l(e.DRAWER_BEFORE_CLOSE, {
 			drawer: this.id,
-			instance: this,
-			resolve: t
-		}, { bubbles: !1 }) ? (t(), !0) : !this.hasAttribute("open");
+			instance: this
+		}, !1) : Promise.resolve(!1);
 	}
-	attributeChangedCallback(l, u, d) {
-		if (!(!this.isConnected || l !== "open")) {
-			if (d !== null) {
-				this.$panel?.removeEventListener("transitionend", this.#i), this.style.setProperty("opacity", "1"), this.style.setProperty("visibility", "visible"), o(this.trigger), r(document.documentElement, e.DRAWER_OPEN, {
+	#l(e, t, r) {
+		if (this.#e) return this.#e;
+		let i = (e) => !e || this.hasAttribute("open") === r ? !1 : (this.toggleAttribute("open", r), !0), a = n(document.documentElement, e, t);
+		return typeof a == "boolean" ? Promise.resolve(i(a)) : (this.#e = a.then(i).finally(() => {
+			this.#e = null;
+		}), this.#e);
+	}
+	attributeChangedCallback(t, n, a) {
+		if (!(!this.isConnected || t !== "open" || !this.$dialog)) {
+			if (a !== null) {
+				o(this.trigger), r(document.documentElement, e.DRAWER_OPEN, {
 					drawer: this.id,
 					trigger: this.trigger
 				}, {
 					bubbles: !1,
 					cancelable: !1
-				});
-				let i = this.trap || this, s = a(i);
-				s.length > 0 && t(i, s[0]), n();
+				}), this.#c();
 				return;
 			}
-			this.$panel?.removeEventListener("transitionend", this.#i), s(), i(!1), c(this), r(document.documentElement, e.DRAWER_CLOSE, { drawer: this.id }, {
+			this.$dialog.open && this.$dialog.close(), i(!1), s(this), r(document.documentElement, e.DRAWER_CLOSE, { drawer: this.id }, {
 				bubbles: !1,
 				cancelable: !1
-			}), this.$panel?.addEventListener("transitionend", this.#i);
+			});
 		}
 	}
 };
-customElements.get("cinq-drawer") || customElements.define("cinq-drawer", l);
+customElements.get("cinq-drawer") || customElements.define("cinq-drawer", c);
 //#endregion
 //#region src/drawer-button.ts
-var u = class extends HTMLElement {
+var l = class extends HTMLElement {
 	controls = [];
 	$button = null;
 	#e = (e) => {
@@ -119,20 +125,18 @@ var u = class extends HTMLElement {
 		this.$button && this.$button.removeEventListener("click", this.#n), document.documentElement.removeEventListener(e.DRAWER_CLOSE, this.#e), document.documentElement.removeEventListener(e.DRAWER_OPEN, this.#t);
 	}
 	#n = () => {
-		let t = this.$button?.getAttribute("data-trap");
-		this.controls.forEach((n) => {
-			let i = {
+		this.controls.forEach((t) => {
+			let n = {
 				trigger: this.$button,
-				trap: t ? document.getElementById(t) : null,
-				drawer: n
+				drawer: t
 			};
-			r(document.documentElement, e.DRAWER_TOGGLE, i, {
+			r(document.documentElement, e.DRAWER_TOGGLE, n, {
 				bubbles: !1,
 				cancelable: !1
 			});
 		});
 	};
 };
-customElements.get("cinq-drawer-button") || customElements.define("cinq-drawer-button", u);
+customElements.get("cinq-drawer-button") || customElements.define("cinq-drawer-button", l);
 //#endregion
-export { l as Drawer, u as DrawerButton };
+export { c as Drawer, l as DrawerButton };

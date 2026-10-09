@@ -22,11 +22,9 @@ import { drawerImage } from './images';
   </div>
 
   <cinq-drawer id="docs-pixelate-drawer">
-    <div data-dom="overlay" class="fixed inset-0 z-[2147483646] bg-black/50"></div>
-    <div
-      role="dialog"
+    <dialog
       aria-label="Photo drawer"
-      class="fixed right-0 top-0 z-[2147483647] h-full w-full max-w-md bg-white shadow-2xl"
+      class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl backdrop:bg-black/50"
     >
       <div class="flex h-full flex-col">
         <header class="flex items-center justify-between border-b px-4 py-3">
@@ -59,7 +57,7 @@ import { drawerImage } from './images';
           </cinq-pixelate>
         </div>
       </div>
-    </div>
+    </dialog>
   </cinq-drawer>
 
   <PortalToBody selector="#docs-pixelate-drawer" />
