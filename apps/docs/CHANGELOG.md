@@ -1,5 +1,38 @@
 # @agencecinq/docs
 
+## 4.4.20
+
+### Patch Changes
+
+- Focus the opened panel's `[autofocus]` element when there is one, and document panel announcement and accessibility guidance.
+- Updated dependencies
+  - @agencecinq/drilldown@1.1.0
+
+## 4.4.19
+
+### Patch Changes
+
+- Add `@agencecinq/drilldown`, a drill-down navigation Web Component with nested panels and back buttons, plus `DRILLDOWN_*` event constants on `@agencecinq/utils`.
+- Updated dependencies
+  - @agencecinq/drilldown@1.0.0
+  - @agencecinq/utils@7.8.0
+  - @agencecinq/accordion@3.0.0
+  - @agencecinq/calendar@3.0.0
+  - @agencecinq/combobox@2.0.1
+  - @agencecinq/disclosure-button@3.0.1
+  - @agencecinq/drawer@8.0.0
+  - @agencecinq/dual-scroll@0.0.0
+  - @agencecinq/modal@5.0.0
+  - @agencecinq/pixelate@0.0.0
+  - @agencecinq/sheet@2.0.0
+  - @agencecinq/slider@6.0.0
+  - @agencecinq/snake@1.0.0
+  - @agencecinq/spinbutton@4.0.0
+  - @agencecinq/switch@3.0.1
+  - @agencecinq/tabs@11.0.0
+  - @agencecinq/toast@1.0.0
+  - @agencecinq/windowsplitter@3.0.0
+
 ## 4.4.18
 
 ### Patch Changes

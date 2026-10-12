@@ -19,6 +19,8 @@ export declare const EVENTS: {
     TOAST_CLOSE: string;
     DISCLOSURE_BUTTON_OPEN: string;
     DISCLOSURE_BUTTON_CLOSE: string;
+    DRILLDOWN_OPEN: string;
+    DRILLDOWN_CLOSE: string;
     SWITCH_ACTIVATE: string;
     SWITCH_DEACTIVATE: string;
     ACCORDION_OPEN: string;
