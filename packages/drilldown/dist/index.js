@@ -107,7 +107,7 @@ var { DRILLDOWN_OPEN: s, DRILLDOWN_CLOSE: c } = e, l = class extends HTMLElement
 			previous: r,
 			$button: a,
 			open: !0
-		}) ? !1 : (a.setAttribute("aria-expanded", "true"), r.hidden = !0, i.hidden = !1, o(i)[0]?.focus(), !0);
+		}) ? !1 : (a.setAttribute("aria-expanded", "true"), r.hidden = !0, i.hidden = !1, (i.querySelector("[autofocus]") ?? o(i)[0])?.focus(), !0);
 	}
 	close(e = !0) {
 		let n = this.current, r = n ? this.#e(n) : null, i = r ? this.#t(r) : null;

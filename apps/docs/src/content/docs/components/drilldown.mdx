@@ -112,14 +112,48 @@ trigger linking them. Events fire **before** the DOM mutates. `closeAll()` fires
 Triggers and back buttons are native `<button type="button">`: Enter and Space work
 through the browser.
 
-- **Open:** focus moves to the first focusable element of the new panel, usually its
-  back button.
+- **Open:** focus moves to the new panel's `[autofocus]` element if there is one,
+  otherwise to its first focusable element, usually the back button.
 - **Close:** focus returns to the trigger that opened the panel.
 - **closeAll():** focus does not move.
 
 Focus is moved, never trapped. Hidden panels are out of the tab order and the
 accessibility tree. To contain focus, put the drilldown in a
 [Drawer](../drawer/) or [Modal](../modal/).
+
+### Announcing the panel
+
+Landing on the back button, a screen reader announces the button but not always the
+panel it belongs to. To say where the user is, put `autofocus` on the panel's
+heading, made focusable with `tabindex="-1"`:
+
+```html
+<nav id="menu-solutions" aria-labelledby="menu-solutions-title" hidden>
+  <button type="button" data-close>Back to menu</button>
+  <h2 id="menu-solutions-title" tabindex="-1" autofocus>Solutions</h2>
+  <a href="/audit">Audit</a>
+</nav>
+```
+
+Same convention as [Drawer](../drawer/) and [Sheet](../sheet/). An `autofocus`
+element inside a hidden panel is not focusable, so the browser skips it on page
+load and when a dialog opens.
+
+## Accessibility
+
+- **Labels:** name every panel (`aria-label` or `aria-labelledby` on the `<nav>`),
+  and give the back button a name that says where it goes ("Back to menu", not
+  "Back").
+- **Parents that are also pages:** an element can't be both a link and a trigger. Put
+  a link to the parent page in its sub panel (e.g. "All solutions"), or a link and a
+  separate trigger side by side, the trigger labelled for what it opens.
+- **Not a menubar:** keep `<nav>`, `<button>` and `<a>`, without `menu` /
+  `menuitem` roles. The APG reserves the
+  [menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) for
+  application menus: for site navigation it turns links into menu items and requires
+  arrow-key navigation.
+- **Test with a screen reader:** VoiceOver (Safari, macOS and iOS) and NVDA (Firefox
+  or Chrome), going down and back up through every level.
 
 ## Inside a drawer
 

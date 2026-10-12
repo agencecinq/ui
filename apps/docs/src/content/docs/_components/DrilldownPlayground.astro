@@ -13,7 +13,8 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Bestiary navigation</h3>
           <p class="text-sm text-gray-600">
             Three levels deep. Triggers open their child panel, the back button returns to the
-            parent and focus goes back to the trigger. Open/close events are logged below.
+            parent and focus goes back to the trigger. The Undead panel focuses its heading
+            with <code>autofocus</code>. Open/close events are logged below.
           </p>
         </div>
 
@@ -89,7 +90,7 @@ import RegisterComponents from './RegisterComponents.astro';
             </ul>
           </nav>
 
-          <nav id="docs-drilldown-undead" aria-label="Undead" class="h-full overflow-y-auto bg-white p-4 text-gray-900" hidden>
+          <nav id="docs-drilldown-undead" aria-labelledby="docs-drilldown-undead-title" class="h-full overflow-y-auto bg-white p-4 text-gray-900" hidden>
             <button
               type="button"
               class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
@@ -97,6 +98,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <span aria-hidden="true">←</span> Back to bestiary
             </button>
+            <h4 id="docs-drilldown-undead-title" tabindex="-1" autofocus class="mt-0 mb-3 px-1 text-base font-semibold text-gray-900">Undead</h4>
             <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
               <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Lich</a></li>
               <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Vampire</a></li>

@@ -1,5 +1,13 @@
 # @agencecinq/docs
 
+## 4.4.20
+
+### Patch Changes
+
+- Focus the opened panel's `[autofocus]` element when there is one, and document panel announcement and accessibility guidance.
+- Updated dependencies
+  - @agencecinq/drilldown@1.1.0
+
 ## 4.4.19
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @agencecinq/drilldown
 
+## 1.1.0
+
+### Minor Changes
+
+- Focus the opened panel's `[autofocus]` element when there is one, and document panel announcement and accessibility guidance.
+
 ## 1.0.0
 
 ### Major Changes
