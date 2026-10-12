@@ -1,7 +1,7 @@
 {
   "name": "@agencecinq/docs",
   "type": "module",
-  "version": "4.4.18",
+  "version": "4.4.19",
   "private": true,
   "description": "CINQ UI components documentation site (Starlight).",
   "scripts": {
@@ -21,6 +21,7 @@
     "@agencecinq/dual-scroll": "workspace:*",
     "@agencecinq/snake": "workspace:*",
     "@agencecinq/disclosure-button": "workspace:*",
+    "@agencecinq/drilldown": "workspace:*",
     "@agencecinq/drawer": "workspace:*",
     "@agencecinq/sheet": "workspace:*",
     "@agencecinq/modal": "workspace:*",

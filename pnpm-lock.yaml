@@ -38,6 +38,9 @@ importers:
       '@agencecinq/drawer':
         specifier: workspace:*
         version: link:../../packages/drawer
+      '@agencecinq/drilldown':
+        specifier: workspace:*
+        version: link:../../packages/drilldown
       '@agencecinq/dual-scroll':
         specifier: workspace:*
         version: link:../../packages/dual-scroll
@@ -155,6 +158,18 @@ importers:
       vite-plugin-dts:
         specifier: ^5.0.3
         version: 5.0.3(@microsoft/api-extractor@7.55.2(@types/node@26.2.0))(esbuild@0.28.2)(rolldown@1.2.8)(rollup@4.56.0)(typescript@7.0.2)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0))
+
+  packages/drilldown:
+    devDependencies:
+      '@agencecinq/utils':
+        specifier: workspace:*
+        version: link:../utils
+      vite:
+        specifier: ^8.2.0
+        version: 8.3.0(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)
+      vite-plugin-dts:
+        specifier: ^5.0.3
+        version: 5.0.3(@microsoft/api-extractor@7.55.2(@types/node@26.2.0))(esbuild@0.28.2)(rolldown@1.2.8)(rollup@4.56.0)(typescript@7.0.2)(vite@8.3.0(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0))
 
   packages/dual-scroll:
     devDependencies:

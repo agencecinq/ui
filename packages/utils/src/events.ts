@@ -19,6 +19,8 @@ export const EVENTS = {
   TOAST_CLOSE: 'toast:close',
   DISCLOSURE_BUTTON_OPEN: 'disclosure-button:open',
   DISCLOSURE_BUTTON_CLOSE: 'disclosure-button:close',
+  DRILLDOWN_OPEN: 'drilldown:open',
+  DRILLDOWN_CLOSE: 'drilldown:close',
   SWITCH_ACTIVATE: 'switch:activate',
   SWITCH_DEACTIVATE: 'switch:deactivate',
   ACCORDION_OPEN: 'accordion:open',
