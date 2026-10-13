@@ -1,0 +1,155 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+---
+
+<RegisterComponents />
+
+<style is:global>
+  .docs-dropzone {
+    border: 2px dashed #d1d5db;
+    transition:
+      background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out;
+  }
+
+  .docs-dropzone[dragover] {
+    border-color: #111827;
+    background-color: #f3f4f6;
+  }
+
+  .docs-dropzone label:has(:focus-visible) {
+    outline: 2px solid #111827;
+    outline-offset: 4px;
+  }
+</style>
+
+<div class="not-content">
+  <div class="flex flex-col gap-10">
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Character portrait</h3>
+          <p class="text-sm text-gray-600">
+            One image up to 2 MB. Drop it or click to browse. Other files and larger images are
+            rejected, with the reason.
+          </p>
+        </div>
+
+        <cinq-dropzone id="docs-dropzone-portrait" class="docs-dropzone rounded-xl p-6" data-max-size="2097152">
+          <label class="flex cursor-pointer flex-col items-center gap-1 text-center">
+            <input type="file" name="portrait" accept="image/*" class="sr-only" />
+            <span class="font-medium text-gray-900">Drop your portrait or click to browse</span>
+            <span class="text-sm text-gray-600">PNG, JPG, SVG or WebP, 2 MB max</span>
+          </label>
+        </cinq-dropzone>
+
+        <div class="flex items-center gap-4" id="docs-dropzone-portrait-file" hidden>
+          <img alt="" class="size-16 rounded-lg object-cover" id="docs-dropzone-portrait-preview" />
+          <span class="flex-1 text-sm text-gray-900" id="docs-dropzone-portrait-name"></span>
+          <button
+            type="button"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+            id="docs-dropzone-portrait-clear"
+          >
+            Remove
+          </button>
+        </div>
+
+        <p class="text-sm text-red-700" id="docs-dropzone-portrait-error" role="alert"></p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Spell scrolls, input in a form</h3>
+          <p class="text-sm text-gray-600">
+            The input stays in its form and the label points to it with <code>for</code>. Several
+            PDF or text files. The form shows what it would send.
+          </p>
+        </div>
+
+        <cinq-dropzone class="docs-dropzone rounded-xl p-6">
+          <label for="docs-dropzone-scrolls" class="block cursor-pointer text-center font-medium text-gray-900">
+            Drop your spell scrolls or click to browse
+          </label>
+        </cinq-dropzone>
+
+        <form id="docs-dropzone-form" class="flex flex-col gap-3">
+          <input
+            type="file"
+            id="docs-dropzone-scrolls"
+            name="scrolls"
+            accept=".pdf,.txt"
+            multiple
+            class="text-sm text-gray-600"
+          />
+          <output class="text-sm text-gray-900" id="docs-dropzone-form-output">No scroll yet.</output>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { EVENTS } from '@agencecinq/utils';
+  import type { ChangeDetail, Dropzone, RejectDetail } from '@agencecinq/dropzone';
+
+  const $portrait = document.getElementById('docs-dropzone-portrait') as Dropzone | null;
+  const $file = document.getElementById('docs-dropzone-portrait-file');
+  const $preview = document.getElementById('docs-dropzone-portrait-preview') as HTMLImageElement | null;
+  const $name = document.getElementById('docs-dropzone-portrait-name');
+  const $error = document.getElementById('docs-dropzone-portrait-error');
+  const reasons = {
+    accept: 'is not an image',
+    size: 'is over 2 MB',
+    multiple: 'is one portrait too many',
+  };
+  // A drop can reject some files and keep others: the change that follows keeps the message.
+  let rejecting = false;
+
+  $portrait?.addEventListener(EVENTS.DROPZONE_CHANGE, (event) => {
+    const [file] = (event as CustomEvent<ChangeDetail>).detail.files;
+
+    if ($preview?.src) {
+      URL.revokeObjectURL($preview.src);
+    }
+
+    if ($file && $preview && $name) {
+      $file.hidden = !file;
+      $preview.src = file ? URL.createObjectURL(file) : '';
+      $name.textContent = file?.name ?? '';
+    }
+
+    if ($error && !rejecting) {
+      $error.textContent = '';
+    }
+  });
+
+  $portrait?.addEventListener(EVENTS.DROPZONE_REJECT, (event) => {
+    const { rejected } = (event as CustomEvent<RejectDetail>).detail;
+
+    if ($error) {
+      $error.textContent = rejected.map(({ file, reason }) => `${file.name} ${reasons[reason]}.`).join(' ');
+    }
+
+    rejecting = true;
+    queueMicrotask(() => {
+      rejecting = false;
+    });
+  });
+
+  document.getElementById('docs-dropzone-portrait-clear')?.addEventListener('click', () => $portrait?.clear());
+
+  const $form = document.getElementById('docs-dropzone-form') as HTMLFormElement | null;
+  const $output = document.getElementById('docs-dropzone-form-output');
+
+  $form?.addEventListener('change', () => {
+    const files = new FormData($form).getAll('scrolls') as File[];
+    const names = files.filter(({ size }) => size).map(({ name }) => name);
+
+    if ($output) {
+      $output.textContent = names.length ? `Would send ${names.join(', ')}.` : 'No scroll yet.';
+    }
+  });
+</script>

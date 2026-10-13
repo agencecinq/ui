@@ -1,0 +1,145 @@
+---
+import { SHOP } from './store/party';
+---
+
+<div class="not-content">
+  <div class="grid gap-6 sm:grid-cols-2">
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <h3 class="text-lg font-semibold text-gray-900">Purse</h3>
+      <p class="text-sm text-gray-600">Selects the gold only.</p>
+      <p class="mt-4 text-3xl font-semibold text-gray-900">
+        <span id="docs-store-gold">0</span> gp
+      </p>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <h3 class="text-lg font-semibold text-gray-900">Dungeon</h3>
+      <p class="text-sm text-gray-600">
+        An async action on the queue. Click several times, the loots settle in order.
+      </p>
+      <button
+        type="button"
+        id="docs-store-loot"
+        class="mt-4 rounded-lg border border-gray-900 px-3 py-2 text-sm font-medium text-gray-900 aria-busy:opacity-60"
+      >
+        Loot the dungeon
+      </button>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <h3 class="text-lg font-semibold text-gray-900">Shop</h3>
+      <p class="text-sm text-gray-600">Disables what the party cannot afford or carry.</p>
+      <ul class="m-0 mt-4 flex list-none flex-col gap-2 p-0" id="docs-store-shop">
+        {
+          SHOP.map((item) => (
+            <li class="flex items-center justify-between gap-3">
+              <span class="text-sm text-gray-900">
+                {item.label}, {item.price} gp
+              </span>
+              <button
+                type="button"
+                class="rounded-lg bg-gray-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-40"
+                data-item={item.key}
+              >
+                Buy
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <h3 class="text-lg font-semibold text-gray-900">Backpack</h3>
+      <p class="text-sm text-gray-600">Four slots. Selling gives half the price back.</p>
+      <ul class="m-0 mt-4 flex list-none flex-col gap-2 p-0" id="docs-store-backpack"></ul>
+      <p class="mt-2 text-sm text-gray-600" id="docs-store-empty">Empty.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { party } from './store/party';
+
+  const $gold = document.getElementById('docs-store-gold');
+
+  party.select(
+    (state) => state.gold,
+    (gold) => {
+      if ($gold) {
+        $gold.textContent = gold.toString();
+      }
+    },
+  );
+</script>
+
+<script>
+  import { party } from './store/party';
+
+  const $loot = document.getElementById('docs-store-loot');
+
+  party.subscribePending((pending) => $loot?.setAttribute('aria-busy', pending.toString()));
+  $loot?.addEventListener('click', () => void party.loot());
+</script>
+
+<script>
+  import { BACKPACK_SIZE, SHOP, party } from './store/party';
+
+  const $buttons = document.querySelectorAll<HTMLButtonElement>('#docs-store-shop [data-item]');
+
+  // The shop only cares about the gold and whether the backpack is full.
+  party.select(
+    ({ gold, backpack }) => ({ gold, full: backpack.length >= BACKPACK_SIZE }),
+    ({ gold, full }) => {
+      $buttons.forEach(($button) => {
+        const item = SHOP.find(({ key }) => key === $button.dataset.item);
+
+        $button.disabled = !item || full || item.price > gold;
+      });
+    },
+    (a, b) => a.gold === b.gold && a.full === b.full,
+  );
+
+  $buttons.forEach(($button) => {
+    $button.addEventListener('click', () => {
+      const item = SHOP.find(({ key }) => key === $button.dataset.item);
+
+      if (item) {
+        party.buy(item);
+      }
+    });
+  });
+</script>
+
+<script>
+  import { party } from './store/party';
+
+  const $list = document.getElementById('docs-store-backpack');
+  const $empty = document.getElementById('docs-store-empty');
+
+  party.select(
+    (state) => state.backpack,
+    (backpack) => {
+      $list?.replaceChildren(
+        ...backpack.map((item, index) => {
+          const $item = document.createElement('li');
+          const $sell = document.createElement('button');
+
+          $item.className = 'flex items-center justify-between gap-3 text-sm text-gray-900';
+          $item.textContent = item.label;
+          $sell.type = 'button';
+          $sell.className = 'rounded-lg px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100';
+          $sell.textContent = 'Sell';
+          $sell.addEventListener('click', () => party.sell(index));
+          $item.append($sell);
+
+          return $item;
+        }),
+      );
+
+      if ($empty) {
+        $empty.hidden = backpack.length > 0;
+      }
+    },
+  );
+</script>

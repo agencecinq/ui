@@ -21,6 +21,8 @@ export declare const EVENTS: {
     DISCLOSURE_BUTTON_CLOSE: string;
     DRILLDOWN_OPEN: string;
     DRILLDOWN_CLOSE: string;
+    DROPZONE_CHANGE: string;
+    DROPZONE_REJECT: string;
     SWITCH_ACTIVATE: string;
     SWITCH_DEACTIVATE: string;
     ACCORDION_OPEN: string;

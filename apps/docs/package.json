@@ -1,7 +1,7 @@
 {
   "name": "@agencecinq/docs",
   "type": "module",
-  "version": "4.4.20",
+  "version": "4.4.21",
   "private": true,
   "description": "CINQ UI components documentation site (Starlight).",
   "scripts": {
@@ -22,11 +22,13 @@
     "@agencecinq/snake": "workspace:*",
     "@agencecinq/disclosure-button": "workspace:*",
     "@agencecinq/drilldown": "workspace:*",
+    "@agencecinq/dropzone": "workspace:*",
     "@agencecinq/drawer": "workspace:*",
     "@agencecinq/sheet": "workspace:*",
     "@agencecinq/modal": "workspace:*",
     "@agencecinq/spinbutton": "workspace:*",
     "@agencecinq/slider": "workspace:*",
+    "@agencecinq/store": "workspace:*",
     "@agencecinq/switch": "workspace:*",
     "@agencecinq/toast": "workspace:*",
     "@agencecinq/tabs": "workspace:*",

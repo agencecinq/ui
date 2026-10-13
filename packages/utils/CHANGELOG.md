@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 7.9.0
+
+### Minor Changes
+
+- Add `DROPZONE_CHANGE` and `DROPZONE_REJECT` event constants for `@agencecinq/dropzone`.
+
 ## 7.8.0
 
 ### Minor Changes

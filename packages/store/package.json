@@ -1,0 +1,39 @@
+{
+  "name": "@agencecinq/store",
+  "version": "1.0.0",
+  "description": "Tiny observable state store: normalized updates, selectors and a queue for async actions.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agencecinq/ui.git",
+    "directory": "packages/store"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vite": "^8.2.0",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.1.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

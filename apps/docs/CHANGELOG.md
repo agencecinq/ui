@@ -1,5 +1,15 @@
 # @agencecinq/docs
 
+## 4.4.21
+
+### Patch Changes
+
+- Document `@agencecinq/dropzone` and `@agencecinq/store`.
+- Updated dependencies
+  - @agencecinq/dropzone@1.0.0
+  - @agencecinq/store@1.0.0
+  - @agencecinq/utils@7.9.0
+
 ## 4.4.20
 
 ### Patch Changes

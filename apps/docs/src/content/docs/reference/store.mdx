@@ -1,0 +1,123 @@
+---
+title: Store
+description: Tiny observable state store with normalized updates, selectors and a queue for async actions.
+---
+
+import StorePlayground from '../_components/StorePlayground.astro';
+
+A page often has several components working on the same data: a cart icon, a
+drawer and an add to cart button, or the steps of a configurator and its preview.
+Wired to each other, they end up knowing every other component and duplicating the
+rules. With a store, each component only knows the store: it reads the slice it
+needs, writes through the store, and the rules live in one place.
+
+`Store` keeps one immutable state, normalizes every change, notifies listeners
+synchronously, and queues async actions such as server calls so they settle in
+order.
+
+## Install
+
+```bash
+pnpm add @agencecinq/store
+```
+
+## Example
+
+Four widgets share a party. None of them knows the others: buying in the shop
+updates the purse and the backpack, looting refills the purse and unlocks the shop.
+
+<StorePlayground />
+
+The store is a module that every widget imports. The rules are in `normalize`, so
+they hold whoever writes: a purchase that would empty the purse below zero or
+overfill the backpack is simply ignored.
+
+```ts
+// party.ts
+import { Store } from "@agencecinq/store";
+
+class PartyStore extends Store<Party> {
+  constructor() {
+    super(
+      { gold: 60, backpack: [] },
+      {
+        normalize: (next, previous) =>
+          next.gold < 0 || next.backpack.length > 4 ? previous : next,
+      },
+    );
+  }
+
+  buy(item: Item): void {
+    this.set((party) => ({
+      gold: party.gold - item.price,
+      backpack: [...party.backpack, item],
+    }));
+  }
+
+  /** A server call: loots settle in order, `pending` tracks the queue. */
+  loot(): Promise<Party> {
+    return this.mutate(async (party) => {
+      const gold = await rollTreasure();
+      return { ...party, gold: party.gold + gold };
+    });
+  }
+}
+
+export const party = new PartyStore();
+```
+
+Each widget selects its slice. `select` calls the listener right away, then only when
+the slice changes: the purse does not redraw when the backpack changes.
+
+```ts
+// purse.ts
+import { party } from "./party";
+
+party.select(
+  (state) => state.gold,
+  (gold) => {
+    $gold.textContent = gold.toString();
+  },
+);
+```
+
+A slice built on the fly needs its own comparison, or it would look new every time:
+
+```ts
+// shop.ts
+party.select(
+  ({ gold, backpack }) => ({ gold, full: backpack.length >= 4 }),
+  ({ gold, full }) => updateButtons(gold, full),
+  (a, b) => a.gold === b.gold && a.full === b.full,
+);
+```
+
+The queue drives busy states:
+
+```ts
+// dungeon.ts
+party.subscribePending((pending) => $loot.setAttribute("aria-busy", pending.toString()));
+$loot.addEventListener("click", () => party.loot());
+```
+
+## API
+
+`new Store(initial, options?)`. The initial state is taken as is.
+
+| Option | Default | Description |
+| ------ | ------- | ----------- |
+| `normalize(next, previous)` | identity | Applied to every next state before the comparison. |
+| `equals(a, b)` | `Object.is` | Equal states skip the notification. |
+
+| Method / property | Description |
+| ----------------- | ----------- |
+| `get()` | Current state. |
+| `set(update)` | A value, or a function of the current state. |
+| `subscribe(listener)` | `listener(state, previous)` on every change. Returns the unsubscribe function. |
+| `select(selector, listener, equals?)` | `listener(slice)` right away, then when the slice changes. |
+| `mutate(action)` | Runs `action(state)` after the queued ones, then sets the state it resolves to. |
+| `pending` | Whether queued actions are running. |
+| `subscribePending(listener)` | `listener(pending)` right away, then when the queue starts or settles. |
+
+A listener that throws is reported with `reportError()` and does not stop the others.
+A rejected action leaves the state as is and does not block the queue.

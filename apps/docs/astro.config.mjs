@@ -28,6 +28,7 @@ export default defineConfig({
             { label: 'Slider', slug: 'components/slider' },
             { label: 'Disclosure Button', slug: 'components/disclosure-button' },
             { label: 'Drilldown', slug: 'components/drilldown' },
+            { label: 'Dropzone', slug: 'components/dropzone' },
             { label: 'Switch', slug: 'components/switch' },
             { label: 'Toast', slug: 'components/toast' },
             { label: 'Accordion', slug: 'components/accordion' },
@@ -39,7 +40,10 @@ export default defineConfig({
         },
         {
           label: 'Reference',
-          items: [{ label: 'Utils', slug: 'reference/utils' }],
+          items: [
+            { label: 'Utils', slug: 'reference/utils' },
+            { label: 'Store', slug: 'reference/store' },
+          ],
         },
         {
           label: 'Sandbox',

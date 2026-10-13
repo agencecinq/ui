@@ -1,0 +1,88 @@
+---
+title: Dropzone
+description: File drop zone Web Component wired to a native file input.
+---
+
+import DropzonePlayground from '../_components/DropzonePlayground.astro';
+
+A drop zone lets users drag files from their desktop instead of browsing for them.
+`<cinq-dropzone>` hands the dropped files to a native `<input type="file">`, as if
+they were picked in the browser dialog, and checks them against the input's
+`accept`, `multiple` and an optional maximum size.
+
+The input stays the source of truth: it keeps its name, its form and its
+validation. Clicking the label still opens the native picker, so the zone works
+with the keyboard and without JavaScript.
+
+## Install
+
+```bash
+pnpm add @agencecinq/dropzone
+```
+
+## Usage
+
+```js
+import "@agencecinq/dropzone";
+```
+
+```html
+<cinq-dropzone data-max-size="10485760">
+  <label>
+    <input type="file" name="portrait" accept=".svg,.png,.jpg" class="sr-only" />
+    Drop your portrait or click to browse
+  </label>
+</cinq-dropzone>
+```
+
+The input can live elsewhere, for example inside a form rendered by a plugin. Point
+a label inside the host to it with `for`:
+
+```html
+<cinq-dropzone>
+  <label for="quote-file">Drop your files or click to browse</label>
+</cinq-dropzone>
+```
+
+> **HTML is the source of truth.** The component will not auto-set `role`,
+> auto-migrate attributes, or warn about missing labels. Use an a11y linter
+> (axe-core, Lighthouse) to catch invalid markup.
+
+## Playground
+
+<DropzonePlayground />
+
+## Required markup
+
+| Attribute / element | Required | Role |
+| ------------------- | -------- | ---- |
+| `<cinq-dropzone>` | **Yes** | Host and drop target. |
+| `input[type="file"]` | **Yes** | Inside the host, or anywhere when a `label[for]` inside the host points to it. |
+| `<label>` | Recommended | Opens the native picker and names the input. |
+| `accept` / `multiple` / `disabled` | Optional | On the input, read on every drop. |
+| `data-max-size` | Optional | On the host. Largest file in bytes. |
+
+## API
+
+| Method / property | Description |
+| ----------------- | ----------- |
+| `$input` / `$label` | The file input and the first label inside the host. |
+| `files` | Files held by the input, as an array. |
+| `clear()` | Empties the input and dispatches `change`. |
+| `init()` / `destroy()` | Bind / unbind for DOM mutation. |
+
+## Styling
+
+`[dragover]` is set on the host while files are dragged over it. Hide the input
+with `sr-only`, not `display: none`, so it stays focusable, and show its focus on
+the label with `:has(:focus-visible)`.
+
+## Events
+
+| Constant | Name | Detail |
+| -------- | ---- | ------ |
+| `EVENTS.DROPZONE_CHANGE` | `dropzone:change` | `{ files, $input }` |
+| `EVENTS.DROPZONE_REJECT` | `dropzone:reject` | `{ rejected, $input }`, each `{ file, reason }` |
+
+`reason` is `accept`, `size` or `multiple`. Both events bubble from the host and are
+not cancelable.

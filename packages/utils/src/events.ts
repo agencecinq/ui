@@ -21,6 +21,8 @@ export const EVENTS = {
   DISCLOSURE_BUTTON_CLOSE: 'disclosure-button:close',
   DRILLDOWN_OPEN: 'drilldown:open',
   DRILLDOWN_CLOSE: 'drilldown:close',
+  DROPZONE_CHANGE: 'dropzone:change',
+  DROPZONE_REJECT: 'dropzone:reject',
   SWITCH_ACTIVATE: 'switch:activate',
   SWITCH_DEACTIVATE: 'switch:deactivate',
   ACCORDION_OPEN: 'accordion:open',
