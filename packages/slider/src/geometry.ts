@@ -18,7 +18,14 @@ export const valueFromRatio = (
   max: number,
 ): number => min + ratio * (max - min);
 
-/** Snap a value to the nearest step within `[min, max]`. */
+/** Decimal places of a number, e.g. 2 for `0.25`. */
+const decimals = (value: number): number =>
+  value.toString().split(".")[1]?.length ?? 0;
+
+/**
+ * Snap a value to the nearest step within `[min, max]`.
+ * Rounded to the precision of `min` and `step`, so `0.1` steps give `4.2`, not `4.199999999999999`.
+ */
 export const snapToStep = (
   value: number,
   min: number,
@@ -30,7 +37,9 @@ export const snapToStep = (
   }
 
   const snapped = min + Math.round((value - min) / step) * step;
-  return clamp(snapped, min, max);
+  const precision = Math.max(decimals(min), decimals(step));
+
+  return clamp(Number(snapped.toFixed(precision)), min, max);
 };
 
 /** Single-thumb track length. */
@@ -107,9 +116,10 @@ export const multiValueFromPointer = (
   const ratio = track > 0 ? position / track : 0;
   const span = gmax - gmin;
 
+  // Unsnapped: the caller snaps to its step.
   if (vertical || rtl) {
-    return Math.round(gmax - span * ratio);
+    return gmax - span * ratio;
   }
 
-  return Math.round(gmin + span * ratio);
+  return gmin + span * ratio;
 };

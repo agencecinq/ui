@@ -3,7 +3,10 @@ import { ActiveThumb } from './types.js';
 export declare const ratioFromValue: (value: number, min: number, max: number) => number;
 /** Value from semantic ratio. */
 export declare const valueFromRatio: (ratio: number, min: number, max: number) => number;
-/** Snap a value to the nearest step within `[min, max]`. */
+/**
+ * Snap a value to the nearest step within `[min, max]`.
+ * Rounded to the precision of `min` and `step`, so `0.1` steps give `4.2`, not `4.199999999999999`.
+ */
 export declare const snapToStep: (value: number, min: number, max: number, step: number) => number;
 /** Single-thumb track length. */
 export declare const singleTrackLength: (railLength: number, thumbSize: number) => number;

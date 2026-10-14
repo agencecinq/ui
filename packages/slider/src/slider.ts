@@ -113,7 +113,8 @@ export class Slider extends SliderBase {
       vertical,
     );
 
-    return Math.round(valueFromRatio(ratio, min, max));
+    // Unsnapped: setValue snaps to data-step, rounding here would only allow integers.
+    return valueFromRatio(ratio, min, max);
   }
 
   protected commitPointerValue(event: PointerEvent, $thumb: HTMLElement): void {

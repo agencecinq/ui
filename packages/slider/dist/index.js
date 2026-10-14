@@ -20,6 +20,10 @@ var e = {
 	TOAST_CLOSE: "toast:close",
 	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
 	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
+	DRILLDOWN_OPEN: "drilldown:open",
+	DRILLDOWN_CLOSE: "drilldown:close",
+	DROPZONE_CHANGE: "dropzone:change",
+	DROPZONE_REJECT: "dropzone:reject",
 	SWITCH_ACTIVATE: "switch:activate",
 	SWITCH_DEACTIVATE: "switch:deactivate",
 	ACCORDION_OPEN: "accordion:open",
@@ -65,15 +69,19 @@ i.hasAttribute("data-debug"), window.addEventListener("pointermove", r(({ x: e, 
 var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 	let r = n - t;
 	return r > 0 ? (e - t) / r : 0;
-}, c = (e, t, n) => t + e * (n - t), l = (e, t, n, r) => o(r <= 0 ? e : t + Math.round((e - t) / r) * r, t, n), u = (e, t) => Math.max(0, e - t), d = (e, t) => Math.max(0, e - 2 * t), f = (e, t, n, r) => r || n ? e === "min" ? t : 0 : e === "max" ? t : 0, p = (e, t, n, r, i) => {
-	let a = i ? t.height : t.width, s = i ? t.top : t.left, c = u(a, n);
+}, c = (e, t, n) => t + e * (n - t), l = (e) => e.toString().split(".")[1]?.length ?? 0, u = (e, t, n, r) => {
+	if (r <= 0) return o(e, t, n);
+	let i = t + Math.round((e - t) / r) * r, a = Math.max(l(t), l(r));
+	return o(Number(i.toFixed(a)), t, n);
+}, d = (e, t) => Math.max(0, e - t), f = (e, t) => Math.max(0, e - 2 * t), p = (e, t, n, r) => r || n ? e === "min" ? t : 0 : e === "max" ? t : 0, m = (e, t, n, r, i) => {
+	let a = i ? t.height : t.width, s = i ? t.top : t.left, c = d(a, n);
 	if (c <= 0) return 0;
 	let l = o((e - s - n / 2) / c, 0, 1);
 	return i || r ? 1 - l : l;
-}, m = (e, t, n, r, i, a, s, c, l) => {
-	let u = f(n, s, c, l), d = o(e - (l ? t.top : t.left) - u, 0, a), p = a > 0 ? d / a : 0, m = i - r;
-	return Math.round(l || c ? i - m * p : r + m * p);
-}, h = class {
+}, h = (e, t, n, r, i, a, s, c, l) => {
+	let u = p(n, s, c, l), d = o(e - (l ? t.top : t.left) - u, 0, a), f = a > 0 ? d / a : 0, m = i - r;
+	return l || c ? i - m * f : r + m * f;
+}, g = class {
 	#e;
 	#t;
 	#n;
@@ -128,7 +136,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 	static isEnd(e) {
 		return e === "End";
 	}
-}, g = class extends HTMLElement {
+}, _ = class extends HTMLElement {
 	static observedAttributes = ["data-step", "data-page"];
 	step = 1;
 	page = 10;
@@ -215,7 +223,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 	get offset() {
 		return this.#n?.offset ?? 0;
 	}
-}, _ = class extends g {
+}, v = class extends _ {
 	$thumb = null;
 	get orientation() {
 		return this.$thumb?.getAttribute("aria-orientation") ?? null;
@@ -247,12 +255,12 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 		this.#e(this.value, !1);
 	}
 	setValue(e, t = {}) {
-		let { emit: n = !0 } = t, r = l(e, this.min, this.max, this.step);
+		let { emit: n = !0 } = t, r = u(e, this.min, this.max, this.step);
 		this.#e(r, n);
 	}
 	valueFromPointer(e, t) {
-		let { clientY: n, clientX: r } = e, i = this.getBoundingClientRect(), { min: a, max: o } = this, { offsetHeight: s, offsetWidth: l } = t, u = this.isVertical, d = p((u ? n : r) + this.offset, i, u ? s : l, this.isRtl, u);
-		return Math.round(c(d, a, o));
+		let { clientY: n, clientX: r } = e, i = this.getBoundingClientRect(), { min: a, max: o } = this, { offsetHeight: s, offsetWidth: l } = t, u = this.isVertical;
+		return c(m((u ? n : r) + this.offset, i, u ? s : l, this.isRtl, u), a, o);
 	}
 	commitPointerValue(e, t) {
 		this.setValue(this.valueFromPointer(e, t));
@@ -260,15 +268,15 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 	onKeydown(e) {
 		if (!this.$thumb) return;
 		let { key: t } = e;
-		if (h.isHome(t)) {
+		if (g.isHome(t)) {
 			e.preventDefault(), this.setValue(this.min);
 			return;
 		}
-		if (h.isEnd(t)) {
+		if (g.isEnd(t)) {
 			e.preventDefault(), this.setValue(this.max);
 			return;
 		}
-		let n = new h(this.step, this.page, this.isRtl, this.isVertical).delta(t);
+		let n = new g(this.step, this.page, this.isRtl, this.isVertical).delta(t);
 		if (!n) return;
 		let { preventDefault: r, delta: i } = n;
 		r && e.preventDefault(), i !== 0 && this.setValue(this.value + i);
@@ -283,10 +291,10 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 		}, { cancelable: !1 });
 	}
 };
-customElements.get("cinq-slider") || customElements.define("cinq-slider", _);
+customElements.get("cinq-slider") || customElements.define("cinq-slider", v);
 //#endregion
 //#region src/slider-range.ts
-var v = class extends g {
+var y = class extends _ {
 	$max = null;
 	$min = null;
 	#e = "min";
@@ -333,7 +341,7 @@ var v = class extends g {
 	}
 	valueFromPointer(e, t) {
 		let { clientY: n, clientX: r } = e, { offsetHeight: i, offsetWidth: a } = t, o = t === this.$min ? "min" : "max", s = this.isVertical ? i : a;
-		return m(this.isVertical ? n + this.offset : r + this.offset, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
+		return h(this.isVertical ? n + this.offset : r + this.offset, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
 	}
 	commitPointerValue(e, t) {
 		let n = this.valueFromPointer(e, t);
@@ -348,19 +356,19 @@ var v = class extends g {
 		if (!t) return;
 		this.#e = t;
 		let { key: n } = e, r = t === "min" ? this.min : this.max;
-		if (h.isHome(n)) {
+		if (g.isHome(n)) {
 			e.preventDefault();
 			let n = t === "min" ? this.#t : this.min;
 			t === "min" ? this.setValues(n, this.max, { active: "min" }) : this.setValues(this.min, n, { active: "max" });
 			return;
 		}
-		if (h.isEnd(n)) {
+		if (g.isEnd(n)) {
 			e.preventDefault();
 			let n = t === "max" ? this.#n : this.max;
 			t === "min" ? this.setValues(n, this.max, { active: "min" }) : this.setValues(this.min, n, { active: "max" });
 			return;
 		}
-		let i = new h(this.step, this.page, this.isRtl, this.isVertical).delta(n);
+		let i = new g(this.step, this.page, this.isRtl, this.isVertical).delta(n);
 		if (!i) return;
 		let { delta: a } = i;
 		if (a !== 0) {
@@ -375,23 +383,23 @@ var v = class extends g {
 		return e === this.$min ? "min" : e === this.$max ? "max" : null;
 	}
 	#i(e) {
-		return d(this.isVertical ? this.clientHeight : this.clientWidth, e);
+		return f(this.isVertical ? this.clientHeight : this.clientWidth, e);
 	}
 	#a(n, r, i, a) {
 		if (!this.$min || !this.$max) return;
-		let o = this.#t, c = this.#n, u = l(n, o, c, this.step), d = l(r, o, c, this.step);
-		i === "min" ? u = Math.min(u, d) : d = Math.max(d, u), this.#e = i, this.setAttribute("data-active", i), this.$min.setAttribute("aria-valuenow", String(u)), this.$max.setAttribute("aria-valuenow", String(d)), this.$min.setAttribute("aria-valuemax", String(d)), this.$max.setAttribute("aria-valuemin", String(u)), this.setValuetext(this.$min, u), this.setValuetext(this.$max, d);
-		let f = s(u, o, c), p = s(d, o, c);
-		if (this.style.setProperty("--min", String(u)), this.style.setProperty("--max", String(d)), this.style.setProperty("--min-ratio", String(f)), this.style.setProperty("--max-ratio", String(p)), u === d ? this.setAttribute("data-collapsed", "") : this.removeAttribute("data-collapsed"), a) {
+		let o = this.#t, c = this.#n, l = u(n, o, c, this.step), d = u(r, o, c, this.step);
+		i === "min" ? l = Math.min(l, d) : d = Math.max(d, l), this.#e = i, this.setAttribute("data-active", i), this.$min.setAttribute("aria-valuenow", String(l)), this.$max.setAttribute("aria-valuenow", String(d)), this.$min.setAttribute("aria-valuemax", String(d)), this.$max.setAttribute("aria-valuemin", String(l)), this.setValuetext(this.$min, l), this.setValuetext(this.$max, d);
+		let f = s(l, o, c), p = s(d, o, c);
+		if (this.style.setProperty("--min", String(l)), this.style.setProperty("--max", String(d)), this.style.setProperty("--min-ratio", String(f)), this.style.setProperty("--max-ratio", String(p)), l === d ? this.setAttribute("data-collapsed", "") : this.removeAttribute("data-collapsed"), a) {
 			let n = i === "min" ? this.$min : this.$max;
 			t(this, e.SLIDER_CHANGE, {
-				min: u,
+				min: l,
 				max: d,
 				$thumb: n
 			}, { cancelable: !1 });
 		}
 	}
 };
-customElements.get("cinq-slider-range") || customElements.define("cinq-slider-range", v);
+customElements.get("cinq-slider-range") || customElements.define("cinq-slider-range", y);
 //#endregion
-export { _ as Slider, v as SliderRange };
+export { v as Slider, y as SliderRange };

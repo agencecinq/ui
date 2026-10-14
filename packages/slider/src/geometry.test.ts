@@ -56,6 +56,11 @@ describe("snapToStep", () => {
     expect(snapToStep(47.44, 0, 100, 0.1)).toBeCloseTo(47.4);
   });
 
+  it("keeps fractional steps free of float noise", () => {
+    expect(snapToStep(4.2, 3.5, 6, 0.1)).toBe(4.2);
+    expect(snapToStep(3.97, 3.25, 6, 0.1)).toBe(3.95);
+  });
+
   it("clamps only when step is non-positive", () => {
     expect(snapToStep(150, 0, 100, 0)).toBe(100);
     expect(snapToStep(150, 0, 100, -1)).toBe(100);
@@ -182,6 +187,22 @@ describe("multiValueFromPointer", () => {
         true,
       ),
     ).toBe(0);
+  });
+
+  it("returns unsnapped values so fractional steps can apply", () => {
+    expect(
+      multiValueFromPointer(
+        rail.left + thumb + track / 8,
+        rail,
+        "max",
+        gmin,
+        gmax,
+        track,
+        thumb,
+        false,
+        false,
+      ),
+    ).toBe(12.5);
   });
 
   it("maps vertical max at the top", () => {
