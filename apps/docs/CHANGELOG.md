@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.22
+
+### Patch Changes
+
+- Updated dependencies [4431fb3]
+  - @agencecinq/slider@6.0.1
+
 ## 4.4.21
 
 ### Patch Changes

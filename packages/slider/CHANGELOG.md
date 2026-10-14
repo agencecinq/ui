@@ -1,5 +1,11 @@
 # @agencecinq/slider
 
+## 6.0.1
+
+### Patch Changes
+
+- 4431fb3: Dragging honours fractional `data-step` again: pointer values are no longer rounded to integers before snapping, and snapped values are free of float noise (`4.2`, not `4.199999999999999`).
+
 ## 6.0.0
 
 ### Changed
