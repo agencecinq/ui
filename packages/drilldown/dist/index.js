@@ -109,7 +109,7 @@ var { DRILLDOWN_OPEN: s, DRILLDOWN_CLOSE: c } = e, l = class extends HTMLElement
 			previous: r,
 			$button: a,
 			open: !0
-		}) ? !1 : (a.setAttribute("aria-expanded", "true"), r.hidden = !0, i.hidden = !1, (i.querySelector("[data-autofocus], [autofocus]") ?? o(i)[0])?.focus(), !0);
+		}) ? !1 : (this.dataset.direction = "forward", a.setAttribute("aria-expanded", "true"), r.hidden = !0, i.hidden = !1, (i.querySelector("[data-autofocus], [autofocus]") ?? o(i)[0])?.focus(), !0);
 	}
 	close(e = !0) {
 		let n = this.current, r = n ? this.#e(n) : null, i = r ? this.#t(r) : null;
@@ -118,10 +118,11 @@ var { DRILLDOWN_OPEN: s, DRILLDOWN_CLOSE: c } = e, l = class extends HTMLElement
 			previous: n,
 			$button: r,
 			open: !1
-		}) ? !1 : (r.setAttribute("aria-expanded", "false"), n.hidden = !0, i.hidden = !1, e && r.focus(), !0);
+		}) ? !1 : (this.dataset.direction = "back", r.setAttribute("aria-expanded", "false"), n.hidden = !0, i.hidden = !1, e && r.focus(), !0);
 	}
 	closeAll() {
 		for (; this.close(!1););
+		delete this.dataset.direction;
 	}
 	#e(e) {
 		return this.querySelector(`button[aria-controls="${CSS.escape(e.id)}"][aria-expanded="true"]`);

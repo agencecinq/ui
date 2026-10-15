@@ -5,6 +5,55 @@ import RegisterComponents from './RegisterComponents.astro';
 
 <RegisterComponents />
 
+<style is:global>
+  /* Portal of summoning: deliberately excessive, driven by data-direction only. */
+  @media (prefers-reduced-motion: no-preference) {
+    #docs-drilldown-portal {
+      perspective: 800px;
+    }
+
+    #docs-drilldown-portal[data-direction] > * {
+      transition:
+        opacity 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+        filter 0.8s ease-out,
+        box-shadow 0.8s ease-out,
+        display 0.8s allow-discrete;
+    }
+
+    #docs-drilldown-portal[data-direction] > [hidden] {
+      opacity: 0;
+      filter: blur(12px) hue-rotate(180deg) saturate(3);
+      pointer-events: none;
+    }
+
+    #docs-drilldown-portal[data-direction='forward'] > [hidden] {
+      transform: translateX(-60%) rotateY(75deg) scale(0.5);
+    }
+
+    #docs-drilldown-portal[data-direction='back'] > [hidden] {
+      transform: translateX(60%) rotateY(-75deg) scale(0.5);
+    }
+
+    @starting-style {
+      #docs-drilldown-portal[data-direction] > :not([hidden]) {
+        opacity: 0;
+        filter: blur(12px) hue-rotate(-180deg) saturate(3);
+        box-shadow: 0 0 4rem 1rem rgb(168 85 247);
+      }
+
+      #docs-drilldown-portal[data-direction='forward'] > :not([hidden]) {
+        transform: translateX(60%) rotateY(-75deg) scale(0.5);
+      }
+
+      #docs-drilldown-portal[data-direction='back'] > :not([hidden]) {
+        transform: translateX(-60%) rotateY(75deg) scale(0.5);
+      }
+    }
+  }
+</style>
+
+
 <div class="not-content">
   <div class="flex flex-col gap-10">
     <section class="rounded-2xl bg-white p-6 shadow">
@@ -14,7 +63,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <p class="text-sm text-gray-600">
             Three levels deep. Triggers open their child panel, the back button returns to the
             parent and focus goes back to the trigger. The Undead panel focuses its heading
-            with <code>autofocus</code>. Open/close events are logged below.
+            with <code>data-autofocus</code>. Open/close events are logged below.
           </p>
         </div>
 
@@ -98,7 +147,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <span aria-hidden="true">←</span> Back to bestiary
             </button>
-            <h4 id="docs-drilldown-undead-title" tabindex="-1" autofocus class="mt-0 mb-3 px-1 text-base font-semibold text-gray-900">Undead</h4>
+            <h4 id="docs-drilldown-undead-title" tabindex="-1" data-autofocus class="mt-0 mb-3 px-1 text-base font-semibold text-gray-900">Undead</h4>
             <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
               <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Lich</a></li>
               <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Vampire</a></li>
@@ -119,6 +168,110 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
           Last event: <span id="docs-drilldown-status" class="font-mono font-medium text-gray-900">-</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-6 shadow">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Portal of summoning</h3>
+          <p class="text-sm text-gray-600">
+            Deliberately over the top, to show what <code>data-direction</code> allows. The host
+            reflects <code>forward</code> or <code>back</code> before each change, and pure CSS
+            spins the panels through a portal: 3D turn, scale, blur and hue shift, with an
+            overshooting curve. <code>closeAll()</code> removes the attribute, so the reset is
+            instant. Skipped when you prefer reduced motion.
+          </p>
+        </div>
+
+        <cinq-drilldown
+          id="docs-drilldown-portal"
+          class="relative block h-80 rounded-lg bg-gray-900"
+        >
+          <nav id="docs-drilldown-portal-root" aria-label="Planes of existence" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900">
+            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+              <li>
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  aria-expanded="false"
+                  aria-controls="docs-drilldown-portal-outer"
+                >
+                  Outer planes <span aria-hidden="true">→</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  aria-expanded="false"
+                  aria-controls="docs-drilldown-portal-elemental"
+                >
+                  Elemental planes <span aria-hidden="true">→</span>
+                </button>
+              </li>
+              <li>
+                <a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Material plane</a>
+              </li>
+            </ul>
+          </nav>
+
+          <nav id="docs-drilldown-portal-outer" aria-label="Outer planes" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900" hidden>
+            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100" data-close>
+              <span aria-hidden="true">←</span> Back to the planes
+            </button>
+            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+              <li>
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  aria-expanded="false"
+                  aria-controls="docs-drilldown-portal-abyss"
+                >
+                  The Abyss <span aria-hidden="true">→</span>
+                </button>
+              </li>
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Mount Celestia</a></li>
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Limbo</a></li>
+            </ul>
+          </nav>
+
+          <nav id="docs-drilldown-portal-abyss" aria-label="The Abyss" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900" hidden>
+            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100" data-close>
+              <span aria-hidden="true">←</span> Back to the outer planes
+            </button>
+            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Demogorgon</a></li>
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Orcus</a></li>
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Lolth</a></li>
+            </ul>
+          </nav>
+
+          <nav id="docs-drilldown-portal-elemental" aria-label="Elemental planes" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900" hidden>
+            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100" data-close>
+              <span aria-hidden="true">←</span> Back to the planes
+            </button>
+            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Plane of Fire</a></li>
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Plane of Water</a></li>
+              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-gray-900 no-underline transition-colors hover:bg-gray-100">Plane of Air</a></li>
+            </ul>
+          </nav>
+        </cinq-drilldown>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="docs-drilldown-portal-close-all"
+            class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
+          >
+            closeAll()
+          </button>
+        </div>
+
+        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          <code>data-direction</code>: <span id="docs-drilldown-portal-status" class="font-mono font-medium text-gray-900">none</span>
         </p>
       </div>
     </section>
@@ -253,6 +406,19 @@ import RegisterComponents from './RegisterComponents.astro';
   $host?.addEventListener(EVENTS.DRILLDOWN_OPEN, log);
   $host?.addEventListener(EVENTS.DRILLDOWN_CLOSE, log);
   $closeAll?.addEventListener('click', () => $host?.closeAll());
+
+  const $portal = document.getElementById('docs-drilldown-portal') as Drilldown | null;
+  const $portalStatus = document.getElementById('docs-drilldown-portal-status');
+
+  if ($portal && $portalStatus) {
+    new MutationObserver(() => {
+      $portalStatus.textContent = $portal.dataset.direction ?? 'none';
+    }).observe($portal, { attributeFilter: ['data-direction'] });
+  }
+
+  document
+    .getElementById('docs-drilldown-portal-close-all')
+    ?.addEventListener('click', () => $portal?.closeAll());
 
   const $drawerDrilldown = document.getElementById('docs-drilldown-in-drawer') as Drilldown | null;
 

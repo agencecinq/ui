@@ -13,6 +13,10 @@ const { DRILLDOWN_OPEN, DRILLDOWN_CLOSE } = EVENTS;
  * State lives in the HTML: `hidden` on panels and `aria-expanded` on triggers.
  * The path back to the root is read from the expanded triggers, so no stack is kept.
  *
+ * Before each panel change the host reflects `data-direction` (`forward` when
+ * drilling in, `back` when going up), so CSS can animate the panels. `closeAll()`
+ * removes it: a reset is not a navigation.
+ *
  * Focus is moved, never trapped: put the host in a drawer or modal to contain it.
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/
@@ -82,6 +86,7 @@ export class Drilldown extends HTMLElement {
       return false;
     }
 
+    this.dataset.direction = "forward";
     $button.setAttribute("aria-expanded", "true");
     previous.hidden = true;
     panel.hidden = false;
@@ -118,6 +123,7 @@ export class Drilldown extends HTMLElement {
       return false;
     }
 
+    this.dataset.direction = "back";
     $button.setAttribute("aria-expanded", "false");
     previous.hidden = true;
     panel.hidden = false;
@@ -129,9 +135,14 @@ export class Drilldown extends HTMLElement {
     return true;
   }
 
-  /** Goes back to the root panel without moving focus (e.g. when the drawer closes). */
+  /**
+   * Goes back to the root panel without moving focus (e.g. when the drawer closes).
+   * Removes `data-direction` afterwards, so the reset is not animated.
+   */
   closeAll(): void {
     while (this.close(false));
+
+    delete this.dataset.direction;
   }
 
   /** Expanded trigger that controls the given panel. */

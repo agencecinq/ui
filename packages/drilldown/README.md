@@ -79,7 +79,7 @@ JavaScript.
 | `destroy()` | Removes listeners. Safe while the host stays mounted. |
 | `open(id, trigger?)` | Shows panel `#id` and hides the current one. Returns `false` if cancelled or invalid. |
 | `close(focus?)` | Goes back to the parent panel. Returns `false` on the root panel. |
-| `closeAll()` | Goes back to the root panel without moving focus. |
+| `closeAll()` | Goes back to the root panel without moving focus or animating. |
 
 | Property | Description |
 | -------- | ----------- |
@@ -106,6 +106,74 @@ To reset the menu when its drawer closes, see [Inside a drawer](#inside-a-drawer
 `panel` is the panel about to show, `previous` the one about to hide, `$button` the
 trigger linking them. Events fire **before** the DOM mutates. `closeAll()` fires one
 `drilldown:close` per level.
+
+## Animating panels
+
+The component only toggles `hidden`, so panels switch at once by default. To let CSS
+animate them, the host reflects the direction of each change:
+
+| Attribute | Value | When |
+| --------- | ----- | ---- |
+| `data-direction` | `forward` | Set on the host before a child panel opens. |
+| `data-direction` | `back` | Set on the host before going back to the parent. |
+| `data-direction` | (removed) | After `closeAll()`, so a reset is not animated. |
+
+It is set only when the event was not cancelled, right before `hidden` changes, and
+stays until the next change. Nothing is animated unless your CSS uses it.
+
+Panels must overlap while one leaves and the other arrives: stack them in the same
+grid cell, or position them absolutely inside a `relative` host. Then transition
+`display` as a discrete value, so the panel getting `hidden` stays on screen for its
+exit, and give the entering panel its first frame with `@starting-style`:
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  cinq-drilldown[data-direction] > * {
+    transition:
+      opacity 0.3s ease-out,
+      translate 0.3s ease-out,
+      display 0.3s allow-discrete;
+  }
+
+  cinq-drilldown[data-direction] > [hidden] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  cinq-drilldown[data-direction="forward"] > [hidden] {
+    translate: -1.5rem 0;
+  }
+
+  cinq-drilldown[data-direction="back"] > [hidden] {
+    translate: 1.5rem 0;
+  }
+
+  @starting-style {
+    cinq-drilldown[data-direction="forward"] > :not([hidden]) {
+      opacity: 0;
+      translate: 1.5rem 0;
+    }
+
+    cinq-drilldown[data-direction="back"] > :not([hidden]) {
+      opacity: 0;
+      translate: -1.5rem 0;
+    }
+  }
+}
+```
+
+Drilling in, the parent slides out to the left while the child comes in from the
+right. Going back, the other way round.
+
+- **Browser support:** `@starting-style` and `transition-behavior: allow-discrete`
+  ship in Chrome 117, Safari 17.5 and Firefox 129. Older browsers switch panels at
+  once, as without the CSS.
+- **Tailwind:** its preflight hides `[hidden]` with `display: none !important`. The
+  transition still runs, as transitions win over `!important` declarations.
+- **Focus** moves to the new panel when the transition starts. `pointer-events: none`
+  keeps the leaving panel from catching clicks meanwhile.
+- **Reduced motion:** keep the transition inside
+  `@media (prefers-reduced-motion: no-preference)`, or fade only.
 
 ## Keyboard & focus
 
