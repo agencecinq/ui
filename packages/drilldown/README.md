@@ -112,7 +112,7 @@ trigger linking them. Events fire **before** the DOM mutates. `closeAll()` fires
 Triggers and back buttons are native `<button type="button">`: Enter and Space work
 through the browser.
 
-- **Open:** focus moves to the new panel's `[autofocus]` element if there is one,
+- **Open:** focus moves to the new panel's `[data-autofocus]` element if there is one,
   otherwise to its first focusable element, usually the back button.
 - **Close:** focus returns to the trigger that opened the panel.
 - **closeAll():** focus does not move.
@@ -124,20 +124,21 @@ accessibility tree. To contain focus, put the drilldown in a
 ### Announcing the panel
 
 Landing on the back button, a screen reader announces the button but not always the
-panel it belongs to. To say where the user is, put `autofocus` on the panel's
+panel it belongs to. To say where the user is, put `data-autofocus` on the panel's
 heading, made focusable with `tabindex="-1"`:
 
 ```html
 <nav id="menu-solutions" aria-labelledby="menu-solutions-title" hidden>
   <button type="button" data-close>Back to menu</button>
-  <h2 id="menu-solutions-title" tabindex="-1" autofocus>Solutions</h2>
+  <h2 id="menu-solutions-title" tabindex="-1" data-autofocus>Solutions</h2>
   <a href="/audit">Audit</a>
 </nav>
 ```
 
-Same convention as [`@agencecinq/drawer`](../drawer/) and [`@agencecinq/sheet`](../sheet/). An `autofocus`
-element inside a hidden panel is not focusable, so the browser skips it on page
-load and when a dialog opens.
+Panels are not dialogs, so they share one autofocus scope: HTML allows a single
+`autofocus` per page, and one per panel fails validation. `data-autofocus` keeps
+each panel's target without touching the page's own autofocus. `[autofocus]` is
+still honoured for existing markup.
 
 ## Accessibility
 

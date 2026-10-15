@@ -48,7 +48,7 @@ export class Drilldown extends HTMLElement {
 
   /**
    * Shows the panel with the given ID and hides the current one.
-   * Focus moves to the panel's `[autofocus]` element, or its first focusable one.
+   * Focus moves to the panel's `[data-autofocus]` element, or its first focusable one.
    *
    * @param id - ID of a child panel controlled by a trigger in the current panel.
    * @param trigger - Trigger to expand. Defaults to the one in the current panel.
@@ -87,7 +87,7 @@ export class Drilldown extends HTMLElement {
     panel.hidden = false;
 
     (
-      panel.querySelector<HTMLElement>("[autofocus]") ??
+      panel.querySelector<HTMLElement>("[data-autofocus], [autofocus]") ??
       getFocusableElements(panel)[0]
     )?.focus();
 
