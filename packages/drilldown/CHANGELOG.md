@@ -1,5 +1,11 @@
 # @agencecinq/drilldown
 
+## 1.2.0
+
+### Minor Changes
+
+- d446982: Focus the opened panel's `[data-autofocus]` element, so each panel can mark its target without repeating `autofocus`, which HTML allows once per page. `[autofocus]` still works.
+
 ## 1.1.0
 
 ### Minor Changes

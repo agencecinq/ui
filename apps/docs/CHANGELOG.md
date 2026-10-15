@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.23
+
+### Patch Changes
+
+- Updated dependencies [d446982]
+  - @agencecinq/drilldown@1.2.0
+
 ## 4.4.22
 
 ### Patch Changes
