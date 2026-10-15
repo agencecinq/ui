@@ -1,5 +1,11 @@
 # @agencecinq/drilldown
 
+## 1.3.0
+
+### Minor Changes
+
+- cfc5003: Reflect `data-direction` on the host (`forward` when drilling in, `back` when going up) right before each panel change, so CSS can animate the panels. `closeAll()` removes it, so a reset is not animated. The README documents an `@starting-style` recipe.
+
 ## 1.2.0
 
 ### Minor Changes

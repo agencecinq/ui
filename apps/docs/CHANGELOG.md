@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.24
+
+### Patch Changes
+
+- Updated dependencies [cfc5003]
+  - @agencecinq/drilldown@1.3.0
+
 ## 4.4.23
 
 ### Patch Changes
