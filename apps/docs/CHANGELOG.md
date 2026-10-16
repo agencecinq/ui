@@ -1,5 +1,14 @@
 # @agencecinq/docs
 
+## 4.4.29
+
+### Patch Changes
+
+- Updated dependencies [ad31101]
+- Updated dependencies [0180c76]
+  - @agencecinq/calendar@4.2.0
+  - @agencecinq/switch@4.0.0
+
 ## 4.4.28
 
 ### Patch Changes
