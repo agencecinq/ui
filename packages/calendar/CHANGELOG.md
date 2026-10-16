@@ -1,5 +1,15 @@
 # @agencecinq/calendar
 
+## 4.1.0
+
+### Minor Changes
+
+- f7ea749: The calendar matches custom states for CSS: `:state(empty)` without a picked day, `:state(picking)` while a range waits for its end, and `:state(pending)` while a `waitUntil()` of `calendar:before-change` holds a change. The README shows hints that follow them in a `role="status"` element, which screen readers announce.
+
+### Patch Changes
+
+- 3ce7c23: The range preview follows the pointer and the focused day only: a month button no longer paints a range up to the day that holds the tab stop.
+
 ## 4.0.1
 
 ### Patch Changes
