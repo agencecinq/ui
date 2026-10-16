@@ -34,7 +34,7 @@ No class to add: the calendar finds its parts in your HTML.
 | `<cinq-calendar>` | **Yes** | Host. Needs an `id` only for the month buttons |
 | `<tbody>` of the `role="grid"` table | **Yes** | Filled with the day cells |
 | `<thead> <tr>` of the same table | No | Filled with the weekday headers |
-| `[aria-live]` | No | Filled with the month and year, announced on each change |
+| `[aria-live]` | No | The first one in the calendar gets the month and year as its whole text, announced on each change: put it on the title itself |
 | Buttons with `commandfor` | No | Month navigation, see [Commands](#commands) |
 
 Each generated day button carries `data-day="YYYY-MM-DD"`.
@@ -42,9 +42,9 @@ Each generated day button carries `data-day="YYYY-MM-DD"`.
 ```html
 <cinq-calendar id="calendar" lang="fr" deselectable>
   <header>
-    <button type="button" commandfor="calendar" command="--previous-month" aria-label="Previous month">Previous</button>
+    <button type="button" commandfor="calendar" command="--previous-month" aria-label="Mois précédent">Précédent</button>
     <h2 id="calendar-title" aria-live="polite"></h2>
-    <button type="button" commandfor="calendar" command="--next-month" aria-label="Next month">Next</button>
+    <button type="button" commandfor="calendar" command="--next-month" aria-label="Mois suivant">Suivant</button>
   </header>
   <table role="grid" aria-labelledby="calendar-title">
     <thead>
@@ -164,12 +164,14 @@ el.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, event => {
 ### Bounds
 
 `min` and `max` (`YYYY-MM-DD`) work as on `<input type="date">`: days outside
-are `aria-disabled`. Without them, every day can be picked. Both are observed,
+are `aria-disabled`, and a picked day that a moving bound leaves outside makes
+the field invalid. Without them, every day can be picked. Both are observed,
 so a departure calendar can follow the arrival:
 
 ```js
 import { dayFromDate } from "@agencecinq/calendar";
 
+const [arrival, departure] = document.querySelectorAll("cinq-calendar");
 const today = dayFromDate(new Date());
 
 arrival.setAttribute("min", today);
@@ -214,10 +216,14 @@ el.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, event => {
 
 `<cinq-calendar>` is a form-associated custom element. Inside a `<form>`, its
 `name` is submitted with the picked days joined by commas (`2026-11-10`,
-`2026-11-10,2026-11-14`). `required` blocks the submission until a day is
-picked, or both ends of a range, with the browser's own message.
-`form.reset()` brings back the `data-picked` selection, and `disabled` (or a
-disabled `<fieldset>`) leaves the field out.
+`2026-11-10,2026-11-14`). Validation follows a date field, with the browser's
+own messages: `required` needs at least one day (both ends in `range`), and a
+day before `min` or after `max` blocks the submission. `form.reset()` brings
+back the `data-picked` selection, and `disabled` (or a disabled `<fieldset>`)
+leaves the field out. A range with only its start is invalid, like a half-typed
+date. The element has the validation API of a native field: `form`,
+`validity`, `validationMessage`, `willValidate`, `checkValidity()` and
+`reportValidity()`.
 
 ```html
 <form>
@@ -304,6 +310,11 @@ calendar.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
   input.dispatchEvent(new Event("change", { bubbles: true }));
   dialog.close();
 });
+
+// Confirming the day already picked changes nothing, so no calendar:change.
+calendar.addEventListener("click", ({ target }) => {
+  if (target.closest("[data-day]")?.dataset.day === input.value) dialog.close();
+});
 ```
 
 ### Language & week start
@@ -311,8 +322,8 @@ calendar.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
 The labels follow `lang` through `Intl`: the calendar's own `lang`, or the
 closest ancestor's (`<html lang>`), else the browser's language. The same
 attribute tells screen readers which language to read them in. The week starts
-on the language's first day, `first-day` overrides it. Both attributes are
-observed.
+on the language's first day, `first-day` overrides it. Both are observed on
+the calendar itself: after changing an ancestor's `lang`, call `render()`.
 
 ```html
 <cinq-calendar lang="fr">...</cinq-calendar>
@@ -330,10 +341,10 @@ language's digits, Persian ones for `fa`. Add `-u-nu-latn` to `lang`
 
 Right-to-left languages (`ar`, `fa`, `he`) also need `dir="rtl"`, usually
 next to `lang` on `<html>`. The table then lays the week out from the right,
-and the left and right arrow keys follow what is on screen. Mirror the arrow
-icons of the month buttons in your CSS, for instance
-`[command]:dir(rtl) { scale: -1 1; }`, and round range ends with logical
-corners such as `border-start-start-radius`.
+and the left and right arrow keys follow what is on screen. Characters such as `‹ ›`
+mirror themselves in right-to-left text: mirror only icons that do not, such
+as an SVG, with `[command] svg:dir(rtl) { scale: -1 1; }`. Round range ends
+with logical corners such as `border-start-start-radius`.
 
 Change the language at runtime:
 
@@ -384,13 +395,13 @@ script that runs first.
 | `deselectable` | Allow clearing the selection in `mode="single"` |
 | `min` / `max` | First / last day that can be picked (`YYYY-MM-DD`). Observed |
 | `name` | Form field name, also in the event details |
-| `required` | Needs a day, or both ends of a range, to submit. Observed |
+| `required` | Needs at least one day, both ends in `range`, to submit. Observed |
 | `disabled` | Leaves the field out of the form and disables every day |
 | `first-day` | Week start (`0`=Sun ... `6`=Sat). Defaults from the language. Observed |
 | `button-class` | Extra classes on day buttons |
 | `data-month` | Initial month (`0`-`11`) |
 | `data-year` | Initial year |
-| `data-picked` | JSON array of `YYYY-MM-DD` days to preselect |
+| `data-picked` | JSON array of `YYYY-MM-DD` days to preselect, in order (start then end in a range) |
 
 ## Keyboard (focus in the grid)
 
@@ -427,15 +438,133 @@ holds it until the promise settles (a rejection cancels it).
 
 | Method / property | Description |
 | ----------------- | ----------- |
-| `options` | Runtime options object |
+| `options` | Resolved options. `locale` and `firstDay` are read from `lang` and `first-day` on each render: set the attributes instead |
 | `picked` | Selected days as `YYYY-MM-DD` |
 | `current` | Viewed `{ month, year, day }` |
 | `render()` | Rebuild the grid |
-| `setPicked(picked, emit?)` | Assign the selection, mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
+| `setPicked(picked, emit?)` | Assign the selection (days in order, start then end in a range), mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
-| `destroy()` | Detach listeners and clear the grid |
+| `destroy()` | Detach listeners, clear the grid and its validity |
+| `form`, `validity`, `validationMessage`, `willValidate` | As on a native field |
+| `checkValidity()`, `reportValidity()` | As on a native field |
 
 Exported helpers: `getFirstDay`, `dayFromDate`, `dateFromDay`.
+
+## Migration
+
+### From 3.x to 4.0
+
+4.0 reads its markup, language and bounds from standard HTML and takes part in
+forms. It relies on current browsers: form-associated custom elements (Safari
+16.4), invoker commands (Chrome 135, Firefox 144, Safari 26.2) for the month
+buttons, and `Intl.Locale#getWeekInfo()` (Chrome 130,
+Firefox 153, Safari 17) for the first day of the week. Without the latter the
+week starts on Sunday unless `first-day` says otherwise.
+
+Each step is a search and replace: find the 3.x form, write the 4.0 one.
+
+**1. Markup.** Drop the `.js-*` classes. Give the calendar an `id`, link the
+month buttons to it with commands, and put `aria-live` on the title itself.
+
+```html
+<!-- 3.x -->
+<cinq-calendar locale="fr">
+  <header>
+    <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+    <button type="button" class="js-title" id="title" aria-live="polite"></button>
+    <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+  </header>
+  <table role="grid" aria-labelledby="title">
+    <thead><tr class="js-days"></tr></thead>
+    <tbody class="js-body"></tbody>
+  </table>
+</cinq-calendar>
+
+<!-- 4.0 -->
+<cinq-calendar id="calendar" lang="fr">
+  <header>
+    <button type="button" commandfor="calendar" command="--previous-month" aria-label="Mois précédent">‹</button>
+    <h2 id="title" aria-live="polite"></h2>
+    <button type="button" commandfor="calendar" command="--next-month" aria-label="Mois suivant">›</button>
+  </header>
+  <table role="grid" aria-labelledby="title">
+    <thead><tr></tr></thead>
+    <tbody></tbody>
+  </table>
+</cinq-calendar>
+```
+
+Clicking the title no longer moves to the next month. Add
+`aria-multiselectable="true"` on the grid in `range` and `multiple` modes.
+
+**2. Attributes.**
+
+| 3.x | 4.0 |
+| --- | --- |
+| `locale="fr"`, `data-locale="fr"` | `lang="fr"`, or nothing when an ancestor already has it (`<html lang>`) |
+| `deselect` | `deselectable` |
+| `allow-past` | Removed: past days can be picked by default. To block them, set `min` to today (`YYYY-MM-DD`) |
+| `data-picked` in any order | `data-picked` in order, start then end in a range |
+
+**3. Styling.** Classes are gone: the state is in attributes on each `<td>`,
+and the day button is its direct child (the wrapping `<div>` is gone).
+
+| 3.x selector | 4.0 selector |
+| --- | --- |
+| `.js-day` | `[data-day]` |
+| `.js-day.active`, `.js-day[aria-selected="true"]` | `td[aria-selected="true"] [data-day]` |
+| `.js-day.range` | `td[data-range] [data-day]`, picked range and preview alike |
+| `.js-day.start`, `.js-day.end` | `td[data-start] [data-day]`, `td[data-end] [data-day]` |
+
+`options.stateClasses` is removed. Write the rules in this order, so the range
+ends win over the range, which wins over a picked day.
+
+**4. Script API.**
+
+| 3.x | 4.0 |
+| --- | --- |
+| `el.renderInner = (inner, date) => { … }` | `el.addEventListener(EVENTS.CALENDAR_RENDER, …)`, then decorate `el.querySelectorAll("[data-day]")` |
+| `toDayString(date)` | `dayFromDate(date)` |
+| `fromDayString(day)` | `dateFromDay(day)` |
+| `getWeekStart(locale)` | `getFirstDay(locale)` |
+| `el.getWeekdays()` | `el.getWeekdayNames()` |
+| `el.getMonthName()`, `el.options.months` | Removed: the title comes from `Intl` |
+| `el.setDaySelected()` | Removed: `el.setPicked()` paints the grid |
+| `el.setPicked(days, false); el.render();` | `el.setPicked(days, false);` |
+| `el.options.locale = …; el.render();` | `el.lang = …;` (observed) |
+| `el.options.firstDay = …; el.render();` | `el.setAttribute("first-day", …);` (observed) |
+| `el.$previous`, `el.$next` | Removed |
+| `renderHeader(month, year)`, `renderCalendar(month, year, { focus })` | `renderHeader(year, month)`, `renderCalendar(year, month)` |
+
+`options.locale` and `options.firstDay` are read-only: they follow `lang` and
+`first-day` on each render.
+
+**5. Forms.** With a `name`, `<cinq-calendar>` is a form field: its value is the
+picked days joined by commas (`2026-11-10,2026-11-14`), and `required`, `min`
+and `max` validate it. Remove a hidden input you synced from `calendar:change`,
+unless the server expects another format.
+
+**6. Events.** Import the constants from `@agencecinq/utils` 7.10.0 or later.
+`calendar:change` now fires only when the selection changes: clicking the
+picked day again in `single` mode no longer fires it. Cap a selection with the
+cancelable `calendar:before-change` instead of trimming after
+`calendar:change`:
+
+```js
+// 3.x
+el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
+  if (el.picked.length > 3) el.setPicked(el.picked.slice(0, 3), false);
+});
+
+// 4.0
+el.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, event => {
+  if (event.detail.values.length > 3) event.preventDefault();
+});
+```
+
+**7. Keyboard.** Enter and Space are the day button's own activation. Left and
+right follow the screen: in a right-to-left grid the right arrow goes back a
+day.
 
 ## Build setup
 
