@@ -37,7 +37,7 @@ only.
 
 ```html
 <cinq-accordion>
-  <div data-panel data-open="true" data-deselect="true">
+  <div data-panel data-open="true" data-deselectable="true">
     <button
       type="button"
       data-header
@@ -96,7 +96,7 @@ Per panel:
 
 | Attribute | Default | Description |
 | --------- | ------- | ----------- |
-| `data-deselect` | `false` | Allow collapsing when already open. |
+| `data-deselectable` | `false` | Allow collapsing when already open. |
 | `data-open` | - | Reflected open state for styling. |
 
 ## Nested accordion
@@ -109,7 +109,7 @@ Set `data-hash="false"` on nested hosts to avoid hash collisions.
 
 ```html
 <cinq-accordion data-hash="false">
-  <div data-panel data-open="true" data-deselect="true">
+  <div data-panel data-open="true" data-deselectable="true">
     <button
       type="button"
       data-header
@@ -125,7 +125,7 @@ Set `data-hash="false"` on nested hosts to avoid hash collisions.
         <p>Roll ability scores, pick a class, then flesh out your adventurer.</p>
 
         <cinq-accordion data-hash="false">
-          <div data-panel data-open="true" data-deselect="true">
+          <div data-panel data-open="true" data-deselectable="true">
             <button
               type="button"
               data-header

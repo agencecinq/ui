@@ -220,7 +220,7 @@ var _ = class {
 		stateClasses: { ...v },
 		locale: "en",
 		buttonClass: "",
-		deselect: !1
+		deselectable: !1
 	};
 	current = {
 		month: 0,
@@ -263,7 +263,7 @@ var _ = class {
 			stateClasses: { ...v },
 			locale: e,
 			buttonClass: this.getAttribute("button-class") || "",
-			deselect: i(this.getAttribute("deselect"), !1),
+			deselectable: i(this.getAttribute("deselectable"), !1),
 			name: this.getAttribute("name") || void 0
 		};
 	}
@@ -309,7 +309,7 @@ var _ = class {
 		this.#n.setValidity({ valueMissing: !0 }, y(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
 	}
 	#c(e) {
-		let { mode: t, deselect: n } = this.options, r = this.picked.includes(e);
+		let { mode: t, deselectable: n } = this.options, r = this.picked.includes(e);
 		return t === "multiple" ? r ? this.picked.filter((t) => t !== e) : [...this.picked, e].sort() : t === "range" ? this.picked.length === 1 ? [this.picked[0], e].sort() : [e] : r && n ? [] : [e];
 	}
 	#l = (t) => {

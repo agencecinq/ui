@@ -90,7 +90,7 @@ export class Calendar extends HTMLElement {
     stateClasses: { ...stateClassesDefault },
     locale: "en",
     buttonClass: "",
-    deselect: false,
+    deselectable: false,
   };
   current: Current = { month: 0, year: 0, day: null };
 
@@ -161,7 +161,7 @@ export class Calendar extends HTMLElement {
       stateClasses: { ...stateClassesDefault },
       locale,
       buttonClass: this.getAttribute("button-class") || "",
-      deselect: parseBoolean(this.getAttribute("deselect"), false),
+      deselectable: parseBoolean(this.getAttribute("deselectable"), false),
       name: this.getAttribute("name") || undefined,
     };
   }
@@ -309,7 +309,7 @@ export class Calendar extends HTMLElement {
 
   /** Selection once `day` is activated, by mode. Any other mode picks a single day. */
   #nextPicked(day: string): string[] {
-    const { mode, deselect } = this.options;
+    const { mode, deselectable } = this.options;
     const isPicked = this.picked.includes(day);
 
     if (mode === "multiple") {
@@ -322,7 +322,7 @@ export class Calendar extends HTMLElement {
       return 1 === this.picked.length ? [this.picked[0], day].sort() : [day];
     }
 
-    return isPicked && deselect ? [] : [day];
+    return isPicked && deselectable ? [] : [day];
   }
 
   #handleClick = (event: MouseEvent) => {

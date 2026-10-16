@@ -38,6 +38,8 @@ var e = {
 	SNAKE_EAT: "snake:eat",
 	SNAKE_OVER: "snake:over",
 	SNAKE_REPLAY: "snake:replay",
+	CALENDAR_RENDER: "calendar:render",
+	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
 	CALENDAR_CHANGE: "calendar:change",
 	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
 	TABS_ACTIVATE: "tabs:activate",
@@ -74,7 +76,7 @@ var o = (e) => {
 	$button = null;
 	$inner = null;
 	index;
-	isDeselect = !1;
+	isDeselectable = !1;
 	isOpen = !1;
 	height = 0;
 	transitionDuration = 0;
@@ -86,7 +88,7 @@ var o = (e) => {
 	init() {
 		if (this.$button = this.el.querySelector("[data-header]") || this.el.querySelector("button"), !this.$button) throw Error("Accordion panel: header button not found");
 		if (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? document.getElementById(this.$button.getAttribute("aria-controls") || ""), !this.$body) throw Error("Accordion panel: aria-controls target not found");
-		this.$inner = this.$body.querySelector("[data-inner]") || this.$body.firstElementChild, this.isDeselect = n(this.el.getAttribute("data-deselect")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.#o(), this.$button.addEventListener("click", this.#r), this.$button.addEventListener("focus", this.#i), this.$button.addEventListener("blur", this.#a), window.addEventListener("resize", this.#o);
+		this.$inner = this.$body.querySelector("[data-inner]") || this.$body.firstElementChild, this.isDeselectable = n(this.el.getAttribute("data-deselectable")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.#o(), this.$button.addEventListener("click", this.#r), this.$button.addEventListener("focus", this.#i), this.$button.addEventListener("blur", this.#a), window.addEventListener("resize", this.#o);
 	}
 	get open() {
 		return this.$button?.getAttribute("aria-expanded") === "true";
@@ -106,7 +108,7 @@ var o = (e) => {
 		}, this.transitionDuration), o(this.el), this.isOpen = !1, !0);
 	}
 	toggle() {
-		return !this.isDeselect && this.open ? !1 : this.open ? this.close() : this.openPanel();
+		return !this.isDeselectable && this.open ? !1 : this.open ? this.close() : this.openPanel();
 	}
 	focus() {
 		this.$button?.focus();

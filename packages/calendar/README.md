@@ -39,7 +39,7 @@ Required hooks:
 | `.js-day` | Day button (generated) |
 
 ```html
-<cinq-calendar locale="fr" deselect>
+<cinq-calendar locale="fr" deselectable>
   <header>
     <button type="button" class="js-previous" aria-label="Previous month">Previous</button>
     <h2 class="js-title" id="calendar-label" aria-live="polite"></h2>
@@ -100,11 +100,11 @@ td[aria-selected="true"] .js-day {
 
 ### Single date
 
-The default mode. Add `deselect` to clear the selection by clicking the
+The default mode. Add `deselectable` to clear the selection by clicking the
 selected day again.
 
 ```html
-<cinq-calendar deselect>...</cinq-calendar>
+<cinq-calendar deselectable>...</cinq-calendar>
 ```
 
 ### Date range
@@ -343,7 +343,7 @@ script that runs first.
 | --------- | ----------- |
 | `locale` / `data-locale` | BCP 47 locale for title and weekday/month labels |
 | `mode` | Selection mode: `single` (default), `range`, or `multiple` |
-| `deselect` | Allow clearing the selection in `mode="single"` |
+| `deselectable` | Allow clearing the selection in `mode="single"` |
 | `min` / `max` | First / last day that can be picked (`YYYY-MM-DD`). Observed |
 | `name` | Form field name, also in the event details |
 | `required` | Needs a day, or both ends of a range, to submit. Observed |

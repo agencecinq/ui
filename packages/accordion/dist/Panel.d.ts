@@ -10,7 +10,7 @@ export declare class Panel {
     $button: HTMLButtonElement | null;
     $inner: HTMLElement | null;
     index: number;
-    isDeselect: boolean;
+    isDeselectable: boolean;
     isOpen: boolean;
     height: number;
     transitionDuration: number;

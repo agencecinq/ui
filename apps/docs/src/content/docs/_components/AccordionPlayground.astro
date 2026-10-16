@@ -64,7 +64,7 @@ import RegisterComponents from './RegisterComponents.astro';
           id="docs-accordion-basic"
           class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
         >
-          <div data-panel data-open="true" data-deselect="true">
+          <div data-panel data-open="true" data-deselectable="true">
             <button
               type="button"
               data-header
@@ -174,7 +174,7 @@ import RegisterComponents from './RegisterComponents.astro';
           class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
           data-multiselectable="true"
         >
-          <div data-panel data-open="true" data-deselect="true">
+          <div data-panel data-open="true" data-deselectable="true">
             <button
               type="button"
               data-header
@@ -200,7 +200,7 @@ import RegisterComponents from './RegisterComponents.astro';
             </div>
           </div>
 
-          <div data-panel data-open="true" data-deselect="true">
+          <div data-panel data-open="true" data-deselectable="true">
             <button
               type="button"
               data-header
@@ -244,7 +244,7 @@ import RegisterComponents from './RegisterComponents.astro';
           class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
           data-hash="false"
         >
-          <div data-panel data-open="true" data-deselect="true">
+          <div data-panel data-open="true" data-deselectable="true">
             <button
               type="button"
               data-header
@@ -273,7 +273,7 @@ import RegisterComponents from './RegisterComponents.astro';
                   class="docs-accordion overflow-hidden rounded-xl border border-gray-300 bg-white divide-y divide-gray-200"
                   data-hash="false"
                 >
-                  <div data-panel data-open="true" data-deselect="true">
+                  <div data-panel data-open="true" data-deselectable="true">
                     <button
                       type="button"
                       data-header
@@ -372,9 +372,9 @@ import RegisterComponents from './RegisterComponents.astro';
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Deselect disabled</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Not deselectable</h3>
           <p class="text-sm text-gray-600">
-            Without <code>data-deselect="true"</code>, clicking an open
+            Without <code>data-deselectable="true"</code>, clicking an open
             header does not collapse it. Typical accordion behaviour.
           </p>
         </div>

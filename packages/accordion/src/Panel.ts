@@ -13,7 +13,7 @@ export class Panel {
   $button: HTMLButtonElement | null = null;
   $inner: HTMLElement | null = null;
   index: number;
-  isDeselect = false;
+  isDeselectable = false;
   isOpen = false;
   height = 0;
   transitionDuration = 0;
@@ -52,8 +52,8 @@ export class Panel {
       this.$body.querySelector<HTMLElement>("[data-inner]") ||
       (this.$body.firstElementChild as HTMLElement | null);
 
-    this.isDeselect = parseBoolean(
-      this.el.getAttribute("data-deselect"),
+    this.isDeselectable = parseBoolean(
+      this.el.getAttribute("data-deselectable"),
     );
     this.isOpen = this.$button.getAttribute("aria-expanded") === "true";
 
@@ -141,7 +141,7 @@ export class Panel {
   }
 
   toggle(): boolean {
-    if (!this.isDeselect && this.open) return false;
+    if (!this.isDeselectable && this.open) return false;
 
     if (this.open) {
       return this.close();

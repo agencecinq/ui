@@ -42,7 +42,7 @@ day cells, and wires selection + keyboard navigation.
 > `aria-multiselectable="true"` on the grid in `range` and `multiple` modes.
 
 ```html
-<cinq-calendar locale="fr" deselect>
+<cinq-calendar locale="fr" deselectable>
   <header>
     <button type="button" class="js-previous" aria-label="Previous month">Previous</button>
     <h2 class="js-title" id="calendar-label" aria-live="polite"></h2>
@@ -69,10 +69,10 @@ decorated on `calendar:render`.
 
 ### Single date
 
-Default `mode="single"`. Add `deselect` to clear by clicking the selected day again.
+Default `mode="single"`. Add `deselectable` to clear by clicking the selected day again.
 
 ```html
-<cinq-calendar locale="fr" deselect name="arrival">
+<cinq-calendar locale="fr" deselectable name="arrival">
   <!-- header + table -->
 </cinq-calendar>
 ```
@@ -370,7 +370,7 @@ td[aria-selected="true"] .js-day {
 | --------- | ----------- |
 | `locale` / `data-locale` | BCP 47 locale for labels |
 | `mode` | `single` (default), `range`, or `multiple` |
-| `deselect` | Allow clearing selection in `mode="single"` |
+| `deselectable` | Allow clearing selection in `mode="single"` |
 | `min` / `max` | First / last day that can be picked (`YYYY-MM-DD`). Observed |
 | `name` | Form field name, also in the event details |
 | `required` | Needs a day, or both ends of a range, to submit. Observed |

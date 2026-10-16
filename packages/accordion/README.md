@@ -25,7 +25,7 @@ pnpm add @agencecinq/accordion
 
 ```html
 <cinq-accordion>
-  <div data-panel data-open="true" data-deselect="true">
+  <div data-panel data-open="true" data-deselectable="true">
     <button
       type="button"
       data-header
@@ -102,7 +102,7 @@ Per panel:
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
 | `data-open` | boolean | - | Reflected open state. Useful for styling. |
-| `data-deselect` | boolean | `false` | Allow collapsing the panel when it is already open. |
+| `data-deselectable` | boolean | `false` | Allow collapsing the panel when it is already open. |
 
 ### Nested accordion
 

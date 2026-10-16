@@ -15,7 +15,7 @@ export interface Options {
     buttonClass?: string;
     months?: string[];
     days?: string[];
-    deselect?: boolean;
+    deselectable?: boolean;
     name?: string;
 }
 export interface Current {
