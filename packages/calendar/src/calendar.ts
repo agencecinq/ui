@@ -32,18 +32,6 @@ const stateClassesDefault: StateClasses = {
   end: "end",
 };
 
-const MODES = ["single", "range", "multiple"] as const;
-
-const parseMode = (el: HTMLElement): Mode => {
-  const mode = el.getAttribute("mode");
-
-  if (mode && (MODES as readonly string[]).includes(mode)) {
-    return mode as Mode;
-  }
-
-  return "single";
-};
-
 /** The browser's own message for an empty required field, in the user's language. */
 const valueMissingMessage = (): string => {
   const input = document.createElement("input");
@@ -165,7 +153,7 @@ export class Calendar extends HTMLElement {
     const firstDay = this.getAttribute("first-day");
 
     return {
-      mode: parseMode(this),
+      mode: (this.getAttribute("mode") || "single") as Mode,
       firstDay:
         firstDay != null && firstDay !== ""
           ? parseNumber(firstDay, getFirstDay(locale))
@@ -319,7 +307,7 @@ export class Calendar extends HTMLElement {
     );
   }
 
-  /** Selection once `day` is activated, by mode. */
+  /** Selection once `day` is activated, by mode. Any other mode picks a single day. */
   #nextPicked(day: string): string[] {
     const { mode, deselect } = this.options;
     const isPicked = this.picked.includes(day);
@@ -330,11 +318,11 @@ export class Calendar extends HTMLElement {
         : [...this.picked, day].sort();
     }
 
-    if (mode === "single") {
-      return isPicked && deselect ? [] : [day];
+    if (mode === "range") {
+      return 1 === this.picked.length ? [this.picked[0], day].sort() : [day];
     }
 
-    return 1 === this.picked.length ? [this.picked[0], day].sort() : [day];
+    return isPicked && deselect ? [] : [day];
   }
 
   #handleClick = (event: MouseEvent) => {

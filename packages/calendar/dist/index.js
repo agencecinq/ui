@@ -190,17 +190,10 @@ var _ = class {
 	range: "range",
 	start: "start",
 	end: "end"
-}, y = [
-	"single",
-	"range",
-	"multiple"
-], b = (e) => {
-	let t = e.getAttribute("mode");
-	return t && y.includes(t) ? t : "single";
-}, x = () => {
+}, y = () => {
 	let e = document.createElement("input");
 	return e.required = !0, e.validationMessage;
-}, S = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
+}, b = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
 	<button
 		type="button"
 		class="js-day${n ? ` ${n}` : ""}"
@@ -212,7 +205,7 @@ var _ = class {
 	>
 		${t}
 	</button>
-`, C = class extends HTMLElement {
+`, x = class extends HTMLElement {
 	static formAssociated = !0;
 	static observedAttributes = [
 		"min",
@@ -265,7 +258,7 @@ var _ = class {
 	#a() {
 		let e = this.getAttribute("locale") || this.getAttribute("data-locale") || document.documentElement.getAttribute("lang") || "en", t = this.getAttribute("first-day");
 		return {
-			mode: b(this),
+			mode: this.getAttribute("mode") || "single",
 			firstDay: t != null && t !== "" ? r(t, p(e)) : p(e),
 			stateClasses: { ...v },
 			locale: e,
@@ -313,11 +306,11 @@ var _ = class {
 			this.#n.setValidity({});
 			return;
 		}
-		this.#n.setValidity({ valueMissing: !0 }, x(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
+		this.#n.setValidity({ valueMissing: !0 }, y(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
 	}
 	#c(e) {
 		let { mode: t, deselect: n } = this.options, r = this.picked.includes(e);
-		return t === "multiple" ? r ? this.picked.filter((t) => t !== e) : [...this.picked, e].sort() : t === "single" ? r && n ? [] : [e] : this.picked.length === 1 ? [this.picked[0], e].sort() : [e];
+		return t === "multiple" ? r ? this.picked.filter((t) => t !== e) : [...this.picked, e].sort() : t === "range" ? this.picked.length === 1 ? [this.picked[0], e].sort() : [e] : r && n ? [] : [e];
 	}
 	#l = (t) => {
 		let { target: r } = t;
@@ -391,7 +384,7 @@ var _ = class {
 				else if (l > d(e, t)) break;
 				else {
 					let e = c(m);
-					g.innerHTML = S(e, s.format(l), r, {
+					g.innerHTML = b(e, s.format(l), r, {
 						label: o.format(m),
 						disabled: this.#i || !!i && e < i || !!a && e > a,
 						current: e === this.day,
@@ -413,6 +406,6 @@ var _ = class {
 		}, { cancelable: !1 });
 	}
 };
-customElements.get("cinq-calendar") || customElements.define("cinq-calendar", C);
+customElements.get("cinq-calendar") || customElements.define("cinq-calendar", x);
 //#endregion
-export { C as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };
+export { x as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };
