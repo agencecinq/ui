@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 7.10.0
+
+### Minor Changes
+
+- 421e95f: Add `EVENTS.CALENDAR_RENDER` (`calendar:render`) and `EVENTS.CALENDAR_BEFORE_CHANGE` (`calendar:before-change`).
+
 ## 7.9.0
 
 ### Minor Changes

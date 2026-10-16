@@ -1,5 +1,11 @@
 # @agencecinq/accordion
 
+## 4.0.0
+
+### Major Changes
+
+- 1b92ddc: `data-deselect` is `data-deselectable` and the panel's `isDeselect` is `isDeselectable`, an adjective like `data-multiselectable`.
+
 ## 3.0.0
 
 ### Major Changes

@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/calendar",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Accessible date / range / multi-date picker as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "dev": "vite build --watch"
   },
   "peerDependencies": {
-    "@agencecinq/utils": "*"
+    "@agencecinq/utils": ">=7.10.0"
   },
   "devDependencies": {
     "@agencecinq/utils": "workspace:*",
