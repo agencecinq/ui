@@ -97,15 +97,23 @@ function f(e, t, n = 0) {
 function p(e) {
 	return (new Intl.Locale(e).getWeekInfo?.()?.firstDay ?? 0) % 7;
 }
-function m(e, t = "short") {
-	return Array.from({ length: 7 }, (n, r) => new Date(2020, 0, 5 + r).toLocaleDateString(e, { weekday: t }));
+function m(e, t) {
+	return new Intl.DateTimeFormat(e, {
+		...t,
+		calendar: "gregory"
+	});
 }
-function h(e, t = "long") {
-	return Array.from({ length: 12 }, (n, r) => new Date(2020, r, 1).toLocaleDateString(e, { month: t }));
+function h(e, t = "short") {
+	let n = m(e, { weekday: t });
+	return Array.from({ length: 7 }, (e, t) => n.format(new Date(2020, 0, 5 + t)));
+}
+function g(e, t = "long") {
+	let n = m(e, { month: t });
+	return Array.from({ length: 12 }, (e, t) => n.format(new Date(2020, t, 1)));
 }
 //#endregion
 //#region src/keyboard.ts
-var g = class {
+var _ = class {
 	host;
 	constructor(e) {
 		this.host = e;
@@ -176,22 +184,22 @@ var g = class {
 		};
 		return (o[i || a] || o.default)();
 	};
-}, _ = {
+}, v = {
 	active: "active",
 	range: "range",
 	start: "start",
 	end: "end"
-}, v = [
+}, y = [
 	"single",
 	"range",
 	"multiple"
-], y = (e) => {
+], b = (e) => {
 	let t = e.getAttribute("mode");
-	return t && v.includes(t) ? t : "single";
-}, b = () => {
+	return t && y.includes(t) ? t : "single";
+}, x = () => {
 	let e = document.createElement("input");
 	return e.required = !0, e.validationMessage;
-}, x = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
+}, S = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
 	<button
 		type="button"
 		class="js-day${n ? ` ${n}` : ""}"
@@ -203,7 +211,7 @@ var g = class {
 	>
 		${t}
 	</button>
-`, S = class extends HTMLElement {
+`, C = class extends HTMLElement {
 	static formAssociated = !0;
 	static observedAttributes = [
 		"min",
@@ -215,7 +223,7 @@ var g = class {
 	options = {
 		mode: "single",
 		firstDay: 0,
-		stateClasses: { ..._ },
+		stateClasses: { ...v },
 		locale: "en",
 		buttonClass: "",
 		deselect: !1
@@ -256,9 +264,9 @@ var g = class {
 	#a() {
 		let e = this.getAttribute("locale") || this.getAttribute("data-locale") || document.documentElement.getAttribute("lang") || "en", t = this.getAttribute("first-day");
 		return {
-			mode: y(this),
+			mode: b(this),
 			firstDay: t != null && t !== "" ? r(t, p(e)) : p(e),
-			stateClasses: { ..._ },
+			stateClasses: { ...v },
 			locale: e,
 			buttonClass: this.getAttribute("button-class") || "",
 			deselect: i(this.getAttribute("deselect"), !1),
@@ -272,7 +280,7 @@ var g = class {
 			year: r(this.getAttribute("data-year"), this.today.getFullYear()),
 			day: null
 		}, this.$title = this.querySelector(".js-title"), this.$body = this.querySelector(".js-body"), this.$next = this.querySelector(".js-next"), this.$previous = this.querySelector(".js-previous"), !this.$body) throw Error("Calendar: .js-body element not found");
-		this.#e = new g(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.#r ??= [...this.picked], this.render(), this.addEventListener("click", this.#l), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#u, !1), this.#t = () => {
+		this.#e = new _(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.#r ??= [...this.picked], this.render(), this.addEventListener("click", this.#l), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#u, !1), this.#t = () => {
 			let n = {
 				values: this.picked,
 				name: this.options.name
@@ -304,7 +312,7 @@ var g = class {
 			this.#n.setValidity({});
 			return;
 		}
-		this.#n.setValidity({ valueMissing: !0 }, b(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
+		this.#n.setValidity({ valueMissing: !0 }, x(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
 	}
 	#c(e) {
 		let { mode: t, deselect: n } = this.options, r = this.picked.includes(e);
@@ -345,15 +353,15 @@ var g = class {
 		n && this.previewRange(n);
 	};
 	getMonthName(e) {
-		return this.options.months?.[e] ?? h(this.options.locale)[e];
+		return this.options.months?.[e] ?? g(this.options.locale)[e];
 	}
 	getWeekdayNames() {
-		return this.options.days ?? m(this.options.locale);
+		return this.options.days ?? h(this.options.locale);
 	}
 	renderDays() {
 		let e = this.querySelector(".js-days");
 		if (!e) return;
-		let t = this.getWeekdayNames(), n = m(this.options.locale, "long");
+		let t = this.getWeekdayNames(), n = h(this.options.locale, "long");
 		e.innerHTML = "";
 		for (let r = 0; r < 7; r += 1) {
 			let i = (this.options.firstDay + r) % 7, a = document.createElement("th");
@@ -361,14 +369,14 @@ var g = class {
 		}
 	}
 	renderHeader(e, t) {
-		this.$title && (this.$title.textContent = new Date(e, t, 1).toLocaleDateString(this.options.locale, {
+		this.$title && (this.$title.textContent = m(this.options.locale, {
 			month: "long",
 			year: "numeric"
-		})), this.$previous?.setAttribute("data-content", this.getMonthName(0 > t - 1 ? 11 : t - 1)), this.$next?.setAttribute("data-content", this.getMonthName(11 < t + 1 ? 0 : t + 1));
+		}).format(new Date(e, t, 1))), this.$previous?.setAttribute("data-content", this.getMonthName(0 > t - 1 ? 11 : t - 1)), this.$next?.setAttribute("data-content", this.getMonthName(11 < t + 1 ? 0 : t + 1));
 	}
 	renderCalendar(e, t, { focus: n = !1 } = {}) {
 		if (!this.$body) return;
-		let r = this.options.buttonClass ?? "", i = this.getAttribute("min"), a = this.getAttribute("max"), o = new Intl.DateTimeFormat(this.options.locale, {
+		let r = this.options.buttonClass ?? "", i = this.getAttribute("min"), a = this.getAttribute("max"), o = m(this.options.locale, {
 			weekday: "long",
 			day: "numeric",
 			month: "long",
@@ -382,7 +390,7 @@ var g = class {
 				else if (s > d(e, t)) break;
 				else {
 					let e = c(p);
-					h.innerHTML = x(e, s, r, {
+					h.innerHTML = S(e, s, r, {
 						label: o.format(p),
 						disabled: this.#i || !!i && e < i || !!a && e > a,
 						current: e === this.day,
@@ -402,6 +410,6 @@ var g = class {
 	}
 	renderInner(e, t) {}
 };
-customElements.get("cinq-calendar") || customElements.define("cinq-calendar", S);
+customElements.get("cinq-calendar") || customElements.define("cinq-calendar", C);
 //#endregion
-export { S as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };
+export { C as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };

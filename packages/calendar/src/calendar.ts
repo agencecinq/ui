@@ -9,6 +9,7 @@ import Keyboard from "./keyboard.js";
 import type { Detail, Current, Options, Mode, StateClasses } from "./types.js";
 import {
   dayFromDate,
+  getDateFormat,
   getDaysInMonth,
   getFirstDay,
   getLeadingDays,
@@ -476,13 +477,10 @@ export class Calendar extends HTMLElement {
 
   renderHeader(year: number, month: number) {
     if (this.$title) {
-      this.$title.textContent = new Date(year, month, 1).toLocaleDateString(
-        this.options.locale,
-        {
-          month: "long",
-          year: "numeric",
-        },
-      );
+      this.$title.textContent = getDateFormat(this.options.locale, {
+        month: "long",
+        year: "numeric",
+      }).format(new Date(year, month, 1));
     }
 
     this.$previous?.setAttribute(
@@ -503,7 +501,7 @@ export class Calendar extends HTMLElement {
     const buttonClass = this.options.buttonClass ?? "";
     const min = this.getAttribute("min");
     const max = this.getAttribute("max");
-    const longDate = new Intl.DateTimeFormat(this.options.locale, {
+    const longDate = getDateFormat(this.options.locale, {
       weekday: "long",
       day: "numeric",
       month: "long",

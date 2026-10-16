@@ -50,15 +50,26 @@ export function getFirstDay(locale: string): number {
   return (weekInfo?.firstDay ?? 0) % 7;
 }
 
+/**
+ * Date formatter on the Gregorian calendar the grid is built on, whatever the
+ * locale's own calendar (Persian for `fa`, Buddhist for `th`).
+ */
+export function getDateFormat(
+  locale: string,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(locale, { ...options, calendar: "gregory" });
+}
+
 /** Weekday names, Sunday first (5 January 2020 was a Sunday). */
 export function getWeekdayNames(
   locale: string,
   width: "long" | "short" | "narrow" = "short",
 ): string[] {
+  const format = getDateFormat(locale, { weekday: width });
+
   return Array.from({ length: 7 }, (_, weekday) =>
-    new Date(2020, 0, 5 + weekday).toLocaleDateString(locale, {
-      weekday: width,
-    }),
+    format.format(new Date(2020, 0, 5 + weekday)),
   );
 }
 
@@ -67,7 +78,9 @@ export function getMonthNames(
   locale: string,
   width: "long" | "short" | "narrow" = "long",
 ): string[] {
+  const format = getDateFormat(locale, { month: width });
+
   return Array.from({ length: 12 }, (_, month) =>
-    new Date(2020, month, 1).toLocaleDateString(locale, { month: width }),
+    format.format(new Date(2020, month, 1)),
   );
 }

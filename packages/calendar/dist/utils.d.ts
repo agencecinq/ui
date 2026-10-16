@@ -16,6 +16,11 @@ export declare function getLeadingDays(year: number, month: number, firstDay?: n
  * Sunday when `Intl.Locale#getWeekInfo()` is unavailable.
  */
 export declare function getFirstDay(locale: string): number;
+/**
+ * Date formatter on the Gregorian calendar the grid is built on, whatever the
+ * locale's own calendar (Persian for `fa`, Buddhist for `th`).
+ */
+export declare function getDateFormat(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat;
 /** Weekday names, Sunday first (5 January 2020 was a Sunday). */
 export declare function getWeekdayNames(locale: string, width?: "long" | "short" | "narrow"): string[];
 /** Month names, January first. */
