@@ -35,9 +35,11 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-calendar .js-title {
     flex: 1;
-    border: none;
-    background: transparent;
+    margin: 0;
+    font-size: inherit;
     font-weight: 600;
+    color: #111827;
+    text-align: center;
     text-transform: capitalize;
   }
 
@@ -71,7 +73,7 @@ import RegisterComponents from './RegisterComponents.astro';
     color: #111827;
   }
 
-  .docs-calendar .js-day:hover:not([aria-disabled='true']):not(.active):not([aria-selected='true']):not(.start):not(.end) {
+  .docs-calendar .js-day:hover:not([aria-disabled='true']):not(.active):not(.start):not(.end) {
     background: #f3f4f6;
   }
 
@@ -80,16 +82,13 @@ import RegisterComponents from './RegisterComponents.astro';
     outline-offset: -1px;
   }
 
-  .docs-calendar .js-day.active,
-  .docs-calendar .js-day[aria-selected='true'] {
+  .docs-calendar .js-day.active {
     background: #111827;
     color: #fff;
   }
 
   .docs-calendar .js-day.active:hover,
-  .docs-calendar .js-day[aria-selected='true']:hover,
-  .docs-calendar .js-day.active:focus,
-  .docs-calendar .js-day[aria-selected='true']:focus {
+  .docs-calendar .js-day.active:focus {
     background: #111827;
     color: #fff;
   }
@@ -100,7 +99,7 @@ import RegisterComponents from './RegisterComponents.astro';
     color: #111827;
   }
 
-  .docs-calendar .js-day.range:hover:not(.active):not([aria-selected='true']):not(.start):not(.end) {
+  .docs-calendar .js-day.range:hover:not(.active):not(.start):not(.end) {
     background: #d1d5db;
   }
 
@@ -154,12 +153,11 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #111827;
   }
 
-  .docs-calendar-events .js-day.active[data-has-event]::after,
-  .docs-calendar-events .js-day[aria-selected='true'][data-has-event]::after {
+  .docs-calendar-events .js-day.active[data-has-event]::after {
     background: #fff;
   }
 
-  .docs-calendar-events .js-day.is-weekend:not(.active):not([aria-selected='true']) {
+  .docs-calendar-events .js-day.is-weekend:not(.active) {
     color: #9ca3af;
   }
 </style>
@@ -186,12 +184,7 @@ import RegisterComponents from './RegisterComponents.astro';
       >
         <header>
           <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <button
-            type="button"
-            class="js-title"
-            id="docs-calendar-single-label"
-            aria-live="polite"
-          ></button>
+          <h4 class="js-title" id="docs-calendar-single-label" aria-live="polite"></h4>
           <button type="button" class="js-next" aria-label="Mois suivant">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-single-label">
@@ -228,15 +221,10 @@ import RegisterComponents from './RegisterComponents.astro';
       >
         <header>
           <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <button
-            type="button"
-            class="js-title"
-            id="docs-calendar-range-label"
-            aria-live="polite"
-          ></button>
+          <h4 class="js-title" id="docs-calendar-range-label" aria-live="polite"></h4>
           <button type="button" class="js-next" aria-label="Mois suivant">›</button>
         </header>
-        <table role="grid" aria-labelledby="docs-calendar-range-label">
+        <table role="grid" aria-labelledby="docs-calendar-range-label" aria-multiselectable="true">
           <thead>
             <tr class="js-days"></tr>
           </thead>
@@ -271,15 +259,10 @@ import RegisterComponents from './RegisterComponents.astro';
       >
         <header>
           <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <button
-            type="button"
-            class="js-title"
-            id="docs-calendar-multiple-label"
-            aria-live="polite"
-          ></button>
+          <h4 class="js-title" id="docs-calendar-multiple-label" aria-live="polite"></h4>
           <button type="button" class="js-next" aria-label="Mois suivant">›</button>
         </header>
-        <table role="grid" aria-labelledby="docs-calendar-multiple-label">
+        <table role="grid" aria-labelledby="docs-calendar-multiple-label" aria-multiselectable="true">
           <thead>
             <tr class="js-days"></tr>
           </thead>
@@ -315,15 +298,10 @@ import RegisterComponents from './RegisterComponents.astro';
       >
         <header>
           <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <button
-            type="button"
-            class="js-title"
-            id="docs-calendar-preselected-label"
-            aria-live="polite"
-          ></button>
+          <h4 class="js-title" id="docs-calendar-preselected-label" aria-live="polite"></h4>
           <button type="button" class="js-next" aria-label="Mois suivant">›</button>
         </header>
-        <table role="grid" aria-labelledby="docs-calendar-preselected-label">
+        <table role="grid" aria-labelledby="docs-calendar-preselected-label" aria-multiselectable="true">
           <thead>
             <tr class="js-days"></tr>
           </thead>
@@ -355,12 +333,7 @@ import RegisterComponents from './RegisterComponents.astro';
       >
         <header>
           <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <button
-            type="button"
-            class="js-title"
-            id="docs-calendar-future-label"
-            aria-live="polite"
-          ></button>
+          <h4 class="js-title" id="docs-calendar-future-label" aria-live="polite"></h4>
           <button type="button" class="js-next" aria-label="Mois suivant">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-future-label">
@@ -418,12 +391,7 @@ import RegisterComponents from './RegisterComponents.astro';
       >
         <header>
           <button type="button" class="js-previous" aria-label="Previous month">‹</button>
-          <button
-            type="button"
-            class="js-title"
-            id="docs-calendar-locale-label"
-            aria-live="polite"
-          ></button>
+          <h4 class="js-title" id="docs-calendar-locale-label" aria-live="polite"></h4>
           <button type="button" class="js-next" aria-label="Next month">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-locale-label">
@@ -462,12 +430,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <header>
             <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-            <button
-              type="button"
-              class="js-title"
-              id="docs-calendar-events-label"
-              aria-live="polite"
-            ></button>
+            <h4 class="js-title" id="docs-calendar-events-label" aria-live="polite"></h4>
             <button type="button" class="js-next" aria-label="Mois suivant">›</button>
           </header>
           <table role="grid" aria-labelledby="docs-calendar-events-label">
@@ -599,8 +562,6 @@ import RegisterComponents from './RegisterComponents.astro';
         button.title = events[day];
       } else {
         button.setAttribute('aria-disabled', 'true');
-        button.removeAttribute('aria-selected');
-        button.classList.remove('active', 'start', 'end', 'range');
       }
     };
 

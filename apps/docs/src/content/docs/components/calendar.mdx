@@ -29,13 +29,14 @@ Then write the grid markup. The host `<cinq-calendar>` fills weekday headers and
 day cells, and wires selection + keyboard navigation.
 
 > **HTML is the source of truth.** The component does not invent missing ARIA
-> attributes. Provide `role="grid"`, labels, and live regions yourself.
+> attributes. Provide `role="grid"`, labels, and live regions yourself, and
+> `aria-multiselectable="true"` on the grid in `range` and `multiple` modes.
 
 ```html
 <cinq-calendar locale="fr" deselect>
   <header>
     <button type="button" class="js-previous" aria-label="Previous month">Previous</button>
-    <button type="button" class="js-title" id="calendar-label" aria-live="polite"></button>
+    <h2 class="js-title" id="calendar-label" aria-live="polite"></h2>
     <button type="button" class="js-next" aria-label="Next month">Next</button>
   </header>
   <table role="grid" aria-labelledby="calendar-label">
@@ -102,7 +103,6 @@ el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
   if (el.picked.length <= MAX) return;
 
   el.setPicked(el.picked.slice(0, MAX), false);
-  el.render();
 });
 ```
 
@@ -183,8 +183,31 @@ el.renderInner = (inner, date) => {
 | `.js-body` | **Yes** | Day cells container (`tbody`) |
 | `.js-days` | **Yes** | Weekday headers row |
 | `.js-previous` / `.js-next` | Optional | Month navigation |
-| `.js-title` | Optional | Month / year label (click = next month) |
+| `.js-title` | Optional | Month / year label, filled by the calendar |
 | `.js-day` | Generated | Day button |
+
+## Selection state
+
+The calendar writes the state on the cells it generates:
+
+- `aria-selected="true"` on the `<td>` of each selected day, every day of a
+  range included.
+- The full date as `aria-label` on each day button (`lundi 16 novembre 2026`),
+  `aria-current="date"` on today, and `aria-disabled="true"` on days that
+  cannot be picked.
+- Classes on the day button for styling: `active` (picked day, range ends),
+  `range` (inside a range, ends included), `start` and `end`.
+
+```css
+td[aria-selected="true"] .js-day {
+  background: #e5e7eb;
+}
+
+.js-day.active {
+  background: #111827;
+  color: #fff;
+}
+```
 
 ## Attributes
 
@@ -201,6 +224,8 @@ el.renderInner = (inner, date) => {
 | `data-picked` | JSON array of preselected `YYYY-MM-DD` days |
 
 ## Events
+
+Dispatched on the host `<cinq-calendar>` (bubble) when the selection changes.
 
 | Event | Constant | Detail |
 | ----- | -------- | ------ |
@@ -233,7 +258,7 @@ document.querySelector("cinq-calendar")?.addEventListener(
 | `picked` | Selected days as `YYYY-MM-DD` |
 | `current` | Viewed `{ month, year, day }` |
 | `render()` | Rebuild the grid |
-| `setPicked(picked, emit?)` | Assign selection, mirror `data-picked`. Emits `calendar:change` when `emit` is true (default). Pass `false` to sync without re-firing the event. |
+| `setPicked(picked, emit?)` | Assign the selection, mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
 | `destroy()` | Detach listeners and clear the grid |
 | `renderInner(inner, date)` | Per-cell hook (override) |

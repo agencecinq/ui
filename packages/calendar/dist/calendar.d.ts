@@ -31,9 +31,8 @@ export declare class Calendar extends HTMLElement {
     move(delta: number, { focus }?: {
         focus?: boolean | undefined;
     }): void;
-    /** Assign selection, mirror `data-picked`, optionally emit `calendar:change`. */
+    /** Assign selection, mirror `data-picked`, paint the grid, optionally emit `calendar:change`. */
     setPicked(picked: string[], emit?: boolean): void;
-    setDaySelected($el: HTMLElement, selected: boolean): void;
     /** Paint in-between days while choosing the range end (mouse or keyboard). */
     previewRange(to: string): void;
     getMonthName(month: number): string;

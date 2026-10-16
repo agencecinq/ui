@@ -40,13 +40,13 @@ const dayButton = (
   date: number,
   className: string,
   {
+    label,
     disabled,
-    selected,
     current,
     tabIndex,
   }: {
+    label: string;
     disabled: boolean;
-    selected: boolean;
     current: boolean;
     tabIndex: 0 | -1;
   },
@@ -56,8 +56,8 @@ const dayButton = (
 		class="js-day${className ? ` ${className}` : ""}"
 		data-day="${day}"
 		tabindex="${tabIndex}"
+		aria-label="${label}"
 		${disabled ? 'aria-disabled="true"' : ""}
-		${selected ? 'aria-selected="true"' : ""}
 		${current ? 'aria-current="date"' : ""}
 	>
 		${date}
@@ -219,24 +219,59 @@ export class Calendar extends HTMLElement {
     this.render({ focus });
   }
 
-  /** Assign selection, mirror `data-picked`, optionally emit `calendar:change`. */
+  /** Assign selection, mirror `data-picked`, paint the grid, optionally emit `calendar:change`. */
   setPicked(picked: string[], emit = true): void {
     this.picked = picked;
     this.setAttribute("data-picked", JSON.stringify(this.picked));
+    this.#paint();
 
     if (emit) {
       this.#dispatchChange();
     }
   }
 
-  setDaySelected($el: HTMLElement, selected: boolean): void {
-    if (selected) {
-      $el.classList.add(this.options.stateClasses.active);
-      return $el.setAttribute("aria-selected", "true");
+  /** Reflect `picked` on the grid: `aria-selected` on each selected cell, state classes on its day button. */
+  #paint(): void {
+    const { mode, stateClasses } = this.options;
+    const [start, end] = this.picked;
+    const isRange = mode === "range";
+    const isComplete = isRange && 2 === this.picked.length;
+
+    this.$body?.querySelectorAll<HTMLElement>(".js-day").forEach($day => {
+      const day = $day.getAttribute("data-day") as string;
+      const isPicked = this.picked.includes(day);
+      const inRange = isComplete && isBetween(day, start, end);
+      const $cell = $day.closest("td");
+
+      if (isPicked || inRange) {
+        $cell?.setAttribute("aria-selected", "true");
+      } else {
+        $cell?.removeAttribute("aria-selected");
+      }
+
+      $day.classList.toggle(stateClasses.active, isPicked);
+      $day.classList.toggle(stateClasses.range, inRange);
+      $day.classList.toggle(stateClasses.start, isRange && day === start);
+      $day.classList.toggle(stateClasses.end, isComplete && day === end);
+    });
+  }
+
+  /** Selection once `day` is activated, by mode. */
+  #nextPicked(day: string): string[] {
+    const { mode, deselect } = this.options;
+    const isPicked = this.picked.includes(day);
+
+    if (mode === "multiple") {
+      return isPicked
+        ? this.picked.filter(picked => picked !== day)
+        : [...this.picked, day].sort();
     }
 
-    $el.classList.remove(this.options.stateClasses.active);
-    return $el.removeAttribute("aria-selected");
+    if (mode === "single") {
+      return isPicked && deselect ? [] : [day];
+    }
+
+    return 1 === this.picked.length ? [this.picked[0], day].sort() : [day];
   }
 
   #handleClick = (event: MouseEvent) => {
@@ -246,7 +281,7 @@ export class Calendar extends HTMLElement {
       return;
     }
 
-    if (target.closest(".js-next") || target.closest(".js-title")) {
+    if (target.closest(".js-next")) {
       return this.move(1, { focus: false });
     }
 
@@ -254,68 +289,18 @@ export class Calendar extends HTMLElement {
       return this.move(-1, { focus: false });
     }
 
-    const $day = target.closest<HTMLElement>(".js-day");
+    const $day = target.closest<HTMLButtonElement>(".js-day");
 
     if (!$day || $day.getAttribute("aria-disabled") === "true") {
       return;
     }
 
-    const day = $day.getAttribute("data-day") as string;
-    this.#keyboard?.setFocusDay($day as HTMLButtonElement, { focus: false });
+    const picked = this.#nextPicked($day.getAttribute("data-day") as string);
+    this.#keyboard?.setFocusDay($day, { focus: false });
 
-    if (this.options.mode === "multiple") {
-      const index = this.picked.indexOf(day);
-
-      if (index >= 0) {
-        this.picked.splice(index, 1);
-        this.setDaySelected($day, false);
-      } else {
-        this.picked.push(day);
-        this.picked.sort();
-        this.setDaySelected($day, true);
-      }
-
-      return this.setPicked(this.picked);
+    if (picked.join() !== this.picked.join()) {
+      this.setPicked(picked);
     }
-
-    if (this.options.mode === "single") {
-      if (
-        $day.classList.contains(this.options.stateClasses.active) &&
-        this.options.deselect
-      ) {
-        this.picked = [];
-        this.setDaySelected($day, false);
-        return this.setPicked(this.picked);
-      }
-
-      if (this.picked.includes(day)) {
-        return;
-      }
-
-      this.picked.forEach(pickedDay => {
-        const $el = this.$body?.querySelector(`[data-day="${pickedDay}"]`);
-        if ($el) {
-          this.setDaySelected($el as HTMLElement, false);
-        }
-      });
-
-      this.picked = [day];
-      this.setDaySelected($day, true);
-      return this.setPicked(this.picked);
-    }
-
-    if (1 < this.picked.length) {
-      this.$body?.querySelectorAll(".js-day").forEach($el => {
-        $el.classList.remove(this.options.stateClasses.range);
-        this.setDaySelected($el as HTMLElement, false);
-      });
-      this.picked = [];
-    }
-
-    this.picked.push(day);
-    this.picked.sort();
-    this.setDaySelected($day, true);
-    return this.setPicked(this.picked);
   };
 
   /** Paint in-between days while choosing the range end (mouse or keyboard). */
@@ -443,6 +428,12 @@ export class Calendar extends HTMLElement {
     }
 
     const buttonClass = this.options.buttonClass ?? "";
+    const longDate = new Intl.DateTimeFormat(this.options.locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
     let dayOfMonth = 1;
 
     for (let i = 0; 6 >= i; i += 1) {
@@ -468,42 +459,13 @@ export class Calendar extends HTMLElement {
           break;
         } else {
           const day = toDayString(date);
-          const isToday = day === this.day;
-          const isSelectable = this.options.allowPast || day >= this.day;
-          const isSelected = this.picked.includes(day);
 
           inner.innerHTML = dayButton(day, dayOfMonth, buttonClass, {
-            disabled: !isSelectable,
-            selected: isSelected,
-            current: isToday,
+            label: longDate.format(date),
+            disabled: !this.options.allowPast && day < this.day,
+            current: day === this.day,
             tabIndex: -1,
           });
-
-          const $button = inner.querySelector("button") as HTMLButtonElement;
-
-          if (isSelected) {
-            $button.classList.add(this.options.stateClasses.active);
-
-            if (this.options.mode === "range") {
-              if (day === this.picked[0]) {
-                $button.classList.add(this.options.stateClasses.start);
-              }
-              if (
-                this.picked.length > 1 &&
-                day === this.picked[this.picked.length - 1]
-              ) {
-                $button.classList.add(this.options.stateClasses.end);
-              }
-            }
-          }
-
-          if (
-            this.options.mode === "range" &&
-            2 === this.picked.length &&
-            isBetween(day, this.picked[0], this.picked[1])
-          ) {
-            $button.classList.add(this.options.stateClasses.range);
-          }
 
           this.renderInner(inner, date);
 
@@ -519,6 +481,7 @@ export class Calendar extends HTMLElement {
       }
     }
 
+    this.#paint();
     this.#keyboard?.sync({ focus });
   }
 

@@ -25,7 +25,7 @@ Required hooks:
 | -------- | ---- |
 | `<cinq-calendar>` | Host element |
 | `.js-previous` / `.js-next` | Month navigation (optional) |
-| `.js-title` | Month / year label. Click advances to the next month (same as `.js-next`) |
+| `.js-title` | Month / year label, filled by the calendar |
 | `.js-days` | Weekday headers row |
 | `.js-body` | Day cells |
 | `.js-day` | Day button (generated) |
@@ -34,7 +34,7 @@ Required hooks:
 <cinq-calendar locale="fr" deselect>
   <header>
     <button type="button" class="js-previous" aria-label="Previous month">Previous</button>
-    <button type="button" class="js-title" id="calendar-label" aria-live="polite"></button>
+    <h2 class="js-title" id="calendar-label" aria-live="polite"></h2>
     <button type="button" class="js-next" aria-label="Next month">Next</button>
   </header>
   <table role="grid" aria-labelledby="calendar-label">
@@ -64,7 +64,31 @@ Importing the package registers the custom element. The calendar mounts on
 `connectedCallback`. No manual `init()` is required.
 
 > **HTML is the source of truth.** Provide `role="grid"`, `aria-labelledby`,
-> `aria-live` on the title, and `aria-label` on nav buttons yourself.
+> `aria-live` on the title, `aria-multiselectable="true"` on the grid in
+> `range` and `multiple` modes, and `aria-label` on nav buttons yourself.
+
+### Selection state
+
+The calendar writes the state on the cells it generates:
+
+- `aria-selected="true"` on the `<td>` of each selected day, every day of a
+  range included.
+- The full date as `aria-label` on each day button (`lundi 16 novembre 2026`),
+  `aria-current="date"` on today, and `aria-disabled="true"` on days that
+  cannot be picked.
+- Classes on the day button for styling: `active` (picked day, range ends),
+  `range` (inside a range, ends included), `start` and `end`.
+
+```css
+td[aria-selected="true"] .js-day {
+  background: #e5e7eb;
+}
+
+.js-day.active {
+  background: #111827;
+  color: #fff;
+}
+```
 
 ### Single date
 
@@ -97,7 +121,6 @@ el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
   if (el.picked.length <= MAX) return;
 
   el.setPicked(el.picked.slice(0, MAX), false);
-  el.render();
 });
 ```
 
@@ -177,8 +200,8 @@ el.renderInner = (inner, date) => {
 
 ## Events
 
-Dispatched on the host `<cinq-calendar>` (bubble). Constants live on
-`@agencecinq/utils` `EVENTS`:
+Dispatched on the host `<cinq-calendar>` (bubble) when the selection changes.
+Constants live on `@agencecinq/utils` `EVENTS`:
 
 | Event | Constant | Detail |
 | ----- | -------- | ------ |
@@ -192,6 +215,7 @@ Dispatched on the host `<cinq-calendar>` (bubble). Constants live on
 | `picked` | Selected days as `YYYY-MM-DD` |
 | `current` | Viewed `{ month, year, day }` |
 | `render()` | Rebuild the grid |
+| `setPicked(picked, emit?)` | Assign the selection, mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
 | `destroy()` | Detach listeners and clear the grid |
 | `renderInner(inner, date)` | Per-cell hook (override) |
