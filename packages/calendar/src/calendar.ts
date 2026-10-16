@@ -270,6 +270,7 @@ export class Calendar extends HTMLElement {
 
     this.reset();
     this.#internals.setValidity({});
+    this.#internals.states.delete("picking");
     this.#keyboard = null;
     this.$body = null;
     this.$title = null;
@@ -318,7 +319,8 @@ export class Calendar extends HTMLElement {
   /**
    * Reflect `picked` on the grid cells: `aria-selected` on each selected day,
    * and in a range `data-range` inside it (ends included), `data-start` and
-   * `data-end` on its ends.
+   * `data-end` on its ends. A range with its start only puts the calendar in
+   * `:state(picking)`.
    */
   #paint(): void {
     const [start, end] = this.picked;
@@ -340,6 +342,12 @@ export class Calendar extends HTMLElement {
       $cell?.toggleAttribute("data-start", isRange && day === start);
       $cell?.toggleAttribute("data-end", isComplete && day === end);
     });
+
+    if (isRange && 1 === this.picked.length) {
+      this.#internals.states.add("picking");
+    } else {
+      this.#internals.states.delete("picking");
+    }
   }
 
   /**

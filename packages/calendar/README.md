@@ -104,6 +104,8 @@ The calendar writes the state as attributes, no class:
 - On each day button: the full date as `aria-label`
   (`lundi 16 novembre 2026`), `aria-current="date"` on today, and
   `aria-disabled="true"` on days that cannot be picked.
+- On the calendar: `:state(picking)` while a range waits for its end, see
+  [Date range](#date-range).
 
 These rules weigh the same, so the last one that matches wins:
 
@@ -139,8 +141,33 @@ selected day again.
 
 ### Date range
 
+The first day picked starts the range, the next one ends it, and the one after
+starts a new range.
+
 ```html
 <cinq-calendar mode="range">...</cinq-calendar>
+```
+
+While the range waits for its end, the calendar matches `:state(picking)`, a
+[custom state](https://developer.mozilla.org/docs/Web/CSS/:state) for CSS.
+Show a hint with it: put the text in a `role="status"` element and hide the
+text, not the element. The status stays in the page, so screen readers announce
+the text when it shows. Prefer `role="status"` to `aria-live` here: the
+calendar writes the month in the first `[aria-live]` it finds.
+
+```html
+<cinq-calendar mode="range" lang="fr">
+  <!-- header and table -->
+  <div role="status">
+    <p>Choisissez la date de fin.</p>
+  </div>
+</cinq-calendar>
+```
+
+```css
+cinq-calendar:not(:state(picking)) [role="status"] p {
+  display: none;
+}
 ```
 
 ### Multiple dates
@@ -444,7 +471,7 @@ holds it until the promise settles (a rejection cancels it).
 | `render()` | Rebuild the grid |
 | `setPicked(picked, emit?)` | Assign the selection (days in order, start then end in a range), mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
-| `destroy()` | Detach listeners, clear the grid and its validity |
+| `destroy()` | Detach listeners, clear the grid, its validity and its state |
 | `form`, `validity`, `validationMessage`, `willValidate` | As on a native field |
 | `checkValidity()`, `reportValidity()` | As on a native field |
 

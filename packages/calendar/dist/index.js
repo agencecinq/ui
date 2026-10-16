@@ -303,7 +303,7 @@ var g = class {
 		this.#e = new g(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.#n ??= [...this.picked], this.render(), this.addEventListener("click", this.#d), this.addEventListener("command", this.#f), this.$body.addEventListener("focusin", this.#p), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#m, !1);
 	}
 	destroy() {
-		this.removeEventListener("click", this.#d), this.removeEventListener("command", this.#f), this.$body?.removeEventListener("focusin", this.#p), this.$body?.removeEventListener("mousemove", this.#m, !1), this.#e?.detach(), this.reset(), this.#t.setValidity({}), this.#e = null, this.$body = null, this.$title = null;
+		this.removeEventListener("click", this.#d), this.removeEventListener("command", this.#f), this.$body?.removeEventListener("focusin", this.#p), this.$body?.removeEventListener("mousemove", this.#m, !1), this.#e?.detach(), this.reset(), this.#t.setValidity({}), this.#t.states.delete("picking"), this.#e = null, this.$body = null, this.$title = null;
 	}
 	move(e, { focus: t = !0 } = {}) {
 		let { year: n, month: r } = this.current, i = new Date(n, r + e, 1);
@@ -327,7 +327,7 @@ var g = class {
 		this.$body?.querySelectorAll("[data-day]").forEach((i) => {
 			let a = i.getAttribute("data-day"), o = r && u(a, e, t), s = i.closest("td");
 			o || this.picked.includes(a) ? s?.setAttribute("aria-selected", "true") : s?.removeAttribute("aria-selected"), s?.toggleAttribute("data-range", o), s?.toggleAttribute("data-start", n && a === e), s?.toggleAttribute("data-end", r && a === t);
-		});
+		}), n && this.picked.length === 1 ? this.#t.states.add("picking") : this.#t.states.delete("picking");
 	}
 	#l() {
 		let e = this.picked.join(","), t = this.getAttribute("min") ?? "", n = this.getAttribute("max") ?? "", r = this.options.mode === "range" ? 2 : 1, i = this.$body?.querySelector("[data-day][tabindex=\"0\"]") ?? void 0;
