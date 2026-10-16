@@ -79,7 +79,7 @@ const dayButton = (
  */
 export class Calendar extends HTMLElement {
   static formAssociated = true;
-  static observedAttributes = ["min", "max", "required"];
+  static observedAttributes = ["lang", "first-day", "min", "max", "required"];
 
   today: Date = new Date();
   day = "";
@@ -137,22 +137,25 @@ export class Calendar extends HTMLElement {
     this.setPicked(state ? state.split(",") : [], false);
   }
 
-  #readOptions(): Options {
+  /**
+   * Language of the labels: the closest `lang`, the calendar's or an
+   * ancestor's, else the browser's. The week starts on its first day unless
+   * `first-day` says otherwise.
+   */
+  #readLanguage(): Pick<Options, "locale" | "firstDay"> {
     const locale =
-      this.getAttribute("locale") ||
-      this.getAttribute("data-locale") ||
-      document.documentElement.getAttribute("lang") ||
-      "en";
-
-    const firstDay = this.getAttribute("first-day");
+      this.closest("[lang]")?.getAttribute("lang") || navigator.language;
 
     return {
-      mode: (this.getAttribute("mode") || "single") as Mode,
-      firstDay:
-        firstDay != null && firstDay !== ""
-          ? parseNumber(firstDay, getFirstDay(locale))
-          : getFirstDay(locale),
       locale,
+      firstDay: parseNumber(this.getAttribute("first-day"), getFirstDay(locale)),
+    };
+  }
+
+  #readOptions(): Options {
+    return {
+      mode: (this.getAttribute("mode") || "single") as Mode,
+      ...this.#readLanguage(),
       buttonClass: this.getAttribute("button-class") || "",
       deselectable: parseBoolean(this.getAttribute("deselectable"), false),
       name: this.getAttribute("name") || undefined,
@@ -520,6 +523,8 @@ export class Calendar extends HTMLElement {
   }
 
   render({ focus = false } = {}) {
+    Object.assign(this.options, this.#readLanguage());
+
     this.reset();
     this.renderDays();
     this.renderHeader(this.current.year, this.current.month);

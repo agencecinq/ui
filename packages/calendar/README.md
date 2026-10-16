@@ -40,7 +40,7 @@ No class to add: the calendar finds its parts in your HTML.
 Each generated day button carries `data-day="YYYY-MM-DD"`.
 
 ```html
-<cinq-calendar id="calendar" locale="fr" deselectable>
+<cinq-calendar id="calendar" lang="fr" deselectable>
   <header>
     <button type="button" commandfor="calendar" command="--previous-month" aria-label="Previous month">Previous</button>
     <h2 id="calendar-title" aria-live="polite"></h2>
@@ -257,7 +257,7 @@ button. The calendar has no `name`, so only the input is submitted.
 
 <dialog id="arrival-dialog" aria-labelledby="arrival-dialog-title">
   <h2 id="arrival-dialog-title">Date d'arrivée</h2>
-  <cinq-calendar id="arrival-calendar" locale="fr" min="2026-10-16">
+  <cinq-calendar id="arrival-calendar" lang="fr" min="2026-10-16">
     <header>
       <button type="button" commandfor="arrival-calendar" command="--previous-month" aria-label="Mois précédent">‹</button>
       <h3 id="arrival-month" aria-live="polite"></h3>
@@ -306,33 +306,32 @@ calendar.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
 });
 ```
 
-### Locale & week start
+### Language & week start
 
-`locale` drives labels via `Intl`. Week start defaults from the locale
-(`weekInfo`). Pass `first-day` to override.
+The labels follow `lang` through `Intl`: the calendar's own `lang`, or the
+closest ancestor's (`<html lang>`), else the browser's language. The same
+attribute tells screen readers which language to read them in. The week starts
+on the language's first day, `first-day` overrides it. Both attributes are
+observed.
 
 ```html
-<cinq-calendar locale="fr">...</cinq-calendar>
+<cinq-calendar lang="fr">...</cinq-calendar>
 <!-- fr: week starts Monday -->
 
-<cinq-calendar locale="en" first-day="1">...</cinq-calendar>
+<cinq-calendar lang="en" first-day="1">...</cinq-calendar>
 <!-- force Monday despite en -->
 ```
 
-Labels stay on the Gregorian calendar the grid is built on, even for a locale
+Labels stay on the Gregorian calendar the grid is built on, even for a language
 with another calendar of its own: `fa` shows `نوامبر ۲۰۲۶`, not the Persian
 month, and `th` shows 2026, not the Buddhist year. Day numbers use the
-locale's digits, Persian ones for `fa`. Add `-u-nu-latn` to the locale
+language's digits, Persian ones for `fa`. Add `-u-nu-latn` to `lang`
 (`fa-u-nu-latn`) to keep Latin digits everywhere.
 
-Update at runtime:
+Change the language at runtime:
 
 ```js
-import { getFirstDay } from "@agencecinq/calendar";
-
-el.options.locale = "ja";
-el.options.firstDay = getFirstDay("ja");
-el.render();
+el.lang = "ja";
 ```
 
 ### Custom labels
@@ -369,14 +368,14 @@ script that runs first.
 
 | Attribute | Description |
 | --------- | ----------- |
-| `locale` / `data-locale` | BCP 47 locale for title and weekday/month labels |
+| `lang` | Language of the labels and of their reading, own or inherited (BCP 47). Observed |
 | `mode` | Selection mode: `single` (default), `range`, or `multiple` |
 | `deselectable` | Allow clearing the selection in `mode="single"` |
 | `min` / `max` | First / last day that can be picked (`YYYY-MM-DD`). Observed |
 | `name` | Form field name, also in the event details |
 | `required` | Needs a day, or both ends of a range, to submit. Observed |
 | `disabled` | Leaves the field out of the form and disables every day |
-| `first-day` | Week start (`0`=Sun ... `6`=Sat). Defaults from locale |
+| `first-day` | Week start (`0`=Sun ... `6`=Sat). Defaults from the language. Observed |
 | `button-class` | Extra classes on day buttons |
 | `data-month` | Initial month (`0`-`11`) |
 | `data-year` | Initial year |

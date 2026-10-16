@@ -42,7 +42,7 @@ day cells, and wires selection + keyboard navigation.
 > `aria-multiselectable="true"` on the grid in `range` and `multiple` modes.
 
 ```html
-<cinq-calendar id="calendar" locale="fr" deselectable>
+<cinq-calendar id="calendar" lang="fr" deselectable>
   <header>
     <button type="button" commandfor="calendar" command="--previous-month" aria-label="Previous month">Previous</button>
     <h2 id="calendar-title" aria-live="polite"></h2>
@@ -65,7 +65,7 @@ The component upgrades automatically on `connectedCallback`.
 ## Examples
 
 Interactive demos below cover single date, range, multiple dates, preselection,
-a form, a dialog, bounds, locale / week start, and an events calendar
+a form, a dialog, bounds, language / week start, and an events calendar
 decorated on `calendar:render`.
 
 <CalendarPlayground />
@@ -75,7 +75,7 @@ decorated on `calendar:render`.
 Default `mode="single"`. Add `deselectable` to clear by clicking the selected day again.
 
 ```html
-<cinq-calendar locale="fr" deselectable name="arrival">
+<cinq-calendar lang="fr" deselectable name="arrival">
   <!-- header + table -->
 </cinq-calendar>
 ```
@@ -86,7 +86,7 @@ Set `mode="range"`. First click is the start, second is the end. Hover or
 keyboard focus previews the range. A third click resets.
 
 ```html
-<cinq-calendar locale="fr" mode="range" name="stay">
+<cinq-calendar lang="fr" mode="range" name="stay">
   <!-- header + table -->
 </cinq-calendar>
 ```
@@ -97,7 +97,7 @@ Set `mode="multiple"`. Each click toggles a day in or out of the selection. No
 range preview.
 
 ```html
-<cinq-calendar locale="fr" mode="multiple" name="availability">
+<cinq-calendar lang="fr" mode="multiple" name="availability">
   <!-- header + table -->
 </cinq-calendar>
 ```
@@ -121,7 +121,7 @@ Seed the viewed month and selection from attributes:
 
 ```html
 <cinq-calendar
-  locale="fr"
+  lang="fr"
   mode="range"
   data-month="10"
   data-year="2025"
@@ -179,7 +179,7 @@ button. The calendar has no `name`, so only the input is submitted. The
 
 <dialog id="arrival-dialog" aria-labelledby="arrival-dialog-title">
   <h2 id="arrival-dialog-title">Date d'arrivée</h2>
-  <cinq-calendar id="arrival-calendar" locale="fr" min="2026-10-16">
+  <cinq-calendar id="arrival-calendar" lang="fr" min="2026-10-16">
     <header>
       <button type="button" commandfor="arrival-calendar" command="--previous-month" aria-label="Mois précédent">‹</button>
       <h3 id="arrival-month" aria-live="polite"></h3>
@@ -280,35 +280,33 @@ el.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, event => {
 });
 ```
 
-### Locale & week start
+### Language & week start
 
-`locale` drives labels via `Intl`. Week start follows the locale. Override with
-`first-day` (`0`=Sun ... `6`=Sat). Use the select in the playground to try
-`en`, `fr`, `de`, `es`, `ja`, `ar`, `fa` and `th`.
+The labels follow `lang` through `Intl`: the calendar's own `lang`, or the
+closest ancestor's (`<html lang>`), else the browser's language. The same
+attribute tells screen readers which language to read them in. The week starts
+on the language's first day, `first-day` (`0`=Sun ... `6`=Sat) overrides it.
+Both attributes are observed. Use the select in the playground to try `en`,
+`fr`, `de`, `es`, `ja`, `ar`, `fa` and `th`.
 
-Labels stay on the Gregorian calendar the grid is built on, even for a locale
+Labels stay on the Gregorian calendar the grid is built on, even for a language
 with another calendar of its own: `fa` shows `نوامبر ۲۰۲۶`, not the Persian
 month, and `th` shows 2026, not the Buddhist year. Day numbers use the
-locale's digits, Persian ones for `fa`. Add `-u-nu-latn` to the locale
+language's digits, Persian ones for `fa`. Add `-u-nu-latn` to `lang`
 (`fa-u-nu-latn`) to keep Latin digits everywhere.
 
 ```html
-<!-- French to week starts Monday -->
-<cinq-calendar locale="fr">...</cinq-calendar>
+<!-- French, week starts Monday -->
+<cinq-calendar lang="fr">...</cinq-calendar>
 
 <!-- English labels, force Monday -->
-<cinq-calendar locale="en" first-day="1">...</cinq-calendar>
+<cinq-calendar lang="en" first-day="1">...</cinq-calendar>
 ```
 
-Update at runtime:
+Change the language at runtime:
 
 ```js
-import { getFirstDay } from "@agencecinq/calendar";
-
-const el = document.querySelector("cinq-calendar");
-el.options.locale = "ja";
-el.options.firstDay = getFirstDay("ja");
-el.render();
+document.querySelector("cinq-calendar").lang = "ja";
 ```
 
 ### Decorate days
@@ -403,14 +401,14 @@ td[data-end] [data-day] {
 
 | Attribute | Description |
 | --------- | ----------- |
-| `locale` / `data-locale` | BCP 47 locale for labels |
+| `lang` | Language of the labels and of their reading, own or inherited (BCP 47). Observed |
 | `mode` | `single` (default), `range`, or `multiple` |
 | `deselectable` | Allow clearing selection in `mode="single"` |
 | `min` / `max` | First / last day that can be picked (`YYYY-MM-DD`). Observed |
 | `name` | Form field name, also in the event details |
 | `required` | Needs a day, or both ends of a range, to submit. Observed |
 | `disabled` | Leaves the field out of the form and disables every day |
-| `first-day` | Week start (`0`=Sun ... `6`=Sat) |
+| `first-day` | Week start (`0`=Sun ... `6`=Sat). Defaults from the language. Observed |
 | `button-class` | Extra classes on day buttons |
 | `data-month` / `data-year` | Initial view (`month` is `0`-`11`) |
 | `data-picked` | JSON array of preselected `YYYY-MM-DD` days |

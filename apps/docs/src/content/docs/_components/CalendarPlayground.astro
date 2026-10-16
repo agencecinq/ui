@@ -183,7 +183,7 @@ import RegisterComponents from './RegisterComponents.astro';
         id="docs-calendar-single"
         class="docs-calendar"
         data-calendar-demo="single"
-        locale="fr"
+        lang="fr"
         deselectable
         name="single"
       >
@@ -220,7 +220,7 @@ import RegisterComponents from './RegisterComponents.astro';
         id="docs-calendar-range"
         class="docs-calendar"
         data-calendar-demo="range"
-        locale="fr"
+        lang="fr"
         mode="range"
         name="range"
       >
@@ -258,7 +258,7 @@ import RegisterComponents from './RegisterComponents.astro';
         id="docs-calendar-multiple"
         class="docs-calendar"
         data-calendar-demo="multiple"
-        locale="fr"
+        lang="fr"
         mode="multiple"
         name="multiple"
       >
@@ -294,7 +294,7 @@ import RegisterComponents from './RegisterComponents.astro';
         id="docs-calendar-preselected"
         class="docs-calendar"
         data-calendar-demo="preselected"
-        locale="fr"
+        lang="fr"
         mode="range"
         data-month="10"
         data-year="2025"
@@ -338,7 +338,7 @@ import RegisterComponents from './RegisterComponents.astro';
           id="docs-calendar-form"
           class="docs-calendar"
           data-calendar-demo="form"
-          locale="fr"
+          lang="fr"
           mode="range"
           name="stay"
           required
@@ -415,7 +415,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <h4 id="docs-calendar-dialog-title" class="mb-3 text-base font-semibold text-gray-900">
           Date d'arrivée
         </h4>
-        <cinq-calendar id="docs-calendar-dialog-calendar" class="docs-calendar" locale="fr">
+        <cinq-calendar id="docs-calendar-dialog-calendar" class="docs-calendar" lang="fr">
           <header>
             <button type="button" commandfor="docs-calendar-dialog-calendar" command="--previous-month" aria-label="Mois précédent">‹</button>
             <h5 id="docs-calendar-dialog-label" aria-live="polite"></h5>
@@ -456,7 +456,7 @@ import RegisterComponents from './RegisterComponents.astro';
         id="docs-calendar-future"
         class="docs-calendar"
         data-calendar-demo="future"
-        locale="fr"
+        lang="fr"
         deselectable
         name="future"
       >
@@ -482,30 +482,31 @@ import RegisterComponents from './RegisterComponents.astro';
   <section class="rounded-2xl bg-white p-6 shadow">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Locale & week start</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Language & week start</h3>
         <p class="text-sm text-gray-600">
-          Change the locale. Labels update via <code>Intl</code>, week start follows
-          <code>getFirstDay(locale)</code> unless you override <code>first-day</code>, and the
-          locale's weekend from <code>Intl.Locale#getWeekInfo()</code> is grayed: Friday alone
-          for <code>fa</code>, Friday and Saturday for <code>ar</code>.
+          The select sets <code>lang</code> on the calendar, an observed attribute: labels
+          follow through <code>Intl</code>, the week starts on the language's first day unless
+          <code>first-day</code> says otherwise, and the language's weekend from
+          <code>Intl.Locale#getWeekInfo()</code> is grayed: Friday alone for <code>fa</code>,
+          Friday and Saturday for <code>ar</code>.
         </p>
       </div>
 
       <div class="flex flex-wrap items-end gap-3">
         <label class="flex flex-col gap-1 text-sm text-gray-700">
-          <span class="text-xs font-medium uppercase tracking-wide text-gray-500">Locale</span>
+          <span class="text-xs font-medium uppercase tracking-wide text-gray-500">Language</span>
           <select
             data-calendar-locale-select
             class="rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
           >
-            <option value="en">English (en)</option>
-            <option value="fr" selected>Français (fr)</option>
-            <option value="de">Deutsch (de)</option>
-            <option value="es">Español (es)</option>
-            <option value="ja">日本語 (ja)</option>
-            <option value="ar">العربية (ar)</option>
-            <option value="fa">فارسی (fa)</option>
-            <option value="th">ไทย (th)</option>
+            <option value="en" lang="en">English (en)</option>
+            <option value="fr" lang="fr" selected>Français (fr)</option>
+            <option value="de" lang="de">Deutsch (de)</option>
+            <option value="es" lang="es">Español (es)</option>
+            <option value="ja" lang="ja">日本語 (ja)</option>
+            <option value="ar" lang="ar">العربية (ar)</option>
+            <option value="fa" lang="fa">فارسی (fa)</option>
+            <option value="th" lang="th">ไทย (th)</option>
           </select>
         </label>
         <p class="pb-1.5 font-mono text-xs text-gray-500">
@@ -518,14 +519,14 @@ import RegisterComponents from './RegisterComponents.astro';
         id="docs-calendar-locale"
         class="docs-calendar"
         data-calendar-demo="locale"
-        locale="fr"
+        lang="fr"
         deselectable
         name="locale"
       >
         <header>
-          <button type="button" commandfor="docs-calendar-locale" command="--previous-month" aria-label="Previous month">‹</button>
+          <button type="button" commandfor="docs-calendar-locale" command="--previous-month" lang="en" aria-label="Previous month">‹</button>
           <h4 id="docs-calendar-locale-label" aria-live="polite"></h4>
-          <button type="button" commandfor="docs-calendar-locale" command="--next-month" aria-label="Next month">›</button>
+          <button type="button" commandfor="docs-calendar-locale" command="--next-month" lang="en" aria-label="Next month">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-locale-label">
           <thead>
@@ -557,7 +558,7 @@ import RegisterComponents from './RegisterComponents.astro';
           id="docs-calendar-events"
           class="docs-calendar docs-calendar-events"
           data-calendar-demo="events"
-          locale="fr"
+          lang="fr"
           deselectable
           name="events"
         >
@@ -601,7 +602,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
 <script>
   import { EVENTS } from '@agencecinq/utils';
-  import { dateFromDay, dayFromDate, getFirstDay } from '@agencecinq/calendar';
+  import { dateFromDay, dayFromDate } from '@agencecinq/calendar';
 
   const emptyLabels = {
     single: 'Aucune date',
@@ -706,27 +707,22 @@ import RegisterComponents from './RegisterComponents.astro';
     markWeekend(localeCalendar);
   });
 
-  const applyLocale = (locale) => {
+  const applyLang = (lang) => {
     if (!localeCalendar) return;
 
-    const firstDay = getFirstDay(locale);
-    localeCalendar.options.locale = locale;
-    localeCalendar.options.firstDay = firstDay;
-    localeCalendar.setAttribute('locale', locale);
-    localeCalendar.removeAttribute('first-day');
-    localeCalendar.render();
+    localeCalendar.lang = lang;
 
     if (firstDayOutput) {
-      firstDayOutput.textContent = String(firstDay);
+      firstDayOutput.textContent = String(localeCalendar.options.firstDay);
     }
   };
 
   localeSelect?.addEventListener('change', (event) => {
-    applyLocale(event.target.value);
+    applyLang(event.target.value);
   });
 
   if (localeSelect) {
-    applyLocale(localeSelect.value);
+    applyLang(localeSelect.value);
   }
 
   const eventsCalendar = document.querySelector('[data-calendar-demo="events"]');
