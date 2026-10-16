@@ -3,8 +3,10 @@ export type Mode = "single" | "range" | "multiple";
 export interface Options {
     /** `single` (default), `range`, or `multiple` (toggle discrete days). */
     mode: Mode;
-    firstDay: number;
-    locale: string;
+    /** Read from `first-day`, else the language, on each render: set the attribute to change it. */
+    readonly firstDay: number;
+    /** Read from the closest `lang` on each render: set `lang` to change it. */
+    readonly locale: string;
     buttonClass?: string;
     days?: string[];
     deselectable?: boolean;

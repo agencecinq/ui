@@ -33,10 +33,6 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #f3f4f6;
   }
 
-  /* Previous points right and next points left in a right-to-left calendar. */
-  .docs-calendar header [command]:dir(rtl) {
-    scale: -1 1;
-  }
 
   .docs-calendar [aria-live] {
     flex: 1;
@@ -698,8 +694,13 @@ import RegisterComponents from './RegisterComponents.astro';
     dialog.close();
   });
 
+  // Confirming the day already picked changes nothing, so no calendar:change.
+  dialogCalendar?.addEventListener('click', ({ target }) => {
+    if (target.closest('[data-day]')?.dataset.day === dialogInput.value) dialog.close();
+  });
+
   const markWeekend = (calendar) => {
-    const { weekend } = new Intl.Locale(calendar.options.locale).getWeekInfo();
+    const { weekend } = new Intl.Locale(calendar.options.locale).getWeekInfo?.() ?? { weekend: [6, 7] };
 
     calendar.querySelectorAll('[data-day]').forEach((button) => {
       // getWeekInfo() counts 1 (Monday) to 7 (Sunday), getDay() 0 (Sunday) to 6.
@@ -721,7 +722,7 @@ import RegisterComponents from './RegisterComponents.astro';
     if (!localeCalendar) return;
 
     localeCalendar.lang = lang;
-    localeCalendar.dir = new Intl.Locale(lang).getTextInfo().direction;
+    localeCalendar.dir = new Intl.Locale(lang).getTextInfo?.().direction ?? 'ltr';
 
     if (firstDayOutput) {
       firstDayOutput.textContent = String(localeCalendar.options.firstDay);

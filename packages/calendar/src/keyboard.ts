@@ -97,11 +97,11 @@ export default class Keyboard {
   }
 
   #handleKeydown = (event: KeyboardEvent) => {
-    const $target = (event.target as HTMLElement).closest(
+    const $target = (event.target as Element).closest<HTMLButtonElement>(
       "[data-day]",
-    ) as HTMLButtonElement | null;
+    );
 
-    if (!$target) {
+    if (!$target || !this.host.$body?.contains($target)) {
       return;
     }
 
@@ -109,7 +109,7 @@ export default class Keyboard {
     const dayOfWeek = dateFromDay(day).getDay();
     const offset = (dayOfWeek - this.host.options.firstDay + 7) % 7;
     // Left and right follow the screen: in a right-to-left grid the next day sits on the left.
-    const forward = $target.matches(":dir(rtl)") ? -1 : 1;
+    const forward = getComputedStyle($target).direction === "rtl" ? -1 : 1;
     const { key, code } = event;
 
     const codes: Record<string, () => void | false> = {

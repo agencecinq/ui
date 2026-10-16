@@ -151,8 +151,8 @@ var g = class {
 	}
 	#e = (e) => {
 		let t = e.target.closest("[data-day]");
-		if (!t) return;
-		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, i = t.matches(":dir(rtl)") ? -1 : 1, { key: a, code: o } = e, s = {
+		if (!t || !this.host.$body?.contains(t)) return;
+		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, i = getComputedStyle(t).direction === "rtl" ? -1 : 1, { key: a, code: o } = e, s = {
 			ArrowLeft: () => {
 				e.preventDefault(), this.focusDayByOffset(n, -i);
 			},
@@ -181,15 +181,21 @@ var g = class {
 		};
 		return (s[a || o] || s.default)();
 	};
-}, _ = () => {
-	let e = document.createElement("input");
-	return e.required = !0, e.validationMessage;
+}, _ = (e) => {
+	let t = document.createElement("input");
+	return t.type = "date", Object.assign(t, e), t.validationMessage;
 }, v = {
 	"--previous-month": -1,
 	"--next-month": 1,
 	"--previous-year": -12,
 	"--next-year": 12
-}, y = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
+}, y = (e) => {
+	for (let t = e; t; t = t.getRootNode().host) {
+		let e = t.closest("[lang]");
+		if (e) return e.getAttribute("lang");
+	}
+	return null;
+}, b = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
 	<button
 		type="button"
 		${n ? `class="${n}"` : ""}
@@ -201,7 +207,7 @@ var g = class {
 	>
 		${t}
 	</button>
-`, b = class extends HTMLElement {
+`, x = class extends HTMLElement {
 	static formAssociated = !0;
 	static observedAttributes = [
 		"lang",
@@ -225,10 +231,9 @@ var g = class {
 		day: null
 	};
 	#e = null;
-	#t = () => {};
-	#n = this.attachInternals();
-	#r = null;
-	#i = !1;
+	#t = this.attachInternals();
+	#n = null;
+	#r = !1;
 	$body = null;
 	$title = null;
 	picked = [];
@@ -236,116 +241,145 @@ var g = class {
 		this.init();
 	}
 	disconnectedCallback() {
-		this.destroy(), this.#e = null, this.$body = null, this.$title = null;
+		this.destroy();
 	}
-	attributeChangedCallback() {
-		this.$body && this.render();
+	get form() {
+		return this.#t.form;
+	}
+	get validity() {
+		return this.#t.validity;
+	}
+	get validationMessage() {
+		return this.#t.validationMessage;
+	}
+	get willValidate() {
+		return this.#t.willValidate;
+	}
+	checkValidity() {
+		return this.#t.checkValidity();
+	}
+	reportValidity() {
+		return this.#t.reportValidity();
+	}
+	attributeChangedCallback(e, t, n) {
+		this.$body && t !== n && this.render();
 	}
 	formDisabledCallback(e) {
-		this.#i = e, this.$body && this.render();
+		this.#r = e, this.$body && this.render();
 	}
 	formResetCallback() {
-		this.setPicked([...this.#r ?? []], !1);
+		this.setPicked([...this.#n ?? []], !1);
 	}
 	formStateRestoreCallback(e) {
 		this.setPicked(e ? e.split(",") : [], !1);
 	}
-	#a() {
-		let e = this.closest("[lang]")?.getAttribute("lang") || navigator.language;
+	#i() {
+		let e = y(this) || navigator.language;
 		return {
 			locale: e,
 			firstDay: r(this.getAttribute("first-day"), p(e))
 		};
 	}
-	#o() {
+	#a() {
 		return {
 			mode: this.getAttribute("mode") || "single",
-			...this.#a(),
+			...this.#i(),
 			buttonClass: this.getAttribute("button-class") || "",
 			deselectable: i(this.getAttribute("deselectable"), !1),
 			name: this.getAttribute("name") || void 0
 		};
 	}
 	init() {
-		let n = /* @__PURE__ */ new Date();
-		if (this.today = new Date(n.getFullYear(), n.getMonth(), n.getDate()), this.day = c(this.today), this.options = this.#o(), this.current = {
+		let e = /* @__PURE__ */ new Date();
+		if (this.today = new Date(e.getFullYear(), e.getMonth(), e.getDate()), this.day = c(this.today), this.options = this.#a(), this.current = {
 			month: r(this.getAttribute("data-month"), this.today.getMonth()),
 			year: r(this.getAttribute("data-year"), this.today.getFullYear()),
 			day: null
 		}, this.$title = this.querySelector("[aria-live]"), this.$body = this.querySelector("[role=\"grid\"] tbody"), !this.$body) throw Error("Calendar: [role=\"grid\"] tbody not found");
-		this.#e = new g(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.#r ??= [...this.picked], this.render(), this.addEventListener("click", this.#u), this.addEventListener("command", this.#d), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#f, !1), this.#t = () => {
-			let n = {
-				values: this.picked,
-				name: this.options.name
-			};
-			t(this, e.CALENDAR_CHANGE, n, { cancelable: !1 });
-		};
+		this.#e = new g(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.#n ??= [...this.picked], this.render(), this.addEventListener("click", this.#d), this.addEventListener("command", this.#f), this.$body.addEventListener("focusin", this.#p), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#m, !1);
 	}
 	destroy() {
-		this.removeEventListener("click", this.#u), this.removeEventListener("command", this.#d), this.#e && (this.#e.detach(), this.$body?.removeEventListener("mousemove", this.#f, !1)), this.reset(), this.#t = () => {};
+		this.removeEventListener("click", this.#d), this.removeEventListener("command", this.#f), this.$body?.removeEventListener("focusin", this.#p), this.$body?.removeEventListener("mousemove", this.#m, !1), this.#e?.detach(), this.reset(), this.#t.setValidity({}), this.#e = null, this.$body = null, this.$title = null;
 	}
 	move(e, { focus: t = !0 } = {}) {
 		let { year: n, month: r } = this.current, i = new Date(n, r + e, 1);
 		this.current.year = i.getFullYear(), this.current.month = i.getMonth(), this.render({ focus: t });
 	}
 	setPicked(e, t = !0) {
-		this.picked = e, this.setAttribute("data-picked", JSON.stringify(this.picked)), this.#s(), this.#c(), t && this.#t();
+		this.picked = e, this.setAttribute("data-picked", JSON.stringify(this.picked)), this.#c(), this.#l(), t && this.#o();
 	}
-	#s() {
+	#o() {
+		t(this, e.CALENDAR_CHANGE, {
+			values: this.picked,
+			name: this.options.name
+		}, { cancelable: !1 });
+	}
+	#s(e) {
+		let t = this.getAttribute("min"), n = this.getAttribute("max");
+		return this.#r || !!t && e < t || !!n && e > n;
+	}
+	#c() {
 		let [e, t] = this.picked, n = this.options.mode === "range", r = n && this.picked.length === 2;
 		this.$body?.querySelectorAll("[data-day]").forEach((i) => {
 			let a = i.getAttribute("data-day"), o = r && u(a, e, t), s = i.closest("td");
 			o || this.picked.includes(a) ? s?.setAttribute("aria-selected", "true") : s?.removeAttribute("aria-selected"), s?.toggleAttribute("data-range", o), s?.toggleAttribute("data-start", n && a === e), s?.toggleAttribute("data-end", r && a === t);
 		});
 	}
-	#c() {
-		this.#n.setFormValue(this.picked.join(",") || null);
-		let e = this.options.mode === "range" ? 2 : 1;
-		if (!this.hasAttribute("required") || this.picked.length >= e) {
-			this.#n.setValidity({});
-			return;
-		}
-		this.#n.setValidity({ valueMissing: !0 }, _(), this.$body?.querySelector("[data-day][tabindex=\"0\"]") ?? void 0);
+	#l() {
+		let e = this.picked.join(","), t = this.getAttribute("min") ?? "", n = this.getAttribute("max") ?? "", r = this.options.mode === "range" ? 2 : 1, i = this.$body?.querySelector("[data-day][tabindex=\"0\"]") ?? void 0;
+		if (this.#t.setFormValue(e || null, e), this.hasAttribute("required") && this.picked.length < r) return this.#t.setValidity({ valueMissing: !0 }, _({ required: !0 }), i);
+		if (r === 2 && this.picked.length === 1) return this.#t.setValidity({ badInput: !0 }, _({ required: !0 }), i);
+		let a = this.picked.find((e) => t && e < t), o = this.picked.find((e) => n && e > n), s = a ? _({
+			min: t,
+			value: a
+		}) : "", c = o ? _({
+			max: n,
+			value: o
+		}) : "";
+		if (s) return this.#t.setValidity({ rangeUnderflow: !0 }, s, i);
+		if (c) return this.#t.setValidity({ rangeOverflow: !0 }, c, i);
+		this.#t.setValidity({});
 	}
-	#l(e) {
+	#u(e) {
 		let { mode: t, deselectable: n } = this.options, r = this.picked.includes(e);
 		return t === "multiple" ? r ? this.picked.filter((t) => t !== e) : [...this.picked, e].sort() : t === "range" ? this.picked.length === 1 ? [this.picked[0], e].sort() : [e] : r && n ? [] : [e];
 	}
-	#u = (t) => {
+	#d = (t) => {
 		let { target: r } = t;
-		if (!(r instanceof HTMLElement)) return;
-		let i = r.closest("[data-day]");
-		if (!i || i.getAttribute("aria-disabled") === "true") return;
-		let a = this.#l(i.getAttribute("data-day"));
-		if (this.#e?.setFocusDay(i, { focus: !1 }), a.join() === this.picked.join()) return;
-		let o = this.picked, s = (e) => {
-			e && this.picked === o && this.setPicked(a);
-		}, c = n(this, e.CALENDAR_BEFORE_CHANGE, {
-			values: [...a],
+		if (!(r instanceof Element)) return;
+		let i = r.closest("[data-day]"), a = i?.getAttribute("data-day");
+		if (!i || !a || !this.$body?.contains(i) || i.getAttribute("aria-disabled") === "true" || this.#s(a)) return;
+		let o = this.#u(a);
+		if (this.#e?.setFocusDay(i, { focus: !1 }), o.join() === this.picked.join()) return;
+		let s = this.picked.join(), c = (e) => {
+			e && this.picked.join() === s && this.setPicked(o);
+		}, l = n(this, e.CALENDAR_BEFORE_CHANGE, {
+			values: [...o],
 			name: this.options.name
 		});
-		if (typeof c == "boolean") return s(c);
-		c.then(s);
+		if (typeof l == "boolean") return c(l);
+		l.then(c);
 	};
-	#d = (e) => {
+	#f = (e) => {
 		let t = v[e.command];
 		t && this.move(t, { focus: !1 });
 	};
 	previewRange(e) {
 		if (this.options.mode !== "range" || this.picked.length !== 1 || !this.$body) return;
 		let t = this.$body.querySelector(`[data-day="${e}"]`);
-		if (!t || t.getAttribute("aria-disabled") === "true") return;
+		if (!t || t.getAttribute("aria-disabled") === "true" || this.#s(e)) return;
 		let [n, r] = [this.picked[0], e].sort();
 		this.$body.querySelectorAll("[data-day]").forEach((e) => {
 			let t = e.getAttribute("data-day"), i = e.closest("td");
 			i?.toggleAttribute("data-range", u(t, n, r)), i?.toggleAttribute("data-start", t === n), i?.toggleAttribute("data-end", t === r);
 		});
 	}
-	#f = (e) => {
-		let t = e.target.closest("[data-day]");
-		if (!t) return;
-		let n = t.getAttribute("data-day");
-		n && this.previewRange(n);
+	#p = () => {
+		this.#l();
+	};
+	#m = (e) => {
+		let t = e.target.closest("[data-day]"), n = t?.getAttribute("data-day");
+		t && n && this.$body?.contains(t) && this.previewRange(n);
 	};
 	getWeekdayNames() {
 		return this.options.days ?? h(this.options.locale);
@@ -361,49 +395,51 @@ var g = class {
 		}
 	}
 	renderHeader(e, t) {
-		this.$title && (this.$title.textContent = m(this.options.locale, {
+		let n = m(this.options.locale, {
 			month: "long",
 			year: "numeric"
-		}).format(new Date(e, t, 1)));
+		}).format(new Date(e, t, 1));
+		this.$title && this.$title.textContent !== n && (this.$title.textContent = n);
 	}
-	renderCalendar(e, t, { focus: n = !1 } = {}) {
+	renderCalendar(e, t) {
 		if (!this.$body) return;
-		let r = this.options.buttonClass ?? "", i = this.getAttribute("min"), a = this.getAttribute("max"), o = m(this.options.locale, {
+		let n = this.options.buttonClass ?? "", r = m(this.options.locale, {
 			weekday: "long",
 			day: "numeric",
 			month: "long",
 			year: "numeric"
-		}), s = new Intl.NumberFormat(this.options.locale), l = 1;
-		for (let n = 0; 6 >= n; n += 1) {
-			let u = document.createElement("tr");
-			for (let p = this.options.firstDay; p < 7 + this.options.firstDay; p += 1) {
-				let m = new Date(e, t, l), h = document.createElement("td"), g = document.createElement("div");
-				if (n === 0 && p < this.options.firstDay + f(e, t, this.options.firstDay)) u.appendChild(h);
-				else if (l > d(e, t)) break;
+		}), i = new Intl.NumberFormat(this.options.locale), a = 1;
+		for (let o = 0; 6 >= o; o += 1) {
+			let s = document.createElement("tr");
+			for (let l = this.options.firstDay; l < 7 + this.options.firstDay; l += 1) {
+				let u = new Date(e, t, a), p = document.createElement("td");
+				if (o === 0 && l < this.options.firstDay + f(e, t, this.options.firstDay)) s.appendChild(p);
+				else if (a > d(e, t)) break;
 				else {
-					let e = c(m);
-					g.innerHTML = y(e, s.format(l), r, {
-						label: o.format(m),
-						disabled: this.#i || !!i && e < i || !!a && e > a,
+					let e = c(u);
+					p.innerHTML = b(e, i.format(a), n, {
+						label: r.format(u),
+						disabled: this.#s(e),
 						current: e === this.day,
 						tabIndex: -1
-					}), h.appendChild(g), u.appendChild(h), l += 1;
+					}), s.appendChild(p), a += 1;
 				}
 			}
-			u.childNodes.length && this.$body.appendChild(u);
+			s.childNodes.length && this.$body.appendChild(s);
 		}
-		this.#s(), this.#e?.sync({ focus: n });
+		this.#c();
 	}
 	reset() {
 		this.$body && (this.$body.innerHTML = "");
 	}
 	render({ focus: n = !1 } = {}) {
-		Object.assign(this.options, this.#a()), this.reset(), this.renderDays(), this.renderHeader(this.current.year, this.current.month), this.renderCalendar(this.current.year, this.current.month, { focus: n }), this.#c(), t(this, e.CALENDAR_RENDER, {
+		let { activeElement: r } = this.getRootNode(), i = !!this.$body?.contains(r), a = i && r?.getAttribute("data-day");
+		a && (this.current.day = a), Object.assign(this.options, this.#i()), this.reset(), this.renderDays(), this.renderHeader(this.current.year, this.current.month), this.renderCalendar(this.current.year, this.current.month), t(this, e.CALENDAR_RENDER, {
 			year: this.current.year,
 			month: this.current.month
-		}, { cancelable: !1 });
+		}, { cancelable: !1 }), this.#e?.sync({ focus: n || i }), this.#l();
 	}
 };
-customElements.get("cinq-calendar") || customElements.define("cinq-calendar", b);
+customElements.get("cinq-calendar") || customElements.define("cinq-calendar", x);
 //#endregion
-export { b as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };
+export { x as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };

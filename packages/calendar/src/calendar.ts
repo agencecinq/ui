@@ -23,10 +23,16 @@ import {
   isBetween,
 } from "./utils.js";
 
-/** The browser's own message for an empty required field, in the user's language. */
-const valueMissingMessage = (): string => {
+/**
+ * The browser's own validation message for a date field in the same state, in
+ * the user's language. Empty when such a field would be valid.
+ */
+const nativeMessage = (
+  state: Partial<Pick<HTMLInputElement, "required" | "min" | "max" | "value">>,
+): string => {
   const input = document.createElement("input");
-  input.required = true;
+  input.type = "date";
+  Object.assign(input, state);
 
   return input.validationMessage;
 };
@@ -37,6 +43,23 @@ const COMMANDS: Record<string, number> = {
   "--next-month": 1,
   "--previous-year": -12,
   "--next-year": 12,
+};
+
+/** The `lang` that applies to `element`, through shadow roots like the `:lang()` selector. */
+const langOf = (element: Element): string | null => {
+  for (
+    let node: Element | undefined = element;
+    node;
+    node = (node.getRootNode() as ShadowRoot).host
+  ) {
+    const holder = node.closest("[lang]");
+
+    if (holder) {
+      return holder.getAttribute("lang");
+    }
+  }
+
+  return null;
 };
 
 const dayButton = (
@@ -93,7 +116,6 @@ export class Calendar extends HTMLElement {
   current: Current = { month: 0, year: 0, day: null };
 
   #keyboard: Keyboard | null = null;
-  #dispatchChange: () => void = () => { };
   #internals = this.attachInternals();
   #defaultPicked: string[] | null = null;
   #disabled = false;
@@ -110,13 +132,39 @@ export class Calendar extends HTMLElement {
 
   disconnectedCallback(): void {
     this.destroy();
-    this.#keyboard = null;
-    this.$body = null;
-    this.$title = null;
   }
 
-  attributeChangedCallback(): void {
-    if (this.$body) {
+  /** The form the calendar belongs to, as on a native field. */
+  get form(): HTMLFormElement | null {
+    return this.#internals.form;
+  }
+
+  get validity(): ValidityState {
+    return this.#internals.validity;
+  }
+
+  get validationMessage(): string {
+    return this.#internals.validationMessage;
+  }
+
+  get willValidate(): boolean {
+    return this.#internals.willValidate;
+  }
+
+  checkValidity(): boolean {
+    return this.#internals.checkValidity();
+  }
+
+  reportValidity(): boolean {
+    return this.#internals.reportValidity();
+  }
+
+  attributeChangedCallback(
+    _name: string,
+    oldValue: string | null,
+    newValue: string | null,
+  ): void {
+    if (this.$body && oldValue !== newValue) {
       this.render();
     }
   }
@@ -143,8 +191,7 @@ export class Calendar extends HTMLElement {
    * `first-day` says otherwise.
    */
   #readLanguage(): Pick<Options, "locale" | "firstDay"> {
-    const locale =
-      this.closest("[lang]")?.getAttribute("lang") || navigator.language;
+    const locale = langOf(this) || navigator.language;
 
     return {
       locale,
@@ -204,38 +251,28 @@ export class Calendar extends HTMLElement {
     this.render();
     this.addEventListener("click", this.#handleClick);
     this.addEventListener("command", this.#handleCommand);
+    this.$body.addEventListener("focusin", this.#handleFocusin);
 
     this.#keyboard.attach();
 
     if (this.options.mode === "range") {
       this.$body.addEventListener("mousemove", this.#handleMousemove, false);
     }
-
-    this.#dispatchChange = () => {
-      const detail: Detail = {
-        values: this.picked,
-        name: this.options.name,
-      };
-
-      dispatchEvent(this, EVENTS.CALENDAR_CHANGE, detail, { cancelable: false });
-    };
   }
 
+  /** Unbind and empty the grid. A destroyed calendar no longer renders nor blocks its form. */
   destroy(): void {
     this.removeEventListener("click", this.#handleClick);
     this.removeEventListener("command", this.#handleCommand);
-
-    if (this.#keyboard) {
-      this.#keyboard.detach();
-      this.$body?.removeEventListener(
-        "mousemove",
-        this.#handleMousemove,
-        false,
-      );
-    }
+    this.$body?.removeEventListener("focusin", this.#handleFocusin);
+    this.$body?.removeEventListener("mousemove", this.#handleMousemove, false);
+    this.#keyboard?.detach();
 
     this.reset();
-    this.#dispatchChange = () => { };
+    this.#internals.setValidity({});
+    this.#keyboard = null;
+    this.$body = null;
+    this.$title = null;
   }
 
   /** Navigate by `delta` months (negative = previous). */
@@ -259,6 +296,23 @@ export class Calendar extends HTMLElement {
     if (emit) {
       this.#dispatchChange();
     }
+  }
+
+  #dispatchChange(): void {
+    dispatchEvent<Detail>(
+      this,
+      EVENTS.CALENDAR_CHANGE,
+      { values: this.picked, name: this.options.name },
+      { cancelable: false },
+    );
+  }
+
+  /** Whether `day` cannot be picked: the field is disabled, or the day is outside `min` / `max`. */
+  #isUnavailable(day: string): boolean {
+    const min = this.getAttribute("min");
+    const max = this.getAttribute("max");
+
+    return this.#disabled || (!!min && day < min) || (!!max && day > max);
   }
 
   /**
@@ -288,22 +342,53 @@ export class Calendar extends HTMLElement {
     });
   }
 
-  /** Mirror the selection into the form: days joined by commas, `valueMissing` while `required` lacks a day or a range end. */
+  /**
+   * Mirror the selection into the form: the days joined by commas, with the
+   * validity a date field would have with the same `required`, `min` and `max`.
+   */
   #syncForm(): void {
-    this.#internals.setFormValue(this.picked.join(",") || null);
-
+    const value = this.picked.join(",");
+    const min = this.getAttribute("min") ?? "";
+    const max = this.getAttribute("max") ?? "";
     const needed = this.options.mode === "range" ? 2 : 1;
+    const anchor =
+      this.$body?.querySelector<HTMLElement>('[data-day][tabindex="0"]') ??
+      undefined;
 
-    if (!this.hasAttribute("required") || this.picked.length >= needed) {
-      this.#internals.setValidity({});
-      return;
+    // The state restores an emptied selection too, where a null value would not.
+    this.#internals.setFormValue(value || null, value);
+
+    if (this.hasAttribute("required") && this.picked.length < needed) {
+      return this.#internals.setValidity(
+        { valueMissing: true },
+        nativeMessage({ required: true }),
+        anchor,
+      );
     }
 
-    this.#internals.setValidity(
-      { valueMissing: true },
-      valueMissingMessage(),
-      this.$body?.querySelector<HTMLElement>('[data-day][tabindex="0"]') ?? undefined,
-    );
+    // A range with only its start is unfinished, like a half-typed date.
+    if (2 === needed && 1 === this.picked.length) {
+      return this.#internals.setValidity(
+        { badInput: true },
+        nativeMessage({ required: true }),
+        anchor,
+      );
+    }
+
+    const early = this.picked.find(day => min && day < min);
+    const late = this.picked.find(day => max && day > max);
+    const underflow = early ? nativeMessage({ min, value: early }) : "";
+    const overflow = late ? nativeMessage({ max, value: late }) : "";
+
+    if (underflow) {
+      return this.#internals.setValidity({ rangeUnderflow: true }, underflow, anchor);
+    }
+
+    if (overflow) {
+      return this.#internals.setValidity({ rangeOverflow: true }, overflow, anchor);
+    }
+
+    this.#internals.setValidity({});
   }
 
   /** Selection once `day` is activated, by mode. Any other mode picks a single day. */
@@ -327,26 +412,33 @@ export class Calendar extends HTMLElement {
   #handleClick = (event: MouseEvent) => {
     const { target } = event;
 
-    if (!(target instanceof HTMLElement)) {
+    if (!(target instanceof Element)) {
       return;
     }
 
     const $day = target.closest<HTMLButtonElement>("[data-day]");
+    const day = $day?.getAttribute("data-day");
 
-    if (!$day || $day.getAttribute("aria-disabled") === "true") {
+    if (
+      !$day ||
+      !day ||
+      !this.$body?.contains($day) ||
+      $day.getAttribute("aria-disabled") === "true" ||
+      this.#isUnavailable(day)
+    ) {
       return;
     }
 
-    const picked = this.#nextPicked($day.getAttribute("data-day") as string);
+    const picked = this.#nextPicked(day);
     this.#keyboard?.setFocusDay($day, { focus: false });
 
     if (picked.join() === this.picked.join()) {
       return;
     }
 
-    const current = this.picked;
+    const current = this.picked.join();
     const commit = (proceed: boolean) => {
-      if (proceed && this.picked === current) {
+      if (proceed && this.picked.join() === current) {
         this.setPicked(picked);
       }
     };
@@ -381,7 +473,11 @@ export class Calendar extends HTMLElement {
       `[data-day="${to}"]`,
     ) as HTMLElement | null;
 
-    if (!$target || $target.getAttribute("aria-disabled") === "true") {
+    if (
+      !$target ||
+      $target.getAttribute("aria-disabled") === "true" ||
+      this.#isUnavailable(to)
+    ) {
       return;
     }
 
@@ -397,17 +493,16 @@ export class Calendar extends HTMLElement {
     });
   }
 
+  /** Keep the validation message on the day that holds the tab stop. */
+  #handleFocusin = () => {
+    this.#syncForm();
+  };
+
   #handleMousemove = (event: MouseEvent) => {
-    const $target = (event.target as HTMLElement).closest(
-      "[data-day]",
-    ) as HTMLElement | null;
+    const $target = (event.target as Element).closest("[data-day]");
+    const day = $target?.getAttribute("data-day");
 
-    if (!$target) {
-      return;
-    }
-
-    const day = $target.getAttribute("data-day");
-    if (day) {
+    if ($target && day && this.$body?.contains($target)) {
       this.previewRange(day);
     }
   };
@@ -441,22 +536,23 @@ export class Calendar extends HTMLElement {
   }
 
   renderHeader(year: number, month: number) {
-    if (this.$title) {
-      this.$title.textContent = getDateFormat(this.options.locale, {
-        month: "long",
-        year: "numeric",
-      }).format(new Date(year, month, 1));
+    const title = getDateFormat(this.options.locale, {
+      month: "long",
+      year: "numeric",
+    }).format(new Date(year, month, 1));
+
+    // Rewriting the same month would announce it again.
+    if (this.$title && this.$title.textContent !== title) {
+      this.$title.textContent = title;
     }
   }
 
-  renderCalendar(year: number, month: number, { focus = false } = {}) {
+  renderCalendar(year: number, month: number) {
     if (!this.$body) {
       return;
     }
 
     const buttonClass = this.options.buttonClass ?? "";
-    const min = this.getAttribute("min");
-    const max = this.getAttribute("max");
     const longDate = getDateFormat(this.options.locale, {
       weekday: "long",
       day: "numeric",
@@ -476,7 +572,6 @@ export class Calendar extends HTMLElement {
       ) {
         const date = new Date(year, month, dayOfMonth);
         const cell = document.createElement("td");
-        const inner = document.createElement("div");
 
         if (
           0 === i &&
@@ -490,17 +585,13 @@ export class Calendar extends HTMLElement {
         } else {
           const day = dayFromDate(date);
 
-          inner.innerHTML = dayButton(day, numerals.format(dayOfMonth), buttonClass, {
+          cell.innerHTML = dayButton(day, numerals.format(dayOfMonth), buttonClass, {
             label: longDate.format(date),
-            disabled:
-              this.#disabled ||
-              (!!min && day < min) ||
-              (!!max && day > max),
+            disabled: this.#isUnavailable(day),
             current: day === this.day,
             tabIndex: -1,
           });
 
-          cell.appendChild(inner);
           row.appendChild(cell);
 
           dayOfMonth += 1;
@@ -513,7 +604,6 @@ export class Calendar extends HTMLElement {
     }
 
     this.#paint();
-    this.#keyboard?.sync({ focus });
   }
 
   reset() {
@@ -522,14 +612,25 @@ export class Calendar extends HTMLElement {
     }
   }
 
+  /**
+   * Rebuild the grid. Focus comes back to the grid when it was there, and the
+   * range preview runs once `calendar:render` listeners have decorated the days.
+   */
   render({ focus = false } = {}) {
+    const { activeElement } = this.getRootNode() as Document | ShadowRoot;
+    const hadFocus = !!this.$body?.contains(activeElement);
+    const focusedDay = hadFocus && activeElement?.getAttribute("data-day");
+
+    if (focusedDay) {
+      this.current.day = focusedDay;
+    }
+
     Object.assign(this.options, this.#readLanguage());
 
     this.reset();
     this.renderDays();
     this.renderHeader(this.current.year, this.current.month);
-    this.renderCalendar(this.current.year, this.current.month, { focus });
-    this.#syncForm();
+    this.renderCalendar(this.current.year, this.current.month);
 
     dispatchEvent<RenderDetail>(
       this,
@@ -537,6 +638,9 @@ export class Calendar extends HTMLElement {
       { year: this.current.year, month: this.current.month },
       { cancelable: false },
     );
+
+    this.#keyboard?.sync({ focus: focus || hadFocus });
+    this.#syncForm();
   }
 }
 

@@ -22,7 +22,14 @@ export declare class Calendar extends HTMLElement {
     picked: string[];
     connectedCallback(): void;
     disconnectedCallback(): void;
-    attributeChangedCallback(): void;
+    /** The form the calendar belongs to, as on a native field. */
+    get form(): HTMLFormElement | null;
+    get validity(): ValidityState;
+    get validationMessage(): string;
+    get willValidate(): boolean;
+    checkValidity(): boolean;
+    reportValidity(): boolean;
+    attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void;
     formDisabledCallback(disabled: boolean): void;
     formResetCallback(): void;
     formStateRestoreCallback(state: string | null): void;
@@ -30,6 +37,7 @@ export declare class Calendar extends HTMLElement {
      * Bind markup + listeners. Call {@link destroy} first if already bound.
      */
     init(): void;
+    /** Unbind and empty the grid. A destroyed calendar no longer renders nor blocks its form. */
     destroy(): void;
     /** Navigate by `delta` months (negative = previous). */
     move(delta: number, { focus }?: {
@@ -42,10 +50,12 @@ export declare class Calendar extends HTMLElement {
     getWeekdayNames(): string[];
     renderDays(): void;
     renderHeader(year: number, month: number): void;
-    renderCalendar(year: number, month: number, { focus }?: {
-        focus?: boolean | undefined;
-    }): void;
+    renderCalendar(year: number, month: number): void;
     reset(): void;
+    /**
+     * Rebuild the grid. Focus comes back to the grid when it was there, and the
+     * range preview runs once `calendar:render` listeners have decorated the days.
+     */
     render({ focus }?: {
         focus?: boolean | undefined;
     }): void;
