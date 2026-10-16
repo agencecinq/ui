@@ -294,7 +294,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Preselected dates</h3>
         <p class="text-sm text-gray-600">
-          Seed the view with <code>data-month</code>, <code>data-year</code>, and&nbsp;<code>data-picked</code>. Here a range covering mid-November 2025.
+          Seed the view with <code>data-month</code>, <code>data-year</code>, and <code>data-picked</code>. Here a range covering mid-November 2025.
         </p>
       </div>
 
@@ -333,7 +333,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Form</h3>
         <p class="text-sm text-gray-600">
-          <code>&lt;cinq-calendar&gt;</code> is a form field: <code>name="stay"</code>,
+          <code>&lt;cinq-calendar&gt;</code> is a form field: <code>name="stay"</code>,{' '}
           <code>mode="range"</code> and <code>required</code>. Submit with a missing end to get the
           browser's own message. Reset brings back the initial selection.
         </p>
@@ -456,7 +456,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Bounds</h3>
         <p class="text-sm text-gray-600">
-          The page script sets <code>min</code> to today and <code>max</code> 60 days later. Days outside are&nbsp;<code>aria-disabled</code>&nbsp;and cannot be selected (still in the keyboard grid).
+          The page script sets <code>min</code> to today and <code>max</code> 60 days later. Days outside are <code>aria-disabled</code> and cannot be selected (still in the keyboard grid).
         </p>
       </div>
 
@@ -493,10 +493,10 @@ import RegisterComponents from './RegisterComponents.astro';
         <h3 class="text-lg font-semibold text-gray-900">Language & week start</h3>
         <p class="text-sm text-gray-600">
           The select sets <code>lang</code> on the calendar, an observed attribute: labels
-          follow through <code>Intl</code>, the week starts on the language's first day unless
-          <code>first-day</code> says otherwise, and the language's weekend from
+          follow through <code>Intl</code>, the week starts on the language's first day unless{' '}
+          <code>first-day</code> says otherwise, and the language's weekend from{' '}
           <code>Intl.Locale#getWeekInfo()</code> is grayed: Friday alone for <code>fa</code>,
-          Friday and Saturday for <code>ar</code>. It also sets <code>dir</code> from
+          Friday and Saturday for <code>ar</code>. It also sets <code>dir</code> from{' '}
           <code>getTextInfo()</code>: <code>ar</code> and <code>fa</code> read from the right,
           and the arrow keys follow.
         </p>
@@ -557,7 +557,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Advanced: event markers</h3>
         <p class="text-sm text-gray-600">
-          Decorate the days on <code>calendar:render</code>: wrap each one in
+          Decorate the days on <code>calendar:render</code>: wrap each one in{' '}
           <code>&lt;time&gt;</code>, mark weekends, and paint dots on days that have events.
           Only event days are selectable. Others get <code>aria-disabled</code>.
         </p>
