@@ -303,10 +303,23 @@ language's digits, Persian ones for `fa`. Add `-u-nu-latn` to `lang`
 <cinq-calendar lang="en" first-day="1">...</cinq-calendar>
 ```
 
+Right-to-left languages (`ar`, `fa`, `he`) also need `dir="rtl"`, usually
+next to `lang` on `<html>`. The table then lays the week out from the right,
+and the left and right arrow keys follow what is on screen. Mirror the arrow
+icons of the month buttons in your CSS, for instance
+`[command]:dir(rtl) { scale: -1 1; }`, and round range ends with logical
+corners such as `border-start-start-radius`.
+
 Change the language at runtime:
 
 ```js
-document.querySelector("cinq-calendar").lang = "ja";
+const el = document.querySelector("cinq-calendar");
+
+el.lang = "ja";
+
+// right to left
+el.lang = "ar";
+el.dir = new Intl.Locale(el.lang).getTextInfo().direction;
 ```
 
 ### Decorate days
@@ -446,7 +459,7 @@ document.querySelector("cinq-calendar")?.addEventListener(
 
 | Key | Action |
 | --- | ------ |
-| Arrow keys | Move by day / week |
+| Arrow keys | Move by day / week. Left and right follow the screen, mirrored under `dir="rtl"` |
 | Home / End | First / last day of the week |
 | Page Up / Page Down | Previous / next month |
 | Shift + Page Up / Down | Previous / next year |

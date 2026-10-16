@@ -33,6 +33,11 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #f3f4f6;
   }
 
+  /* Previous points right and next points left in a right-to-left calendar. */
+  .docs-calendar header [command]:dir(rtl) {
+    scale: -1 1;
+  }
+
   .docs-calendar [aria-live] {
     flex: 1;
     margin: 0;
@@ -106,12 +111,15 @@ import RegisterComponents from './RegisterComponents.astro';
     color: #fff;
   }
 
+  /* Logical corners: the start of a range sits on the right in a right-to-left grid. */
   .docs-calendar td[data-start] [data-day] {
-    border-radius: 0.375rem 0 0 0.375rem;
+    border-start-start-radius: 0.375rem;
+    border-end-start-radius: 0.375rem;
   }
 
   .docs-calendar td[data-end] [data-day] {
-    border-radius: 0 0.375rem 0.375rem 0;
+    border-start-end-radius: 0.375rem;
+    border-end-end-radius: 0.375rem;
   }
 
   .docs-calendar td[data-start][data-end] [data-day] {
@@ -488,7 +496,9 @@ import RegisterComponents from './RegisterComponents.astro';
           follow through <code>Intl</code>, the week starts on the language's first day unless
           <code>first-day</code> says otherwise, and the language's weekend from
           <code>Intl.Locale#getWeekInfo()</code> is grayed: Friday alone for <code>fa</code>,
-          Friday and Saturday for <code>ar</code>.
+          Friday and Saturday for <code>ar</code>. It also sets <code>dir</code> from
+          <code>getTextInfo()</code>: <code>ar</code> and <code>fa</code> read from the right,
+          and the arrow keys follow.
         </p>
       </div>
 
@@ -711,6 +721,7 @@ import RegisterComponents from './RegisterComponents.astro';
     if (!localeCalendar) return;
 
     localeCalendar.lang = lang;
+    localeCalendar.dir = new Intl.Locale(lang).getTextInfo().direction;
 
     if (firstDayOutput) {
       firstDayOutput.textContent = String(localeCalendar.options.firstDay);

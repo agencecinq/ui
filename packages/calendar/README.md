@@ -328,10 +328,21 @@ month, and `th` shows 2026, not the Buddhist year. Day numbers use the
 language's digits, Persian ones for `fa`. Add `-u-nu-latn` to `lang`
 (`fa-u-nu-latn`) to keep Latin digits everywhere.
 
+Right-to-left languages (`ar`, `fa`, `he`) also need `dir="rtl"`, usually
+next to `lang` on `<html>`. The table then lays the week out from the right,
+and the left and right arrow keys follow what is on screen. Mirror the arrow
+icons of the month buttons in your CSS, for instance
+`[command]:dir(rtl) { scale: -1 1; }`, and round range ends with logical
+corners such as `border-start-start-radius`.
+
 Change the language at runtime:
 
 ```js
 el.lang = "ja";
+
+// right to left
+el.lang = "ar";
+el.dir = new Intl.Locale(el.lang).getTextInfo().direction;
 ```
 
 ### Custom labels
@@ -385,7 +396,7 @@ script that runs first.
 
 | Key | Action |
 | --- | ------ |
-| Arrow keys | Move by day / week (crosses months) |
+| Arrow keys | Move by day / week (crosses months). Left and right follow the screen, mirrored under `dir="rtl"` |
 | Home / End | First / last day of the week |
 | Page Up / Page Down | Previous / next month |
 | Shift + Page Up / Down | Previous / next year |

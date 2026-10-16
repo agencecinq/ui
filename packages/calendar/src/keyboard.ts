@@ -108,16 +108,18 @@ export default class Keyboard {
     const day = $target.getAttribute("data-day") as string;
     const dayOfWeek = dateFromDay(day).getDay();
     const offset = (dayOfWeek - this.host.options.firstDay + 7) % 7;
+    // Left and right follow the screen: in a right-to-left grid the next day sits on the left.
+    const forward = $target.matches(":dir(rtl)") ? -1 : 1;
     const { key, code } = event;
 
     const codes: Record<string, () => void | false> = {
       ArrowLeft: () => {
         event.preventDefault();
-        this.focusDayByOffset(day, -1);
+        this.focusDayByOffset(day, -forward);
       },
       ArrowRight: () => {
         event.preventDefault();
-        this.focusDayByOffset(day, 1);
+        this.focusDayByOffset(day, forward);
       },
       ArrowUp: () => {
         event.preventDefault();

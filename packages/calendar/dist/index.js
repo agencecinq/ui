@@ -152,12 +152,12 @@ var g = class {
 	#e = (e) => {
 		let t = e.target.closest("[data-day]");
 		if (!t) return;
-		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, { key: i, code: a } = e, o = {
+		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, i = t.matches(":dir(rtl)") ? -1 : 1, { key: a, code: o } = e, s = {
 			ArrowLeft: () => {
-				e.preventDefault(), this.focusDayByOffset(n, -1);
+				e.preventDefault(), this.focusDayByOffset(n, -i);
 			},
 			ArrowRight: () => {
-				e.preventDefault(), this.focusDayByOffset(n, 1);
+				e.preventDefault(), this.focusDayByOffset(n, i);
 			},
 			ArrowUp: () => {
 				e.preventDefault(), this.focusDayByOffset(n, -7);
@@ -179,7 +179,7 @@ var g = class {
 			},
 			default: () => !1
 		};
-		return (o[i || a] || o.default)();
+		return (s[a || o] || s.default)();
 	};
 }, _ = () => {
 	let e = document.createElement("input");
