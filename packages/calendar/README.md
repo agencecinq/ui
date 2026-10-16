@@ -100,8 +100,11 @@ td[aria-selected="true"] .js-day {
 
 ### Single date
 
+The default mode. Add `deselect` to clear the selection by clicking the
+selected day again.
+
 ```html
-<cinq-calendar mode="single" deselect>...</cinq-calendar>
+<cinq-calendar deselect>...</cinq-calendar>
 ```
 
 ### Date range
