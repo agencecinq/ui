@@ -54,7 +54,7 @@ const valueMissingMessage = (): string => {
 
 const dayButton = (
   day: string,
-  dayOfMonth: number,
+  numeral: string,
   className: string,
   {
     label,
@@ -77,7 +77,7 @@ const dayButton = (
 		${disabled ? 'aria-disabled="true"' : ""}
 		${current ? 'aria-current="date"' : ""}
 	>
-		${dayOfMonth}
+		${numeral}
 	</button>
 `;
 
@@ -514,6 +514,7 @@ export class Calendar extends HTMLElement {
       month: "long",
       year: "numeric",
     });
+    const numerals = new Intl.NumberFormat(this.options.locale);
     let dayOfMonth = 1;
 
     for (let i = 0; 6 >= i; i += 1) {
@@ -540,7 +541,7 @@ export class Calendar extends HTMLElement {
         } else {
           const day = dayFromDate(date);
 
-          inner.innerHTML = dayButton(day, dayOfMonth, buttonClass, {
+          inner.innerHTML = dayButton(day, numerals.format(dayOfMonth), buttonClass, {
             label: longDate.format(date),
             disabled:
               this.#disabled ||

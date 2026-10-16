@@ -281,7 +281,13 @@ el.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, event => {
 
 `locale` drives labels via `Intl`. Week start follows the locale. Override with
 `first-day` (`0`=Sun ... `6`=Sat). Use the select in the playground to try
-`en`, `fr`, `de`, `es`, `ja`, and `ar`.
+`en`, `fr`, `de`, `es`, `ja`, `ar`, `fa` and `th`.
+
+Labels stay on the Gregorian calendar the grid is built on, even for a locale
+with another calendar of its own: `fa` shows `نوامبر ۲۰۲۶`, not the Persian
+month, and `th` shows 2026, not the Buddhist year. Day numbers use the
+locale's digits, Persian ones for `fa`. Add `-u-nu-latn` to the locale
+(`fa-u-nu-latn`) to keep Latin digits everywhere.
 
 ```html
 <!-- French to week starts Monday -->

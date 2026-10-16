@@ -286,6 +286,12 @@ calendar.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
 <!-- force Monday despite en -->
 ```
 
+Labels stay on the Gregorian calendar the grid is built on, even for a locale
+with another calendar of its own: `fa` shows `نوامبر ۲۰۲۶`, not the Persian
+month, and `th` shows 2026, not the Buddhist year. Day numbers use the
+locale's digits, Persian ones for `fa`. Add `-u-nu-latn` to the locale
+(`fa-u-nu-latn`) to keep Latin digits everywhere.
+
 Update at runtime:
 
 ```js

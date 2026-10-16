@@ -382,24 +382,24 @@ var _ = class {
 			day: "numeric",
 			month: "long",
 			year: "numeric"
-		}), s = 1;
+		}), s = new Intl.NumberFormat(this.options.locale), l = 1;
 		for (let n = 0; 6 >= n; n += 1) {
-			let l = document.createElement("tr");
-			for (let u = this.options.firstDay; u < 7 + this.options.firstDay; u += 1) {
-				let p = new Date(e, t, s), m = document.createElement("td"), h = document.createElement("div");
-				if (n === 0 && u < this.options.firstDay + f(e, t, this.options.firstDay)) l.appendChild(m);
-				else if (s > d(e, t)) break;
+			let u = document.createElement("tr");
+			for (let p = this.options.firstDay; p < 7 + this.options.firstDay; p += 1) {
+				let m = new Date(e, t, l), h = document.createElement("td"), g = document.createElement("div");
+				if (n === 0 && p < this.options.firstDay + f(e, t, this.options.firstDay)) u.appendChild(h);
+				else if (l > d(e, t)) break;
 				else {
-					let e = c(p);
-					h.innerHTML = S(e, s, r, {
-						label: o.format(p),
+					let e = c(m);
+					g.innerHTML = S(e, s.format(l), r, {
+						label: o.format(m),
 						disabled: this.#i || !!i && e < i || !!a && e > a,
 						current: e === this.day,
 						tabIndex: -1
-					}), m.appendChild(h), l.appendChild(m), s += 1;
+					}), h.appendChild(g), u.appendChild(h), l += 1;
 				}
 			}
-			l.childNodes.length && this.$body.appendChild(l);
+			u.childNodes.length && this.$body.appendChild(u);
 		}
 		this.#o(), this.#e?.sync({ focus: n });
 	}
