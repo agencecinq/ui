@@ -28,12 +28,14 @@ import RegisterComponents from './RegisterComponents.astro';
     outline-color: #111827;
   }
 
+  .docs-switch:disabled,
   .docs-switch[aria-disabled='true'] {
     opacity: 0.65;
     pointer-events: none;
     cursor: not-allowed;
   }
 
+  .docs-switch:disabled:hover,
   .docs-switch[aria-disabled='true']:hover,
   .docs-switch[aria-disabled='true']:focus-visible {
     background-color: transparent;
@@ -127,27 +129,9 @@ import RegisterComponents from './RegisterComponents.astro';
     transform: translateX(2.25rem);
   }
 
-  .docs-switch[checked] .label {
+  .docs-switch[aria-checked='true'] .label {
     font-weight: 600;
     color: #111827;
-  }
-
-  .docs-switch-fieldset {
-    margin: 0;
-    padding: 1rem;
-    border: 1px dashed #d1d5db;
-    border-radius: 0.75rem;
-  }
-
-  .docs-switch-fieldset legend {
-    padding: 0 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .docs-switch-fieldset .docs-switch + .docs-switch {
-    margin-top: 0.5rem;
   }
 
   .docs-switch-minimal {
@@ -163,8 +147,7 @@ import RegisterComponents from './RegisterComponents.astro';
       color 0.15s ease-in-out;
   }
 
-  .docs-switch-minimal[aria-checked='true'],
-  .docs-switch-minimal[checked] {
+  .docs-switch-minimal[aria-checked='true'] {
     border-color: #111827;
     background-color: #111827;
     color: #fff;
@@ -172,9 +155,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-switch-minimal[aria-checked='true']:hover,
-  .docs-switch-minimal[aria-checked='true']:focus-visible,
-  .docs-switch-minimal[checked]:hover,
-  .docs-switch-minimal[checked]:focus-visible {
+  .docs-switch-minimal[aria-checked='true']:focus-visible {
     background-color: #1f2937;
     outline-color: #111827;
   }
@@ -238,9 +219,6 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <span class="label">Infravision</span>
           <span class="slider" aria-hidden="true"></span>
-          <div hidden>
-            <input type="checkbox" name="infravision" tabindex="-1" aria-hidden="true" />
-          </div>
         </cinq-switch>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
@@ -255,7 +233,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">On / Off labels</h3>
           <p class="text-sm text-gray-600">
             A larger track can reveal <strong>On</strong> and <strong>Off</strong> text inside the
-            slider. Style with <code>[aria-checked="true"]</code> or the reflected <code>checked</code> attribute on the host.
+            slider. Style with <code>[aria-checked="true"]</code> on the host.
           </p>
         </div>
 
@@ -271,9 +249,6 @@ import RegisterComponents from './RegisterComponents.astro';
             <span class="on" aria-hidden="true">On</span>
             <span class="off" aria-hidden="true">Off</span>
           </span>
-          <div hidden>
-            <input type="checkbox" name="dark-mode" tabindex="-1" aria-hidden="true" />
-          </div>
         </cinq-switch>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
@@ -288,7 +263,8 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Accessible naming</h3>
           <p class="text-sm text-gray-600">
             Per the <a href="https://www.w3.org/WAI/ARIA/apg/patterns/switch/">APG</a>, the switch
-            needs an accessible name via visible text, <code>aria-label</code>, or <code>aria-labelledby</code>.
+            needs an accessible name via visible text, <code>aria-label</code>,
+            <code>aria-labelledby</code>, or a <code>&lt;label&gt;</code> (see <strong>Like a native field</strong>).
           </p>
         </div>
 
@@ -338,8 +314,8 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Minimal markup</h3>
           <p class="text-sm text-gray-600">
-            No slider, no hidden checkbox. Enough when you do not submit a form. The visible text
-            inside the host provides the accessible name. Style the on state with <code>[aria-checked="true"]</code> or <code>[checked]</code>.
+            No slider. The visible text inside the host provides the accessible name. Style the on
+            state with <code>[aria-checked="true"]</code>.
           </p>
         </div>
 
@@ -359,8 +335,8 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Pre-checked state</h3>
           <p class="text-sm text-gray-600">
-            Set <code>aria-checked="true"</code> in markup for an initially on switch. Add <code>checked</code>             on the host too if you style with <code>cinq-switch[checked]</code>.
-            The component reflects <code>checked</code> after the first toggle.
+            Set <code>aria-checked="true"</code> in markup for an initially on switch. It is also
+            the state <code>form.reset()</code> brings back.
           </p>
         </div>
 
@@ -368,7 +344,6 @@ import RegisterComponents from './RegisterComponents.astro';
           class="docs-switch self-start"
           role="switch"
           aria-checked="true"
-          checked
           tabindex="0"
         >
           <span class="label">Sage's gazette</span>
@@ -404,114 +379,81 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
-      <div class="flex flex-col gap-4">
-        <div>
-          <h3 class="text-lg font-semibold text-gray-900">Switch group</h3>
-          <p class="text-sm text-gray-600">
-            Wrap related switches in a <code>&lt;fieldset&gt;</code> with a <code>&lt;legend&gt;</code>, or use <code>role="group"</code> with <code>aria-labelledby</code>.
-          </p>
-        </div>
 
-        <fieldset class="docs-switch-fieldset self-start">
-          <legend>Campaign preferences</legend>
-
-          <cinq-switch
-            class="docs-switch"
-            role="switch"
-            aria-checked="false"
-            tabindex="0"
-          >
-            <span class="label">Identify magic items</span>
-            <span class="slider" aria-hidden="true"></span>
-          </cinq-switch>
-
-          <cinq-switch
-            class="docs-switch"
-            role="switch"
-            aria-checked="true"
-            checked
-            tabindex="0"
-          >
-            <span class="label">Show THAC0</span>
-            <span class="slider" aria-hidden="true"></span>
-          </cinq-switch>
-        </fieldset>
-      </div>
-    </section>
 
     <section class="rounded-2xl bg-white p-6 shadow">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Form helper input</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Like a native field</h3>
           <p class="text-sm text-gray-600">
-            Optional hidden <code>&lt;input&gt;</code> for form submission (one per host). Keep
-            it hidden from assistive tech. The host is the switch.
+            Plain HTML, no script: with a <code>name</code>, the switch submits its
+            <code>value</code> while on (<code>"on"</code> by default), and Reset brings back the
+            markup state. A <code>&lt;label for&gt;</code> or a wrapping <code>&lt;label&gt;</code>
+            names the switch and toggles it on click, a <code>&lt;fieldset&gt;</code> with a
+            <code>&lt;legend&gt;</code> groups it, and <code>&lt;fieldset disabled&gt;</code>
+            disables every switch inside. The output lists <code>new FormData(form)</code>.
           </p>
         </div>
 
-        <cinq-switch
-          class="docs-switch self-start"
-          role="switch"
-          aria-checked="false"
-          tabindex="0"
-        >
-          <span class="label">Henchman reports</span>
-          <span class="slider" aria-hidden="true"></span>
-          <div hidden>
-            <input
-              type="checkbox"
-              name="newsletter"
-              tabindex="-1"
-              aria-hidden="true"
-            />
-          </div>
-        </cinq-switch>
-      </div>
-    </section>
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="docs-switch-native-lock" class="rounded border-gray-300" />
+          Disable the fieldset
+        </label>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
-      <div class="flex flex-col gap-4">
-        <div>
-          <h3 class="text-lg font-semibold text-gray-900">Form submission</h3>
-          <p class="text-sm text-gray-600">
-            Submit the form to read checkbox values synced by the component. The host stays the
-            accessible switch. The hidden input is for the form only.
-          </p>
-        </div>
+        <form id="docs-switch-native-form" class="flex max-w-md flex-col gap-3">
 
-        <form id="docs-switch-form" class="flex flex-col gap-3 max-w-md">
-          <cinq-switch
-            class="docs-switch self-start"
-            role="switch"
-            aria-checked="false"
-            tabindex="0"
-          >
-            <span class="label">Daily henchman reports</span>
-            <span class="slider" aria-hidden="true"></span>
-            <div hidden>
-              <input
-                type="checkbox"
-                name="henchman_reports"
-                value="yes"
-                tabindex="-1"
-                aria-hidden="true"
-              />
+          <fieldset id="docs-switch-native-fieldset" class="docs-switch-advanced-panel">
+            <legend>Party notifications</legend>
+
+            <div class="flex items-center justify-between gap-3">
+              <label for="docs-switch-native-loot" class="text-sm text-gray-900">Loot found</label>
+              <cinq-switch
+                id="docs-switch-native-loot"
+                class="docs-switch"
+                name="loot"
+                role="switch"
+                aria-checked="true"
+                tabindex="0"
+              >
+                <span class="slider" aria-hidden="true"></span>
+              </cinq-switch>
             </div>
-          </cinq-switch>
 
-          <button
-            type="submit"
-            class="self-start rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
-          >
-            Submit preferences
-          </button>
+            <label class="flex items-center justify-between gap-3 text-sm text-gray-900">
+              Level up
+              <cinq-switch
+                class="docs-switch"
+                name="level_up"
+                value="yes"
+                role="switch"
+                aria-checked="false"
+                tabindex="0"
+              >
+                <span class="slider" aria-hidden="true"></span>
+              </cinq-switch>
+            </label>
+          </fieldset>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="submit"
+              class="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+            >
+              Submit
+            </button>
+            <button
+              type="reset"
+              class="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200"
+            >
+              Reset
+            </button>
+          </div>
         </form>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Submitted:
-          <span id="docs-switch-form-status" class="font-mono font-medium text-gray-900">-</span>
-        </p>
+        <pre
+          id="docs-switch-native-output"
+          class="docs-switch-advanced-output"
+        >Submit the form to read FormData.</pre>
       </div>
     </section>
 
@@ -520,28 +462,26 @@ import RegisterComponents from './RegisterComponents.astro';
         <div>
           <h3 class="text-lg font-semibold text-gray-900">Disabled</h3>
           <p class="text-sm text-gray-600">
-            Pair <code>disabled</code> with <code>aria-disabled="true"</code> and <code>tabindex="-1"</code>. The getter also respects <code>aria-disabled</code> alone.
+            <code>disabled</code> works as on a native field: the switch leaves the tab order and
+            the form, matches <code>:disabled</code>, and is announced as disabled.
+            <code>aria-disabled="true"</code> alone keeps it focusable and submitted.
           </p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-2">
             <span class="text-xs font-medium uppercase tracking-wide text-gray-500">
-              <code>disabled</code> + <code>aria-disabled</code>
+              <code>disabled</code>
             </span>
             <cinq-switch
               class="docs-switch self-start"
               role="switch"
               aria-checked="false"
               disabled
-              aria-disabled="true"
-              tabindex="-1"
+              tabindex="0"
             >
               <span class="label">Experimental kits</span>
               <span class="slider" aria-hidden="true"></span>
-              <div hidden>
-                <input type="checkbox" tabindex="-1" aria-hidden="true" disabled />
-              </div>
             </cinq-switch>
           </div>
 
@@ -554,7 +494,7 @@ import RegisterComponents from './RegisterComponents.astro';
               role="switch"
               aria-checked="false"
               aria-disabled="true"
-              tabindex="-1"
+              tabindex="0"
             >
               <span class="label">1st-edition THAC0</span>
               <span class="slider" aria-hidden="true"></span>
@@ -583,9 +523,6 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <span class="label">Auto-save session notes</span>
           <span class="slider" aria-hidden="true"></span>
-          <div hidden>
-            <input type="checkbox" name="autosave" tabindex="-1" aria-hidden="true" />
-          </div>
         </cinq-switch>
 
         <div class="flex flex-wrap gap-2">
@@ -659,9 +596,6 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <span class="label">Scrying pool access</span>
           <span class="slider" aria-hidden="true"></span>
-          <div hidden>
-            <input type="checkbox" name="analytics" tabindex="-1" aria-hidden="true" />
-          </div>
         </cinq-switch>
 
         <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
@@ -676,7 +610,8 @@ import RegisterComponents from './RegisterComponents.astro';
           <h3 class="text-lg font-semibold text-gray-900">Campaign settings (advanced)</h3>
           <p class="text-sm text-gray-600">
             Form submit, a master switch that enables/disables a child, preset loading via{' '}
-            <code>activate(false)</code>, and external <code>disabled</code> on the whole panel.
+            <code>activate(false)</code>, <code>form.reset()</code>, and a disabled
+            <code>&lt;fieldset&gt;</code> that locks the whole panel.
           </p>
         </div>
 
@@ -711,64 +646,41 @@ import RegisterComponents from './RegisterComponents.astro';
             <cinq-switch
               id="docs-switch-advanced-master"
               class="docs-switch"
+              name="house_rules"
+              value="yes"
               role="switch"
               aria-checked="false"
               tabindex="0"
             >
               <span class="label">Enable house rules</span>
               <span class="slider" aria-hidden="true"></span>
-              <div hidden>
-                <input
-                  type="checkbox"
-                  name="house_rules"
-                  value="yes"
-                  tabindex="-1"
-                  aria-hidden="true"
-                />
-              </div>
             </cinq-switch>
 
             <cinq-switch
               id="docs-switch-advanced-fumbles"
               class="docs-switch"
+              name="critical_fumbles"
+              value="yes"
               role="switch"
               aria-checked="false"
               disabled
-              aria-disabled="true"
-              tabindex="-1"
+              tabindex="0"
             >
               <span class="label">Critical fumbles</span>
               <span class="slider" aria-hidden="true"></span>
-              <div hidden>
-                <input
-                  type="checkbox"
-                  name="critical_fumbles"
-                  value="yes"
-                  tabindex="-1"
-                  aria-hidden="true"
-                  disabled
-                />
-              </div>
             </cinq-switch>
 
             <cinq-switch
               id="docs-switch-advanced-milestone"
               class="docs-switch"
+              name="milestone_leveling"
+              value="yes"
               role="switch"
               aria-checked="false"
               tabindex="0"
             >
               <span class="label">Milestone leveling</span>
               <span class="slider" aria-hidden="true"></span>
-              <div hidden>
-                <input
-                  type="checkbox"
-                  name="milestone_leveling"
-                  value="yes"
-                  tabindex="-1"
-                  aria-hidden="true"
-                />
-              </div>
             </cinq-switch>
           </fieldset>
 
@@ -865,15 +777,22 @@ import RegisterComponents from './RegisterComponents.astro';
     });
   }
 
-  const switchForm = document.getElementById('docs-switch-form') as HTMLFormElement | null;
-  const switchFormStatus = document.getElementById('docs-switch-form-status');
+  const nativeForm = document.getElementById('docs-switch-native-form') as HTMLFormElement | null;
+  const nativeLock = document.getElementById('docs-switch-native-lock') as HTMLInputElement | null;
+  const nativeFieldset = document.getElementById(
+    'docs-switch-native-fieldset',
+  ) as HTMLFieldSetElement | null;
+  const nativeOutput = document.getElementById('docs-switch-native-output');
 
-  if (switchForm && switchFormStatus) {
-    switchForm.addEventListener('submit', (event) => {
+  if (nativeForm && nativeLock && nativeFieldset && nativeOutput) {
+    nativeLock.addEventListener('change', () => {
+      nativeFieldset.disabled = nativeLock.checked;
+    });
+
+    nativeForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      const data = new FormData(switchForm);
-      const henchman = data.get('henchman_reports');
-      switchFormStatus.textContent = henchman ? 'henchman_reports=yes' : 'henchman_reports=(off)';
+      const entries = [...new FormData(nativeForm)].map(([key, value]) => `  ${key}=${value}`);
+      nativeOutput.textContent = ['FormData:', ...(entries.length ? entries : ['  (empty)'])].join('\n');
     });
   }
 
@@ -909,6 +828,9 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   const advancedForm = document.getElementById('docs-switch-advanced-form') as HTMLFormElement | null;
+  const advancedFieldset = document.getElementById(
+    'docs-switch-advanced-fieldset',
+  ) as HTMLFieldSetElement | null;
   const advancedOutput = document.getElementById('docs-switch-advanced-output');
   const advancedMaster = document.getElementById('docs-switch-advanced-master') as Switch | null;
   const advancedFumbles = document.getElementById('docs-switch-advanced-fumbles') as Switch | null;
@@ -919,6 +841,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
   if (
     advancedForm &&
+    advancedFieldset &&
     advancedOutput &&
     advancedMaster &&
     advancedFumbles &&
@@ -943,27 +866,8 @@ import RegisterComponents from './RegisterComponents.astro';
     };
 
     const silentActivate = (host: Switch) => {
-      if (host.disabled) {
-        host.removeAttribute('disabled');
-        host.removeAttribute('aria-disabled');
-        host.setAttribute('tabindex', '0');
-      }
-
-      if (!host.checked) {
-        host.activate(false);
-      }
-    };
-
-    const silentDeactivate = (host: Switch) => {
-      if (host.disabled) {
-        host.removeAttribute('disabled');
-        host.removeAttribute('aria-disabled');
-        host.setAttribute('tabindex', '0');
-      }
-
-      if (host.checked) {
-        host.deactivate(false);
-      }
+      host.removeAttribute('disabled');
+      host.activate(false);
     };
 
     const setChildEnabled = (enabled: boolean) => {
@@ -971,16 +875,12 @@ import RegisterComponents from './RegisterComponents.astro';
 
       if (enabled) {
         advancedFumbles.removeAttribute('disabled');
-        advancedFumbles.removeAttribute('aria-disabled');
-        advancedFumbles.setAttribute('tabindex', '0');
         return;
       }
 
-      silentDeactivate(advancedFumbles);
-
+      advancedFumbles.removeAttribute('disabled');
+      advancedFumbles.deactivate(false);
       advancedFumbles.setAttribute('disabled', '');
-      advancedFumbles.setAttribute('aria-disabled', 'true');
-      advancedFumbles.setAttribute('tabindex', '-1');
     };
 
     advancedMaster.addEventListener(EVENTS.SWITCH_ACTIVATE, () => {
@@ -1012,35 +912,18 @@ import RegisterComponents from './RegisterComponents.astro';
         return;
       }
 
-      silentDeactivate(advancedMaster);
-      silentDeactivate(advancedMilestone);
+      advancedForm.reset();
       setChildEnabled(false);
-      writeOutput('Defaults restored silently.');
+      writeOutput('Defaults restored with form.reset().');
     });
 
     advancedLock?.addEventListener('click', () => {
       panelLocked = !panelLocked;
 
-      for (const host of [advancedMaster, advancedFumbles, advancedMilestone]) {
-        if (panelLocked) {
-          host.setAttribute('disabled', '');
-          host.setAttribute('aria-disabled', 'true');
-          host.setAttribute('tabindex', '-1');
-        } else {
-          host.removeAttribute('disabled');
-          host.removeAttribute('aria-disabled');
-          host.setAttribute('tabindex', '0');
-        }
-      }
-
-      if (!panelLocked && !advancedMaster.checked) {
-        setChildEnabled(false);
-      } else if (!panelLocked && advancedMaster.checked) {
-        setChildEnabled(true);
-      }
+      advancedFieldset.disabled = panelLocked;
 
       advancedLock.textContent = panelLocked ? 'Unlock panel' : 'Lock panel';
-      writeOutput(panelLocked ? 'Panel locked via disabled attribute.' : 'Panel unlocked.');
+      writeOutput(panelLocked ? 'Panel locked by the disabled fieldset.' : 'Panel unlocked.');
     });
 
     advancedForm.addEventListener('submit', (event) => {

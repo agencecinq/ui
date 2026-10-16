@@ -38,6 +38,8 @@ var e = {
 	SNAKE_EAT: "snake:eat",
 	SNAKE_OVER: "snake:over",
 	SNAKE_REPLAY: "snake:replay",
+	CALENDAR_RENDER: "calendar:render",
+	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
 	CALENDAR_CHANGE: "calendar:change",
 	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
 	TABS_ACTIVATE: "tabs:activate",
@@ -65,59 +67,63 @@ r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, 
 //#endregion
 //#region src/switch.ts
 var a = class extends HTMLElement {
-	static observedAttributes = ["checked", "disabled"];
-	$input = null;
+	static formAssociated = !0;
+	static observedAttributes = ["aria-checked", "value"];
+	#e = this.attachInternals();
+	#t = null;
 	connectedCallback() {
 		this.init();
 	}
 	disconnectedCallback() {
-		this.destroy(), this.$input = null;
+		this.destroy();
 	}
 	init() {
-		this.$input = this.querySelector("input"), this.addEventListener("click", this.#e), this.addEventListener("keydown", this.#t), this.#r();
+		this.#t ??= this.checked, this.addEventListener("click", this.#n), this.addEventListener("keydown", this.#r), this.#o();
 	}
-	attributeChangedCallback(e, t, n) {
-		if (e === "disabled") {
-			this.#r(), n !== null && this.matches(":focus") && this.blur();
-			return;
-		}
-		if (e === "checked") {
-			if (n !== null && !this.checked) {
-				this.activate();
-				return;
-			}
-			n === null && this.checked && this.deactivate();
-		}
+	attributeChangedCallback() {
+		this.#o();
+	}
+	formResetCallback() {
+		this.#a(this.#t ?? !1);
+	}
+	formStateRestoreCallback(e) {
+		this.#a(e === "true");
+	}
+	get value() {
+		return this.getAttribute("value") ?? "on";
 	}
 	get checked() {
 		return this.getAttribute("aria-checked") === "true";
 	}
 	get disabled() {
-		return this.hasAttribute("disabled") || this.getAttribute("aria-disabled") === "true";
+		return this.matches(":disabled") || this.getAttribute("aria-disabled") === "true";
 	}
 	toggle() {
 		return this.disabled ? !1 : this.checked ? this.deactivate() : this.activate();
 	}
 	activate(n = !0) {
-		return this.disabled || this.checked || n && !t(this, e.SWITCH_ACTIVATE, this.#n) ? !1 : (this.setAttribute("aria-checked", "true"), this.#r(), this.setAttribute("checked", ""), !0);
+		return this.disabled || this.checked || n && !t(this, e.SWITCH_ACTIVATE, this.#i) ? !1 : (this.#a(!0), !0);
 	}
 	deactivate(n = !0) {
-		return this.disabled || !this.checked || n && !t(this, e.SWITCH_DEACTIVATE, this.#n) ? !1 : (this.setAttribute("aria-checked", "false"), this.#r(), this.removeAttribute("checked"), !0);
+		return this.disabled || !this.checked || n && !t(this, e.SWITCH_DEACTIVATE, this.#i) ? !1 : (this.#a(!1), !0);
 	}
 	destroy() {
-		this.removeEventListener("click", this.#e), this.removeEventListener("keydown", this.#t);
+		this.removeEventListener("click", this.#n), this.removeEventListener("keydown", this.#r);
 	}
-	#e = (e) => {
+	#n = (e) => {
 		this.disabled || e.detail !== 0 && this.toggle();
 	};
-	#t = (e) => {
+	#r = (e) => {
 		this.disabled || (e.key === " " || e.key === "Enter") && (e.preventDefault(), this.toggle());
 	};
-	get #n() {
+	get #i() {
 		return { el: this };
 	}
-	#r() {
-		this.$input && (this.$input.checked = this.checked, this.$input.toggleAttribute("checked", this.checked), this.$input.disabled = this.disabled, this.$input.toggleAttribute("disabled", this.disabled));
+	#a(e) {
+		this.setAttribute("aria-checked", String(e));
+	}
+	#o() {
+		this.#e.setFormValue(this.checked ? this.value : null, String(this.checked));
 	}
 };
 customElements.get("cinq-switch") || customElements.define("cinq-switch", a);
