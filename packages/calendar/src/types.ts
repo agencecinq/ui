@@ -19,7 +19,6 @@ export interface Options {
   days?: string[];
   deselect?: boolean;
   name?: string;
-  allowPast?: boolean;
 }
 
 export interface Current {

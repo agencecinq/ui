@@ -107,22 +107,98 @@ td[aria-selected="true"] .js-day {
 Toggle discrete days (no range painting). Click again to remove.
 
 ```html
-<cinq-calendar mode="multiple" allow-past>...</cinq-calendar>
+<cinq-calendar mode="multiple">...</cinq-calendar>
 ```
 
-There is no built-in max. Cap the selection in your app (e.g. after
-`calendar:change`). Pass `emit: false` to `setPicked` so the trim does not
-fire a second `calendar:change`:
+There is no built-in max. Cancel the change that would go over yours:
 
 ```js
 const MAX = 3;
 
-el.addEventListener(EVENTS.CALENDAR_CHANGE, () => {
-  if (el.picked.length <= MAX) return;
-
-  el.setPicked(el.picked.slice(0, MAX), false);
+el.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, event => {
+  if (event.detail.values.length > MAX) event.preventDefault();
 });
 ```
+
+### Bounds
+
+`min` and `max` (`YYYY-MM-DD`) work as on `<input type="date">`: days outside
+are `aria-disabled`. Without them, every day can be picked. Both are observed,
+so a departure calendar can follow the arrival:
+
+```js
+import { toDayString } from "@agencecinq/calendar";
+
+const today = toDayString(new Date());
+
+arrival.setAttribute("min", today);
+departure.setAttribute("min", today);
+
+arrival.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
+  departure.setAttribute("min", detail.values[0] ?? today);
+});
+```
+
+### Unavailable days
+
+Set `aria-disabled="true"` on a day button in `renderInner`. Clicks, the
+keyboard and the range preview already skip it.
+
+```js
+const unavailable = ["2026-11-11", "2026-11-12"];
+
+el.renderInner = inner => {
+  const button = inner.querySelector(".js-day");
+
+  if (unavailable.includes(button.dataset.day)) {
+    button.setAttribute("aria-disabled", "true");
+  }
+};
+el.render();
+```
+
+A range can still go over an unavailable day. Refuse it:
+
+```js
+el.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, event => {
+  const [start, end] = event.detail.values;
+
+  if (end && unavailable.some(day => day > start && day < end)) {
+    event.preventDefault();
+  }
+});
+```
+
+### Forms
+
+`<cinq-calendar>` is a form-associated custom element. Inside a `<form>`, its
+`name` is submitted with the picked days joined by commas (`2026-11-10`,
+`2026-11-10,2026-11-14`). `required` blocks the submission until a day is
+picked, or both ends of a range, with the browser's own message.
+`form.reset()` brings back the `data-picked` selection, and `disabled` (or a
+disabled `<fieldset>`) leaves the field out.
+
+```html
+<form>
+  <p id="stay-label">Dates du séjour</p>
+  <cinq-calendar name="stay" mode="range" required>
+    <header>
+      <!-- previous / next buttons -->
+      <h2 class="js-title" id="stay-title" aria-live="polite"></h2>
+    </header>
+    <table role="grid" aria-labelledby="stay-label stay-title" aria-multiselectable="true">
+      <thead>
+        <tr class="js-days"></tr>
+      </thead>
+      <tbody class="js-body"></tbody>
+    </table>
+  </cinq-calendar>
+  <button>Réserver</button>
+</form>
+```
+
+Name the grid with `aria-labelledby`: a `<label for>` on the host does not
+reach it.
 
 ### Locale & week start
 
@@ -180,10 +256,12 @@ el.renderInner = (inner, date) => {
 | `locale` / `data-locale` | BCP 47 locale for title and weekday/month labels |
 | `mode` | Selection mode: `single` (default), `range`, or `multiple` |
 | `deselect` | Allow clearing the selection in `mode="single"` |
-| `allow-past` | Allow selecting past dates |
+| `min` / `max` | First / last day that can be picked (`YYYY-MM-DD`). Observed |
+| `name` | Form field name, also in the event details |
+| `required` | Needs a day, or both ends of a range, to submit. Observed |
+| `disabled` | Leaves the field out of the form and disables every day |
 | `first-day` | Week start (`0`=Sun ... `6`=Sat). Defaults from locale |
 | `button-class` | Extra classes on day buttons |
-| `name` | Forwarded in `calendar:change` detail |
 | `data-month` | Initial month (`0`-`11`) |
 | `data-year` | Initial year |
 | `data-picked` | JSON array of `YYYY-MM-DD` days to preselect |
@@ -200,12 +278,21 @@ el.renderInner = (inner, date) => {
 
 ## Events
 
-Dispatched on the host `<cinq-calendar>` (bubble) when the selection changes.
-Constants live on `@agencecinq/utils` `EVENTS`:
+Dispatched on the host `<cinq-calendar>`. Constants live on
+`@agencecinq/utils` `EVENTS`:
 
 | Event | Constant | Detail |
 | ----- | -------- | ------ |
+| `calendar:before-change` | `CALENDAR_BEFORE_CHANGE` | `{ values: string[], name?: string, waitUntil }` |
 | `calendar:change` | `CALENDAR_CHANGE` | `{ values: string[], name?: string }` |
+
+`calendar:before-change` comes first when a click or a key would change the
+selection, with the selection to come in `values`. It does not bubble.
+`preventDefault()` cancels the change, and `event.detail.waitUntil(promise)`
+holds it until the promise settles (a rejection cancels it).
+`calendar:change` bubbles once the selection has changed. `setPicked()` skips
+`calendar:before-change`, and dispatches `calendar:change` unless `emit` is
+`false`.
 
 ## API
 

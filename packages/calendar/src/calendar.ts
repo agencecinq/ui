@@ -1,5 +1,6 @@
 import {
   EVENTS,
+  dispatchBeforeEvent,
   dispatchEvent,
   parseBoolean,
   parseNumber,
@@ -33,6 +34,14 @@ const parseMode = (el: HTMLElement): Mode => {
   }
 
   return "single";
+};
+
+/** The browser's own message for an empty required field, in the user's language. */
+const valueMissingMessage = (): string => {
+  const input = document.createElement("input");
+  input.required = true;
+
+  return input.validationMessage;
 };
 
 const dayButton = (
@@ -74,6 +83,9 @@ const dayButton = (
  * @see https://github.com/19h47/19h47-calendar
  */
 export class Calendar extends HTMLElement {
+  static formAssociated = true;
+  static observedAttributes = ["min", "max", "required"];
+
   today: Date = new Date();
   day = "";
   options: Options = {
@@ -83,12 +95,14 @@ export class Calendar extends HTMLElement {
     locale: "en",
     buttonClass: "",
     deselect: false,
-    allowPast: false,
   };
   current: Current = { month: 0, year: 0, day: null };
 
   #keyboard: Keyboard | null = null;
   #dispatchChange: () => void = () => { };
+  #internals = this.attachInternals();
+  #defaultPicked: string[] | null = null;
+  #disabled = false;
 
   $body: HTMLTableSectionElement | null = null;
   $title: HTMLElement | null = null;
@@ -111,6 +125,28 @@ export class Calendar extends HTMLElement {
     this.$previous = null;
   }
 
+  attributeChangedCallback(): void {
+    if (this.$body) {
+      this.render();
+    }
+  }
+
+  formDisabledCallback(disabled: boolean): void {
+    this.#disabled = disabled;
+
+    if (this.$body) {
+      this.render();
+    }
+  }
+
+  formResetCallback(): void {
+    this.setPicked([...(this.#defaultPicked ?? [])], false);
+  }
+
+  formStateRestoreCallback(state: string | null): void {
+    this.setPicked(state ? state.split(",") : [], false);
+  }
+
   #readOptions(): Options {
     const locale =
       this.getAttribute("locale") ||
@@ -130,7 +166,6 @@ export class Calendar extends HTMLElement {
       locale,
       buttonClass: this.getAttribute("button-class") || "",
       deselect: parseBoolean(this.getAttribute("deselect"), false),
-      allowPast: parseBoolean(this.getAttribute("allow-past"), false),
       name: this.getAttribute("name") || undefined,
     };
   }
@@ -172,6 +207,7 @@ export class Calendar extends HTMLElement {
     this.picked = JSON.parse(
       this.getAttribute("data-picked") || "[]",
     ) as string[];
+    this.#defaultPicked ??= [...this.picked];
 
     this.render();
     this.addEventListener("click", this.#handleClick);
@@ -224,6 +260,7 @@ export class Calendar extends HTMLElement {
     this.picked = picked;
     this.setAttribute("data-picked", JSON.stringify(this.picked));
     this.#paint();
+    this.#syncForm();
 
     if (emit) {
       this.#dispatchChange();
@@ -254,6 +291,24 @@ export class Calendar extends HTMLElement {
       $day.classList.toggle(stateClasses.start, isRange && day === start);
       $day.classList.toggle(stateClasses.end, isComplete && day === end);
     });
+  }
+
+  /** Mirror the selection into the form: days joined by commas, `valueMissing` while `required` lacks a day or a range end. */
+  #syncForm(): void {
+    this.#internals.setFormValue(this.picked.join(",") || null);
+
+    const needed = this.options.mode === "range" ? 2 : 1;
+
+    if (!this.hasAttribute("required") || this.picked.length >= needed) {
+      this.#internals.setValidity({});
+      return;
+    }
+
+    this.#internals.setValidity(
+      { valueMissing: true },
+      valueMissingMessage(),
+      this.$body?.querySelector<HTMLElement>('.js-day[tabindex="0"]') ?? undefined,
+    );
   }
 
   /** Selection once `day` is activated, by mode. */
@@ -298,9 +353,27 @@ export class Calendar extends HTMLElement {
     const picked = this.#nextPicked($day.getAttribute("data-day") as string);
     this.#keyboard?.setFocusDay($day, { focus: false });
 
-    if (picked.join() !== this.picked.join()) {
-      this.setPicked(picked);
+    if (picked.join() === this.picked.join()) {
+      return;
     }
+
+    const current = this.picked;
+    const commit = (proceed: boolean) => {
+      if (proceed && this.picked === current) {
+        this.setPicked(picked);
+      }
+    };
+    const result = dispatchBeforeEvent<Detail>(
+      this,
+      EVENTS.CALENDAR_BEFORE_CHANGE,
+      { values: [...picked], name: this.options.name },
+    );
+
+    if (typeof result === "boolean") {
+      return commit(result);
+    }
+
+    result.then(commit);
   };
 
   /** Paint in-between days while choosing the range end (mouse or keyboard). */
@@ -428,6 +501,8 @@ export class Calendar extends HTMLElement {
     }
 
     const buttonClass = this.options.buttonClass ?? "";
+    const min = this.getAttribute("min");
+    const max = this.getAttribute("max");
     const longDate = new Intl.DateTimeFormat(this.options.locale, {
       weekday: "long",
       day: "numeric",
@@ -462,7 +537,10 @@ export class Calendar extends HTMLElement {
 
           inner.innerHTML = dayButton(day, dayOfMonth, buttonClass, {
             label: longDate.format(date),
-            disabled: !this.options.allowPast && day < this.day,
+            disabled:
+              this.#disabled ||
+              (!!min && day < min) ||
+              (!!max && day > max),
             current: day === this.day,
             tabIndex: -1,
           });
@@ -496,6 +574,7 @@ export class Calendar extends HTMLElement {
     this.renderDays();
     this.renderHeader(this.current.month, this.current.year);
     this.renderCalendar(this.current.month, this.current.year, { focus });
+    this.#syncForm();
   }
 
   /** Override to enrich or rebuild each day cell. Keep `.js-day` and `data-day`. */

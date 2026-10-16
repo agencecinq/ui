@@ -168,7 +168,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Single date</h3>
         <p class="text-sm text-gray-600">
-          Locale <code>fr</code>, <code>deselect</code> and <code>allow-past</code>.
+          Locale <code>fr</code> and <code>deselect</code>.
           Click the selected day again to clear. Try the keyboard once a day is focused:
           arrows, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>Page Up</kbd>/<kbd>Page Down</kbd>.
         </p>
@@ -179,7 +179,6 @@ import RegisterComponents from './RegisterComponents.astro';
         data-calendar-demo="single"
         locale="fr"
         deselect
-        allow-past
         name="single"
       >
         <header>
@@ -216,7 +215,6 @@ import RegisterComponents from './RegisterComponents.astro';
         data-calendar-demo="range"
         locale="fr"
         mode="range"
-        allow-past
         name="range"
       >
         <header>
@@ -245,7 +243,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <p class="text-sm text-gray-600">
           <code>mode="multiple"</code>. Toggle discrete days in and out of the
           selection. No range painting. Click a selected day again to remove it.
-          Cap the count in your app if needed (no built-in max).
+          Capped at 3 days here by canceling <code>calendar:before-change</code>.
         </p>
       </div>
 
@@ -254,7 +252,6 @@ import RegisterComponents from './RegisterComponents.astro';
         data-calendar-demo="multiple"
         locale="fr"
         mode="multiple"
-        allow-past
         name="multiple"
       >
         <header>
@@ -290,7 +287,6 @@ import RegisterComponents from './RegisterComponents.astro';
         data-calendar-demo="preselected"
         locale="fr"
         mode="range"
-        allow-past
         data-month="10"
         data-year="2025"
         data-picked='["2025-11-10","2025-11-18"]'
@@ -318,9 +314,64 @@ import RegisterComponents from './RegisterComponents.astro';
   <section class="rounded-2xl bg-white p-6 shadow">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Future only</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Form</h3>
         <p class="text-sm text-gray-600">
-          Without <code>allow-past</code>, days before today are&nbsp;<code>aria-disabled</code>&nbsp;and cannot be selected (still in the keyboard grid).
+          <code>&lt;cinq-calendar&gt;</code> is a form field: <code>name="stay"</code>,
+          <code>mode="range"</code> and <code>required</code>. Submit with a missing end to get the
+          browser's own message. Reset brings back the initial selection.
+        </p>
+      </div>
+
+      <form class="flex flex-col gap-4" data-calendar-form>
+        <p id="docs-calendar-form-field" class="text-sm font-medium text-gray-900">Dates du séjour</p>
+
+        <cinq-calendar
+          class="docs-calendar"
+          data-calendar-demo="form"
+          locale="fr"
+          mode="range"
+          name="stay"
+          required
+        >
+          <header>
+            <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+            <h4 class="js-title" id="docs-calendar-form-label" aria-live="polite"></h4>
+            <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          </header>
+          <table
+            role="grid"
+            aria-labelledby="docs-calendar-form-field docs-calendar-form-label"
+            aria-multiselectable="true"
+          >
+            <thead>
+              <tr class="js-days"></tr>
+            </thead>
+            <tbody class="js-body"></tbody>
+          </table>
+        </cinq-calendar>
+
+        <div class="flex gap-2">
+          <button type="submit" class="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white">
+            Réserver
+          </button>
+          <button type="reset" class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900">
+            Réinitialiser
+          </button>
+        </div>
+      </form>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+        FormData&nbsp;:&nbsp;<span data-calendar-form-output class="font-medium text-gray-900">-</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Bounds</h3>
+        <p class="text-sm text-gray-600">
+          The page script sets <code>min</code> to today and <code>max</code> 60 days later. Days outside are&nbsp;<code>aria-disabled</code>&nbsp;and cannot be selected (still in the keyboard grid).
         </p>
       </div>
 
@@ -386,7 +437,6 @@ import RegisterComponents from './RegisterComponents.astro';
         data-calendar-demo="locale"
         locale="fr"
         deselect
-        allow-past
         name="locale"
       >
         <header>
@@ -425,7 +475,6 @@ import RegisterComponents from './RegisterComponents.astro';
           data-calendar-demo="events"
           locale="fr"
           deselect
-          allow-past
           name="events"
         >
           <header>
@@ -494,6 +543,39 @@ import RegisterComponents from './RegisterComponents.astro';
       output.textContent =
         key === 'multiple' ? values.join(', ') : values.join(' to ');
     });
+  });
+
+  const multipleCalendar = document.querySelector('[data-calendar-demo="multiple"]');
+
+  multipleCalendar?.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, (event) => {
+    if (event.detail.values.length > 3) {
+      event.preventDefault();
+    }
+  });
+
+  const boundsCalendar = document.querySelector('[data-calendar-demo="future"]');
+  const today = new Date();
+  const inSixtyDays = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 60);
+
+  boundsCalendar?.setAttribute('min', toDayString(today));
+  boundsCalendar?.setAttribute('max', toDayString(inSixtyDays));
+
+  const form = document.querySelector('[data-calendar-form]');
+  const formOutput = document.querySelector('[data-calendar-form-output]');
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    if (formOutput) {
+      formOutput.textContent =
+        [...new FormData(form)].map(([key, value]) => `${key}=${value}`).join('&') || '-';
+    }
+  });
+
+  form?.addEventListener('reset', () => {
+    if (formOutput) {
+      formOutput.textContent = '-';
+    }
   });
 
   const localeCalendar = document.querySelector('[data-calendar-demo="locale"]');

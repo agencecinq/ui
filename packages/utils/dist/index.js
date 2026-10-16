@@ -38,6 +38,7 @@ var e = {
 	SNAKE_EAT: "snake:eat",
 	SNAKE_OVER: "snake:over",
 	SNAKE_REPLAY: "snake:replay",
+	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
 	CALENDAR_CHANGE: "calendar:change",
 	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
 	TABS_ACTIVATE: "tabs:activate",

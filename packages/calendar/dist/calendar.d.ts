@@ -10,6 +10,8 @@ import { Current, Options } from './types.js';
  */
 export declare class Calendar extends HTMLElement {
     #private;
+    static formAssociated: boolean;
+    static observedAttributes: string[];
     today: Date;
     day: string;
     options: Options;
@@ -22,6 +24,10 @@ export declare class Calendar extends HTMLElement {
     picked: string[];
     connectedCallback(): void;
     disconnectedCallback(): void;
+    attributeChangedCallback(): void;
+    formDisabledCallback(disabled: boolean): void;
+    formResetCallback(): void;
+    formStateRestoreCallback(state: string | null): void;
     /**
      * Bind markup + listeners. Call {@link destroy} first if already bound.
      */

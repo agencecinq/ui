@@ -37,6 +37,7 @@ export declare const EVENTS: {
     SNAKE_EAT: string;
     SNAKE_OVER: string;
     SNAKE_REPLAY: string;
+    CALENDAR_BEFORE_CHANGE: string;
     CALENDAR_CHANGE: string;
     TABS_BEFORE_ACTIVATE: string;
     TABS_ACTIVATE: string;
