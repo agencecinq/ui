@@ -52,7 +52,5 @@ export declare class Calendar extends HTMLElement {
     render({ focus }?: {
         focus?: boolean | undefined;
     }): void;
-    /** Override to enrich or rebuild each day cell. Keep `.js-day` and `data-day`. */
-    renderInner(_inner: HTMLElement, _date: Date): void;
 }
 //# sourceMappingURL=calendar.d.ts.map

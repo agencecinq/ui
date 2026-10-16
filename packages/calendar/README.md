@@ -149,19 +149,19 @@ arrival.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
 
 ### Unavailable days
 
-Set `aria-disabled="true"` on a day button in `renderInner`. Clicks, the
+Set `aria-disabled="true"` on a day button on `calendar:render`. Clicks, the
 keyboard and the range preview already skip it.
 
 ```js
 const unavailable = ["2026-11-11", "2026-11-12"];
 
-el.renderInner = inner => {
-  const button = inner.querySelector(".js-day");
-
-  if (unavailable.includes(button.dataset.day)) {
-    button.setAttribute("aria-disabled", "true");
-  }
-};
+el.addEventListener(EVENTS.CALENDAR_RENDER, () => {
+  el.querySelectorAll(".js-day").forEach(button => {
+    if (unavailable.includes(button.dataset.day)) {
+      button.setAttribute("aria-disabled", "true");
+    }
+  });
+});
 el.render();
 ```
 
@@ -307,20 +307,26 @@ el.options.months = [
 el.render();
 ```
 
-### Cell hook
+### Decorate days
 
-Override `renderInner` to enrich or rebuild each day cell. Keep `.js-day` and
+`calendar:render` bubbles from the host after each render: on connection, on
+each month change, and when an observed attribute changes. The cells already
+carry their state, so decorate the day buttons from there. Keep `.js-day` and
 `data-day`.
 
 ```js
-el.renderInner = (inner, date) => {
-  const button = inner.querySelector(".js-day");
-  if (!button) return;
-
-  button.classList.add("MyDay");
-  button.innerHTML = `<time datetime="${date.toISOString().slice(0, 10)}">${date.getDate()}</time>`;
-};
+el.addEventListener(EVENTS.CALENDAR_RENDER, ({ detail }) => {
+  // detail.year and detail.month (`0`-`11`): the month on screen
+  el.querySelectorAll(".js-day").forEach(button => {
+    button.innerHTML = `<time datetime="${button.dataset.day}">${button.textContent.trim()}</time>`;
+  });
+});
+el.render();
 ```
+
+The first render happens on connection, often before your script runs. Call
+`render()` once after adding the listener, or listen on `document` from a
+script that runs first.
 
 ## Attributes
 
@@ -356,9 +362,12 @@ Dispatched on the host `<cinq-calendar>`. Constants live on
 
 | Event | Constant | Detail |
 | ----- | -------- | ------ |
+| `calendar:render` | `CALENDAR_RENDER` | `{ year: number, month: number }` |
 | `calendar:before-change` | `CALENDAR_BEFORE_CHANGE` | `{ values: string[], name?: string, waitUntil }` |
 | `calendar:change` | `CALENDAR_CHANGE` | `{ values: string[], name?: string }` |
 
+`calendar:render` bubbles after each render, once the cells carry their state
+(see [Decorate days](#decorate-days)).
 `calendar:before-change` comes first when a click or a key would change the
 selection, with the selection to come in `values`. It does not bubble.
 `preventDefault()` cancels the change, and `event.detail.waitUntil(promise)`
@@ -378,7 +387,6 @@ holds it until the promise settles (a rejection cancels it).
 | `setPicked(picked, emit?)` | Assign the selection, mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
 | `destroy()` | Detach listeners and clear the grid |
-| `renderInner(inner, date)` | Per-cell hook (override) |
 
 Exported helpers: `getFirstDay`, `dayFromDate`, `dateFromDay`.
 

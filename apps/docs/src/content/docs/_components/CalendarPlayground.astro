@@ -541,9 +541,9 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Advanced: event markers</h3>
         <p class="text-sm text-gray-600">
-          Override <code>renderInner</code> to wrap each day in <code>&lt;time&gt;</code>,
-          mark weekends, and paint dots on days that have events. Only event days are
-          selectable. Others get <code>aria-disabled</code>.
+          Decorate the days on <code>calendar:render</code>: wrap each one in
+          <code>&lt;time&gt;</code>, mark weekends, and paint dots on days that have events.
+          Only event days are selectable. Others get <code>aria-disabled</code>.
         </p>
       </div>
 
@@ -727,28 +727,25 @@ import RegisterComponents from './RegisterComponents.astro';
   };
 
   if (eventsCalendar) {
-    eventsCalendar.renderInner = (inner, date) => {
-      const button = inner.querySelector('.js-day');
-      if (!button) return;
+    eventsCalendar.addEventListener(EVENTS.CALENDAR_RENDER, () => {
+      eventsCalendar.querySelectorAll('.js-day').forEach((button) => {
+        const day = button.dataset.day;
+        const weekday = dateFromDay(day).getDay();
 
-      const day = dayFromDate(date);
-      const weekday = date.getDay();
-      const hasEvent = Boolean(events[day]);
-      const label = date.getDate();
+        button.innerHTML = `<time datetime="${day}">${button.textContent.trim()}</time>`;
 
-      button.innerHTML = `<time datetime="${day}">${label}</time>`;
+        if (weekday === 0 || weekday === 6) {
+          button.classList.add('is-weekend');
+        }
 
-      if (weekday === 0 || weekday === 6) {
-        button.classList.add('is-weekend');
-      }
-
-      if (hasEvent) {
-        button.dataset.hasEvent = '';
-        button.title = events[day];
-      } else {
-        button.setAttribute('aria-disabled', 'true');
-      }
-    };
+        if (events[day]) {
+          button.dataset.hasEvent = '';
+          button.title = events[day];
+        } else {
+          button.setAttribute('aria-disabled', 'true');
+        }
+      });
+    });
 
     eventsCalendar.addEventListener(EVENTS.CALENDAR_CHANGE, (event) => {
       const day = event.detail.values[0];
@@ -761,7 +758,7 @@ import RegisterComponents from './RegisterComponents.astro';
       }
 
       eventTitle.textContent = events[day];
-      eventDate.textContent = new Date(`${day}T12:00:00`).toLocaleDateString('fr', {
+      eventDate.textContent = dateFromDay(day).toLocaleDateString('fr', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',

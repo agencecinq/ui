@@ -32,3 +32,9 @@ export interface Detail {
   values: string[];
   name?: string;
 }
+
+/** `calendar:render` detail: the month on screen (`month` is `0`-`11`). */
+export interface RenderDetail {
+  year: number;
+  month: number;
+}

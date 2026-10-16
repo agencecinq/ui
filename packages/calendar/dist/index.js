@@ -38,6 +38,7 @@ var e = {
 	SNAKE_EAT: "snake:eat",
 	SNAKE_OVER: "snake:over",
 	SNAKE_REPLAY: "snake:replay",
+	CALENDAR_RENDER: "calendar:render",
 	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
 	CALENDAR_CHANGE: "calendar:change",
 	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
@@ -395,7 +396,7 @@ var _ = class {
 						disabled: this.#i || !!i && e < i || !!a && e > a,
 						current: e === this.day,
 						tabIndex: -1
-					}), this.renderInner(h, p), m.appendChild(h), l.appendChild(m), s += 1;
+					}), m.appendChild(h), l.appendChild(m), s += 1;
 				}
 			}
 			l.childNodes.length && this.$body.appendChild(l);
@@ -405,10 +406,12 @@ var _ = class {
 	reset() {
 		this.$body && (this.$body.innerHTML = "");
 	}
-	render({ focus: e = !1 } = {}) {
-		this.reset(), this.renderDays(), this.renderHeader(this.current.year, this.current.month), this.renderCalendar(this.current.year, this.current.month, { focus: e }), this.#s();
+	render({ focus: n = !1 } = {}) {
+		this.reset(), this.renderDays(), this.renderHeader(this.current.year, this.current.month), this.renderCalendar(this.current.year, this.current.month, { focus: n }), this.#s(), t(this, e.CALENDAR_RENDER, {
+			year: this.current.year,
+			month: this.current.month
+		}, { cancelable: !1 });
 	}
-	renderInner(e, t) {}
 };
 customElements.get("cinq-calendar") || customElements.define("cinq-calendar", C);
 //#endregion

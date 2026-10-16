@@ -6,7 +6,14 @@ import {
   parseNumber,
 } from "@agencecinq/utils";
 import Keyboard from "./keyboard.js";
-import type { Detail, Current, Options, Mode, StateClasses } from "./types.js";
+import type {
+  Detail,
+  Current,
+  Options,
+  Mode,
+  RenderDetail,
+  StateClasses,
+} from "./types.js";
 import {
   dayFromDate,
   getDateFormat,
@@ -543,8 +550,6 @@ export class Calendar extends HTMLElement {
             tabIndex: -1,
           });
 
-          this.renderInner(inner, date);
-
           cell.appendChild(inner);
           row.appendChild(cell);
 
@@ -573,10 +578,14 @@ export class Calendar extends HTMLElement {
     this.renderHeader(this.current.year, this.current.month);
     this.renderCalendar(this.current.year, this.current.month, { focus });
     this.#syncForm();
-  }
 
-  /** Override to enrich or rebuild each day cell. Keep `.js-day` and `data-day`. */
-  renderInner(_inner: HTMLElement, _date: Date) { }
+    dispatchEvent<RenderDetail>(
+      this,
+      EVENTS.CALENDAR_RENDER,
+      { year: this.current.year, month: this.current.month },
+      { cancelable: false },
+    );
+  }
 }
 
 if (!customElements.get("cinq-calendar")) {
