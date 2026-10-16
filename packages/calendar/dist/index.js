@@ -86,23 +86,22 @@ function l(e) {
 	return new Date(t, n - 1, r);
 }
 function u(e, t, n) {
-	return e <= n && e >= t;
+	return e >= t && e <= n;
 }
 function d(e, t) {
-	return 32 - new Date(e, t, 32).getDate();
+	return new Date(e, t + 1, 0).getDate();
 }
 function f(e, t, n = 0) {
-	return (new Date(t, e).getDay() - n + 7) % 7;
+	return (new Date(e, t, 1).getDay() - n + 7) % 7;
 }
 function p(e) {
-	let t = new Intl.Locale(e).getWeekInfo?.();
-	return t ? t.firstDay === 7 ? 0 : t.firstDay : 0;
+	return (new Intl.Locale(e).getWeekInfo?.()?.firstDay ?? 0) % 7;
 }
 function m(e, t = "short") {
 	return Array.from({ length: 7 }, (n, r) => new Date(2020, 0, 5 + r).toLocaleDateString(e, { weekday: t }));
 }
-function h(e, t) {
-	return new Date(2020, t, 1).toLocaleDateString(e, { month: "long" });
+function h(e, t = "long") {
+	return Array.from({ length: 12 }, (n, r) => new Date(2020, r, 1).toLocaleDateString(e, { month: t }));
 }
 //#endregion
 //#region src/keyboard.ts
@@ -346,15 +345,15 @@ var g = class {
 		n && this.previewRange(n);
 	};
 	getMonthName(e) {
-		return this.options.months?.[e] ?? h(this.options.locale, e);
+		return this.options.months?.[e] ?? h(this.options.locale)[e];
 	}
-	getWeekdays() {
-		return this.options.days ?? m(this.options.locale, "short");
+	getWeekdayNames() {
+		return this.options.days ?? m(this.options.locale);
 	}
 	renderDays() {
 		let e = this.querySelector(".js-days");
 		if (!e) return;
-		let t = this.getWeekdays(), n = m(this.options.locale, "long");
+		let t = this.getWeekdayNames(), n = m(this.options.locale, "long");
 		e.innerHTML = "";
 		for (let r = 0; r < 7; r += 1) {
 			let i = (this.options.firstDay + r) % 7, a = document.createElement("th");
@@ -362,10 +361,10 @@ var g = class {
 		}
 	}
 	renderHeader(e, t) {
-		this.$title && (this.$title.textContent = new Date(t, e, 1).toLocaleDateString(this.options.locale, {
+		this.$title && (this.$title.textContent = new Date(e, t, 1).toLocaleDateString(this.options.locale, {
 			month: "long",
 			year: "numeric"
-		})), this.$previous?.setAttribute("data-content", this.getMonthName(0 > e - 1 ? 11 : e - 1)), this.$next?.setAttribute("data-content", this.getMonthName(11 < e + 1 ? 0 : e + 1));
+		})), this.$previous?.setAttribute("data-content", this.getMonthName(0 > t - 1 ? 11 : t - 1)), this.$next?.setAttribute("data-content", this.getMonthName(11 < t + 1 ? 0 : t + 1));
 	}
 	renderCalendar(e, t, { focus: n = !1 } = {}) {
 		if (!this.$body) return;
@@ -378,9 +377,9 @@ var g = class {
 		for (let n = 0; 6 >= n; n += 1) {
 			let l = document.createElement("tr");
 			for (let u = this.options.firstDay; u < 7 + this.options.firstDay; u += 1) {
-				let p = new Date(t, e, s), m = document.createElement("td"), h = document.createElement("div");
+				let p = new Date(e, t, s), m = document.createElement("td"), h = document.createElement("div");
 				if (n === 0 && u < this.options.firstDay + f(e, t, this.options.firstDay)) l.appendChild(m);
-				else if (s > d(t, e)) break;
+				else if (s > d(e, t)) break;
 				else {
 					let e = c(p);
 					h.innerHTML = x(e, s, r, {
@@ -399,10 +398,10 @@ var g = class {
 		this.$body && (this.$body.innerHTML = "");
 	}
 	render({ focus: e = !1 } = {}) {
-		this.reset(), this.renderDays(), this.renderHeader(this.current.month, this.current.year), this.renderCalendar(this.current.month, this.current.year, { focus: e }), this.#s();
+		this.reset(), this.renderDays(), this.renderHeader(this.current.year, this.current.month), this.renderCalendar(this.current.year, this.current.month, { focus: e }), this.#s();
 	}
 	renderInner(e, t) {}
 };
 customElements.get("cinq-calendar") || customElements.define("cinq-calendar", S);
 //#endregion
-export { S as Calendar, l as fromDayString, p as getWeekStart, c as toDayString };
+export { S as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };

@@ -135,9 +135,9 @@ are `aria-disabled`. Without them, every day can be picked. Both are observed,
 so a departure calendar can follow the arrival:
 
 ```js
-import { toDayString } from "@agencecinq/calendar";
+import { dayFromDate } from "@agencecinq/calendar";
 
-const today = toDayString(new Date());
+const today = dayFromDate(new Date());
 
 arrival.setAttribute("min", today);
 departure.setAttribute("min", today);
@@ -245,7 +245,7 @@ On open, show the input's date and focus it (today when the input is empty).
 A picked day fills the input and closes the dialog:
 
 ```js
-import { fromDayString } from "@agencecinq/calendar";
+import { dateFromDay } from "@agencecinq/calendar";
 import { EVENTS } from "@agencecinq/utils";
 
 const input = document.getElementById("arrival");
@@ -255,7 +255,7 @@ const calendar = dialog.querySelector("cinq-calendar");
 dialog.addEventListener("toggle", ({ newState }) => {
   if (newState !== "open") return;
 
-  const date = input.value ? fromDayString(input.value) : new Date();
+  const date = input.value ? dateFromDay(input.value) : new Date();
 
   calendar.current = {
     month: date.getMonth(),
@@ -289,10 +289,10 @@ calendar.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
 Update at runtime:
 
 ```js
-import { getWeekStart } from "@agencecinq/calendar";
+import { getFirstDay } from "@agencecinq/calendar";
 
 el.options.locale = "ja";
-el.options.firstDay = getWeekStart("ja");
+el.options.firstDay = getFirstDay("ja");
 el.render();
 ```
 
@@ -380,7 +380,7 @@ holds it until the promise settles (a rejection cancels it).
 | `destroy()` | Detach listeners and clear the grid |
 | `renderInner(inner, date)` | Per-cell hook (override) |
 
-Exported helpers: `getWeekStart`, `toDayString`, `fromDayString`.
+Exported helpers: `getFirstDay`, `dayFromDate`, `dateFromDay`.
 
 ## Build setup
 

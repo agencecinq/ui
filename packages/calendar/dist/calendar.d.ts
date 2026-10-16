@@ -42,10 +42,10 @@ export declare class Calendar extends HTMLElement {
     /** Paint in-between days while choosing the range end (mouse or keyboard). */
     previewRange(to: string): void;
     getMonthName(month: number): string;
-    getWeekdays(): string[];
+    getWeekdayNames(): string[];
     renderDays(): void;
-    renderHeader(month: number, year: number): void;
-    renderCalendar(month: number, year: number, { focus }?: {
+    renderHeader(year: number, month: number): void;
+    renderCalendar(year: number, month: number, { focus }?: {
         focus?: boolean | undefined;
     }): void;
     reset(): void;

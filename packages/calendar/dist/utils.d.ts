@@ -1,24 +1,23 @@
-/** Local calendar day as `YYYY-MM-DD`. */
-export declare function toDayString(date: Date): string;
-/** Parse a local `YYYY-MM-DD` day into a Date at local midnight. */
-export declare function fromDayString(day: string): Date;
-/** Inclusive `YYYY-MM-DD` range check. */
-export declare function isBetween(check: string, from: string, to: string): boolean;
-/** @see https://dzone.com/articles/determining-number-days-month */
+/** Local `YYYY-MM-DD` day of a date. */
+export declare function dayFromDate(date: Date): string;
+/** Date at local midnight of a `YYYY-MM-DD` day. */
+export declare function dateFromDay(day: string): Date;
+/** Whether a `YYYY-MM-DD` day falls between `start` and `end`, both included. */
+export declare function isBetween(day: string, start: string, end: string): boolean;
+/** Number of days in a month (`month` is `0`-`11`). */
 export declare function getDaysInMonth(year: number, month: number): number;
 /**
- * How many weekdays precede the 1st of the month, given a week start
- * (`0`=Sun … `6`=Sat).
- *
- * @see https://stackoverflow.com/a/33508649/5091221
+ * How many cells precede the 1st of the month in its first week row, given
+ * the first day of the week (`0`=Sun ... `6`=Sat).
  */
-export declare function getLeadingDays(month: number, year: number, weekStart?: number): number;
+export declare function getLeadingDays(year: number, month: number, firstDay?: number): number;
 /**
- * Week start for a locale as JS `getDay()` (0=Sun … 6=Sat).
- * Falls back to Sunday when `Intl.Locale.getWeekInfo` is unavailable.
+ * First day of the week for a locale, as `Date#getDay()` (`0`=Sun ... `6`=Sat).
+ * Sunday when `Intl.Locale#getWeekInfo()` is unavailable.
  */
-export declare function getWeekStart(locale: string): number;
-/** Sunday-first weekday labels (Jan 5, 2020 was a Sunday). */
-export declare function getIntlWeekdays(locale: string, weekday?: Intl.DateTimeFormatOptions["weekday"]): string[];
-export declare function getIntlMonth(locale: string, month: number): string;
+export declare function getFirstDay(locale: string): number;
+/** Weekday names, Sunday first (5 January 2020 was a Sunday). */
+export declare function getWeekdayNames(locale: string, width?: "long" | "short" | "narrow"): string[];
+/** Month names, January first. */
+export declare function getMonthNames(locale: string, width?: "long" | "short" | "narrow"): string[];
 //# sourceMappingURL=utils.d.ts.map

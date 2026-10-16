@@ -8,13 +8,13 @@ import {
 import Keyboard from "./keyboard.js";
 import type { Detail, Current, Options, Mode, StateClasses } from "./types.js";
 import {
+  dayFromDate,
   getDaysInMonth,
-  getIntlMonth,
-  getIntlWeekdays,
+  getFirstDay,
   getLeadingDays,
-  getWeekStart,
+  getMonthNames,
+  getWeekdayNames,
   isBetween,
-  toDayString,
 } from "./utils.js";
 
 const stateClassesDefault: StateClasses = {
@@ -46,7 +46,7 @@ const valueMissingMessage = (): string => {
 
 const dayButton = (
   day: string,
-  date: number,
+  dayOfMonth: number,
   className: string,
   {
     label,
@@ -69,7 +69,7 @@ const dayButton = (
 		${disabled ? 'aria-disabled="true"' : ""}
 		${current ? 'aria-current="date"' : ""}
 	>
-		${date}
+		${dayOfMonth}
 	</button>
 `;
 
@@ -160,8 +160,8 @@ export class Calendar extends HTMLElement {
       mode: parseMode(this),
       firstDay:
         firstDay != null && firstDay !== ""
-          ? parseNumber(firstDay, getWeekStart(locale))
-          : getWeekStart(locale),
+          ? parseNumber(firstDay, getFirstDay(locale))
+          : getFirstDay(locale),
       stateClasses: { ...stateClassesDefault },
       locale,
       buttonClass: this.getAttribute("button-class") || "",
@@ -177,7 +177,7 @@ export class Calendar extends HTMLElement {
     const now = new Date();
 
     this.today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    this.day = toDayString(this.today);
+    this.day = dayFromDate(this.today);
 
     this.options = this.#readOptions();
 
@@ -444,12 +444,12 @@ export class Calendar extends HTMLElement {
 
   getMonthName(month: number): string {
     return (
-      this.options.months?.[month] ?? getIntlMonth(this.options.locale, month)
+      this.options.months?.[month] ?? getMonthNames(this.options.locale)[month]
     );
   }
 
-  getWeekdays(): string[] {
-    return this.options.days ?? getIntlWeekdays(this.options.locale, "short");
+  getWeekdayNames(): string[] {
+    return this.options.days ?? getWeekdayNames(this.options.locale);
   }
 
   renderDays() {
@@ -458,8 +458,8 @@ export class Calendar extends HTMLElement {
       return;
     }
 
-    const labels = this.getWeekdays();
-    const abbreviations = getIntlWeekdays(this.options.locale, "long");
+    const labels = this.getWeekdayNames();
+    const longNames = getWeekdayNames(this.options.locale, "long");
 
     row.innerHTML = "";
 
@@ -468,13 +468,13 @@ export class Calendar extends HTMLElement {
       const th = document.createElement("th");
 
       th.scope = "col";
-      th.abbr = abbreviations[index];
+      th.abbr = longNames[index];
       th.textContent = labels[index];
       row.appendChild(th);
     }
   }
 
-  renderHeader(month: number, year: number) {
+  renderHeader(year: number, month: number) {
     if (this.$title) {
       this.$title.textContent = new Date(year, month, 1).toLocaleDateString(
         this.options.locale,
@@ -495,7 +495,7 @@ export class Calendar extends HTMLElement {
     );
   }
 
-  renderCalendar(month: number, year: number, { focus = false } = {}) {
+  renderCalendar(year: number, month: number, { focus = false } = {}) {
     if (!this.$body) {
       return;
     }
@@ -527,13 +527,13 @@ export class Calendar extends HTMLElement {
           0 === i &&
           j <
           this.options.firstDay +
-          getLeadingDays(month, year, this.options.firstDay)
+          getLeadingDays(year, month, this.options.firstDay)
         ) {
           row.appendChild(cell);
         } else if (dayOfMonth > getDaysInMonth(year, month)) {
           break;
         } else {
-          const day = toDayString(date);
+          const day = dayFromDate(date);
 
           inner.innerHTML = dayButton(day, dayOfMonth, buttonClass, {
             label: longDate.format(date),
@@ -572,8 +572,8 @@ export class Calendar extends HTMLElement {
   render({ focus = false } = {}) {
     this.reset();
     this.renderDays();
-    this.renderHeader(this.current.month, this.current.year);
-    this.renderCalendar(this.current.month, this.current.year, { focus });
+    this.renderHeader(this.current.year, this.current.month);
+    this.renderCalendar(this.current.year, this.current.month, { focus });
     this.#syncForm();
   }
 

@@ -485,7 +485,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <h3 class="text-lg font-semibold text-gray-900">Locale & week start</h3>
         <p class="text-sm text-gray-600">
           Change the locale. Labels update via <code>Intl</code>, and week start
-          follows <code>getWeekStart(locale)</code> unless you override <code>first-day</code>.
+          follows <code>getFirstDay(locale)</code> unless you override <code>first-day</code>.
         </p>
       </div>
 
@@ -595,7 +595,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
 <script>
   import { EVENTS } from '@agencecinq/utils';
-  import { fromDayString, getWeekStart, toDayString } from '@agencecinq/calendar';
+  import { dateFromDay, dayFromDate, getFirstDay } from '@agencecinq/calendar';
 
   const emptyLabels = {
     single: 'Aucune date',
@@ -635,8 +635,8 @@ import RegisterComponents from './RegisterComponents.astro';
   const today = new Date();
   const inSixtyDays = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 60);
 
-  boundsCalendar?.setAttribute('min', toDayString(today));
-  boundsCalendar?.setAttribute('max', toDayString(inSixtyDays));
+  boundsCalendar?.setAttribute('min', dayFromDate(today));
+  boundsCalendar?.setAttribute('max', dayFromDate(inSixtyDays));
 
   const form = document.querySelector('[data-calendar-form]');
   const formOutput = document.querySelector('[data-calendar-form-output]');
@@ -664,7 +664,7 @@ import RegisterComponents from './RegisterComponents.astro';
     if (newState !== 'open' || !dialogCalendar) return;
 
     const value = dialogInput.value;
-    const date = value ? fromDayString(value) : new Date();
+    const date = value ? dateFromDay(value) : new Date();
 
     dialogCalendar.current = {
       month: date.getMonth(),
@@ -688,7 +688,7 @@ import RegisterComponents from './RegisterComponents.astro';
   const applyLocale = (locale) => {
     if (!localeCalendar) return;
 
-    const firstDay = getWeekStart(locale);
+    const firstDay = getFirstDay(locale);
     localeCalendar.options.locale = locale;
     localeCalendar.options.firstDay = firstDay;
     localeCalendar.setAttribute('locale', locale);
@@ -720,10 +720,10 @@ import RegisterComponents from './RegisterComponents.astro';
   };
 
   const events = {
-    [toDayString(dayOffset(1))]: 'Kick-off projet',
-    [toDayString(dayOffset(3))]: 'Revue design',
-    [toDayString(dayOffset(8))]: 'Atelier accessibilité',
-    [toDayString(dayOffset(12))]: 'Livraison sprint',
+    [dayFromDate(dayOffset(1))]: 'Kick-off projet',
+    [dayFromDate(dayOffset(3))]: 'Revue design',
+    [dayFromDate(dayOffset(8))]: 'Atelier accessibilité',
+    [dayFromDate(dayOffset(12))]: 'Livraison sprint',
   };
 
   if (eventsCalendar) {
@@ -731,7 +731,7 @@ import RegisterComponents from './RegisterComponents.astro';
       const button = inner.querySelector('.js-day');
       if (!button) return;
 
-      const day = toDayString(date);
+      const day = dayFromDate(date);
       const weekday = date.getDay();
       const hasEvent = Boolean(events[day]);
       const label = date.getDate();

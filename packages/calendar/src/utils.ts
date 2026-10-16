@@ -1,73 +1,73 @@
-/** Local calendar day as `YYYY-MM-DD`. */
-export function toDayString(date: Date): string {
+/** Local `YYYY-MM-DD` day of a date. */
+export function dayFromDate(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const dayOfMonth = String(date.getDate()).padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
+  return `${year}-${month}-${dayOfMonth}`;
 }
 
-/** Parse a local `YYYY-MM-DD` day into a Date at local midnight. */
-export function fromDayString(day: string): Date {
-  const [year, month, date] = day.split("-").map(Number);
+/** Date at local midnight of a `YYYY-MM-DD` day. */
+export function dateFromDay(day: string): Date {
+  const [year, month, dayOfMonth] = day.split("-").map(Number);
 
-  return new Date(year, month - 1, date);
+  return new Date(year, month - 1, dayOfMonth);
 }
 
-/** Inclusive `YYYY-MM-DD` range check. */
-export function isBetween(check: string, from: string, to: string): boolean {
-  return check <= to && check >= from;
+/** Whether a `YYYY-MM-DD` day falls between `start` and `end`, both included. */
+export function isBetween(day: string, start: string, end: string): boolean {
+  return day >= start && day <= end;
 }
 
-/** @see https://dzone.com/articles/determining-number-days-month */
+/** Number of days in a month (`month` is `0`-`11`). */
 export function getDaysInMonth(year: number, month: number): number {
-  return 32 - new Date(year, month, 32).getDate();
+  return new Date(year, month + 1, 0).getDate();
 }
 
 /**
- * How many weekdays precede the 1st of the month, given a week start
- * (`0`=Sun … `6`=Sat).
- *
- * @see https://stackoverflow.com/a/33508649/5091221
+ * How many cells precede the 1st of the month in its first week row, given
+ * the first day of the week (`0`=Sun ... `6`=Sat).
  */
 export function getLeadingDays(
-  month: number,
   year: number,
-  weekStart = 0,
+  month: number,
+  firstDay = 0,
 ): number {
-  const day = new Date(year, month).getDay();
-  return (day - weekStart + 7) % 7;
+  return (new Date(year, month, 1).getDay() - firstDay + 7) % 7;
 }
 
 /**
- * Week start for a locale as JS `getDay()` (0=Sun … 6=Sat).
- * Falls back to Sunday when `Intl.Locale.getWeekInfo` is unavailable.
+ * First day of the week for a locale, as `Date#getDay()` (`0`=Sun ... `6`=Sat).
+ * Sunday when `Intl.Locale#getWeekInfo()` is unavailable.
  */
-export function getWeekStart(locale: string): number {
-  const intlLocale = new Intl.Locale(locale) as Intl.Locale & {
-    getWeekInfo?: () => { firstDay: number };
-  };
-  const weekInfo = intlLocale.getWeekInfo?.();
+export function getFirstDay(locale: string): number {
+  const weekInfo = (
+    new Intl.Locale(locale) as Intl.Locale & {
+      getWeekInfo?: () => { firstDay: number };
+    }
+  ).getWeekInfo?.();
 
-  if (weekInfo) {
-    return weekInfo.firstDay === 7 ? 0 : weekInfo.firstDay;
-  }
-
-  return 0;
+  return (weekInfo?.firstDay ?? 0) % 7;
 }
 
-/** Sunday-first weekday labels (Jan 5, 2020 was a Sunday). */
-export function getIntlWeekdays(
+/** Weekday names, Sunday first (5 January 2020 was a Sunday). */
+export function getWeekdayNames(
   locale: string,
-  weekday: Intl.DateTimeFormatOptions["weekday"] = "short",
+  width: "long" | "short" | "narrow" = "short",
 ): string[] {
-  return Array.from({ length: 7 }, (_, day) =>
-    new Date(2020, 0, 5 + day).toLocaleDateString(locale, { weekday }),
+  return Array.from({ length: 7 }, (_, weekday) =>
+    new Date(2020, 0, 5 + weekday).toLocaleDateString(locale, {
+      weekday: width,
+    }),
   );
 }
 
-export function getIntlMonth(locale: string, month: number): string {
-  return new Date(2020, month, 1).toLocaleDateString(locale, {
-    month: "long",
-  });
+/** Month names, January first. */
+export function getMonthNames(
+  locale: string,
+  width: "long" | "short" | "narrow" = "long",
+): string[] {
+  return Array.from({ length: 12 }, (_, month) =>
+    new Date(2020, month, 1).toLocaleDateString(locale, { month: width }),
+  );
 }

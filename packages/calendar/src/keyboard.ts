@@ -1,4 +1,4 @@
-import { fromDayString, getDaysInMonth, toDayString } from "./utils.js";
+import { dateFromDay, dayFromDate, getDaysInMonth } from "./utils.js";
 import type { Calendar } from "./calendar.js";
 
 /** APG day-grid focus: roving tabindex + keyboard navigation. */
@@ -30,20 +30,20 @@ export default class Keyboard {
   dayInView(): string {
     const { current } = this.host;
     const dayOfMonth = current.day
-      ? fromDayString(current.day).getDate()
+      ? dateFromDay(current.day).getDate()
       : 1;
     const lastDay = getDaysInMonth(current.year, current.month);
 
-    return toDayString(
+    return dayFromDate(
       new Date(current.year, current.month, Math.min(dayOfMonth, lastDay)),
     );
   }
 
   focusDayByOffset(fromDay: string, dayDelta: number) {
-    const date = fromDayString(fromDay);
+    const date = dateFromDay(fromDay);
     date.setDate(date.getDate() + dayDelta);
 
-    const day = toDayString(date);
+    const day = dayFromDate(date);
     this.host.current.day = day;
     this.host.current.year = date.getFullYear();
     this.host.current.month = date.getMonth();
@@ -106,7 +106,7 @@ export default class Keyboard {
     }
 
     const day = $target.getAttribute("data-day") as string;
-    const dayOfWeek = fromDayString(day).getDay();
+    const dayOfWeek = dateFromDay(day).getDay();
     const offset = (dayOfWeek - this.host.options.firstDay + 7) % 7;
     const { key, code } = event;
 

@@ -8,4 +8,4 @@ export type {
   Mode,
   StateClasses,
 } from "./types.js";
-export { getWeekStart, toDayString, fromDayString } from "./utils.js";
+export { dateFromDay, dayFromDate, getFirstDay } from "./utils.js";
