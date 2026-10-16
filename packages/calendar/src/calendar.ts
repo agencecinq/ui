@@ -119,6 +119,8 @@ export class Calendar extends HTMLElement {
   #internals = this.attachInternals();
   #defaultPicked: string[] | null = null;
   #disabled = false;
+  /** `calendar:before-change` promises not settled yet. */
+  #pending = 0;
 
   $body: HTMLTableSectionElement | null = null;
   $title: HTMLElement | null = null;
@@ -270,7 +272,7 @@ export class Calendar extends HTMLElement {
 
     this.reset();
     this.#internals.setValidity({});
-    this.#internals.states.delete("picking");
+    this.#internals.states.clear();
     this.#keyboard = null;
     this.$body = null;
     this.$title = null;
@@ -319,8 +321,7 @@ export class Calendar extends HTMLElement {
   /**
    * Reflect `picked` on the grid cells: `aria-selected` on each selected day,
    * and in a range `data-range` inside it (ends included), `data-start` and
-   * `data-end` on its ends. A range with its start only puts the calendar in
-   * `:state(picking)`.
+   * `data-end` on its ends. Then sync the custom states.
    */
   #paint(): void {
     const [start, end] = this.picked;
@@ -343,10 +344,28 @@ export class Calendar extends HTMLElement {
       $cell?.toggleAttribute("data-end", isComplete && day === end);
     });
 
-    if (isRange && 1 === this.picked.length) {
-      this.#internals.states.add("picking");
-    } else {
-      this.#internals.states.delete("picking");
+    this.#syncStates();
+  }
+
+  /**
+   * Custom states for CSS: `:state(empty)` without a picked day,
+   * `:state(picking)` while a range waits for its end, and `:state(pending)`
+   * while a `waitUntil()` of `calendar:before-change` holds a change.
+   */
+  #syncStates(): void {
+    const { length } = this.picked;
+    const states: Record<string, boolean> = {
+      empty: 0 === length,
+      picking: this.options.mode === "range" && 1 === length,
+      pending: this.#pending > 0,
+    };
+
+    for (const [state, on] of Object.entries(states)) {
+      if (on) {
+        this.#internals.states.add(state);
+      } else {
+        this.#internals.states.delete(state);
+      }
     }
   }
 
@@ -460,7 +479,14 @@ export class Calendar extends HTMLElement {
       return commit(result);
     }
 
-    result.then(commit);
+    this.#pending += 1;
+    this.#syncStates();
+
+    result.then(proceed => {
+      this.#pending -= 1;
+      this.#syncStates();
+      commit(proceed);
+    });
   };
 
   #handleCommand = (event: Event) => {

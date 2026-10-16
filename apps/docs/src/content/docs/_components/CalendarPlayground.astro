@@ -127,7 +127,7 @@ import RegisterComponents from './RegisterComponents.astro';
     cursor: not-allowed;
   }
 
-  /* The status stays in the page and keeps its line: only its text shows, while a range waits for its end. */
+  /* The status stays in the page and keeps its line: only its hints show and hide, with the states. */
   .docs-calendar [role='status'] {
     min-block-size: 1lh;
     margin-top: 0.75rem;
@@ -135,8 +135,15 @@ import RegisterComponents from './RegisterComponents.astro';
     color: #4b5563;
   }
 
-  .docs-calendar:not(:state(picking)) [role='status'] p {
+  .docs-calendar:not(:state(empty)) [data-hint='empty'],
+  .docs-calendar:not(:state(picking)) [data-hint='picking'],
+  .docs-calendar:not(:state(pending)) [data-hint='pending'],
+  .docs-calendar:state(pending) [data-hint]:not([data-hint='pending']) {
     display: none;
+  }
+
+  .docs-calendar:state(pending) [data-day] {
+    cursor: progress;
   }
 
   .docs-calendar-events [data-day] {
@@ -228,8 +235,9 @@ import RegisterComponents from './RegisterComponents.astro';
         <h3 class="text-lg font-semibold text-gray-900">Date range</h3>
         <p class="text-sm text-gray-600">
           <code>mode="range"</code>. Pick a start day, then an end day. Hover (or move focus)
-          paints the in-between preview. A third click resets the range. Until the end is
-          picked, <code>:state(picking)</code> shows the hint under the grid.
+          paints the in-between preview. A third click resets the range. The hint under the
+          grid follows <code>:state(empty)</code>, <code>:state(picking)</code> and <code>:state(pending)</code>:
+          a pretend server check holds the end for 0.8 s.
         </p>
       </div>
 
@@ -253,7 +261,9 @@ import RegisterComponents from './RegisterComponents.astro';
           <tbody></tbody>
         </table>
         <div role="status">
-          <p>Choisissez la date de fin.</p>
+          <p data-hint="empty">Choisissez la date de début.</p>
+          <p data-hint="picking">Choisissez la date de fin.</p>
+          <p data-hint="pending">Vérification des disponibilités…</p>
         </div>
       </cinq-calendar>
 
@@ -657,6 +667,15 @@ import RegisterComponents from './RegisterComponents.astro';
   multipleCalendar?.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, (event) => {
     if (event.detail.values.length > 3) {
       event.preventDefault();
+    }
+  });
+
+  const rangeCalendar = document.querySelector('[data-calendar-demo="range"]');
+
+  // A pretend server check on the end of the range, under :state(pending).
+  rangeCalendar?.addEventListener(EVENTS.CALENDAR_BEFORE_CHANGE, (event) => {
+    if (event.detail.values.length === 2) {
+      event.detail.waitUntil(new Promise((resolve) => setTimeout(resolve, 800)));
     }
   });
 

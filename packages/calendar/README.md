@@ -104,8 +104,8 @@ The calendar writes the state as attributes, no class:
 - On each day button: the full date as `aria-label`
   (`lundi 16 novembre 2026`), `aria-current="date"` on today, and
   `aria-disabled="true"` on days that cannot be picked.
-- On the calendar: `:state(picking)` while a range waits for its end, see
-  [Date range](#date-range).
+- On the calendar itself: custom states rather than attributes, see
+  [Custom states](#custom-states).
 
 These rules weigh the same, so the last one that matches wins:
 
@@ -130,6 +130,48 @@ td[data-end] [data-day] {
 }
 ```
 
+### Custom states
+
+The calendar itself matches
+[custom states](https://developer.mozilla.org/docs/Web/CSS/:state):
+
+| State | When |
+| ----- | ---- |
+| `:state(empty)` | No day is picked |
+| `:state(picking)` | A range has its start and waits for its end |
+| `:state(pending)` | A `waitUntil()` of `calendar:before-change` holds a change |
+
+A state only changes the look, so say it in words too: put the hints in a
+`role="status"` element and hide the hints, not the element. The status stays
+in the page, so screen readers announce a hint when it shows. Prefer
+`role="status"` to `aria-live` here: the calendar writes the month in the first
+`[aria-live]` it finds.
+
+```html
+<cinq-calendar mode="range" lang="fr">
+  <!-- header and table -->
+  <div role="status">
+    <p data-hint="empty">Choisissez la date d'arrivée.</p>
+    <p data-hint="picking">Choisissez la date de départ.</p>
+    <p data-hint="pending">Vérification des disponibilités…</p>
+  </div>
+</cinq-calendar>
+```
+
+```css
+/* each hint shows with its state, and the check alone while it runs */
+cinq-calendar:not(:state(empty)) [data-hint="empty"],
+cinq-calendar:not(:state(picking)) [data-hint="picking"],
+cinq-calendar:not(:state(pending)) [data-hint="pending"],
+cinq-calendar:state(pending) [data-hint]:not([data-hint="pending"]) {
+  display: none;
+}
+
+cinq-calendar:state(pending) [data-day] {
+  cursor: progress;
+}
+```
+
 ### Single date
 
 The default mode. Add `deselectable` to clear the selection by clicking the
@@ -148,27 +190,8 @@ starts a new range.
 <cinq-calendar mode="range">...</cinq-calendar>
 ```
 
-While the range waits for its end, the calendar matches `:state(picking)`, a
-[custom state](https://developer.mozilla.org/docs/Web/CSS/:state) for CSS.
-Show a hint with it: put the text in a `role="status"` element and hide the
-text, not the element. The status stays in the page, so screen readers announce
-the text when it shows. Prefer `role="status"` to `aria-live` here: the
-calendar writes the month in the first `[aria-live]` it finds.
-
-```html
-<cinq-calendar mode="range" lang="fr">
-  <!-- header and table -->
-  <div role="status">
-    <p>Choisissez la date de fin.</p>
-  </div>
-</cinq-calendar>
-```
-
-```css
-cinq-calendar:not(:state(picking)) [role="status"] p {
-  display: none;
-}
-```
+While the range waits for its end, the calendar matches `:state(picking)`:
+see [Custom states](#custom-states) to show a hint with it.
 
 ### Multiple dates
 
@@ -456,7 +479,8 @@ Dispatched on the host `<cinq-calendar>`. Constants live on
 `calendar:before-change` comes first when a click or a key would change the
 selection, with the selection to come in `values`. It does not bubble.
 `preventDefault()` cancels the change, and `event.detail.waitUntil(promise)`
-holds it until the promise settles (a rejection cancels it).
+holds it until the promise settles (a rejection cancels it). Meanwhile, the
+calendar matches `:state(pending)`.
 `calendar:change` bubbles once the selection has changed. `setPicked()` skips
 `calendar:before-change`, and dispatches `calendar:change` unless `emit` is
 `false`.
@@ -471,7 +495,7 @@ holds it until the promise settles (a rejection cancels it).
 | `render()` | Rebuild the grid |
 | `setPicked(picked, emit?)` | Assign the selection (days in order, start then end in a range), mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
-| `destroy()` | Detach listeners, clear the grid, its validity and its state |
+| `destroy()` | Detach listeners, clear the grid, its validity and its states |
 | `form`, `validity`, `validationMessage`, `willValidate` | As on a native field |
 | `checkValidity()`, `reportValidity()` | As on a native field |
 
