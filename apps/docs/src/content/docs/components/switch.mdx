@@ -72,6 +72,11 @@ Per the [APG switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/),
 the switch **label must not change** when its state changes. Style On/Off
 decorative text with CSS and mark it `aria-hidden="true"`.
 
+The content of the host is presentational, as for any `role="switch"`
+([ARIA](https://www.w3.org/TR/wai-aria-1.2/#switch)): its text becomes the
+accessible name, and it must hold nothing interactive. Put a help link next to
+the switch, tied with `aria-describedby`.
+
 For multiple switches, use a `<fieldset>` / `<legend>` (see [Forms](#forms)) or
 `role="group"` with `aria-labelledby`.
 

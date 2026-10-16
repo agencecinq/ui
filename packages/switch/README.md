@@ -68,6 +68,11 @@ No manual `init()` call required.
 The switch **label must not change** when its state changes. Update decorative
 On/Off text only if it is marked `aria-hidden="true"`.
 
+The content of the host is presentational, as for any `role="switch"`
+([ARIA](https://www.w3.org/TR/wai-aria-1.2/#switch)): its text becomes the
+accessible name, and it must hold nothing interactive. Put a help link next to
+the switch, tied with `aria-describedby`.
+
 For multiple switches, use a `<fieldset>` with a `<legend>` (see [Forms](#forms)),
 or an element with `role="group"` and `aria-labelledby` pointing to the group
 label ([APG](https://www.w3.org/WAI/ARIA/apg/patterns/switch/)).
