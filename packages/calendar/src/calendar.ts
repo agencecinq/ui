@@ -88,6 +88,7 @@ export class Calendar extends HTMLElement {
   current: Current = { month: 0, year: 0, day: null };
 
   #keyboard: Keyboard | null = null;
+  #dispatchChange: () => void = () => { };
 
   $body: HTMLTableSectionElement | null = null;
   $title: HTMLElement | null = null;
@@ -180,6 +181,15 @@ export class Calendar extends HTMLElement {
     if (this.options.mode === "range") {
       this.$body.addEventListener("mousemove", this.#handleMousemove, false);
     }
+
+    this.#dispatchChange = () => {
+      const detail: Detail = {
+        values: this.picked,
+        name: this.options.name,
+      };
+
+      dispatchEvent(this, EVENTS.CALENDAR_CHANGE, detail, { cancelable: false });
+    };
   }
 
   destroy(): void {
@@ -276,6 +286,10 @@ export class Calendar extends HTMLElement {
         this.picked = [];
         this.setDaySelected($day, false);
         return this.setPicked(this.picked);
+      }
+
+      if (this.picked.includes(day)) {
+        return;
       }
 
       this.picked.forEach(pickedDay => {
@@ -523,15 +537,6 @@ export class Calendar extends HTMLElement {
 
   /** Override to enrich or rebuild each day cell. Keep `.js-day` and `data-day`. */
   renderInner(_inner: HTMLElement, _date: Date) { }
-
-  #dispatchChange = (): void => {
-    const detail: Detail = {
-      values: this.picked,
-      name: this.options.name,
-    };
-
-    dispatchEvent(this, EVENTS.CALENDAR_CHANGE, detail, { cancelable: false });
-  };
 }
 
 if (!customElements.get("cinq-calendar")) {
