@@ -24,7 +24,8 @@ export class Switch extends HTMLElement {
   }
 
   /**
-   * Bind listeners and submit the current state. Call {@link destroy} first if
+   * Note the reset state and bind listeners. The form value already follows
+   * `aria-checked`, observed from the markup on. Call {@link destroy} first if
    * already bound.
    */
   init(): void {
@@ -32,7 +33,6 @@ export class Switch extends HTMLElement {
 
     this.addEventListener("click", this.#handleClick);
     this.addEventListener("keydown", this.#handleKeydown);
-    this.#update();
   }
 
   /** `aria-checked` is the state: whoever writes it, the form value follows. */

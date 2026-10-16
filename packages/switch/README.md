@@ -179,7 +179,7 @@ is synchronous, so nothing waits in between.
 
 | Method | Description |
 | ------ | ----------- |
-| `init()` | Binds listeners and submits the state. Runs on connect. Call `destroy()` first if already bound. |
+| `init()` | Binds listeners. Runs on connect. Call `destroy()` first if already bound. |
 | `activate(emit?)` | Turns the switch on. |
 | `deactivate(emit?)` | Turns the switch off. |
 | `toggle()` | Toggles on/off. |

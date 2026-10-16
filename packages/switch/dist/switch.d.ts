@@ -12,7 +12,8 @@ export declare class Switch extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     /**
-     * Bind listeners and submit the current state. Call {@link destroy} first if
+     * Note the reset state and bind listeners. The form value already follows
+     * `aria-checked`, observed from the markup on. Call {@link destroy} first if
      * already bound.
      */
     init(): void;

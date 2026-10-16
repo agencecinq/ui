@@ -78,7 +78,7 @@ var a = class extends HTMLElement {
 		this.destroy();
 	}
 	init() {
-		this.#t ??= this.checked, this.addEventListener("click", this.#n), this.addEventListener("keydown", this.#r), this.#o();
+		this.#t ??= this.checked, this.addEventListener("click", this.#n), this.addEventListener("keydown", this.#r);
 	}
 	attributeChangedCallback() {
 		this.#o();
