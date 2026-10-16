@@ -152,7 +152,9 @@ var g = class {
 	#e = (e) => {
 		let t = e.target.closest("[data-day]");
 		if (!t || !this.host.$body?.contains(t)) return;
-		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, i = getComputedStyle(t).direction === "rtl" ? -1 : 1, { key: a, code: o } = e, s = {
+		let n = t.getAttribute("data-day");
+		this.host.current.day = n;
+		let r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, i = getComputedStyle(t).direction === "rtl" ? -1 : 1, { key: a, code: o } = e, s = {
 			ArrowLeft: () => {
 				e.preventDefault(), this.focusDayByOffset(n, -i);
 			},
@@ -374,8 +376,9 @@ var g = class {
 			i?.toggleAttribute("data-range", u(t, n, r)), i?.toggleAttribute("data-start", t === n), i?.toggleAttribute("data-end", t === r);
 		});
 	}
-	#p = () => {
-		this.#l();
+	#p = (e) => {
+		let t = e.target.closest("[data-day]");
+		t && this.$body?.contains(t) && this.#e?.setFocusDay(t, { focus: !1 }), this.#l();
 	};
 	#m = (e) => {
 		let t = e.target.closest("[data-day]"), n = t?.getAttribute("data-day");
@@ -433,8 +436,8 @@ var g = class {
 		this.$body && (this.$body.innerHTML = "");
 	}
 	render({ focus: n = !1 } = {}) {
-		let { activeElement: r } = this.getRootNode(), i = !!this.$body?.contains(r), a = i && r?.getAttribute("data-day");
-		a && (this.current.day = a), Object.assign(this.options, this.#i()), this.reset(), this.renderDays(), this.renderHeader(this.current.year, this.current.month), this.renderCalendar(this.current.year, this.current.month), t(this, e.CALENDAR_RENDER, {
+		let { activeElement: r } = this.getRootNode(), i = !!this.$body?.contains(r);
+		Object.assign(this.options, this.#i()), this.reset(), this.renderDays(), this.renderHeader(this.current.year, this.current.month), this.renderCalendar(this.current.year, this.current.month), t(this, e.CALENDAR_RENDER, {
 			year: this.current.year,
 			month: this.current.month
 		}, { cancelable: !1 }), this.#e?.sync({ focus: n || i }), this.#l();

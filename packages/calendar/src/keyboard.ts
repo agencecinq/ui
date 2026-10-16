@@ -106,6 +106,8 @@ export default class Keyboard {
     }
 
     const day = $target.getAttribute("data-day") as string;
+    // Keys act on the day that has the focus, Page Up / Page Down included.
+    this.host.current.day = day;
     const dayOfWeek = dateFromDay(day).getDay();
     const offset = (dayOfWeek - this.host.options.firstDay + 7) % 7;
     // Left and right follow the screen: in a right-to-left grid the next day sits on the left.

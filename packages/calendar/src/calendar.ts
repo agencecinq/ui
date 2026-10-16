@@ -493,8 +493,17 @@ export class Calendar extends HTMLElement {
     });
   }
 
-  /** Keep the validation message on the day that holds the tab stop. */
-  #handleFocusin = () => {
+  /**
+   * Follow the focus, however it moved: the day it lands on becomes the tab
+   * stop and the current day, and carries the validation message.
+   */
+  #handleFocusin = (event: FocusEvent) => {
+    const $day = (event.target as Element).closest<HTMLButtonElement>("[data-day]");
+
+    if ($day && this.$body?.contains($day)) {
+      this.#keyboard?.setFocusDay($day, { focus: false });
+    }
+
     this.#syncForm();
   };
 
@@ -619,11 +628,6 @@ export class Calendar extends HTMLElement {
   render({ focus = false } = {}) {
     const { activeElement } = this.getRootNode() as Document | ShadowRoot;
     const hadFocus = !!this.$body?.contains(activeElement);
-    const focusedDay = hadFocus && activeElement?.getAttribute("data-day");
-
-    if (focusedDay) {
-      this.current.day = focusedDay;
-    }
 
     Object.assign(this.options, this.#readLanguage());
 
