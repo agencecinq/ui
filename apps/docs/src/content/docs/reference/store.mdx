@@ -56,9 +56,9 @@ class PartyStore extends Store<Party> {
 
   /** A server call: loots settle in order, `pending` tracks the queue. */
   loot(): Promise<Party> {
-    return this.mutate(async (party) => {
+    return this.mutate(async () => {
       const gold = await rollTreasure();
-      return { ...party, gold: party.gold + gold };
+      return (party) => ({ ...party, gold: party.gold + gold });
     });
   }
 }
@@ -100,6 +100,294 @@ party.subscribePending((pending) => $loot.setAttribute("aria-busy", pending.toSt
 $loot.addEventListener("click", () => party.loot());
 ```
 
+## Reading and writing
+
+- **`get()`** reads the state when you need it once, in an event handler for
+  instance. To follow it, use `select`.
+- **`select`** follows one slice and redraws only when it changes. **`subscribe`**
+  receives the whole state and the previous one, for logs, persistence or effects
+  that compare both.
+- **`set`** writes right away. Use it for local changes: a choice, a toggle, a
+  purchase checked by `normalize`.
+- **`mutate`** writes once an async action settles. Use it for server calls: the
+  queue keeps them in order and `pending` tells the UI to wait.
+
+A listener can write too, to reset the page of a list when its filter changes for
+instance. Its change waits until the current one has reached every listener: they
+all get the changes in order and end on the current state. A listener that writes on
+every change would loop forever: after 100 chained changes, `set` throws and the
+error is reported.
+
+The state is never changed in place. Build a new object, or the store sees the same
+reference and notifies no one:
+
+```ts
+// Ignored: same object, same array.
+party.set((state) => {
+  state.backpack.push(rope);
+  return state;
+});
+
+// Notified: a new party with a new backpack.
+party.set((state) => ({ ...state, backpack: [...state.backpack, rope] }));
+```
+
+## In a component
+
+A component subscribes when it enters the page and unsubscribes when it leaves.
+`select` and `subscribe` return the unsubscribe function: hand it to an
+`AbortController`, and one `abort()` also removes the DOM listeners.
+
+```ts
+import { party } from "./party";
+
+class PartyPurse extends HTMLElement {
+  #controller?: AbortController;
+
+  connectedCallback() {
+    this.#controller = new AbortController();
+    const { signal } = this.#controller;
+
+    signal.addEventListener(
+      "abort",
+      party.select(
+        (state) => state.gold,
+        (gold) => {
+          this.querySelector("output")!.textContent = gold.toString();
+        },
+      ),
+    );
+
+    this.querySelector("button")!.addEventListener("click", () => party.loot(), {
+      signal,
+    });
+  }
+
+  disconnectedCallback() {
+    this.#controller?.abort();
+  }
+}
+
+customElements.define("party-purse", PartyPurse);
+```
+
+The component never knows the shop or the backpack: it reads the purse and calls an
+action of the store. Removing it or adding a second purse changes nothing elsewhere.
+
+## Sharing the store
+
+Create one store per page and share that instance. In a bundled project, export it
+from a module, as `party.ts` does. On a page without a build step, create it once and
+expose it on `window`, so every component reads the same one:
+
+```html
+<script type="module">
+  // dist/index.js of the package, copied next to the page.
+  import { Store } from "./store.js";
+
+  window.party = new Store({ gold: 60, backpack: [] });
+</script>
+```
+
+The package is an ES module: it needs `<script type="module">`, which browsers block
+on pages opened from `file://`. Serve the page, even locally.
+
+## Server data
+
+**Initial state.** The constructor takes the state as is, `normalize` only runs on
+the next changes. Clean server data before passing it:
+
+```ts
+const clean = (cart: Cart): Cart => ({
+  ...cart,
+  items: cart.items.filter((item) => item.quantity > 0),
+});
+
+export const cart = new CartStore(clean(window.cart), { normalize: clean });
+```
+
+**Merge after the wait.** `mutate` passes the state of the moment the action starts.
+Anything written while it waits, a `set` or an earlier action, is lost if the result
+is built on that argument. Resolve to a function instead: like with `set`, it gets
+the state current once the action settles.
+
+```ts
+// Loses a purchase made during the loot.
+party.mutate(async (state) => ({
+  ...state,
+  gold: state.gold + (await rollTreasure()),
+}));
+
+// Keeps it.
+party.mutate(async () => {
+  const gold = await rollTreasure();
+  return (state) => ({ ...state, gold: state.gold + gold });
+});
+```
+
+When the server's answer is the whole reference, a full cart for instance, return it
+as is.
+
+**Errors.** A rejected action leaves the state as is and the queue goes on, but the
+promise returned by `mutate` rejects: catch it where the call is made, to show a
+message and avoid an unhandled rejection.
+
+```ts
+$loot.addEventListener("click", () => {
+  party.loot().catch(() => toast("The dungeon is closed."));
+});
+```
+
+## Refused writes
+
+A `normalize` that returns `previous` cancels the write without notifying anyone:
+the purse and the backpack stay as they were. The caller gets no error. When it needs
+to know, for a message or a sound, compare the state before and after:
+
+```ts
+buy(item: Item): boolean {
+  const before = this.get();
+  this.set((party) => ({
+    gold: party.gold - item.price,
+    backpack: [...party.backpack, item],
+  }));
+  return this.get() !== before;
+}
+```
+
+## Shopify cart
+
+On a Shopify theme, the store is usually the cart. Shopify is the reference: the store
+starts from the cart rendered by Liquid, every write goes through the Ajax Cart API,
+and Shopify's answer becomes the state.
+
+```liquid
+<script>
+  window.cart = {{ cart | json }};
+</script>
+<script type="importmap">
+  {
+    "imports": {
+      "@agencecinq/store": "{{ 'store.js' | asset_url }}",
+      "@theme/cart": "{{ 'cart.js' | asset_url }}"
+    }
+  }
+</script>
+```
+
+`store.js` is the package's `dist/index.js`, copied into the theme's assets. The
+import map hands every brick the same module, so the same cart.
+
+```js
+// assets/cart.js
+import { Store } from "@agencecinq/store";
+
+/** Ajax Cart API: a refused write rejects with Shopify's message. */
+const request = async (path, body) => {
+  const response = await fetch(
+    window.Shopify.routes.root + path,
+    body && { method: "POST", body },
+  );
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.description ?? data.message);
+
+  return data;
+};
+
+class CartStore extends Store {
+  /** `data` is the product form's FormData: properties and selling plans follow. */
+  add(data) {
+    return this.mutate(async () => {
+      // Answers the added items, not the cart.
+      await request("cart/add.js", data);
+      return request("cart.js");
+    });
+  }
+
+  change(key, quantity) {
+    return this.mutate(() =>
+      request("cart/change.js", new URLSearchParams({ id: key, quantity })),
+    );
+  }
+
+  /** Reads the cart again, a failure keeps it as is. */
+  refresh() {
+    return this.mutate(() => request("cart.js")).catch(() => this.get());
+  }
+}
+
+export const cart = new CartStore(window.cart);
+
+// Back from the browser cache or from another tab: Shopify may hold a newer cart.
+addEventListener("pageshow", (event) => {
+  if (event.persisted) cart.refresh();
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") cart.refresh();
+});
+```
+
+The queue matters here: two `/cart/change.js` sent at once can settle in any order,
+and the cart shown would be the answer of the wrong one. In the queue, the last
+answer is the last click.
+
+A brick wraps Shopify's product form, `{% form 'product' %}`, which still posts to
+`/cart/add` without JavaScript:
+
+```js
+// assets/add-to-cart.js
+import { cart } from "@theme/cart";
+
+class AddToCart extends HTMLElement {
+  #controller;
+
+  connectedCallback() {
+    this.#controller = new AbortController();
+    const { signal } = this.#controller;
+    const form = this.querySelector("form");
+    const error = this.querySelector('[role="alert"]');
+
+    signal.addEventListener(
+      "abort",
+      cart.subscribePending((pending) => form.setAttribute("aria-busy", pending)),
+    );
+
+    form.addEventListener(
+      "submit",
+      (event) => {
+        event.preventDefault();
+        cart
+          .add(new FormData(form))
+          .then(() => (error.textContent = ""))
+          .catch((reason) => (error.textContent = reason.message));
+      },
+      { signal },
+    );
+  }
+
+  disconnectedCallback() {
+    this.#controller?.abort();
+  }
+}
+
+customElements.define("add-to-cart", AddToCart);
+```
+
+- **Rules.** Shopify enforces stock and limits: the cart needs no `normalize`, a
+  refused quantity rejects with the message to show.
+- **Quantity steppers.** Debounce them: five quick clicks then send one request with
+  the final quantity, instead of five in the queue.
+- **Interface state.** When the store also holds an open drawer or a message, resolve
+  to `(state) => ({ ...state, cart: answer })`: a drawer closed during the request
+  stays closed.
+- **Sections.** When the drawer is rendered by Liquid, ask for it in the same request
+  with the `sections` parameter and keep its HTML in the state: the queue makes sure
+  the HTML shown matches the last answer.
+- **Apps.** An app that calls the Ajax API directly bypasses the store. Call
+  `cart.refresh()` on the events it dispatches or, as a last resort, when a
+  `PerformanceObserver` sees a `/cart/` request the store did not make.
+
 ## API
 
 `new Store(initial, options?)`. The initial state is taken as is.
@@ -115,9 +403,11 @@ $loot.addEventListener("click", () => party.loot());
 | `set(update)` | A value, or a function of the current state. |
 | `subscribe(listener)` | `listener(state, previous)` on every change. Returns the unsubscribe function. |
 | `select(selector, listener, equals?)` | `listener(slice)` right away, then when the slice changes. |
-| `mutate(action)` | Runs `action(state)` after the queued ones, then sets the state it resolves to. |
+| `mutate(action)` | Runs `action(state)` after the queued ones, then sets what it resolves to: a state, or a function of the current one. |
 | `pending` | Whether queued actions are running. |
 | `subscribePending(listener)` | `listener(pending)` right away, then when the queue starts or settles. |
 
 A listener that throws is reported with `reportError()` and does not stop the others.
+A listener that sets the state queues its change: every listener gets the changes in
+order. Over 100 chained changes, `set` throws: a listener loops.
 A rejected action leaves the state as is and does not block the queue.

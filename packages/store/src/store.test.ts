@@ -56,6 +56,58 @@ describe("set", () => {
     expect(after).toHaveBeenCalledWith(1, 0);
     report.mockRestore();
   });
+
+  it("delivers a change set by a listener once the current one reached every listener", () => {
+    const store = new Store(0);
+    const calls: string[] = [];
+
+    store.subscribe((value) => {
+      calls.push(`start ${value}`);
+      if (value === 1) store.set(2);
+      calls.push(`end ${value}`);
+    });
+    store.subscribe((value, previous) => {
+      calls.push(`${previous} to ${value}`);
+    });
+    store.set(1);
+
+    expect(calls).toEqual(["start 1", "end 1", "0 to 1", "start 2", "end 2", "1 to 2"]);
+  });
+
+  it("ends every selection on the current state when a listener sets it", () => {
+    const store = new Store(0);
+    const listener = vi.fn();
+
+    store.subscribe((value) => {
+      if (value === 1) store.set(2);
+    });
+    store.select((value) => value, listener);
+    store.set(1);
+
+    expect(listener.mock.calls).toEqual([[0], [1], [2]]);
+    expect(store.get()).toBe(2);
+  });
+
+  it("stops listeners that keep setting the state, then notifies again", () => {
+    const store = new Store(0);
+    const report = vi.spyOn(console, "error").mockImplementation(() => {});
+    const listener = vi.fn();
+    const unsubscribe = store.subscribe((value) => store.set(value + 1));
+
+    store.select((value) => value, listener);
+    store.set(1);
+
+    expect(report).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringMatching(/loops/) }),
+    );
+    expect(listener).toHaveBeenLastCalledWith(store.get());
+
+    unsubscribe();
+    store.set(0);
+
+    expect(listener).toHaveBeenLastCalledWith(0);
+    report.mockRestore();
+  });
 });
 
 describe("subscribe and select", () => {
@@ -100,6 +152,19 @@ describe("mutate", () => {
 
     expect(order).toEqual(["first", "second"]);
     expect(store.get().gold).toBe(30);
+  });
+
+  it("applies a function result to the state current once the action settles", async () => {
+    const store = new Store(party());
+    const loot = store.mutate(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      return (state) => ({ ...state, gold: state.gold + 5 });
+    });
+
+    store.set((state) => ({ ...state, members: [...state.members, "Tordek"] }));
+    await loot;
+
+    expect(store.get()).toEqual({ gold: 15, members: ["Mialee", "Tordek"] });
   });
 
   it("tracks the pending state of the queue", async () => {

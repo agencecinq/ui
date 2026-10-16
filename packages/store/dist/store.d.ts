@@ -16,7 +16,11 @@ export declare class Store<T> {
     get(): T;
     /** Whether queued actions are still running. */
     get pending(): boolean;
-    /** A function is called with the current state and returns the next one. */
+    /**
+     * A function is called with the current state and returns the next one.
+     * Set by a listener, the change waits until the current one has reached
+     * every listener, so they all get the changes in order.
+     */
     set(update: Update<T>): void;
     /** Called on every change, not right away. Returns the unsubscribe function. */
     subscribe(listener: Listener<T>): () => void;
@@ -26,7 +30,9 @@ export declare class Store<T> {
      */
     select<S>(selector: (state: T) => S, listener: (value: S) => void, equals?: Equals<S>): () => void;
     /**
-     * Runs `action` after the queued ones, then sets the state it resolves to.
+     * Runs `action` after the queued ones, then sets what it resolves to: the
+     * next state, or a function of the state current by then, which keeps the
+     * changes made while it waited.
      * A rejected action leaves the state as is and does not block the queue.
      */
     mutate(action: Action<T>): Promise<T>;

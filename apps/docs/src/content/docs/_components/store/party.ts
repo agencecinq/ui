@@ -42,12 +42,18 @@ class PartyStore extends Store<Party> {
     }));
   }
 
-  /** A server call stands in for the dungeon: loots settle in order. */
+  /**
+   * A server call stands in for the dungeon: loots settle in order. The
+   * function applies to the party current once the loot settles, so a
+   * purchase made meanwhile is kept.
+   */
   loot(): Promise<Party> {
-    return this.mutate(async (party) => {
+    return this.mutate(async () => {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      return { ...party, gold: party.gold + 10 + Math.floor(Math.random() * 40) };
+      const gold = 10 + Math.floor(Math.random() * 40);
+
+      return (party) => ({ ...party, gold: party.gold + gold });
     });
   }
 }

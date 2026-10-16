@@ -17,6 +17,9 @@ const report = (error: unknown): void => {
   console.error(error);
 };
 
+/** Changes listeners can chain from one `set()` before it is taken for a loop. */
+const MAX_CHANGES = 100;
+
 /**
  * Observable state: one value, replaced on every change and never mutated.
  *
@@ -32,6 +35,8 @@ export class Store<T> {
   #normalize: (next: T, previous: T) => T;
   #equals: Equals<T>;
   #listeners = new Set<Listener<T>>();
+  /** Changes being delivered, the ones listeners set are appended. */
+  #changes: [state: T, previous: T][] = [];
   #pendingListeners = new Set<PendingListener>();
   #queue: Promise<unknown> = Promise.resolve();
   #running = 0;
@@ -54,7 +59,11 @@ export class Store<T> {
     return this.#running > 0;
   }
 
-  /** A function is called with the current state and returns the next one. */
+  /**
+   * A function is called with the current state and returns the next one.
+   * Set by a listener, the change waits until the current one has reached
+   * every listener, so they all get the changes in order.
+   */
   set(update: Update<T>): void {
     const previous = this.#state;
     const value =
@@ -63,14 +72,27 @@ export class Store<T> {
 
     if (this.#equals(next, previous)) return;
 
+    if (this.#changes.length >= MAX_CHANGES) {
+      throw new Error(`Store: over ${MAX_CHANGES} chained changes, a listener loops.`);
+    }
+
     this.#state = next;
-    this.#listeners.forEach((listener) => {
-      try {
-        listener(next, previous);
-      } catch (error) {
-        report(error);
+
+    if (this.#changes.push([next, previous]) > 1) return;
+
+    try {
+      for (const [state, before] of this.#changes) {
+        this.#listeners.forEach((listener) => {
+          try {
+            listener(state, before);
+          } catch (error) {
+            report(error);
+          }
+        });
       }
-    });
+    } finally {
+      this.#changes = [];
+    }
   }
 
   /** Called on every change, not right away. Returns the unsubscribe function. */
@@ -106,7 +128,9 @@ export class Store<T> {
   }
 
   /**
-   * Runs `action` after the queued ones, then sets the state it resolves to.
+   * Runs `action` after the queued ones, then sets what it resolves to: the
+   * next state, or a function of the state current by then, which keeps the
+   * changes made while it waited.
    * A rejected action leaves the state as is and does not block the queue.
    */
   mutate(action: Action<T>): Promise<T> {

@@ -1,14 +1,15 @@
 //#region src/store.ts
 var e = (e) => {
 	typeof globalThis.reportError == "function" ? globalThis.reportError(e) : console.error(e);
-}, t = class {
+}, t = 100, n = class {
 	#e;
 	#t;
 	#n;
 	#r = /* @__PURE__ */ new Set();
-	#i = /* @__PURE__ */ new Set();
-	#a = Promise.resolve();
-	#o = 0;
+	#i = [];
+	#a = /* @__PURE__ */ new Set();
+	#o = Promise.resolve();
+	#s = 0;
 	constructor(e, t = {}) {
 		let { normalize: n = (e) => e, equals: r = Object.is } = t;
 		this.#e = e, this.#t = n, this.#n = r;
@@ -17,17 +18,24 @@ var e = (e) => {
 		return this.#e;
 	}
 	get pending() {
-		return this.#o > 0;
+		return this.#s > 0;
 	}
-	set(t) {
-		let n = this.#e, r = typeof t == "function" ? t(n) : t, i = this.#t(r, n);
-		this.#n(i, n) || (this.#e = i, this.#r.forEach((t) => {
-			try {
-				t(i, n);
-			} catch (t) {
-				e(t);
+	set(n) {
+		let r = this.#e, i = typeof n == "function" ? n(r) : n, a = this.#t(i, r);
+		if (!this.#n(a, r)) {
+			if (this.#i.length >= t) throw Error(`Store: over ${t} chained changes, a listener loops.`);
+			if (this.#e = a, !(this.#i.push([a, r]) > 1)) try {
+				for (let [t, n] of this.#i) this.#r.forEach((r) => {
+					try {
+						r(t, n);
+					} catch (t) {
+						e(t);
+					}
+				});
+			} finally {
+				this.#i = [];
 			}
-		}));
+		}
 	}
 	subscribe(e) {
 		return this.#r.add(e), () => {
@@ -42,24 +50,24 @@ var e = (e) => {
 		});
 	}
 	mutate(e) {
-		this.#s(1);
+		this.#c(1);
 		let t = async () => {
 			try {
 				return this.set(await e(this.#e)), this.#e;
 			} finally {
-				this.#s(-1);
+				this.#c(-1);
 			}
-		}, n = this.#a.then(t, t);
-		return this.#a = n.catch(() => void 0), n;
+		}, n = this.#o.then(t, t);
+		return this.#o = n.catch(() => void 0), n;
 	}
 	subscribePending(e) {
-		return this.#i.add(e), e(this.pending), () => {
-			this.#i.delete(e);
+		return this.#a.add(e), e(this.pending), () => {
+			this.#a.delete(e);
 		};
 	}
-	#s(t) {
+	#c(t) {
 		let n = this.pending;
-		this.#o += t, n !== this.pending && this.#i.forEach((t) => {
+		this.#s += t, n !== this.pending && this.#a.forEach((t) => {
 			try {
 				t(this.pending);
 			} catch (t) {
@@ -69,4 +77,4 @@ var e = (e) => {
 	}
 };
 //#endregion
-export { t as Store };
+export { n as Store };
