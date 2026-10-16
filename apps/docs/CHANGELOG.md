@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.25
+
+### Patch Changes
+
+- Updated dependencies [302034b]
+  - @agencecinq/store@1.1.0
+
 ## 4.4.24
 
 ### Patch Changes
