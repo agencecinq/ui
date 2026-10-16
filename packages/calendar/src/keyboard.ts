@@ -21,7 +21,10 @@ export default class Keyboard {
       $button.focus();
     }
 
-    if (this.host.current.day) {
+    // The preview follows the focused day, never a tab stop that a render or a month button moved.
+    const { activeElement } = $button.getRootNode() as Document | ShadowRoot;
+
+    if (activeElement === $button && this.host.current.day) {
       this.host.previewRange(this.host.current.day);
     }
   }

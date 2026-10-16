@@ -118,7 +118,9 @@ var g = class {
 	setFocusDay(e, { focus: t = !0 } = {}) {
 		this.host.$body?.querySelectorAll("[data-day]").forEach((e) => {
 			e.tabIndex = -1;
-		}), e.tabIndex = 0, this.host.current.day = e.getAttribute("data-day"), t && e.focus(), this.host.current.day && this.host.previewRange(this.host.current.day);
+		}), e.tabIndex = 0, this.host.current.day = e.getAttribute("data-day"), t && e.focus();
+		let { activeElement: n } = e.getRootNode();
+		n === e && this.host.current.day && this.host.previewRange(this.host.current.day);
 	}
 	dayInView() {
 		let { current: e } = this.host, t = e.day ? l(e.day).getDate() : 1, n = d(e.year, e.month);
