@@ -23,6 +23,4 @@ export declare function getFirstDay(locale: string): number;
 export declare function getDateFormat(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat;
 /** Weekday names, Sunday first (5 January 2020 was a Sunday). */
 export declare function getWeekdayNames(locale: string, width?: "long" | "short" | "narrow"): string[];
-/** Month names, January first. */
-export declare function getMonthNames(locale: string, width?: "long" | "short" | "narrow"): string[];
 //# sourceMappingURL=utils.d.ts.map

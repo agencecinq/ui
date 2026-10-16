@@ -18,8 +18,6 @@ export declare class Calendar extends HTMLElement {
     current: Current;
     $body: HTMLTableSectionElement | null;
     $title: HTMLElement | null;
-    $next: HTMLButtonElement | null;
-    $previous: HTMLButtonElement | null;
     /** Selected days as `YYYY-MM-DD`. */
     picked: string[];
     connectedCallback(): void;
@@ -41,7 +39,6 @@ export declare class Calendar extends HTMLElement {
     setPicked(picked: string[], emit?: boolean): void;
     /** Paint the range to come while choosing its end (mouse or keyboard), with the attributes of a picked range. */
     previewRange(to: string): void;
-    getMonthName(month: number): string;
     getWeekdayNames(): string[];
     renderDays(): void;
     renderHeader(year: number, month: number): void;

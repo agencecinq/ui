@@ -33,7 +33,7 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #f3f4f6;
   }
 
-  .docs-calendar .js-title {
+  .docs-calendar [aria-live] {
     flex: 1;
     margin: 0;
     font-size: inherit;
@@ -61,7 +61,7 @@ import RegisterComponents from './RegisterComponents.astro';
     text-align: center;
   }
 
-  .docs-calendar .js-day {
+  .docs-calendar [data-day] {
     appearance: none;
     width: 100%;
     aspect-ratio: 1;
@@ -73,57 +73,57 @@ import RegisterComponents from './RegisterComponents.astro';
     color: #111827;
   }
 
-  .docs-calendar td:not([aria-selected='true'], [data-range]) .js-day:hover:not([aria-disabled='true']) {
+  .docs-calendar td:not([aria-selected='true'], [data-range]) [data-day]:hover:not([aria-disabled='true']) {
     background: #f3f4f6;
   }
 
-  .docs-calendar .js-day[aria-current='date'] {
+  .docs-calendar [data-day][aria-current='date'] {
     outline: 1px solid #111827;
     outline-offset: -1px;
   }
 
   /* Picked day. The rules below weigh the same: the last one wins. */
-  .docs-calendar td[aria-selected='true'] .js-day {
+  .docs-calendar td[aria-selected='true'] [data-day] {
     background: #111827;
     color: #fff;
   }
 
   /* Inside a range, ends included, picked or previewed. */
-  .docs-calendar td[data-range] .js-day {
+  .docs-calendar td[data-range] [data-day] {
     background: #e5e7eb;
     border-radius: 0;
     color: #111827;
   }
 
-  .docs-calendar td[data-range]:not([data-start], [data-end]) .js-day:hover {
+  .docs-calendar td[data-range]:not([data-start], [data-end]) [data-day]:hover {
     background: #d1d5db;
   }
 
   /* Range ends keep the strong contrast. */
-  .docs-calendar td[data-start] .js-day,
-  .docs-calendar td[data-end] .js-day {
+  .docs-calendar td[data-start] [data-day],
+  .docs-calendar td[data-end] [data-day] {
     background: #111827;
     color: #fff;
   }
 
-  .docs-calendar td[data-start] .js-day {
+  .docs-calendar td[data-start] [data-day] {
     border-radius: 0.375rem 0 0 0.375rem;
   }
 
-  .docs-calendar td[data-end] .js-day {
+  .docs-calendar td[data-end] [data-day] {
     border-radius: 0 0.375rem 0.375rem 0;
   }
 
-  .docs-calendar td[data-start][data-end] .js-day {
+  .docs-calendar td[data-start][data-end] [data-day] {
     border-radius: 0.375rem;
   }
 
-  .docs-calendar .js-day[aria-disabled='true'] {
+  .docs-calendar [data-day][aria-disabled='true'] {
     color: #9ca3af;
     cursor: not-allowed;
   }
 
-  .docs-calendar-events .js-day {
+  .docs-calendar-events [data-day] {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -132,11 +132,11 @@ import RegisterComponents from './RegisterComponents.astro';
     line-height: 1.1;
   }
 
-  .docs-calendar-events .js-day time {
+  .docs-calendar-events [data-day] time {
     font-variant-numeric: tabular-nums;
   }
 
-  .docs-calendar-events .js-day[data-has-event]::after {
+  .docs-calendar-events [data-day][data-has-event]::after {
     content: '';
     width: 0.35rem;
     height: 0.35rem;
@@ -144,11 +144,11 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #111827;
   }
 
-  .docs-calendar-events td[aria-selected='true'] .js-day[data-has-event]::after {
+  .docs-calendar-events td[aria-selected='true'] [data-day][data-has-event]::after {
     background: #fff;
   }
 
-  .docs-calendar td:not([aria-selected='true']) .js-day[data-weekend] {
+  .docs-calendar td:not([aria-selected='true']) [data-day][data-weekend] {
     color: #9ca3af;
   }
 
@@ -180,6 +180,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <cinq-calendar
+        id="docs-calendar-single"
         class="docs-calendar"
         data-calendar-demo="single"
         locale="fr"
@@ -187,15 +188,15 @@ import RegisterComponents from './RegisterComponents.astro';
         name="single"
       >
         <header>
-          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <h4 class="js-title" id="docs-calendar-single-label" aria-live="polite"></h4>
-          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          <button type="button" commandfor="docs-calendar-single" command="--previous-month" aria-label="Mois précédent">‹</button>
+          <h4 id="docs-calendar-single-label" aria-live="polite"></h4>
+          <button type="button" commandfor="docs-calendar-single" command="--next-month" aria-label="Mois suivant">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-single-label">
           <thead>
-            <tr class="js-days"></tr>
+            <tr></tr>
           </thead>
-          <tbody class="js-body"></tbody>
+          <tbody></tbody>
         </table>
       </cinq-calendar>
 
@@ -216,6 +217,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <cinq-calendar
+        id="docs-calendar-range"
         class="docs-calendar"
         data-calendar-demo="range"
         locale="fr"
@@ -223,15 +225,15 @@ import RegisterComponents from './RegisterComponents.astro';
         name="range"
       >
         <header>
-          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <h4 class="js-title" id="docs-calendar-range-label" aria-live="polite"></h4>
-          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          <button type="button" commandfor="docs-calendar-range" command="--previous-month" aria-label="Mois précédent">‹</button>
+          <h4 id="docs-calendar-range-label" aria-live="polite"></h4>
+          <button type="button" commandfor="docs-calendar-range" command="--next-month" aria-label="Mois suivant">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-range-label" aria-multiselectable="true">
           <thead>
-            <tr class="js-days"></tr>
+            <tr></tr>
           </thead>
-          <tbody class="js-body"></tbody>
+          <tbody></tbody>
         </table>
       </cinq-calendar>
 
@@ -253,6 +255,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <cinq-calendar
+        id="docs-calendar-multiple"
         class="docs-calendar"
         data-calendar-demo="multiple"
         locale="fr"
@@ -260,15 +263,15 @@ import RegisterComponents from './RegisterComponents.astro';
         name="multiple"
       >
         <header>
-          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <h4 class="js-title" id="docs-calendar-multiple-label" aria-live="polite"></h4>
-          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          <button type="button" commandfor="docs-calendar-multiple" command="--previous-month" aria-label="Mois précédent">‹</button>
+          <h4 id="docs-calendar-multiple-label" aria-live="polite"></h4>
+          <button type="button" commandfor="docs-calendar-multiple" command="--next-month" aria-label="Mois suivant">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-multiple-label" aria-multiselectable="true">
           <thead>
-            <tr class="js-days"></tr>
+            <tr></tr>
           </thead>
-          <tbody class="js-body"></tbody>
+          <tbody></tbody>
         </table>
       </cinq-calendar>
 
@@ -288,6 +291,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <cinq-calendar
+        id="docs-calendar-preselected"
         class="docs-calendar"
         data-calendar-demo="preselected"
         locale="fr"
@@ -298,15 +302,15 @@ import RegisterComponents from './RegisterComponents.astro';
         name="preselected"
       >
         <header>
-          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <h4 class="js-title" id="docs-calendar-preselected-label" aria-live="polite"></h4>
-          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          <button type="button" commandfor="docs-calendar-preselected" command="--previous-month" aria-label="Mois précédent">‹</button>
+          <h4 id="docs-calendar-preselected-label" aria-live="polite"></h4>
+          <button type="button" commandfor="docs-calendar-preselected" command="--next-month" aria-label="Mois suivant">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-preselected-label" aria-multiselectable="true">
           <thead>
-            <tr class="js-days"></tr>
+            <tr></tr>
           </thead>
-          <tbody class="js-body"></tbody>
+          <tbody></tbody>
         </table>
       </cinq-calendar>
 
@@ -331,6 +335,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <p id="docs-calendar-form-field" class="text-sm font-medium text-gray-900">Dates du séjour</p>
 
         <cinq-calendar
+          id="docs-calendar-form"
           class="docs-calendar"
           data-calendar-demo="form"
           locale="fr"
@@ -339,9 +344,9 @@ import RegisterComponents from './RegisterComponents.astro';
           required
         >
           <header>
-            <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-            <h4 class="js-title" id="docs-calendar-form-label" aria-live="polite"></h4>
-            <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+            <button type="button" commandfor="docs-calendar-form" command="--previous-month" aria-label="Mois précédent">‹</button>
+            <h4 id="docs-calendar-form-label" aria-live="polite"></h4>
+            <button type="button" commandfor="docs-calendar-form" command="--next-month" aria-label="Mois suivant">›</button>
           </header>
           <table
             role="grid"
@@ -349,9 +354,9 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-multiselectable="true"
           >
             <thead>
-              <tr class="js-days"></tr>
+              <tr></tr>
             </thead>
-            <tbody class="js-body"></tbody>
+            <tbody></tbody>
           </table>
         </cinq-calendar>
 
@@ -410,20 +415,20 @@ import RegisterComponents from './RegisterComponents.astro';
         <h4 id="docs-calendar-dialog-title" class="mb-3 text-base font-semibold text-gray-900">
           Date d'arrivée
         </h4>
-        <cinq-calendar class="docs-calendar" locale="fr">
+        <cinq-calendar id="docs-calendar-dialog-calendar" class="docs-calendar" locale="fr">
           <header>
-            <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-            <h5 class="js-title" id="docs-calendar-dialog-label" aria-live="polite"></h5>
-            <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+            <button type="button" commandfor="docs-calendar-dialog-calendar" command="--previous-month" aria-label="Mois précédent">‹</button>
+            <h5 id="docs-calendar-dialog-label" aria-live="polite"></h5>
+            <button type="button" commandfor="docs-calendar-dialog-calendar" command="--next-month" aria-label="Mois suivant">›</button>
           </header>
           <table
             role="grid"
             aria-labelledby="docs-calendar-dialog-title docs-calendar-dialog-label"
           >
             <thead>
-              <tr class="js-days"></tr>
+              <tr></tr>
             </thead>
-            <tbody class="js-body"></tbody>
+            <tbody></tbody>
           </table>
         </cinq-calendar>
         <button
@@ -448,6 +453,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <cinq-calendar
+        id="docs-calendar-future"
         class="docs-calendar"
         data-calendar-demo="future"
         locale="fr"
@@ -455,15 +461,15 @@ import RegisterComponents from './RegisterComponents.astro';
         name="future"
       >
         <header>
-          <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-          <h4 class="js-title" id="docs-calendar-future-label" aria-live="polite"></h4>
-          <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          <button type="button" commandfor="docs-calendar-future" command="--previous-month" aria-label="Mois précédent">‹</button>
+          <h4 id="docs-calendar-future-label" aria-live="polite"></h4>
+          <button type="button" commandfor="docs-calendar-future" command="--next-month" aria-label="Mois suivant">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-future-label">
           <thead>
-            <tr class="js-days"></tr>
+            <tr></tr>
           </thead>
-          <tbody class="js-body"></tbody>
+          <tbody></tbody>
         </table>
       </cinq-calendar>
 
@@ -509,6 +515,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <cinq-calendar
+        id="docs-calendar-locale"
         class="docs-calendar"
         data-calendar-demo="locale"
         locale="fr"
@@ -516,15 +523,15 @@ import RegisterComponents from './RegisterComponents.astro';
         name="locale"
       >
         <header>
-          <button type="button" class="js-previous" aria-label="Previous month">‹</button>
-          <h4 class="js-title" id="docs-calendar-locale-label" aria-live="polite"></h4>
-          <button type="button" class="js-next" aria-label="Next month">›</button>
+          <button type="button" commandfor="docs-calendar-locale" command="--previous-month" aria-label="Previous month">‹</button>
+          <h4 id="docs-calendar-locale-label" aria-live="polite"></h4>
+          <button type="button" commandfor="docs-calendar-locale" command="--next-month" aria-label="Next month">›</button>
         </header>
         <table role="grid" aria-labelledby="docs-calendar-locale-label">
           <thead>
-            <tr class="js-days"></tr>
+            <tr></tr>
           </thead>
-          <tbody class="js-body"></tbody>
+          <tbody></tbody>
         </table>
       </cinq-calendar>
 
@@ -547,6 +554,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
         <cinq-calendar
+          id="docs-calendar-events"
           class="docs-calendar docs-calendar-events"
           data-calendar-demo="events"
           locale="fr"
@@ -554,15 +562,15 @@ import RegisterComponents from './RegisterComponents.astro';
           name="events"
         >
           <header>
-            <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-            <h4 class="js-title" id="docs-calendar-events-label" aria-live="polite"></h4>
-            <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+            <button type="button" commandfor="docs-calendar-events" command="--previous-month" aria-label="Mois précédent">‹</button>
+            <h4 id="docs-calendar-events-label" aria-live="polite"></h4>
+            <button type="button" commandfor="docs-calendar-events" command="--next-month" aria-label="Mois suivant">›</button>
           </header>
           <table role="grid" aria-labelledby="docs-calendar-events-label">
             <thead>
-              <tr class="js-days"></tr>
+              <tr></tr>
             </thead>
-            <tbody class="js-body"></tbody>
+            <tbody></tbody>
           </table>
         </cinq-calendar>
 
@@ -682,7 +690,7 @@ import RegisterComponents from './RegisterComponents.astro';
   const markWeekend = (calendar) => {
     const { weekend } = new Intl.Locale(calendar.options.locale).getWeekInfo();
 
-    calendar.querySelectorAll('.js-day').forEach((button) => {
+    calendar.querySelectorAll('[data-day]').forEach((button) => {
       // getWeekInfo() counts 1 (Monday) to 7 (Sunday), getDay() 0 (Sunday) to 6.
       const weekday = dateFromDay(button.dataset.day).getDay() || 7;
 
@@ -743,7 +751,7 @@ import RegisterComponents from './RegisterComponents.astro';
     eventsCalendar.addEventListener(EVENTS.CALENDAR_RENDER, () => {
       markWeekend(eventsCalendar);
 
-      eventsCalendar.querySelectorAll('.js-day').forEach((button) => {
+      eventsCalendar.querySelectorAll('[data-day]').forEach((button) => {
         const day = button.dataset.day;
 
         button.innerHTML = `<time datetime="${day}">${button.textContent.trim()}</time>`;

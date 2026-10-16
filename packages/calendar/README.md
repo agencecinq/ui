@@ -27,32 +27,45 @@ pnpm add @agencecinq/calendar
 
 ## Markup
 
-Required hooks:
+No class to add: the calendar finds its parts in your HTML.
 
-| Selector | Role |
-| -------- | ---- |
-| `<cinq-calendar>` | Host element |
-| `.js-previous` / `.js-next` | Month navigation (optional) |
-| `.js-title` | Month / year label, filled by the calendar |
-| `.js-days` | Weekday headers row |
-| `.js-body` | Day cells |
-| `.js-day` | Day button (generated) |
+| Element | Required | Role |
+| ------- | -------- | ---- |
+| `<cinq-calendar>` | **Yes** | Host. Give it an `id` for the month buttons |
+| `<tbody>` of the `role="grid"` table | **Yes** | Filled with the day cells |
+| `<thead> <tr>` of the same table | No | Filled with the weekday headers |
+| `[aria-live]` | No | Filled with the month and year, announced on each change |
+| Buttons with `commandfor` | No | Month navigation, see [Commands](#commands) |
+
+Each generated day button carries `data-day="YYYY-MM-DD"`.
 
 ```html
-<cinq-calendar locale="fr" deselectable>
+<cinq-calendar id="calendar" locale="fr" deselectable>
   <header>
-    <button type="button" class="js-previous" aria-label="Previous month">Previous</button>
-    <h2 class="js-title" id="calendar-label" aria-live="polite"></h2>
-    <button type="button" class="js-next" aria-label="Next month">Next</button>
+    <button type="button" commandfor="calendar" command="--previous-month" aria-label="Previous month">Previous</button>
+    <h2 id="calendar-title" aria-live="polite"></h2>
+    <button type="button" commandfor="calendar" command="--next-month" aria-label="Next month">Next</button>
   </header>
-  <table role="grid" aria-labelledby="calendar-label">
+  <table role="grid" aria-labelledby="calendar-title">
     <thead>
-      <tr class="js-days"></tr>
+      <tr></tr>
     </thead>
-    <tbody class="js-body"></tbody>
+    <tbody></tbody>
   </table>
 </cinq-calendar>
 ```
+
+### Commands
+
+Buttons move the calendar with
+[invoker commands](https://developer.mozilla.org/docs/Web/API/Invoker_Commands_API):
+`commandfor` names the calendar `id`, `command` the move. The browser sends the
+command on click, Enter or Space, and the button can sit anywhere in the page.
+
+| `command` | Moves |
+| --------- | ----- |
+| `--previous-month` / `--next-month` | One month back / forward |
+| `--previous-year` / `--next-year` | One year back / forward |
 
 ## Usage
 
@@ -91,20 +104,20 @@ These rules weigh the same, so the last one that matches wins:
 
 ```css
 /* picked day */
-td[aria-selected="true"] .js-day {
+td[aria-selected="true"] [data-day] {
   background: #111827;
   color: #fff;
 }
 
 /* inside a range, ends included */
-td[data-range] .js-day {
+td[data-range] [data-day] {
   background: #e5e7eb;
   color: #111827;
 }
 
 /* range ends */
-td[data-start] .js-day,
-td[data-end] .js-day {
+td[data-start] [data-day],
+td[data-end] [data-day] {
   background: #111827;
   color: #fff;
 }
@@ -171,7 +184,7 @@ keyboard and the range preview already skip it.
 const unavailable = ["2026-11-11", "2026-11-12"];
 
 el.addEventListener(EVENTS.CALENDAR_RENDER, () => {
-  el.querySelectorAll(".js-day").forEach(button => {
+  el.querySelectorAll("[data-day]").forEach(button => {
     if (unavailable.includes(button.dataset.day)) {
       button.setAttribute("aria-disabled", "true");
     }
@@ -204,16 +217,16 @@ disabled `<fieldset>`) leaves the field out.
 ```html
 <form>
   <p id="stay-label">Dates du séjour</p>
-  <cinq-calendar name="stay" mode="range" required>
+  <cinq-calendar id="stay" name="stay" mode="range" required>
     <header>
-      <!-- previous / next buttons -->
-      <h2 class="js-title" id="stay-title" aria-live="polite"></h2>
+      <!-- commandfor="stay" buttons -->
+      <h2 id="stay-title" aria-live="polite"></h2>
     </header>
     <table role="grid" aria-labelledby="stay-label stay-title" aria-multiselectable="true">
       <thead>
-        <tr class="js-days"></tr>
+        <tr></tr>
       </thead>
-      <tbody class="js-body"></tbody>
+      <tbody></tbody>
     </table>
   </cinq-calendar>
   <button>Réserver</button>
@@ -239,17 +252,17 @@ button. The calendar has no `name`, so only the input is submitted.
 
 <dialog id="arrival-dialog" aria-labelledby="arrival-dialog-title">
   <h2 id="arrival-dialog-title">Date d'arrivée</h2>
-  <cinq-calendar locale="fr" min="2026-10-16">
+  <cinq-calendar id="arrival-calendar" locale="fr" min="2026-10-16">
     <header>
-      <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
-      <h3 class="js-title" id="arrival-month" aria-live="polite"></h3>
-      <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+      <button type="button" commandfor="arrival-calendar" command="--previous-month" aria-label="Mois précédent">‹</button>
+      <h3 id="arrival-month" aria-live="polite"></h3>
+      <button type="button" commandfor="arrival-calendar" command="--next-month" aria-label="Mois suivant">›</button>
     </header>
     <table role="grid" aria-labelledby="arrival-dialog-title arrival-month">
       <thead>
-        <tr class="js-days"></tr>
+        <tr></tr>
       </thead>
-      <tbody class="js-body"></tbody>
+      <tbody></tbody>
     </table>
   </cinq-calendar>
   <button type="button" command="close" commandfor="arrival-dialog">Fermer</button>
@@ -319,12 +332,10 @@ el.render();
 
 ### Custom labels
 
+Weekday headers come from `Intl`. Replace them, Sunday first:
+
 ```js
 el.options.days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-el.options.months = [
-  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
-];
 el.render();
 ```
 
@@ -332,13 +343,13 @@ el.render();
 
 `calendar:render` bubbles from the host after each render: on connection, on
 each month change, and when an observed attribute changes. The cells already
-carry their state, so decorate the day buttons from there. Keep `.js-day` and
+carry their state, so decorate the day buttons from there. Keep their
 `data-day`.
 
 ```js
 el.addEventListener(EVENTS.CALENDAR_RENDER, ({ detail }) => {
   // detail.year and detail.month (`0`-`11`): the month on screen
-  el.querySelectorAll(".js-day").forEach(button => {
+  el.querySelectorAll("[data-day]").forEach(button => {
     button.innerHTML = `<time datetime="${button.dataset.day}">${button.textContent.trim()}</time>`;
   });
 });

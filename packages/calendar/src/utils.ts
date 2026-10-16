@@ -72,15 +72,3 @@ export function getWeekdayNames(
     format.format(new Date(2020, 0, 5 + weekday)),
   );
 }
-
-/** Month names, January first. */
-export function getMonthNames(
-  locale: string,
-  width: "long" | "short" | "narrow" = "long",
-): string[] {
-  const format = getDateFormat(locale, { month: width });
-
-  return Array.from({ length: 12 }, (_, month) =>
-    format.format(new Date(2020, month, 1)),
-  );
-}

@@ -6,7 +6,6 @@ export interface Options {
     firstDay: number;
     locale: string;
     buttonClass?: string;
-    months?: string[];
     days?: string[];
     deselectable?: boolean;
     name?: string;

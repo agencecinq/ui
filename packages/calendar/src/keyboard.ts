@@ -10,7 +10,7 @@ export default class Keyboard {
   }
 
   setFocusDay($button: HTMLButtonElement, { focus = true } = {}) {
-    this.host.$body?.querySelectorAll(".js-day").forEach(($el) => {
+    this.host.$body?.querySelectorAll("[data-day]").forEach(($el) => {
       ($el as HTMLButtonElement).tabIndex = -1;
     });
 
@@ -66,7 +66,7 @@ export default class Keyboard {
     }
 
     const buttons = Array.from(
-      this.host.$body.querySelectorAll(".js-day"),
+      this.host.$body.querySelectorAll("[data-day]"),
     ) as HTMLButtonElement[];
 
     if (!buttons.length) {
@@ -98,7 +98,7 @@ export default class Keyboard {
 
   #handleKeydown = (event: KeyboardEvent) => {
     const $target = (event.target as HTMLElement).closest(
-      ".js-day",
+      "[data-day]",
     ) as HTMLButtonElement | null;
 
     if (!$target) {

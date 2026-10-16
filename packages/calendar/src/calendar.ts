@@ -19,7 +19,6 @@ import {
   getDaysInMonth,
   getFirstDay,
   getLeadingDays,
-  getMonthNames,
   getWeekdayNames,
   isBetween,
 } from "./utils.js";
@@ -30,6 +29,14 @@ const valueMissingMessage = (): string => {
   input.required = true;
 
   return input.validationMessage;
+};
+
+/** Invoker commands a `commandfor` button can send to the calendar, with the months each one moves by. */
+const COMMANDS: Record<string, number> = {
+  "--previous-month": -1,
+  "--next-month": 1,
+  "--previous-year": -12,
+  "--next-year": 12,
 };
 
 const dayButton = (
@@ -50,7 +57,7 @@ const dayButton = (
 ) => `
 	<button
 		type="button"
-		class="js-day${className ? ` ${className}` : ""}"
+		${className ? `class="${className}"` : ""}
 		data-day="${day}"
 		tabindex="${tabIndex}"
 		aria-label="${label}"
@@ -93,8 +100,6 @@ export class Calendar extends HTMLElement {
 
   $body: HTMLTableSectionElement | null = null;
   $title: HTMLElement | null = null;
-  $next: HTMLButtonElement | null = null;
-  $previous: HTMLButtonElement | null = null;
 
   /** Selected days as `YYYY-MM-DD`. */
   picked: string[] = [];
@@ -108,8 +113,6 @@ export class Calendar extends HTMLElement {
     this.#keyboard = null;
     this.$body = null;
     this.$title = null;
-    this.$next = null;
-    this.$previous = null;
   }
 
   attributeChangedCallback(): void {
@@ -179,13 +182,13 @@ export class Calendar extends HTMLElement {
       day: null,
     };
 
-    this.$title = this.querySelector(".js-title");
-    this.$body = this.querySelector<HTMLTableSectionElement>(".js-body");
-    this.$next = this.querySelector(".js-next");
-    this.$previous = this.querySelector(".js-previous");
+    this.$title = this.querySelector("[aria-live]");
+    this.$body = this.querySelector<HTMLTableSectionElement>(
+      '[role="grid"] tbody',
+    );
 
     if (!this.$body) {
-      throw new Error("Calendar: .js-body element not found");
+      throw new Error('Calendar: [role="grid"] tbody not found');
     }
 
     this.#keyboard = new Keyboard(this);
@@ -197,6 +200,7 @@ export class Calendar extends HTMLElement {
 
     this.render();
     this.addEventListener("click", this.#handleClick);
+    this.addEventListener("command", this.#handleCommand);
 
     this.#keyboard.attach();
 
@@ -216,6 +220,7 @@ export class Calendar extends HTMLElement {
 
   destroy(): void {
     this.removeEventListener("click", this.#handleClick);
+    this.removeEventListener("command", this.#handleCommand);
 
     if (this.#keyboard) {
       this.#keyboard.detach();
@@ -263,7 +268,7 @@ export class Calendar extends HTMLElement {
     const isRange = this.options.mode === "range";
     const isComplete = isRange && 2 === this.picked.length;
 
-    this.$body?.querySelectorAll<HTMLElement>(".js-day").forEach($day => {
+    this.$body?.querySelectorAll<HTMLElement>("[data-day]").forEach($day => {
       const day = $day.getAttribute("data-day") as string;
       const inRange = isComplete && isBetween(day, start, end);
       const $cell = $day.closest("td");
@@ -294,7 +299,7 @@ export class Calendar extends HTMLElement {
     this.#internals.setValidity(
       { valueMissing: true },
       valueMissingMessage(),
-      this.$body?.querySelector<HTMLElement>('.js-day[tabindex="0"]') ?? undefined,
+      this.$body?.querySelector<HTMLElement>('[data-day][tabindex="0"]') ?? undefined,
     );
   }
 
@@ -323,15 +328,7 @@ export class Calendar extends HTMLElement {
       return;
     }
 
-    if (target.closest(".js-next")) {
-      return this.move(1, { focus: false });
-    }
-
-    if (target.closest(".js-previous")) {
-      return this.move(-1, { focus: false });
-    }
-
-    const $day = target.closest<HTMLButtonElement>(".js-day");
+    const $day = target.closest<HTMLButtonElement>("[data-day]");
 
     if (!$day || $day.getAttribute("aria-disabled") === "true") {
       return;
@@ -363,6 +360,14 @@ export class Calendar extends HTMLElement {
     result.then(commit);
   };
 
+  #handleCommand = (event: Event) => {
+    const months = COMMANDS[(event as CommandEvent).command];
+
+    if (months) {
+      this.move(months, { focus: false });
+    }
+  };
+
   /** Paint the range to come while choosing its end (mouse or keyboard), with the attributes of a picked range. */
   previewRange(to: string) {
     if (this.options.mode !== "range" || 1 !== this.picked.length || !this.$body) {
@@ -379,7 +384,7 @@ export class Calendar extends HTMLElement {
 
     const [start, end] = [this.picked[0], to].sort();
 
-    this.$body.querySelectorAll(".js-day").forEach($day => {
+    this.$body.querySelectorAll("[data-day]").forEach($day => {
       const day = $day.getAttribute("data-day") as string;
       const $cell = $day.closest("td");
 
@@ -391,7 +396,7 @@ export class Calendar extends HTMLElement {
 
   #handleMousemove = (event: MouseEvent) => {
     const $target = (event.target as HTMLElement).closest(
-      ".js-day",
+      "[data-day]",
     ) as HTMLElement | null;
 
     if (!$target) {
@@ -404,18 +409,14 @@ export class Calendar extends HTMLElement {
     }
   };
 
-  getMonthName(month: number): string {
-    return (
-      this.options.months?.[month] ?? getMonthNames(this.options.locale)[month]
-    );
-  }
-
   getWeekdayNames(): string[] {
     return this.options.days ?? getWeekdayNames(this.options.locale);
   }
 
   renderDays() {
-    const row = this.querySelector(".js-days") as HTMLTableRowElement | null;
+    const row = this.querySelector<HTMLTableRowElement>(
+      '[role="grid"] thead tr',
+    );
     if (!row) {
       return;
     }
@@ -443,15 +444,6 @@ export class Calendar extends HTMLElement {
         year: "numeric",
       }).format(new Date(year, month, 1));
     }
-
-    this.$previous?.setAttribute(
-      "data-content",
-      this.getMonthName(0 > month - 1 ? 11 : month - 1),
-    );
-    this.$next?.setAttribute(
-      "data-content",
-      this.getMonthName(11 < month + 1 ? 0 : month + 1),
-    );
   }
 
   renderCalendar(year: number, month: number, { focus = false } = {}) {

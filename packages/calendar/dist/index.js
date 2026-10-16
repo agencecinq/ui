@@ -108,19 +108,15 @@ function h(e, t = "short") {
 	let n = m(e, { weekday: t });
 	return Array.from({ length: 7 }, (e, t) => n.format(new Date(2020, 0, 5 + t)));
 }
-function g(e, t = "long") {
-	let n = m(e, { month: t });
-	return Array.from({ length: 12 }, (e, t) => n.format(new Date(2020, t, 1)));
-}
 //#endregion
 //#region src/keyboard.ts
-var _ = class {
+var g = class {
 	host;
 	constructor(e) {
 		this.host = e;
 	}
 	setFocusDay(e, { focus: t = !0 } = {}) {
-		this.host.$body?.querySelectorAll(".js-day").forEach((e) => {
+		this.host.$body?.querySelectorAll("[data-day]").forEach((e) => {
 			e.tabIndex = -1;
 		}), e.tabIndex = 0, this.host.current.day = e.getAttribute("data-day"), t && e.focus(), this.host.current.day && this.host.previewRange(this.host.current.day);
 	}
@@ -142,7 +138,7 @@ var _ = class {
 	}
 	sync({ focus: e = !1 } = {}) {
 		if (!this.host.$body) return;
-		let t = Array.from(this.host.$body.querySelectorAll(".js-day"));
+		let t = Array.from(this.host.$body.querySelectorAll("[data-day]"));
 		if (!t.length) return;
 		let n = (e) => t.find((t) => t.getAttribute("data-day") === e), r = this.host.current.day && (n(this.host.current.day) || n(this.dayInView())) || t.find((e) => this.host.picked.includes(e.getAttribute("data-day") || "")) || n(this.host.day) || t[0];
 		this.setFocusDay(r, { focus: e });
@@ -154,7 +150,7 @@ var _ = class {
 		this.host.$body?.removeEventListener("keydown", this.#e, !1);
 	}
 	#e = (e) => {
-		let t = e.target.closest(".js-day");
+		let t = e.target.closest("[data-day]");
 		if (!t) return;
 		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, { key: i, code: a } = e, o = {
 			ArrowLeft: () => {
@@ -185,13 +181,18 @@ var _ = class {
 		};
 		return (o[i || a] || o.default)();
 	};
-}, v = () => {
+}, _ = () => {
 	let e = document.createElement("input");
 	return e.required = !0, e.validationMessage;
+}, v = {
+	"--previous-month": -1,
+	"--next-month": 1,
+	"--previous-year": -12,
+	"--next-year": 12
 }, y = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
 	<button
 		type="button"
-		class="js-day${n ? ` ${n}` : ""}"
+		${n ? `class="${n}"` : ""}
 		data-day="${e}"
 		tabindex="${o}"
 		aria-label="${r}"
@@ -228,14 +229,12 @@ var _ = class {
 	#i = !1;
 	$body = null;
 	$title = null;
-	$next = null;
-	$previous = null;
 	picked = [];
 	connectedCallback() {
 		this.init();
 	}
 	disconnectedCallback() {
-		this.destroy(), this.#e = null, this.$body = null, this.$title = null, this.$next = null, this.$previous = null;
+		this.destroy(), this.#e = null, this.$body = null, this.$title = null;
 	}
 	attributeChangedCallback() {
 		this.$body && this.render();
@@ -266,8 +265,8 @@ var _ = class {
 			month: r(this.getAttribute("data-month"), this.today.getMonth()),
 			year: r(this.getAttribute("data-year"), this.today.getFullYear()),
 			day: null
-		}, this.$title = this.querySelector(".js-title"), this.$body = this.querySelector(".js-body"), this.$next = this.querySelector(".js-next"), this.$previous = this.querySelector(".js-previous"), !this.$body) throw Error("Calendar: .js-body element not found");
-		this.#e = new _(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.#r ??= [...this.picked], this.render(), this.addEventListener("click", this.#l), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#u, !1), this.#t = () => {
+		}, this.$title = this.querySelector("[aria-live]"), this.$body = this.querySelector("[role=\"grid\"] tbody"), !this.$body) throw Error("Calendar: [role=\"grid\"] tbody not found");
+		this.#e = new g(this), this.picked = JSON.parse(this.getAttribute("data-picked") || "[]"), this.#r ??= [...this.picked], this.render(), this.addEventListener("click", this.#l), this.addEventListener("command", this.#u), this.#e.attach(), this.options.mode === "range" && this.$body.addEventListener("mousemove", this.#d, !1), this.#t = () => {
 			let n = {
 				values: this.picked,
 				name: this.options.name
@@ -276,7 +275,7 @@ var _ = class {
 		};
 	}
 	destroy() {
-		this.removeEventListener("click", this.#l), this.#e && (this.#e.detach(), this.$body?.removeEventListener("mousemove", this.#u, !1)), this.reset(), this.#t = () => {};
+		this.removeEventListener("click", this.#l), this.removeEventListener("command", this.#u), this.#e && (this.#e.detach(), this.$body?.removeEventListener("mousemove", this.#d, !1)), this.reset(), this.#t = () => {};
 	}
 	move(e, { focus: t = !0 } = {}) {
 		let { year: n, month: r } = this.current, i = new Date(n, r + e, 1);
@@ -287,7 +286,7 @@ var _ = class {
 	}
 	#o() {
 		let [e, t] = this.picked, n = this.options.mode === "range", r = n && this.picked.length === 2;
-		this.$body?.querySelectorAll(".js-day").forEach((i) => {
+		this.$body?.querySelectorAll("[data-day]").forEach((i) => {
 			let a = i.getAttribute("data-day"), o = r && u(a, e, t), s = i.closest("td");
 			o || this.picked.includes(a) ? s?.setAttribute("aria-selected", "true") : s?.removeAttribute("aria-selected"), s?.toggleAttribute("data-range", o), s?.toggleAttribute("data-start", n && a === e), s?.toggleAttribute("data-end", r && a === t);
 		});
@@ -299,7 +298,7 @@ var _ = class {
 			this.#n.setValidity({});
 			return;
 		}
-		this.#n.setValidity({ valueMissing: !0 }, v(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
+		this.#n.setValidity({ valueMissing: !0 }, _(), this.$body?.querySelector("[data-day][tabindex=\"0\"]") ?? void 0);
 	}
 	#c(e) {
 		let { mode: t, deselectable: n } = this.options, r = this.picked.includes(e);
@@ -308,9 +307,7 @@ var _ = class {
 	#l = (t) => {
 		let { target: r } = t;
 		if (!(r instanceof HTMLElement)) return;
-		if (r.closest(".js-next")) return this.move(1, { focus: !1 });
-		if (r.closest(".js-previous")) return this.move(-1, { focus: !1 });
-		let i = r.closest(".js-day");
+		let i = r.closest("[data-day]");
 		if (!i || i.getAttribute("aria-disabled") === "true") return;
 		let a = this.#c(i.getAttribute("data-day"));
 		if (this.#e?.setFocusDay(i, { focus: !1 }), a.join() === this.picked.join()) return;
@@ -323,30 +320,31 @@ var _ = class {
 		if (typeof c == "boolean") return s(c);
 		c.then(s);
 	};
+	#u = (e) => {
+		let t = v[e.command];
+		t && this.move(t, { focus: !1 });
+	};
 	previewRange(e) {
 		if (this.options.mode !== "range" || this.picked.length !== 1 || !this.$body) return;
 		let t = this.$body.querySelector(`[data-day="${e}"]`);
 		if (!t || t.getAttribute("aria-disabled") === "true") return;
 		let [n, r] = [this.picked[0], e].sort();
-		this.$body.querySelectorAll(".js-day").forEach((e) => {
+		this.$body.querySelectorAll("[data-day]").forEach((e) => {
 			let t = e.getAttribute("data-day"), i = e.closest("td");
 			i?.toggleAttribute("data-range", u(t, n, r)), i?.toggleAttribute("data-start", t === n), i?.toggleAttribute("data-end", t === r);
 		});
 	}
-	#u = (e) => {
-		let t = e.target.closest(".js-day");
+	#d = (e) => {
+		let t = e.target.closest("[data-day]");
 		if (!t) return;
 		let n = t.getAttribute("data-day");
 		n && this.previewRange(n);
 	};
-	getMonthName(e) {
-		return this.options.months?.[e] ?? g(this.options.locale)[e];
-	}
 	getWeekdayNames() {
 		return this.options.days ?? h(this.options.locale);
 	}
 	renderDays() {
-		let e = this.querySelector(".js-days");
+		let e = this.querySelector("[role=\"grid\"] thead tr");
 		if (!e) return;
 		let t = this.getWeekdayNames(), n = h(this.options.locale, "long");
 		e.innerHTML = "";
@@ -359,7 +357,7 @@ var _ = class {
 		this.$title && (this.$title.textContent = m(this.options.locale, {
 			month: "long",
 			year: "numeric"
-		}).format(new Date(e, t, 1))), this.$previous?.setAttribute("data-content", this.getMonthName(0 > t - 1 ? 11 : t - 1)), this.$next?.setAttribute("data-content", this.getMonthName(11 < t + 1 ? 0 : t + 1));
+		}).format(new Date(e, t, 1)));
 	}
 	renderCalendar(e, t, { focus: n = !1 } = {}) {
 		if (!this.$body) return;
