@@ -1,5 +1,11 @@
 # @agencecinq/calendar
 
+## 4.0.1
+
+### Patch Changes
+
+- 29c21a6: Arrow keys cross months again: from the 31st, the right arrow goes to the 1st of the next month instead of the same day number there. Page Up and Page Down start from the focused day.
+
 ## 4.0.0
 
 ### Major Changes
