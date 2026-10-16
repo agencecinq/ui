@@ -148,9 +148,7 @@ var g = class {
 	#e = (e) => {
 		let t = e.target.closest(".js-day");
 		if (!t) return;
-		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, { key: i, code: a } = e, o = () => {
-			t.getAttribute("aria-disabled") !== "true" && (e.preventDefault(), t.click());
-		}, s = {
+		let n = t.getAttribute("data-day"), r = (l(n).getDay() - this.host.options.firstDay + 7) % 7, { key: i, code: a } = e, o = {
 			ArrowLeft: () => {
 				e.preventDefault(), this.focusDayByOffset(n, -1);
 			},
@@ -175,11 +173,9 @@ var g = class {
 			PageDown: () => {
 				e.preventDefault(), this.host.move(e.shiftKey ? 12 : 1);
 			},
-			Enter: o,
-			" ": o,
 			default: () => !1
 		};
-		return (s[i || a] || s.default)();
+		return (o[i || a] || o.default)();
 	};
 }, _ = {
 	active: "active",

@@ -110,13 +110,6 @@ export default class Keyboard {
     const offset = (dayOfWeek - this.host.options.firstDay + 7) % 7;
     const { key, code } = event;
 
-    const activate = () => {
-      if ($target.getAttribute("aria-disabled") !== "true") {
-        event.preventDefault();
-        $target.click();
-      }
-    };
-
     const codes: Record<string, () => void | false> = {
       ArrowLeft: () => {
         event.preventDefault();
@@ -150,8 +143,6 @@ export default class Keyboard {
         event.preventDefault();
         this.host.move(event.shiftKey ? 12 : 1);
       },
-      Enter: activate,
-      " ": activate,
       default: () => false,
     };
 
