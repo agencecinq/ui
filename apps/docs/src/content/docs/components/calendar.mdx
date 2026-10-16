@@ -11,6 +11,15 @@ the grid and handles selection. `<cinq-calendar>` follows the
 
 Inspired by [`@19h47/calendar`](https://github.com/19h47/19h47-calendar).
 
+## When not to use it
+
+For one date with no day to rule out, `<input type="date">` already does the
+job without a script: the platform's own picker, typing, `min` / `max`
+validation and a `YYYY-MM-DD` value. Add `autocomplete="bday"` for a birth
+date. Reach for `<cinq-calendar>` for a range or several dates in one field,
+unavailable days, or a grid that has to follow the design. To keep the native
+field and still offer the grid, open the calendar [in a dialog](#in-a-dialog).
+
 ## Install
 
 ```bash
@@ -53,8 +62,8 @@ The component upgrades automatically on `connectedCallback`.
 ## Examples
 
 Interactive demos below cover single date, range, multiple dates, preselection,
-a form, bounds, locale / week start, and an advanced `renderInner` events
-calendar.
+a form, a dialog, bounds, locale / week start, and an advanced `renderInner`
+events calendar.
 
 <CalendarPlayground />
 
@@ -149,6 +158,72 @@ disabled `<fieldset>`) leaves the field out.
 
 Name the grid with `aria-labelledby`: a `<label for>` on the host does not
 reach it.
+
+### In a dialog
+
+Keep a native `<input type="date">` as the field and open the calendar in a
+`<dialog>` to fill it. `command` and `commandfor` open and close the dialog
+without a script, the browser closes it on Escape and gives focus back to the
+button. The calendar has no `name`, so only the input is submitted. The
+**In a dialog** demo above runs this code.
+
+```html
+<label for="arrival">Arrivée</label>
+<input type="date" id="arrival" name="arrival" min="2026-10-16" required />
+<button type="button" command="show-modal" commandfor="arrival-dialog">
+  Choisir dans le calendrier
+</button>
+
+<dialog id="arrival-dialog" aria-labelledby="arrival-dialog-title">
+  <h2 id="arrival-dialog-title">Date d'arrivée</h2>
+  <cinq-calendar locale="fr" min="2026-10-16">
+    <header>
+      <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+      <h3 class="js-title" id="arrival-month" aria-live="polite"></h3>
+      <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+    </header>
+    <table role="grid" aria-labelledby="arrival-dialog-title arrival-month">
+      <thead>
+        <tr class="js-days"></tr>
+      </thead>
+      <tbody class="js-body"></tbody>
+    </table>
+  </cinq-calendar>
+  <button type="button" command="close" commandfor="arrival-dialog">Fermer</button>
+</dialog>
+```
+
+On open, show the input's date and focus it (today when the input is empty).
+A picked day fills the input and closes the dialog:
+
+```js
+import { fromDayString } from "@agencecinq/calendar";
+import { EVENTS } from "@agencecinq/utils";
+
+const input = document.getElementById("arrival");
+const dialog = document.getElementById("arrival-dialog");
+const calendar = dialog.querySelector("cinq-calendar");
+
+dialog.addEventListener("toggle", ({ newState }) => {
+  if (newState !== "open") return;
+
+  const date = input.value ? fromDayString(input.value) : new Date();
+
+  calendar.current = {
+    month: date.getMonth(),
+    year: date.getFullYear(),
+    day: input.value || null,
+  };
+  calendar.setPicked(input.value ? [input.value] : [], false);
+  calendar.render({ focus: true });
+});
+
+calendar.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
+  input.value = detail.values[0] ?? "";
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+  dialog.close();
+});
+```
 
 ### Bounds
 

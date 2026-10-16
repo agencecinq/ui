@@ -160,6 +160,17 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-calendar-events .js-day.is-weekend:not(.active) {
     color: #9ca3af;
   }
+
+  .docs-calendar-dialog {
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  }
+
+  .docs-calendar-dialog::backdrop {
+    background: rgb(17 24 39 / 0.4);
+  }
 </style>
 
 <div class="not-content flex flex-col gap-10">
@@ -369,6 +380,73 @@ import RegisterComponents from './RegisterComponents.astro';
   <section class="rounded-2xl bg-white p-6 shadow">
     <div class="flex flex-col gap-4">
       <div>
+        <h3 class="text-lg font-semibold text-gray-900">In a dialog</h3>
+        <p class="text-sm text-gray-600">
+          A native <code>&lt;input type="date"&gt;</code> stays the field. The button opens the
+          calendar in a <code>&lt;dialog&gt;</code> with <code>command="show-modal"</code>, without a
+          script. A picked day fills the input and closes the dialog. <kbd>Escape</kbd> closes it
+          too, and focus goes back to the button.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="flex flex-col gap-1 text-sm text-gray-700">
+          <span class="text-xs font-medium uppercase tracking-wide text-gray-500">Arrivée</span>
+          <input
+            type="date"
+            id="docs-calendar-dialog-input"
+            class="rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm text-gray-900"
+          />
+        </label>
+        <button
+          type="button"
+          command="show-modal"
+          commandfor="docs-calendar-dialog"
+          class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900"
+        >
+          Choisir dans le calendrier
+        </button>
+      </div>
+
+      <dialog
+        id="docs-calendar-dialog"
+        class="docs-calendar-dialog"
+        aria-labelledby="docs-calendar-dialog-title"
+      >
+        <h4 id="docs-calendar-dialog-title" class="mb-3 text-base font-semibold text-gray-900">
+          Date d'arrivée
+        </h4>
+        <cinq-calendar class="docs-calendar" locale="fr">
+          <header>
+            <button type="button" class="js-previous" aria-label="Mois précédent">‹</button>
+            <h5 class="js-title" id="docs-calendar-dialog-label" aria-live="polite"></h5>
+            <button type="button" class="js-next" aria-label="Mois suivant">›</button>
+          </header>
+          <table
+            role="grid"
+            aria-labelledby="docs-calendar-dialog-title docs-calendar-dialog-label"
+          >
+            <thead>
+              <tr class="js-days"></tr>
+            </thead>
+            <tbody class="js-body"></tbody>
+          </table>
+        </cinq-calendar>
+        <button
+          type="button"
+          command="close"
+          commandfor="docs-calendar-dialog"
+          class="mt-3 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900"
+        >
+          Fermer
+        </button>
+      </dialog>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
         <h3 class="text-lg font-semibold text-gray-900">Bounds</h3>
         <p class="text-sm text-gray-600">
           The page script sets <code>min</code> to today and <code>max</code> 60 days later. Days outside are&nbsp;<code>aria-disabled</code>&nbsp;and cannot be selected (still in the keyboard grid).
@@ -517,7 +595,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
 <script>
   import { EVENTS } from '@agencecinq/utils';
-  import { getWeekStart, toDayString } from '@agencecinq/calendar';
+  import { fromDayString, getWeekStart, toDayString } from '@agencecinq/calendar';
 
   const emptyLabels = {
     single: 'Aucune date',
@@ -576,6 +654,31 @@ import RegisterComponents from './RegisterComponents.astro';
     if (formOutput) {
       formOutput.textContent = '-';
     }
+  });
+
+  const dialogInput = document.getElementById('docs-calendar-dialog-input');
+  const dialog = document.getElementById('docs-calendar-dialog');
+  const dialogCalendar = dialog?.querySelector('cinq-calendar');
+
+  dialog?.addEventListener('toggle', ({ newState }) => {
+    if (newState !== 'open' || !dialogCalendar) return;
+
+    const value = dialogInput.value;
+    const date = value ? fromDayString(value) : new Date();
+
+    dialogCalendar.current = {
+      month: date.getMonth(),
+      year: date.getFullYear(),
+      day: value || null,
+    };
+    dialogCalendar.setPicked(value ? [value] : [], false);
+    dialogCalendar.render({ focus: true });
+  });
+
+  dialogCalendar?.addEventListener(EVENTS.CALENDAR_CHANGE, ({ detail }) => {
+    dialogInput.value = detail.values[0] ?? '';
+    dialogInput.dispatchEvent(new Event('change', { bubbles: true }));
+    dialog.close();
   });
 
   const localeCalendar = document.querySelector('[data-calendar-demo="locale"]');
