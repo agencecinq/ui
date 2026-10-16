@@ -157,7 +157,7 @@ import RegisterComponents from './RegisterComponents.astro';
     background: #fff;
   }
 
-  .docs-calendar-events .js-day.is-weekend:not(.active) {
+  .docs-calendar .js-day.is-weekend:not(.active) {
     color: #9ca3af;
   }
 
@@ -487,8 +487,10 @@ import RegisterComponents from './RegisterComponents.astro';
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Locale & week start</h3>
         <p class="text-sm text-gray-600">
-          Change the locale. Labels update via <code>Intl</code>, and week start
-          follows <code>getFirstDay(locale)</code> unless you override <code>first-day</code>.
+          Change the locale. Labels update via <code>Intl</code>, week start follows
+          <code>getFirstDay(locale)</code> unless you override <code>first-day</code>, and the
+          locale's weekend from <code>Intl.Locale#getWeekInfo()</code> is grayed: Friday alone
+          for <code>fa</code>, Friday and Saturday for <code>ar</code>.
         </p>
       </div>
 
@@ -686,9 +688,24 @@ import RegisterComponents from './RegisterComponents.astro';
     dialog.close();
   });
 
+  const markWeekend = (calendar) => {
+    const { weekend } = new Intl.Locale(calendar.options.locale).getWeekInfo();
+
+    calendar.querySelectorAll('.js-day').forEach((button) => {
+      // getWeekInfo() counts 1 (Monday) to 7 (Sunday), getDay() 0 (Sunday) to 6.
+      const weekday = dateFromDay(button.dataset.day).getDay() || 7;
+
+      button.classList.toggle('is-weekend', weekend.includes(weekday));
+    });
+  };
+
   const localeCalendar = document.querySelector('[data-calendar-demo="locale"]');
   const localeSelect = document.querySelector('[data-calendar-locale-select]');
   const firstDayOutput = document.querySelector('[data-calendar-first-day]');
+
+  localeCalendar?.addEventListener(EVENTS.CALENDAR_RENDER, () => {
+    markWeekend(localeCalendar);
+  });
 
   const applyLocale = (locale) => {
     if (!localeCalendar) return;
@@ -733,15 +750,12 @@ import RegisterComponents from './RegisterComponents.astro';
 
   if (eventsCalendar) {
     eventsCalendar.addEventListener(EVENTS.CALENDAR_RENDER, () => {
+      markWeekend(eventsCalendar);
+
       eventsCalendar.querySelectorAll('.js-day').forEach((button) => {
         const day = button.dataset.day;
-        const weekday = dateFromDay(day).getDay();
 
         button.innerHTML = `<time datetime="${day}">${button.textContent.trim()}</time>`;
-
-        if (weekday === 0 || weekday === 6) {
-          button.classList.add('is-weekend');
-        }
 
         if (events[day]) {
           button.dataset.hasEvent = '';
