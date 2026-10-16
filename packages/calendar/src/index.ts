@@ -7,6 +7,5 @@ export type {
   Options,
   Mode,
   RenderDetail,
-  StateClasses,
 } from "./types.js";
 export { dateFromDay, dayFromDate, getFirstDay } from "./utils.js";

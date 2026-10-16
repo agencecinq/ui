@@ -39,7 +39,7 @@ export declare class Calendar extends HTMLElement {
     }): void;
     /** Assign selection, mirror `data-picked`, paint the grid, optionally emit `calendar:change`. */
     setPicked(picked: string[], emit?: boolean): void;
-    /** Paint in-between days while choosing the range end (mouse or keyboard). */
+    /** Paint the range to come while choosing its end (mouse or keyboard), with the attributes of a picked range. */
     previewRange(to: string): void;
     getMonthName(month: number): string;
     getWeekdayNames(): string[];

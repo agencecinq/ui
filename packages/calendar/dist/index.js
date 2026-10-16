@@ -185,15 +185,10 @@ var _ = class {
 		};
 		return (o[i || a] || o.default)();
 	};
-}, v = {
-	active: "active",
-	range: "range",
-	start: "start",
-	end: "end"
-}, y = () => {
+}, v = () => {
 	let e = document.createElement("input");
 	return e.required = !0, e.validationMessage;
-}, b = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
+}, y = (e, t, n, { label: r, disabled: i, current: a, tabIndex: o }) => `
 	<button
 		type="button"
 		class="js-day${n ? ` ${n}` : ""}"
@@ -205,7 +200,7 @@ var _ = class {
 	>
 		${t}
 	</button>
-`, x = class extends HTMLElement {
+`, b = class extends HTMLElement {
 	static formAssociated = !0;
 	static observedAttributes = [
 		"min",
@@ -217,7 +212,6 @@ var _ = class {
 	options = {
 		mode: "single",
 		firstDay: 0,
-		stateClasses: { ...v },
 		locale: "en",
 		buttonClass: "",
 		deselectable: !1
@@ -260,7 +254,6 @@ var _ = class {
 		return {
 			mode: this.getAttribute("mode") || "single",
 			firstDay: t != null && t !== "" ? r(t, p(e)) : p(e),
-			stateClasses: { ...v },
 			locale: e,
 			buttonClass: this.getAttribute("button-class") || "",
 			deselectable: i(this.getAttribute("deselectable"), !1),
@@ -293,10 +286,10 @@ var _ = class {
 		this.picked = e, this.setAttribute("data-picked", JSON.stringify(this.picked)), this.#o(), this.#s(), t && this.#t();
 	}
 	#o() {
-		let { mode: e, stateClasses: t } = this.options, [n, r] = this.picked, i = e === "range", a = i && this.picked.length === 2;
-		this.$body?.querySelectorAll(".js-day").forEach((e) => {
-			let o = e.getAttribute("data-day"), s = this.picked.includes(o), c = a && u(o, n, r), l = e.closest("td");
-			s || c ? l?.setAttribute("aria-selected", "true") : l?.removeAttribute("aria-selected"), e.classList.toggle(t.active, s), e.classList.toggle(t.range, c), e.classList.toggle(t.start, i && o === n), e.classList.toggle(t.end, a && o === r);
+		let [e, t] = this.picked, n = this.options.mode === "range", r = n && this.picked.length === 2;
+		this.$body?.querySelectorAll(".js-day").forEach((i) => {
+			let a = i.getAttribute("data-day"), o = r && u(a, e, t), s = i.closest("td");
+			o || this.picked.includes(a) ? s?.setAttribute("aria-selected", "true") : s?.removeAttribute("aria-selected"), s?.toggleAttribute("data-range", o), s?.toggleAttribute("data-start", n && a === e), s?.toggleAttribute("data-end", r && a === t);
 		});
 	}
 	#s() {
@@ -306,7 +299,7 @@ var _ = class {
 			this.#n.setValidity({});
 			return;
 		}
-		this.#n.setValidity({ valueMissing: !0 }, y(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
+		this.#n.setValidity({ valueMissing: !0 }, v(), this.$body?.querySelector(".js-day[tabindex=\"0\"]") ?? void 0);
 	}
 	#c(e) {
 		let { mode: t, deselectable: n } = this.options, r = this.picked.includes(e);
@@ -334,11 +327,11 @@ var _ = class {
 		if (this.options.mode !== "range" || this.picked.length !== 1 || !this.$body) return;
 		let t = this.$body.querySelector(`[data-day="${e}"]`);
 		if (!t || t.getAttribute("aria-disabled") === "true") return;
-		let n = this.$body.querySelectorAll(".js-day"), r = this.$body.querySelector(`[data-day="${this.picked[0]}"]`), i = !1, a = this.picked[0], o = e;
-		a > o && (i = !0, o = this.picked[0], a = e), n.forEach((e) => {
-			let t = e.getAttribute("data-day");
-			e.classList.remove(this.options.stateClasses.range, this.options.stateClasses.end, this.options.stateClasses.start), u(t, a, o) && e.classList.add(this.options.stateClasses.range);
-		}), r?.classList.add(this.options.stateClasses.start), t.classList.add(this.options.stateClasses.end), i && (r?.classList.add(this.options.stateClasses.end), r?.classList.remove(this.options.stateClasses.start), t.classList.add(this.options.stateClasses.start), t.classList.remove(this.options.stateClasses.end));
+		let [n, r] = [this.picked[0], e].sort();
+		this.$body.querySelectorAll(".js-day").forEach((e) => {
+			let t = e.getAttribute("data-day"), i = e.closest("td");
+			i?.toggleAttribute("data-range", u(t, n, r)), i?.toggleAttribute("data-start", t === n), i?.toggleAttribute("data-end", t === r);
+		});
 	}
 	#u = (e) => {
 		let t = e.target.closest(".js-day");
@@ -384,7 +377,7 @@ var _ = class {
 				else if (l > d(e, t)) break;
 				else {
 					let e = c(m);
-					g.innerHTML = b(e, s.format(l), r, {
+					g.innerHTML = y(e, s.format(l), r, {
 						label: o.format(m),
 						disabled: this.#i || !!i && e < i || !!a && e > a,
 						current: e === this.day,
@@ -406,6 +399,6 @@ var _ = class {
 		}, { cancelable: !1 });
 	}
 };
-customElements.get("cinq-calendar") || customElements.define("cinq-calendar", x);
+customElements.get("cinq-calendar") || customElements.define("cinq-calendar", b);
 //#endregion
-export { x as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };
+export { b as Calendar, l as dateFromDay, c as dayFromDate, p as getFirstDay };

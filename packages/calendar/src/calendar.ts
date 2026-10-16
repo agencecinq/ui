@@ -12,7 +12,6 @@ import type {
   Options,
   Mode,
   RenderDetail,
-  StateClasses,
 } from "./types.js";
 import {
   dayFromDate,
@@ -24,13 +23,6 @@ import {
   getWeekdayNames,
   isBetween,
 } from "./utils.js";
-
-const stateClassesDefault: StateClasses = {
-  active: "active",
-  range: "range",
-  start: "start",
-  end: "end",
-};
 
 /** The browser's own message for an empty required field, in the user's language. */
 const valueMissingMessage = (): string => {
@@ -87,7 +79,6 @@ export class Calendar extends HTMLElement {
   options: Options = {
     mode: "single",
     firstDay: 0,
-    stateClasses: { ...stateClassesDefault },
     locale: "en",
     buttonClass: "",
     deselectable: false,
@@ -158,7 +149,6 @@ export class Calendar extends HTMLElement {
         firstDay != null && firstDay !== ""
           ? parseNumber(firstDay, getFirstDay(locale))
           : getFirstDay(locale),
-      stateClasses: { ...stateClassesDefault },
       locale,
       buttonClass: this.getAttribute("button-class") || "",
       deselectable: parseBoolean(this.getAttribute("deselectable"), false),
@@ -263,29 +253,30 @@ export class Calendar extends HTMLElement {
     }
   }
 
-  /** Reflect `picked` on the grid: `aria-selected` on each selected cell, state classes on its day button. */
+  /**
+   * Reflect `picked` on the grid cells: `aria-selected` on each selected day,
+   * and in a range `data-range` inside it (ends included), `data-start` and
+   * `data-end` on its ends.
+   */
   #paint(): void {
-    const { mode, stateClasses } = this.options;
     const [start, end] = this.picked;
-    const isRange = mode === "range";
+    const isRange = this.options.mode === "range";
     const isComplete = isRange && 2 === this.picked.length;
 
     this.$body?.querySelectorAll<HTMLElement>(".js-day").forEach($day => {
       const day = $day.getAttribute("data-day") as string;
-      const isPicked = this.picked.includes(day);
       const inRange = isComplete && isBetween(day, start, end);
       const $cell = $day.closest("td");
 
-      if (isPicked || inRange) {
+      if (inRange || this.picked.includes(day)) {
         $cell?.setAttribute("aria-selected", "true");
       } else {
         $cell?.removeAttribute("aria-selected");
       }
 
-      $day.classList.toggle(stateClasses.active, isPicked);
-      $day.classList.toggle(stateClasses.range, inRange);
-      $day.classList.toggle(stateClasses.start, isRange && day === start);
-      $day.classList.toggle(stateClasses.end, isComplete && day === end);
+      $cell?.toggleAttribute("data-range", inRange);
+      $cell?.toggleAttribute("data-start", isRange && day === start);
+      $cell?.toggleAttribute("data-end", isComplete && day === end);
     });
   }
 
@@ -372,7 +363,7 @@ export class Calendar extends HTMLElement {
     result.then(commit);
   };
 
-  /** Paint in-between days while choosing the range end (mouse or keyboard). */
+  /** Paint the range to come while choosing its end (mouse or keyboard), with the attributes of a picked range. */
   previewRange(to: string) {
     if (this.options.mode !== "range" || 1 !== this.picked.length || !this.$body) {
       return;
@@ -386,41 +377,16 @@ export class Calendar extends HTMLElement {
       return;
     }
 
-    const items = this.$body.querySelectorAll(".js-day");
-    const $start = this.$body.querySelector(`[data-day="${this.picked[0]}"]`);
+    const [start, end] = [this.picked[0], to].sort();
 
-    let isReversed = false;
-    let from = this.picked[0];
-    let end = to;
+    this.$body.querySelectorAll(".js-day").forEach($day => {
+      const day = $day.getAttribute("data-day") as string;
+      const $cell = $day.closest("td");
 
-    if (from > end) {
-      isReversed = true;
-      end = this.picked[0];
-      from = to;
-    }
-
-    items.forEach(item => {
-      const check = item.getAttribute("data-day") as string;
-      item.classList.remove(
-        this.options.stateClasses.range,
-        this.options.stateClasses.end,
-        this.options.stateClasses.start,
-      );
-
-      if (isBetween(check, from, end)) {
-        item.classList.add(this.options.stateClasses.range);
-      }
+      $cell?.toggleAttribute("data-range", isBetween(day, start, end));
+      $cell?.toggleAttribute("data-start", day === start);
+      $cell?.toggleAttribute("data-end", day === end);
     });
-
-    $start?.classList.add(this.options.stateClasses.start);
-    $target.classList.add(this.options.stateClasses.end);
-
-    if (isReversed) {
-      $start?.classList.add(this.options.stateClasses.end);
-      $start?.classList.remove(this.options.stateClasses.start);
-      $target.classList.add(this.options.stateClasses.start);
-      $target.classList.remove(this.options.stateClasses.end);
-    }
   }
 
   #handleMousemove = (event: MouseEvent) => {

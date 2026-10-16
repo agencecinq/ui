@@ -77,22 +77,34 @@ Importing the package registers the custom element. The calendar mounts on
 
 ### Selection state
 
-The calendar writes the state on the cells it generates:
+The calendar writes the state as attributes, no class:
 
-- `aria-selected="true"` on the `<td>` of each selected day, every day of a
-  range included.
-- The full date as `aria-label` on each day button (`lundi 16 novembre 2026`),
-  `aria-current="date"` on today, and `aria-disabled="true"` on days that
-  cannot be picked.
-- Classes on the day button for styling: `active` (picked day, range ends),
-  `range` (inside a range, ends included), `start` and `end`.
+- On each `<td>`: `aria-selected="true"` for a selected day, every day of a
+  range included. In `mode="range"`, `data-range` inside the range (ends
+  included), `data-start` and `data-end` on its ends. These three also paint
+  the range to come while the pointer or the focus chooses its end.
+- On each day button: the full date as `aria-label`
+  (`lundi 16 novembre 2026`), `aria-current="date"` on today, and
+  `aria-disabled="true"` on days that cannot be picked.
+
+These rules weigh the same, so the last one that matches wins:
 
 ```css
+/* picked day */
 td[aria-selected="true"] .js-day {
-  background: #e5e7eb;
+  background: #111827;
+  color: #fff;
 }
 
-.js-day.active {
+/* inside a range, ends included */
+td[data-range] .js-day {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* range ends */
+td[data-start] .js-day,
+td[data-end] .js-day {
   background: #111827;
   color: #fff;
 }

@@ -1,10 +1,3 @@
-export interface StateClasses {
-  active: string;
-  range: string;
-  start: string;
-  end: string;
-}
-
 /** Selection behaviour for `<cinq-calendar>`. */
 export type Mode = "single" | "range" | "multiple";
 
@@ -12,7 +5,6 @@ export interface Options {
   /** `single` (default), `range`, or `multiple` (toggle discrete days). */
   mode: Mode;
   firstDay: number;
-  stateClasses: StateClasses;
   locale: string;
   buttonClass?: string;
   months?: string[];
