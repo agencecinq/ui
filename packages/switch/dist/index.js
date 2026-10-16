@@ -120,10 +120,11 @@ var a = class extends HTMLElement {
 		return { el: this };
 	}
 	#a(e) {
-		this.setAttribute("aria-checked", String(e));
+		this.setAttribute("aria-checked", e.toString());
 	}
 	#o() {
-		this.#e.setFormValue(this.checked ? this.value : null, String(this.checked));
+		let e = this.checked ? this.value : null, t = this.checked.toString();
+		this.#e.setFormValue(e, t);
 	}
 };
 customElements.get("cinq-switch") || customElements.define("cinq-switch", a);

@@ -134,15 +134,14 @@ export class Switch extends HTMLElement {
 
   /** Write the state without events, even while disabled, as a form reset does. */
   #set(checked: boolean): void {
-    this.setAttribute("aria-checked", String(checked));
+    this.setAttribute("aria-checked", checked.toString());
   }
 
-  /** Submit `value` while on, nothing while off. */
   #update(): void {
-    this.#internals.setFormValue(
-      this.checked ? this.value : null,
-      String(this.checked),
-    );
+    const value = this.checked ? this.value : null;
+    const state = this.checked.toString();
+
+    this.#internals.setFormValue(value, state);
   }
 }
 
