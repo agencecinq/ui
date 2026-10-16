@@ -31,7 +31,7 @@ No class to add: the calendar finds its parts in your HTML.
 
 | Element | Required | Role |
 | ------- | -------- | ---- |
-| `<cinq-calendar>` | **Yes** | Host. Give it an `id` for the month buttons |
+| `<cinq-calendar>` | **Yes** | Host. Needs an `id` only for the month buttons |
 | `<tbody>` of the `role="grid"` table | **Yes** | Filled with the day cells |
 | `<thead> <tr>` of the same table | No | Filled with the weekday headers |
 | `[aria-live]` | No | Filled with the month and year, announced on each change |
@@ -66,6 +66,11 @@ command on click, Enter or Space, and the button can sit anywhere in the page.
 | --------- | ----- |
 | `--previous-month` / `--next-month` | One month back / forward |
 | `--previous-year` / `--next-year` | One year back / forward |
+
+The calendar needs an `id` for these buttons, and only for them: `commandfor`
+points to it. Without month buttons, leave the `id` out: Page Up and Page Down
+still change the month from the grid. From a script,
+`button.commandForElement = calendar` links a button without any `id`.
 
 ## Usage
 
