@@ -151,6 +151,29 @@ scrim from `cinq-drawer[open]` since `::backdrop` only exists for modal
 dialogs. Focus is not contained: Tab can leave the drawer, as in a disclosure
 menu.
 
+When the drawer covers the page, make the covered regions inert while it is
+open, so Tab and screen readers stay out of what they cannot see. The drawer
+leaves this to the page, which alone knows the regions it covers. Leave out the
+region holding the triggers, here the header:
+
+```js
+import { EVENTS } from "@agencecinq/utils";
+
+const setPageInert = (event, inert) => {
+  if (event.detail.drawer !== "menu-drawer") return;
+
+  document.querySelectorAll("main, footer").forEach(($element) => {
+    $element.inert = inert;
+  });
+};
+
+document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => setPageInert(event, true));
+document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, (event) => setPageInert(event, false));
+```
+
+`drawer:close` fires before focus returns, so an opener inside a covered region
+still gets its focus back.
+
 ## API
 
 ### Attributes
