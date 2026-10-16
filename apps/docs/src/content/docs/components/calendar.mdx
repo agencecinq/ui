@@ -145,9 +145,8 @@ own messages: `required` needs at least one day (both ends in `range`), and a
 day before `min` or after `max` blocks the submission. `form.reset()` brings
 back the `data-picked` selection, and `disabled` (or a disabled `<fieldset>`)
 leaves the field out. A range with only its start is invalid, like a half-typed
-date. The element has the validation API of a native field: `form`,
-`validity`, `validationMessage`, `willValidate`, `checkValidity()` and
-`reportValidity()`.
+date. The element has the validation API of a native field: `validity`,
+`validationMessage`, `checkValidity()` and `reportValidity()`.
 
 ```html
 <form>
@@ -539,7 +538,7 @@ document.querySelector("cinq-calendar")?.addEventListener(
 | `setPicked(picked, emit?)` | Assign the selection (days in order, start then end in a range), mirror `data-picked` and paint the grid. Emits `calendar:change` unless `emit` is `false` |
 | `move(delta)` | Navigate by months (`-1` = previous, `1` = next) |
 | `destroy()` | Detach listeners, clear the grid, its validity and its states |
-| `form`, `validity`, `validationMessage`, `willValidate` | As on a native field |
+| `validity`, `validationMessage` | As on a native field |
 | `checkValidity()`, `reportValidity()` | As on a native field |
 
 Exported helpers: `getFirstDay`, `dayFromDate`, `dateFromDay`.

@@ -22,15 +22,13 @@ export declare class Calendar extends HTMLElement {
     picked: string[];
     connectedCallback(): void;
     disconnectedCallback(): void;
-    /** The form the calendar belongs to, as on a native field. */
-    get form(): HTMLFormElement | null;
     get validity(): ValidityState;
     get validationMessage(): string;
-    get willValidate(): boolean;
     checkValidity(): boolean;
     reportValidity(): boolean;
     attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void;
-    formDisabledCallback(disabled: boolean): void;
+    /** `:disabled` already follows `disabled` and a disabled `<fieldset>`: only the days need a new render. */
+    formDisabledCallback(): void;
     formResetCallback(): void;
     formStateRestoreCallback(state: string | null): void;
     /**

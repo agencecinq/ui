@@ -118,7 +118,6 @@ export class Calendar extends HTMLElement {
   #keyboard: Keyboard | null = null;
   #internals = this.attachInternals();
   #defaultPicked: string[] | null = null;
-  #disabled = false;
   /** `calendar:before-change` promises not settled yet. */
   #pending = 0;
 
@@ -136,21 +135,12 @@ export class Calendar extends HTMLElement {
     this.destroy();
   }
 
-  /** The form the calendar belongs to, as on a native field. */
-  get form(): HTMLFormElement | null {
-    return this.#internals.form;
-  }
-
   get validity(): ValidityState {
     return this.#internals.validity;
   }
 
   get validationMessage(): string {
     return this.#internals.validationMessage;
-  }
-
-  get willValidate(): boolean {
-    return this.#internals.willValidate;
   }
 
   checkValidity(): boolean {
@@ -171,9 +161,8 @@ export class Calendar extends HTMLElement {
     }
   }
 
-  formDisabledCallback(disabled: boolean): void {
-    this.#disabled = disabled;
-
+  /** `:disabled` already follows `disabled` and a disabled `<fieldset>`: only the days need a new render. */
+  formDisabledCallback(): void {
     if (this.$body) {
       this.render();
     }
@@ -315,7 +304,9 @@ export class Calendar extends HTMLElement {
     const min = this.getAttribute("min");
     const max = this.getAttribute("max");
 
-    return this.#disabled || (!!min && day < min) || (!!max && day > max);
+    return (
+      this.matches(":disabled") || (!!min && day < min) || (!!max && day > max)
+    );
   }
 
   /**
