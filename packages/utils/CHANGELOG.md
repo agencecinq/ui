@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 8.0.0
+
+### Major Changes
+
+- c5c844c: Remove `EVENTS.MODAL_TOGGLE`, `EVENTS.MODAL_OPEN` and `EVENTS.MODAL_CLOSE`: `@agencecinq/modal` 6.0 opens with invoker commands and leaves the after-events to the native `toggle` event.
+
 ## 7.10.0
 
 ### Minor Changes
