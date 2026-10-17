@@ -7,7 +7,7 @@
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agencecinq/shopify.git",
+    "url": "https://github.com/agencecinq/ui.git",
     "directory": "packages/calendar"
   },
   "exports": {
