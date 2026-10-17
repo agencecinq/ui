@@ -11,9 +11,6 @@ export declare const EVENTS: {
     SHEET_TOGGLE: string;
     MODAL_BEFORE_CLOSE: string;
     MODAL_BEFORE_OPEN: string;
-    MODAL_CLOSE: string;
-    MODAL_OPEN: string;
-    MODAL_TOGGLE: string;
     SPINBUTTON_CHANGE: string;
     TOAST_OPEN: string;
     TOAST_CLOSE: string;

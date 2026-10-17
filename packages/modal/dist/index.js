@@ -1,129 +1,84 @@
-import { EVENTS as e, dispatchBeforeEvent as t, dispatchEvent as n, getFocusableElements as r } from "@agencecinq/utils";
+import { EVENTS as e, dispatchBeforeEvent as t } from "@agencecinq/utils";
 //#region src/modal.ts
-var i = class extends HTMLElement {
+var n = "closedBy" in HTMLDialogElement.prototype, r = class r extends HTMLElement {
 	trigger = null;
-	$modal = null;
+	$dialog = null;
 	#e = null;
 	#t = (e) => {
-		e.target === e.currentTarget && this.close();
-	};
-	#n = (e) => {
-		e.preventDefault(), this.close();
-	};
-	#r = () => {
-		this.removeAttribute("open");
-	};
-	#i = (e) => {
-		let { modal: t, trigger: n } = e.detail;
-		if (t === this.id) {
-			if (this.hasAttribute("open")) {
-				this.close();
-				return;
+		let t = e.source instanceof HTMLElement ? e.source : null;
+		switch (e.command) {
+			case "show-modal": {
+				let n = t?.hasAttribute("data-replace") ? t.closest("cinq-modal") : null;
+				e.preventDefault(), this.trigger = t, n instanceof r && n !== this ? this.#i(n) : this.show();
+				break;
 			}
-			n && (this.trigger = n), this.show();
+			case "request-close": {
+				let n = t?.getAttribute("value") ?? void 0;
+				e.preventDefault(), this.close(n);
+				break;
+			}
 		}
 	};
-	constructor() {
-		super();
-	}
-	static get observedAttributes() {
-		return ["open"];
-	}
+	#n = (e) => {
+		e.cancelable && (e.preventDefault(), this.close());
+	};
+	#r = (e) => {
+		let t = this.$dialog;
+		if (!t || e.target !== t || t.getAttribute("closedby") !== "any") return;
+		let n = t.getBoundingClientRect();
+		e.clientX >= n.left && e.clientX <= n.right && e.clientY >= n.top && e.clientY <= n.bottom || this.close();
+	};
 	connectedCallback() {
 		this.init();
 	}
 	disconnectedCallback() {
-		this.destroy(), this.$modal = null;
+		this.destroy(), this.$dialog = null;
 	}
 	init() {
-		if (this.$modal = this.querySelector("[data-dialog]") || this.querySelector("dialog"), !this.$modal) throw Error("Modal: No dialog found");
-		if (!this.id) throw Error("Modal: id attribute is required");
-		this.$modal.addEventListener("click", this.#t), this.$modal.addEventListener("cancel", this.#n), this.$modal.addEventListener("close", this.#r), document.documentElement.addEventListener(e.MODAL_TOGGLE, this.#i);
+		if (this.$dialog = this.querySelector("dialog"), !this.$dialog) throw Error("Modal: No <dialog> found");
+		if (!this.$dialog.id) throw Error("Modal: dialog id attribute is required");
+		this.$dialog.addEventListener("command", this.#t), this.$dialog.addEventListener("cancel", this.#n), n || this.$dialog.addEventListener("click", this.#r);
 	}
 	destroy() {
-		this.$modal && (this.$modal.removeEventListener("click", this.#t), this.$modal.removeEventListener("cancel", this.#n), this.$modal.removeEventListener("close", this.#r), this.hasAttribute("open") && this.$modal.open && this.$modal.close()), document.documentElement.removeEventListener(e.MODAL_TOGGLE, this.#i);
+		this.$dialog && (this.$dialog.removeEventListener("command", this.#t), this.$dialog.removeEventListener("cancel", this.#n), this.$dialog.removeEventListener("click", this.#r), this.$dialog.open && this.$dialog.close());
 	}
 	show() {
-		return this.hasAttribute("open") ? Promise.resolve(!1) : this.#a(e.MODAL_BEFORE_OPEN, {
-			modal: this.id,
+		return this.#a(() => this.#o(!0));
+	}
+	close(t) {
+		if (!this.$dialog?.open) return Promise.resolve(!1);
+		let n = {
+			modal: this.$dialog.id,
+			instance: this
+		};
+		return this.#s(e.MODAL_BEFORE_CLOSE, n, () => this.#o(!1, t));
+	}
+	#i(e) {
+		return this.#a(async () => await e.close() && this.#o(!0));
+	}
+	#a(t) {
+		if (!this.$dialog || this.$dialog.open) return Promise.resolve(!1);
+		let n = {
+			modal: this.$dialog.id,
 			instance: this,
 			trigger: this.trigger
-		}, !0);
+		};
+		return this.#s(e.MODAL_BEFORE_OPEN, n, t);
 	}
-	close() {
-		return this.hasAttribute("open") ? this.#a(e.MODAL_BEFORE_CLOSE, {
-			modal: this.id,
-			instance: this
-		}, !1) : Promise.resolve(!1);
+	#o(e, t) {
+		let n = this.$dialog;
+		return !n || n.open === e ? !1 : (e ? n.showModal() : n.close(t), !0);
 	}
-	#a(e, n, r) {
+	#s(e, n, r) {
 		if (this.#e) return this.#e;
-		let i = (e) => !e || this.hasAttribute("open") === r ? !1 : (this.toggleAttribute("open", r), !0), a = t(document.documentElement, e, n);
-		return typeof a == "boolean" ? Promise.resolve(i(a)) : (this.#e = a.then(i).finally(() => {
+		let i = t(document.documentElement, e, n);
+		if (i === !1) return Promise.resolve(!1);
+		let a = i === !0 ? r() : i.then((e) => e && r());
+		return typeof a == "boolean" ? Promise.resolve(a) : (this.#e = a.finally(() => {
 			this.#e = null;
 		}), this.#e);
 	}
-	attributeChangedCallback(t, i, a) {
-		if (!(!this.isConnected || t !== "open")) {
-			if (a !== null) {
-				if (this.$modal && !this.$modal.open) {
-					this.$modal.showModal(), n(document.documentElement, e.MODAL_OPEN, {
-						modal: this.id,
-						trigger: this.trigger
-					}, {
-						bubbles: !1,
-						cancelable: !1
-					});
-					let t = r(this.$modal);
-					t.length > 0 && t[0].focus();
-				}
-				return;
-			}
-			this.$modal?.open && this.$modal.close(), n(document.documentElement, e.MODAL_CLOSE, { modal: this.id }, {
-				bubbles: !1,
-				cancelable: !1
-			});
-		}
-	}
 };
-customElements.get("cinq-modal") || customElements.define("cinq-modal", i);
+customElements.get("cinq-modal") || customElements.define("cinq-modal", r);
 //#endregion
-//#region src/modal-button.ts
-var a = class extends HTMLElement {
-	$button = null;
-	controls = [];
-	#e = (e) => {
-		this.$button && this.controls.includes(e.detail.modal) && this.$button.setAttribute("aria-pressed", "false");
-	};
-	#t = (e) => {
-		this.$button && this.controls.includes(e.detail.modal) && this.$button.setAttribute("aria-pressed", "true");
-	};
-	connectedCallback() {
-		this.init();
-	}
-	disconnectedCallback() {
-		this.destroy(), this.$button = null, this.controls = [];
-	}
-	init() {
-		if (this.$button = this.querySelector("[data-button]") || this.querySelector("button"), !this.$button) throw Error("ModalButton: No button found");
-		this.controls = (this.$button.ariaControlsElements ?? []).map((e) => e.id), this.$button.addEventListener("click", this.show), document.documentElement.addEventListener(e.MODAL_CLOSE, this.#e), document.documentElement.addEventListener(e.MODAL_OPEN, this.#t);
-	}
-	destroy() {
-		this.$button && this.$button.removeEventListener("click", this.show), document.documentElement.removeEventListener(e.MODAL_CLOSE, this.#e), document.documentElement.removeEventListener(e.MODAL_OPEN, this.#t);
-	}
-	show = () => {
-		this.$button && this.controls.forEach((t) => {
-			let r = {
-				trigger: this.$button,
-				modal: t
-			};
-			n(document.documentElement, e.MODAL_TOGGLE, r, {
-				bubbles: !1,
-				cancelable: !1
-			});
-		});
-	};
-};
-customElements.get("cinq-modal-button") || customElements.define("cinq-modal-button", a);
-//#endregion
-export { i as Modal, a as ModalButton };
+export { r as Modal };

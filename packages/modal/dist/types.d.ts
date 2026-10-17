@@ -1,6 +1,7 @@
 import { WaitUntil } from '@agencecinq/utils';
 import { Modal } from './modal.js';
 export type BeforeOpenDetail = {
+    /** The dialog's `id`. */
     modal: string;
     instance: Modal;
     trigger: HTMLElement | null;
@@ -8,6 +9,7 @@ export type BeforeOpenDetail = {
     waitUntil: WaitUntil;
 };
 export type BeforeCloseDetail = {
+    /** The dialog's `id`. */
     modal: string;
     instance: Modal;
     /** Defers the close until `promise` settles. A rejection cancels it. */

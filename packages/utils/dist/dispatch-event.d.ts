@@ -23,7 +23,7 @@ export type Options = {
  * }
  *
  * @example
- * dispatchEvent(document.documentElement, EVENTS.MODAL_CLOSE, undefined, {
+ * dispatchEvent(document.documentElement, EVENTS.DRAWER_CLOSE, { drawer: id }, {
  *   bubbles: false,
  *   cancelable: false,
  * });

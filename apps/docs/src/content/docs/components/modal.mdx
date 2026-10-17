@@ -1,16 +1,30 @@
 ---
 title: Modal
-description: Native `<dialog>` modal Web Component (`<cinq-modal>`).
+description: Before-hooks for the native modal `<dialog>` (`<cinq-modal>`).
 ---
 
 import ModalPlayground from "../_components/ModalPlayground.astro";
 import ModalStackedPlayground from "../_components/ModalStackedPlayground.astro";
 import ModalReplacePlayground from "../_components/ModalReplacePlayground.astro";
 import ModalAsyncBestiary from "../_components/ModalAsyncBestiary.astro";
+import RegisterComponents from "../_components/RegisterComponents.astro";
 
-A modal presents content in a layer above the page. `<cinq-modal>` wraps a native
-`<dialog>` element, wires `showModal()` / `close()`, focus management, and
-open/close events. `<cinq-modal-button>` connects triggers through `aria-controls`.
+<RegisterComponents />
+
+A modal presents content in a layer above the page. The platform already does
+the work: buttons open and close a native `<dialog>` with
+[invoker commands](https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API),
+`showModal()` makes the page inert, focuses the dialog content and returns focus
+on close.
+
+`<cinq-modal>` wraps the `<dialog>` and adds only what the platform lacks:
+
+- `modal:before-open` / `modal:before-close`, to cancel or defer an open or a
+  close with `waitUntil(promise)`;
+- `data-replace` on a `show-modal` button, to open the next modal in place of
+  the current one instead of over it;
+- the backdrop click of `closedby="any"` in Safari, which does not support it
+  yet.
 
 ## Install
 
@@ -28,60 +42,25 @@ Import once:
 import "@agencecinq/modal";
 ```
 
-Then write the markup. A native `<dialog>` inside `<cinq-modal>`, and buttons
-with matching `aria-controls`. The component adds interactivity only.
+Then write the markup: a `<dialog>` with an `id` inside `<cinq-modal>`, and
+buttons that target it with `commandfor`. Without JavaScript, or before the
+element is defined, the buttons still open and close the dialog: only the hooks
+are missing.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
 > auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
 > Lighthouse) to catch invalid markup.
 
 ```html
-<cinq-modal-button class="block">
-  <button aria-controls="demo-modal" aria-pressed="false">Open modal</button>
-</cinq-modal-button>
+<button type="button" commandfor="example-modal" command="show-modal">
+  Open modal
+</button>
 
-<cinq-modal id="demo-modal">
-  <dialog aria-labelledby="demo-monster-entry-title"
-    class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
-  >
-    <h2 id="demo-monster-entry-title" class="text-xl font-semibold mb-2">Monster entry</h2>
-    <p class="text-gray-800 mb-4">
-      This is a native <code>&lt;dialog&gt;</code> modal.
-    </p>
-    <p class="text-gray-800 mb-4">
-      The dracolich is an undead dragon created by forbidden rites. Opening this
-      modal feels like leafing through the AD&amp;D Monster Manual.
-    </p>
-
-    <cinq-modal-button class="block">
-      <button aria-controls="demo-modal" aria-pressed="false">Close</button>
-    </cinq-modal-button>
-  </dialog>
-</cinq-modal>
-```
-
-## API
-
-### Markup
-
-- **`<cinq-modal>`** must contain a **`<dialog>`**. Mark it **`[data-dialog]`** if the host contains several.
-- **`id` is required** for event-driven open/close (it must match the `aria-controls` of your buttons).
-
-Copy‑paste starter markup:
-
-```html
-<cinq-modal-button class="block">
-  <button
-    type="button"
-    aria-controls="example-modal"
-    aria-pressed="false"
-  >
-    Open modal
-  </button>
-</cinq-modal-button>
-
-<cinq-modal id="example-modal">
-  <dialog aria-labelledby="example-dracolich-lore-title"
+<cinq-modal>
+  <dialog
+    id="example-modal"
+    closedby="any"
+    aria-labelledby="example-dracolich-lore-title"
     class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
   >
     <h2 id="example-dracolich-lore-title" class="text-xl font-semibold mb-2">Dracolich lore</h2>
@@ -90,57 +69,78 @@ Copy‑paste starter markup:
       modal feels like leafing through the AD&amp;D Monster Manual.
     </p>
 
-    <cinq-modal-button class="block">
-      <button
-        type="button"
-        aria-controls="example-modal"
-        aria-pressed="false"
-        class="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
-      >
-        Close
-      </button>
-    </cinq-modal-button>
+    <button
+      type="button"
+      commandfor="example-modal"
+      command="request-close"
+      class="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+    >
+      Close
+    </button>
   </dialog>
 </cinq-modal>
 ```
 
-### Attributes
+## API
 
-| Attribute | Required | Description                                      |
-| --------- | -------- | ------------------------------------------------ |
-| `id`      | Yes      | Modal identifier (must match button `aria-controls`). |
-| `open`    | No       | Reflected state attribute (useful for styling). |
+### Markup
+
+| Element / attribute | Required | Role |
+| ------------------- | -------- | ---- |
+| `<cinq-modal>` | Yes | Host. Wraps one `<dialog>`. |
+| `<dialog id>` | Yes | The modal. Buttons target its `id` with `commandfor`. |
+| `closedby="any"` on `<dialog>` | No | Closes on a backdrop click. Without it, only Escape and buttons close the modal. |
+| `autofocus` | No | Element focused on open. Defaults to the first focusable element. |
+| `data-replace` on a `show-modal` button | No | Opens the target in place of the modal holding the button, instead of over it. The target's `modal:before-open` runs first: if it cancels, the current modal stays open. Without JavaScript, the target opens over it. |
+
+### Commands
+
+| Button | Effect | Hook |
+| ------ | ------ | ---- |
+| `command="show-modal"` | Opens the dialog. | `modal:before-open` |
+| `command="request-close"` | Closes the dialog. The button `value` becomes `dialog.returnValue`. | `modal:before-close` |
+| `command="close"` | Closes the dialog at once. | None |
+
+Escape and the backdrop click (`closedby="any"`) go through
+`modal:before-close` too. Direct calls skip the hooks, like on the platform:
+`dialog.showModal()`, `dialog.close()`, `<form method="dialog">`, and Escape
+when the browser forces the close (pressed repeatedly without user activation).
 
 ### Methods
 
 | Method    | Description                                                                 |
 | --------- | --------------------------------------------------------------------------- |
-| `show()`  | Opens the native dialog. Resolves `true` if this call opened it, `false` if already open or canceled. |
-| `close()` | Closes the dialog. Resolves `true` if this call closed it, `false` if already closed or canceled. |
+| `show()`  | Opens the modal. Resolves `true` if this call opened it, `false` if already open or canceled. |
+| `close(returnValue?)` | Closes the modal. Resolves `true` if this call closed it, `false` if already closed or canceled. |
 | `init()`  | Binds listeners. Called on connect.                                          |
 | `destroy()` | Removes listeners and closes the dialog. Called on disconnect.             |
+
+`$dialog` holds the `<dialog>`, `trigger` the button that last opened the modal.
 
 ### Events
 
 Prefer the constants from `@agencecinq/utils` (`EVENTS.MODAL_*`). Events are
-dispatched on `document.documentElement`.
+dispatched on `document.documentElement`. `detail.modal` is the dialog `id`.
 
 | Event                | Cancelable | Detail payload                            | Description                                                                 |
 | -------------------- | ---------- | ----------------------------------------- | --------------------------------------------------------------------------- |
-| `modal:toggle`       | No         | `{ modal, trigger }`                     | Request open/close from a button.                                           |
-| `modal:before-open`  | Yes        | `{ modal, instance, trigger, waitUntil }`  | Fired **before** `open` is set. `preventDefault()` cancels, `waitUntil(promise)` defers. |
-| `modal:before-close` | Yes        | `{ modal, instance, waitUntil }`           | Fired **before** `open` is removed. `preventDefault()` cancels, `waitUntil(promise)` defers. |
-| `modal:open`         | No         | `{ modal, trigger? }`                    | Fired after `open` is set (`showModal()`, focus).                            |
-| `modal:close`        | No         | `{ modal }`                              | Fired after `open` is removed.                                               |
+| `modal:before-open`  | Yes        | `{ modal, instance, trigger, waitUntil }`  | Fired **before** the dialog opens. `preventDefault()` cancels, `waitUntil(promise)` defers. |
+| `modal:before-close` | Yes        | `{ modal, instance, waitUntil }`           | Fired **before** the dialog closes. `preventDefault()` cancels, `waitUntil(promise)` defers. |
+
+Once the dialog opens or closes, it fires the native `toggle` event
+(`event.newState` is `"open"` or `"closed"`):
+
+```js
+document.querySelector("#my-modal").addEventListener("toggle", (event) => {
+  console.log(event.newState);
+});
+```
 
 ### Deferring open or close
 
-Every open path (toggle or `show()`) dispatches cancelable `modal:before-open`
-first. Every close path (toggle, backdrop click, Escape, or `close()`) dispatches
-cancelable `modal:before-close` first. A native close (`<form method="dialog">`,
-`dialog.close()`) skips it and only syncs `open`. Without a listener, the modal
-opens or closes immediately. Call `preventDefault()` to cancel, or pass a
-promise to `detail.waitUntil()` to defer until async work finishes:
+Without a listener, the modal opens or closes immediately. Call
+`preventDefault()` to cancel, or pass a promise to `detail.waitUntil()` to defer
+until async work finishes:
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
@@ -160,15 +160,15 @@ document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => 
 
 Several listeners can defer the same action: the modal waits for every
 promise, and a rejected one cancels the action. Call `waitUntil()`
-synchronously in the listener. `modal:open` and `modal:close` fire only once
-the action commits.
+synchronously in the listener.
 
 **UX:** defer **open** with `before-open` when the fetch is short (roughly under
-500 ms) and the dialog would feel broken if empty: show loading on the trigger
-while the promise is pending. For slower or unpredictable loads, skip
-the defer: let the modal open immediately and fetch on `modal:open` with a
-skeleton or spinner inside the dialog. Defer **close** with `before-close` when
-you need to save, archive, or run an exit animation before dismissing.
+500 ms) and the dialog would feel broken if empty: show loading on
+`detail.trigger` while the promise is pending. For slower or unpredictable
+loads, skip the defer: let the modal open immediately and fetch on `toggle`
+with a skeleton or spinner inside the dialog. Defer **close** with
+`before-close` when you need to save, archive, or run an exit animation before
+dismissing.
 
 TypeScript: import `BeforeOpenDetail` and `BeforeCloseDetail` from
 `@agencecinq/modal` to type listeners.
@@ -180,67 +180,48 @@ focus / pointer outside the dialog) but does **not** lock document scroll. A
 wheel over the backdrop can still move the page underneath.
 
 That lock is a **document / theme** concern (layout, scrollbar gutter, iOS
-quirks), so the consumer owns it. Same idea as styling the backdrop.
-
-### Preferred: CSS
+quirks), so the consumer owns it, in CSS:
 
 ```css
-html:has(dialog[open]:modal) {
+html:has(dialog:modal) {
   overflow: hidden;
   scrollbar-gutter: stable;
 }
 ```
 
 Works with stacked modals: as long as any modal dialog is open, scroll stays
-locked.
+locked. Keep the dialog content scrollable when it overflows. Only lock the
+page behind.
 
-### Alternative: events + `@agencecinq/utils`
+## Older browsers
 
-If you need the shared `disableScroll` / `enableScroll` helpers (e.g. Shopify
-theme already using them), listen on `document.documentElement` and **refcount**
-open modals so closing the top of a stack does not unlock too early:
+Invoker commands need Chrome 135, Firefox 144 or Safari 26.2. For older
+browsers, load the [invokers polyfill](https://keithcirkel.co.uk/invokers-polyfill)
+before the component.
 
-```js
-import { EVENTS, disableScroll, enableScroll } from "@agencecinq/utils";
+## Migration from 5.x
 
-let openCount = 0;
-
-document.documentElement.addEventListener(EVENTS.MODAL_OPEN, () => {
-  if (openCount === 0) disableScroll();
-  openCount += 1;
-});
-
-document.documentElement.addEventListener(EVENTS.MODAL_CLOSE, () => {
-  openCount = Math.max(0, openCount - 1);
-  if (openCount === 0) enableScroll(false);
-});
-```
-
-Keep the dialog content scrollable when it overflows. Only lock the page behind.
-
-## Migration from 4.x
-
-Version 5.0 swaps `detail.resolve()` for `detail.waitUntil(promise)`, makes
-`show()` / `close()` return `Promise<boolean>`, and drops `trap` from
-`modal:toggle`. Markup is unchanged. Details in the
+Version 6.0 drops `<cinq-modal-button>` for invoker commands, moves the `id`
+to the `<dialog>`, needs `closedby="any"` to close on a backdrop click, and
+removes `modal:toggle`, `modal:open` and `modal:close` in favor of `show()` and
+the native `toggle` event. Details in the
 [README](https://github.com/agencecinq/ui/tree/main/packages/modal#migration).
 
 ## Interactive example
 
 <div class="not-content">
   <div class="flex flex-col gap-4">
-    <cinq-modal-button class="block">
-      <button
-        class="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
-        aria-controls="starlight-modal"
-        aria-pressed="false"
-      >
-        Open modal
-      </button>
-    </cinq-modal-button>
+    <button
+      type="button"
+      commandfor="starlight-modal"
+      command="show-modal"
+      class="self-start px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+    >
+      Open modal
+    </button>
 
-    <cinq-modal id="starlight-modal">
-      <dialog aria-labelledby="starlight-dracolich-lore-title" class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-8 shadow-2xl backdrop:bg-black/50 text-gray-900">
+    <cinq-modal>
+      <dialog id="starlight-modal" closedby="any" aria-labelledby="starlight-dracolich-lore-title" class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-8 shadow-2xl backdrop:bg-black/50 text-gray-900">
         <div class="flex items-start justify-between gap-6">
           <div>
             <h2 id="starlight-dracolich-lore-title" class="text-2xl font-bold mb-2">Dracolich lore</h2>
@@ -248,17 +229,15 @@ Version 5.0 swaps `detail.resolve()` for `detail.waitUntil(promise)`, makes
               The dracolich retains the spellcasting and breath weapon of its original form, but its eyes burn with cold, undead hatred.
             </p>
           </div>
-          <cinq-modal-button class="block">
-            <button
-              type="button"
-              aria-controls="starlight-modal"
-              aria-pressed="false"
-              aria-label="Close"
-              class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
-            >
-              <span class="text-lg leading-none">✕</span>
-            </button>
-          </cinq-modal-button>
+          <button
+            type="button"
+            commandfor="starlight-modal"
+            command="request-close"
+            aria-label="Close"
+            class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+          >
+            <span class="text-lg leading-none">✕</span>
+          </button>
         </div>
       </dialog>
     </cinq-modal>
@@ -281,10 +260,12 @@ Closing the parent returns focus to **Add delivery address** on the page.
 
 ### Replace: open next, close current
 
-Not a stack: **Continue** lists both ids (`parent` then `child` in
-`aria-controls`). The parent closes, then the child opens. Closing the child
-returns focus to **Start checkout** on the page (native restore after the parent
-already returned focus there).
+Not a stack: **Continue** opens the next dialog with `command="show-modal"`
+and `data-replace`. The parent closes, then the child opens. **Back** does the
+same toward the parent, and `modal:before-open` copies the street into the child
+before it shows. Closing the child returns focus to **Start checkout** on the page (native restore after the parent
+already returned focus there). Without JavaScript, the child opens over the
+parent.
 
 <ModalReplacePlayground />
 
@@ -295,3 +276,12 @@ work finishes: the creature loads before `showModal()`, then archives before the
 dialog closes.
 
 <ModalAsyncBestiary />
+
+## Acknowledgments
+
+- [Dialog (Modal) Pattern (WAI-ARIA Practices)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+- [The `dialog` element (HTML Standard)](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-dialog-element)
+- [`<dialog>` (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog)
+- [Invoker Commands API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API)
+- [`closedby` browser support (MDN browser-compat-data)](https://github.com/mdn/browser-compat-data/blob/main/html/elements/dialog.json)
+- [Invokers polyfill](https://keithcirkel.co.uk/invokers-polyfill)

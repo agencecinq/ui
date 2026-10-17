@@ -107,6 +107,15 @@ Types: `WaitUntil`, `BeforeEventDetail<T>`.
 | `throttle(fn, wait)` | Trailing throttle. |
 | `debounce(fn, wait)` | Trailing debounce. |
 
+## Migration
+
+### From 7.x to 8.0
+
+`MODAL_TOGGLE`, `MODAL_OPEN` and `MODAL_CLOSE` are gone: `@agencecinq/modal`
+6.0 opens with invoker commands and leaves the after-events to the native
+`toggle` event. See the
+[modal migration](https://github.com/agencecinq/ui/tree/main/packages/modal#migration).
+
 ## Build setup
 
 ```bash

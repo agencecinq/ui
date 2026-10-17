@@ -1,61 +1,85 @@
-import {
-  EVENTS,
-  dispatchBeforeEvent,
-  dispatchEvent,
-  getFocusableElements,
-} from "@agencecinq/utils";
+import { EVENTS, dispatchBeforeEvent } from "@agencecinq/utils";
 
 export type { BeforeCloseDetail, BeforeOpenDetail } from "./types.js";
 
+/** Safari lacks `closedby`: the modal handles `closedby="any"` itself there. */
+const supportsClosedBy = "closedBy" in HTMLDialogElement.prototype;
+
 export class Modal extends HTMLElement {
   trigger: HTMLElement | null = null;
-  $modal: HTMLDialogElement | null = null;
+  $dialog: HTMLDialogElement | null = null;
 
   #pending: Promise<boolean> | null = null;
 
-  #handleClick = (event: MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      this.close();
+  /**
+   * Invoker commands on the dialog: open and close requests go through the
+   * before-events. A `show-modal` button with `data-replace` opens this modal
+   * in place of the one it sits in.
+   */
+  #handleCommand = (event: CommandEvent): void => {
+    const source = event.source instanceof HTMLElement ? event.source : null;
+
+    switch (event.command) {
+      case "show-modal": {
+        const current = source?.hasAttribute("data-replace")
+          ? source.closest("cinq-modal")
+          : null;
+
+        event.preventDefault();
+        this.trigger = source;
+
+        if (current instanceof Modal && current !== this) {
+          this.#replace(current);
+        } else {
+          this.show();
+        }
+        break;
+      }
+
+      case "request-close": {
+        // The button's value becomes the dialog's returnValue, as natively.
+        const returnValue = source?.getAttribute("value") ?? undefined;
+
+        event.preventDefault();
+        this.close(returnValue);
+        break;
+      }
     }
   };
 
-  #handleCancel = (event: Event) => {
+  /** Escape and light dismiss: route through `close()` unless the browser forces the close. */
+  #handleCancel = (event: Event): void => {
+    if (!event.cancelable) {
+      return;
+    }
+
     event.preventDefault();
     this.close();
   };
 
-  /** Native close (`form[method=dialog]`, `dialog.close()`): sync the host. */
-  #handleClose = () => {
-    this.removeAttribute("open");
-  };
+  /** `closedby="any"` fallback: a click outside the dialog box closes it. */
+  #handleClick = (event: MouseEvent): void => {
+    const $dialog = this.$dialog;
 
-  #handleModalToggle = (event: CustomEvent) => {
-    const { modal, trigger } = event.detail;
-
-    if (modal !== this.id) {
+    if (
+      !$dialog ||
+      event.target !== $dialog ||
+      $dialog.getAttribute("closedby") !== "any"
+    ) {
       return;
     }
 
-    if (this.hasAttribute("open")) {
+    const rect = $dialog.getBoundingClientRect();
+    const inside =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+
+    if (!inside) {
       this.close();
-      return;
     }
-
-    // Only remember the opener — a close control must not replace it.
-    if (trigger) {
-      this.trigger = trigger;
-    }
-
-    this.show();
   };
-
-  constructor() {
-    super();
-  }
-
-  static get observedAttributes() {
-    return ["open"];
-  }
 
   connectedCallback() {
     this.init();
@@ -63,49 +87,50 @@ export class Modal extends HTMLElement {
 
   disconnectedCallback() {
     this.destroy();
-    this.$modal = null;
+    this.$dialog = null;
   }
 
   /**
-   * Bind dialog + listeners. Call {@link destroy} first if already bound.
+   * Bind dialog listeners. Call {@link destroy} first if already bound.
    */
   init(): void {
-    this.$modal = (this.querySelector("[data-dialog]") ||
-      this.querySelector("dialog")) as HTMLDialogElement | null;
+    this.$dialog = this.querySelector("dialog");
 
-    if (!this.$modal) {
-      throw new Error("Modal: No dialog found");
+    if (!this.$dialog) {
+      throw new Error("Modal: No <dialog> found");
     }
 
-    if (!this.id) {
-      throw new Error("Modal: id attribute is required");
+    if (!this.$dialog.id) {
+      throw new Error("Modal: dialog id attribute is required");
     }
 
-    this.$modal.addEventListener("click", this.#handleClick);
-    this.$modal.addEventListener("cancel", this.#handleCancel);
-    this.$modal.addEventListener("close", this.#handleClose);
-    document.documentElement.addEventListener(
-      EVENTS.MODAL_TOGGLE,
-      this.#handleModalToggle as EventListener,
+    this.$dialog.addEventListener(
+      "command",
+      this.#handleCommand as EventListener,
     );
+    this.$dialog.addEventListener("cancel", this.#handleCancel);
+
+    if (!supportsClosedBy) {
+      this.$dialog.addEventListener("click", this.#handleClick);
+    }
   }
 
-  /** Detaches listeners. Safe to call from outside while the host stays mounted. */
+  /** Detaches listeners and closes the dialog. Safe to call from outside while the host stays mounted. */
   destroy(): void {
-    if (this.$modal) {
-      this.$modal.removeEventListener("click", this.#handleClick);
-      this.$modal.removeEventListener("cancel", this.#handleCancel);
-      this.$modal.removeEventListener("close", this.#handleClose);
-
-      if (this.hasAttribute("open") && this.$modal.open) {
-        this.$modal.close();
-      }
+    if (!this.$dialog) {
+      return;
     }
 
-    document.documentElement.removeEventListener(
-      EVENTS.MODAL_TOGGLE,
-      this.#handleModalToggle as EventListener,
+    this.$dialog.removeEventListener(
+      "command",
+      this.#handleCommand as EventListener,
     );
+    this.$dialog.removeEventListener("cancel", this.#handleCancel);
+    this.$dialog.removeEventListener("click", this.#handleClick);
+
+    if (this.$dialog.open) {
+      this.$dialog.close();
+    }
   }
 
   /**
@@ -115,105 +140,99 @@ export class Modal extends HTMLElement {
    * @returns Whether this call opened the modal.
    */
   show(): Promise<boolean> {
-    if (this.hasAttribute("open")) {
-      return Promise.resolve(false);
-    }
-
-    return this.#request(
-      EVENTS.MODAL_BEFORE_OPEN,
-      { modal: this.id, instance: this, trigger: this.trigger },
-      true,
-    );
+    return this.#show(() => this.#commit(true));
   }
 
   /**
    * Closes the modal. Dispatches cancelable `modal:before-close`: listeners
    * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
    *
+   * @param returnValue - Becomes the dialog's `returnValue`, as with `dialog.close()`.
    * @returns Whether this call closed the modal.
    */
-  close(): Promise<boolean> {
-    if (!this.hasAttribute("open")) {
+  close(returnValue?: string): Promise<boolean> {
+    if (!this.$dialog?.open) {
       return Promise.resolve(false);
     }
 
-    return this.#request(
-      EVENTS.MODAL_BEFORE_CLOSE,
-      { modal: this.id, instance: this },
-      false,
+    const detail = { modal: this.$dialog.id, instance: this };
+
+    return this.#request(EVENTS.MODAL_BEFORE_CLOSE, detail, () =>
+      this.#commit(false, returnValue),
     );
   }
 
-  /** Commits `open` after the before-event; joins a request already deferred. */
-  #request(name: string, detail: object, open: boolean): Promise<boolean> {
+  /**
+   * Opens in place of `current`. Like a navigation, this modal accepts the open
+   * first, so `current` stays open when its `modal:before-open` cancels.
+   */
+  #replace(current: Modal): Promise<boolean> {
+    return this.#show(async () => {
+      const closed = await current.close();
+
+      return closed && this.#commit(true);
+    });
+  }
+
+  #show(commit: () => boolean | Promise<boolean>): Promise<boolean> {
+    if (!this.$dialog || this.$dialog.open) {
+      return Promise.resolve(false);
+    }
+
+    const detail = {
+      modal: this.$dialog.id,
+      instance: this,
+      trigger: this.trigger,
+    };
+
+    return this.#request(EVENTS.MODAL_BEFORE_OPEN, detail, commit);
+  }
+
+  /** Opens or closes the dialog, unless it is already in that state. */
+  #commit(open: boolean, returnValue?: string): boolean {
+    const $dialog = this.$dialog;
+
+    if (!$dialog || $dialog.open === open) {
+      return false;
+    }
+
+    if (open) {
+      $dialog.showModal();
+    } else {
+      $dialog.close(returnValue);
+    }
+
+    return true;
+  }
+
+  /** Commits after the before-event; joins a request already in progress. */
+  #request(
+    name: string,
+    detail: object,
+    commit: () => boolean | Promise<boolean>,
+  ): Promise<boolean> {
     if (this.#pending) {
       return this.#pending;
     }
 
-    const commit = (proceed: boolean): boolean => {
-      if (!proceed || this.hasAttribute("open") === open) {
-        return false;
-      }
-
-      this.toggleAttribute("open", open);
-      return true;
-    };
-
     const result = dispatchBeforeEvent(document.documentElement, name, detail);
 
-    if (typeof result === "boolean") {
-      return Promise.resolve(commit(result));
+    if (result === false) {
+      return Promise.resolve(false);
     }
 
-    this.#pending = result.then(commit).finally(() => {
+    const committed =
+      result === true ? commit() : result.then((proceed) => proceed && commit());
+
+    if (typeof committed === "boolean") {
+      return Promise.resolve(committed);
+    }
+
+    this.#pending = committed.finally(() => {
       this.#pending = null;
     });
 
     return this.#pending;
-  }
-
-  attributeChangedCallback(
-    name: string,
-    _oldValue: string | null,
-    newValue: string | null,
-  ): void {
-    // Upgrade-time ACC runs before connectedCallback — leave markup alone.
-    if (!this.isConnected || name !== "open") {
-      return;
-    }
-
-    if (newValue !== null) {
-      if (this.$modal && !this.$modal.open) {
-        // Native showModal() stacks in the top layer and restores focus to the
-        // invoker on close (APG: return focus to the element that opened the dialog).
-        this.$modal.showModal();
-
-        dispatchEvent(
-          document.documentElement,
-          EVENTS.MODAL_OPEN,
-          { modal: this.id, trigger: this.trigger },
-          { bubbles: false, cancelable: false },
-        );
-
-        const focusables = getFocusableElements(this.$modal);
-        if (focusables.length > 0) {
-          focusables[0].focus();
-        }
-      }
-
-      return;
-    }
-
-    if (this.$modal?.open) {
-      this.$modal.close();
-    }
-
-    dispatchEvent(
-      document.documentElement,
-      EVENTS.MODAL_CLOSE,
-      { modal: this.id },
-      { bubbles: false, cancelable: false },
-    );
   }
 }
 

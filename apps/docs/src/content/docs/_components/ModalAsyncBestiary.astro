@@ -16,35 +16,34 @@ import RegisterComponents from "./RegisterComponents.astro";
           Open the modal to load a creature. Close it to archive the entry.
         </p>
       </div>
-      <cinq-modal-button class="block">
-        <button
-          type="button"
-          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
-          aria-controls="async-bestiary-modal"
-          aria-pressed="false"
-        >
-          Open bestiary
-        </button>
-      </cinq-modal-button>
+      <button
+        type="button"
+        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+        commandfor="async-bestiary-modal"
+        command="show-modal"
+      >
+        Open bestiary
+      </button>
     </div>
 
-    <cinq-modal id="async-bestiary-modal">
-      <dialog aria-labelledby="monster-entry-title"
+    <cinq-modal>
+      <dialog
+        id="async-bestiary-modal"
+        closedby="any"
+        aria-labelledby="monster-entry-title"
         class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] max-h-[min(92vh,36rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white shadow-2xl backdrop:bg-black/50 text-gray-900"
       >
         <div class="relative flex max-h-[min(92vh,36rem)] flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
             <h2 id="monster-entry-title" class="text-lg font-semibold text-gray-900">Monster entry</h2>
-            <cinq-modal-button class="block">
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
-                aria-controls="async-bestiary-modal"
-                aria-pressed="false"
-              >
-                ✕
-              </button>
-            </cinq-modal-button>
+            <button
+              type="button"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+              commandfor="async-bestiary-modal"
+              command="request-close"
+            >
+              ✕
+            </button>
           </header>
 
           <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
@@ -68,16 +67,14 @@ import RegisterComponents from "./RegisterComponents.astro";
           </div>
 
           <footer class="border-t px-6 py-4">
-            <cinq-modal-button class="block">
-              <button
-                type="button"
-                class="w-full px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
-                aria-controls="async-bestiary-modal"
-                aria-pressed="false"
-              >
-                Close and archive
-              </button>
-            </cinq-modal-button>
+            <button
+              type="button"
+              class="w-full px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+              commandfor="async-bestiary-modal"
+              command="request-close"
+            >
+              Close and archive
+            </button>
           </footer>
 
           <div

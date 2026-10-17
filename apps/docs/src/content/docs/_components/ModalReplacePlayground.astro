@@ -9,30 +9,32 @@ import RegisterComponents from "./RegisterComponents.astro";
     <div>
       <h3 class="text-lg font-semibold text-gray-900">Replace: open next, close current</h3>
       <p class="text-sm text-gray-600">
-        From the first modal, <strong>Continue</strong> targets both ids
-        (<code class="text-xs">aria-controls="...address ...confirm"</code>).
-        Toggle order closes the parent then opens the child. Not a stack.
+        From the first modal, <strong>Continue</strong> opens the confirmation with
+        <code class="text-xs">show-modal</code> and <code class="text-xs">data-replace</code>.
+        The parent closes, then the child opens. Not a stack.
+        <strong>Back</strong> replaces it the other way, with the street still filled in.
         Closing confirm returns focus to <strong>Start checkout</strong>.
       </p>
     </div>
 
-    <cinq-modal-button class="block">
-      <button
-        type="button"
-        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-        aria-controls="replace-modal-address"
-        aria-pressed="false"
-      >
-        Start checkout
-      </button>
-    </cinq-modal-button>
+    <button
+      type="button"
+      class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+      commandfor="replace-modal-address"
+      command="show-modal"
+    >
+      Start checkout
+    </button>
 
     <p class="text-xs text-gray-500">
-      Flow: Start checkout to Continue to Cancel/Confirm to focus back on Start checkout.
+      Flow: Start checkout to Continue (and Back) to Cancel/Place order to focus back on Start checkout.
     </p>
 
-    <cinq-modal id="replace-modal-address">
-      <dialog aria-labelledby="delivery-address-title"
+    <cinq-modal>
+      <dialog
+        id="replace-modal-address"
+        closedby="any"
+        aria-labelledby="delivery-address-title"
         class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
       >
         <div class="flex flex-col gap-4">
@@ -43,43 +45,45 @@ import RegisterComponents from "./RegisterComponents.astro";
                 Step 1 of 2. Continue replaces this dialog with the confirmation.
               </p>
             </div>
-            <cinq-modal-button class="block">
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-                aria-controls="replace-modal-address"
-                aria-pressed="false"
-                aria-label="Close"
-              >
-                ✕
-              </button>
-            </cinq-modal-button>
+            <button
+              type="button"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+              commandfor="replace-modal-address"
+              command="request-close"
+              aria-label="Close"
+            >
+              ✕
+            </button>
           </div>
 
           <label class="block">
             <span class="block text-sm font-medium text-gray-700 mb-1">Street</span>
             <input
+              id="replace-street"
+              name="street"
               class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
               placeholder="12 Goblin Alley"
             />
           </label>
 
-          <cinq-modal-button class="block self-end">
-            <button
-              type="button"
-              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-              aria-controls="replace-modal-address replace-modal-confirm"
-              aria-pressed="false"
-            >
-              Continue
-            </button>
-          </cinq-modal-button>
+          <button
+            type="button"
+            class="self-end px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+            commandfor="replace-modal-confirm"
+            command="show-modal"
+            data-replace
+          >
+            Continue
+          </button>
         </div>
       </dialog>
     </cinq-modal>
 
-    <cinq-modal id="replace-modal-confirm">
-      <dialog aria-labelledby="confirm-order-title"
+    <cinq-modal>
+      <dialog
+        id="replace-modal-confirm"
+        closedby="any"
+        aria-labelledby="confirm-order-title"
         class="fixed left-1/2 top-1/2 w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
       >
         <div class="flex flex-col gap-4">
@@ -89,30 +93,56 @@ import RegisterComponents from "./RegisterComponents.astro";
               Step 2 of 2. The address dialog is closed. Only this one is open.
             </p>
           </div>
-          <div class="flex justify-end gap-2">
-            <cinq-modal-button class="block">
-              <button
-                type="button"
-                class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-                aria-controls="replace-modal-confirm"
-                aria-pressed="false"
-              >
-                Cancel
-              </button>
-            </cinq-modal-button>
-            <cinq-modal-button class="block">
-              <button
-                type="button"
-                class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-                aria-controls="replace-modal-confirm"
-                aria-pressed="false"
-              >
-                Place order
-              </button>
-            </cinq-modal-button>
+          <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+            Deliver to <strong data-replace-street>an unnamed street</strong>.
+          </p>
+          <div class="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              class="mr-auto px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100"
+              commandfor="replace-modal-address"
+              command="show-modal"
+              data-replace
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+              commandfor="replace-modal-confirm"
+              command="request-close"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+              commandfor="replace-modal-confirm"
+              command="request-close"
+            >
+              Place order
+            </button>
           </div>
         </div>
       </dialog>
     </cinq-modal>
   </section>
 </div>
+
+<script>
+  import { EVENTS } from "@agencecinq/utils";
+
+  // Fill the confirmation before it opens, so it never shows a stale street.
+  document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_OPEN, (event) => {
+    if (!(event instanceof CustomEvent) || event.detail.modal !== "replace-modal-confirm") {
+      return;
+    }
+
+    const street = document.querySelector<HTMLInputElement>("#replace-street")?.value.trim();
+    const output = document.querySelector("[data-replace-street]");
+
+    if (output) {
+      output.textContent = street || "an unnamed street";
+    }
+  });
+</script>

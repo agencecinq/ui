@@ -10,7 +10,6 @@
   const COMPARISON_PIXEL = 40;
   const HOVER_ANIMATE_MS = 450;
   const ANIMATE_MS = 700;
-  const LOAD_ANIMATE_MS = 900;
   const SEQUENCE_STAGGER = 0.12;
   const animationTokens = new WeakMap();
 
@@ -294,7 +293,6 @@
     let disclosureClosing = false;
     const $hoverCard = document.querySelector('#docs-pixelate-hover-card');
     const $hoverHost = document.querySelector('#docs-pixelate-hover');
-    const $loadHost = document.querySelector('#docs-pixelate-load');
     const $pointerCenterHost = document.querySelector('#docs-pixelate-pointer-center');
     const $pointerCenterValue = document.querySelector('#docs-pixelate-pointer-center-value');
     const $pointerHorizontalHost = document.querySelector('#docs-pixelate-pointer-horizontal');
@@ -312,89 +310,75 @@
     const $resizeWide = document.querySelector('#docs-pixelate-resize-wide');
     const $resizeNarrow = document.querySelector('#docs-pixelate-resize-narrow');
     const $sequenceHosts = document.querySelectorAll('[data-pixelate-sequence]');
+    const $modal = document.querySelector('#docs-pixelate-modal');
     const $modalHost = document.querySelector('#docs-pixelate-modal-host');
     const $drawerHost = document.querySelector('#docs-pixelate-drawer-host');
 
-    function bindOverlayReveal(
-      $host,
-      toggleEvent,
-      beforeCloseEvent,
-      openEvent,
-      closeEvent,
-      overlayId,
-    ) {
+    function bindModalReveal($host, $dialog) {
+      if (!($host instanceof HTMLElement) || !($dialog instanceof HTMLDialogElement)) {
+        return;
+      }
+
+      $dialog.addEventListener('toggle', (event) => {
+        setPixel($host, PIXEL_MAX);
+
+        if (event.newState === 'open') {
+          requestAnimationFrame(() => {
+            animate($host, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
+          });
+          return;
+        }
+
+        $dialog.classList.remove('is-closing');
+      });
+
+      document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {
+        if (!(event instanceof CustomEvent) || event.detail.modal !== $dialog.id) {
+          return;
+        }
+
+        $dialog.classList.add('is-closing');
+
+        event.detail.waitUntil(
+          Promise.all([
+            animate($host, readPixel($host), PIXEL_MAX, ANIMATE_MS),
+            waitForOverlayFade($dialog, ANIMATE_MS),
+          ]),
+        );
+      });
+    }
+
+    function bindDrawerReveal($host, overlayId) {
       if (!($host instanceof HTMLElement)) {
         return;
       }
 
       let closing = false;
 
-      function overlayElement() {
-        return document.getElementById(overlayId);
+      function drawerElement() {
+        const element = document.getElementById(overlayId);
+
+        return element instanceof HTMLElement ? element : null;
       }
 
       function isOverlayOpen() {
-        const element = overlayElement();
-
-        if (!(element instanceof HTMLElement)) {
-          return false;
-        }
-
-        if (element.tagName === 'CINQ-MODAL') {
-          return element.hasAttribute('open');
-        }
-
-        if (element.tagName === 'CINQ-DRAWER') {
-          return element.hasAttribute('open');
-        }
-
-        return false;
-      }
-
-      function modalDialog() {
-        const element = overlayElement();
-
-        if (!(element instanceof HTMLElement) || element.tagName !== 'CINQ-MODAL') {
-          return null;
-        }
-
-        const $dialog = element.querySelector('dialog');
-
-        return $dialog instanceof HTMLDialogElement ? $dialog : null;
-      }
-
-      function drawerElement() {
-        const element = overlayElement();
-
-        if (!(element instanceof HTMLElement) || element.tagName !== 'CINQ-DRAWER') {
-          return null;
-        }
-
-        return element;
+        return drawerElement()?.hasAttribute('open') ?? false;
       }
 
       function beginCloseTransition() {
-        const $dialog = modalDialog();
         const drawer = drawerElement();
 
-        if ($dialog) {
-          $dialog.classList.remove('is-closing');
-          void $dialog.offsetWidth;
-          $dialog.classList.add('is-closing');
-          return $dialog;
+        if (!drawer) {
+          return null;
         }
 
-        if (drawer) {
-          drawer.classList.remove('is-closing', 'is-opening');
-          void drawer.offsetWidth;
-          drawer.classList.add('is-closing');
+        drawer.classList.remove('is-closing', 'is-opening');
+        void drawer.offsetWidth;
+        drawer.classList.add('is-closing');
 
-          const $panel = drawer.querySelector('dialog');
+        const $panel = drawer.querySelector('dialog');
 
-          return $panel instanceof HTMLElement ? $panel : drawer;
-        }
-
-        return null;
+        return $panel instanceof HTMLElement ? $panel : drawer;
       }
 
       function runCloseAnimation() {
@@ -413,24 +397,18 @@
         return Promise.all([pixelAnimation, overlayAnimation])
           .finally(() => {
             closing = false;
-            modalDialog()?.classList.remove('is-closing');
-
-            const drawer = drawerElement();
-
-            if (drawer) {
-              drawer.classList.remove('is-closing', 'is-opening');
-            }
+            drawerElement()?.classList.remove('is-closing', 'is-opening');
           });
       }
 
-      document.documentElement.addEventListener(beforeCloseEvent, (event) => {
+      document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
         if (!(event instanceof CustomEvent)) {
           return;
         }
 
         const detail = event.detail;
 
-        if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+        if (detail?.drawer !== overlayId) {
           return;
         }
 
@@ -438,25 +416,22 @@
       });
 
       document.documentElement.addEventListener(
-        toggleEvent,
+        EVENTS.DRAWER_TOGGLE,
         (event) => {
           if (!(event instanceof CustomEvent)) {
             return;
           }
 
-          const detail = event.detail;
-
-          if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+          if (event.detail?.drawer !== overlayId || isOverlayOpen()) {
             return;
           }
 
-          if (!isOverlayOpen() && drawerElement() && detail?.drawer === overlayId) {
-            event.stopImmediatePropagation();
-            runOpenAnimation(event);
-          }
+          event.stopImmediatePropagation();
+          runOpenAnimation(event);
         },
         { capture: true },
       );
+
       function runOpenAnimation(event) {
         const drawer = drawerElement();
 
@@ -464,12 +439,9 @@
           return;
         }
 
-        if (event instanceof CustomEvent) {
-          const detail = event.detail;
-
-          if (detail?.trigger) {
-            drawer.trigger = detail.trigger;
-          }        }
+        if (event.detail?.trigger) {
+          drawer.trigger = event.detail.trigger;
+        }
 
         drawer.classList.remove('is-closing');
         drawer.classList.add('is-opening');
@@ -488,36 +460,12 @@
         });
       }
 
-      document.documentElement.addEventListener(openEvent, (event) => {
+      document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, (event) => {
         if (!(event instanceof CustomEvent)) {
           return;
         }
 
-        const detail = event.detail;
-
-        if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
-          return;
-        }
-
-        if (detail?.drawer === overlayId && drawerElement()) {
-          return;
-        }
-
-        modalDialog()?.classList.remove('is-closing');
-        setPixel($host, PIXEL_MAX);
-        requestAnimationFrame(() => {
-          animate($host, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
-        });
-      });
-
-      document.documentElement.addEventListener(closeEvent, (event) => {
-        if (!(event instanceof CustomEvent)) {
-          return;
-        }
-
-        const detail = event.detail;
-
-        if (detail?.modal !== overlayId && detail?.drawer !== overlayId) {
+        if (event.detail?.drawer !== overlayId) {
           return;
         }
 
@@ -525,22 +473,8 @@
       });
     }
 
-    bindOverlayReveal(
-      $modalHost,
-      EVENTS.MODAL_TOGGLE,
-      EVENTS.MODAL_BEFORE_CLOSE,
-      EVENTS.MODAL_OPEN,
-      EVENTS.MODAL_CLOSE,
-      'docs-pixelate-modal',
-    );
-    bindOverlayReveal(
-      $drawerHost,
-      EVENTS.DRAWER_TOGGLE,
-      EVENTS.DRAWER_BEFORE_CLOSE,
-      EVENTS.DRAWER_OPEN,
-      EVENTS.DRAWER_CLOSE,
-      'docs-pixelate-drawer',
-    );
+    bindModalReveal($modalHost, $modal);
+    bindDrawerReveal($drawerHost, 'docs-pixelate-drawer');
 
     function syncScrollPixelate() {
       if (!($scrollHost instanceof HTMLElement)) {
@@ -636,25 +570,6 @@
 
         setPixel($host, pixelFromProgress(progress($host, index)));
       });
-    }
-
-    function bindLoadReveal() {
-      if (!($loadHost instanceof HTMLElement)) {
-        return;
-      }
-
-      const $img = $loadHost.$img;
-
-      function reveal() {
-        animate($loadHost, PIXEL_MAX, PIXEL_MIN, LOAD_ANIMATE_MS);
-      }
-
-      if ($img instanceof HTMLImageElement && $img.complete) {
-        reveal();
-        return;
-      }
-
-      $img?.addEventListener('load', reveal, { once: true });
     }
 
     $spinbutton?.addEventListener(EVENTS.SPINBUTTON_CHANGE, (event) => {
@@ -761,7 +676,6 @@
       }
     });
 
-    bindLoadReveal();
 
     const $splitterPixelate = document.querySelector('#docs-pixelate-splitter-pixelate');
 

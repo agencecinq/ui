@@ -12,20 +12,18 @@ import RegisterComponents from './RegisterComponents.astro';
           <div>
             <h3 class="text-lg font-semibold text-gray-900">Confirm dialog</h3>
             <p class="text-sm text-gray-600">
-              A simple confirm/cancel flow using multiple <code>&lt;cinq-modal-button&gt;</code> tied
-              to the same modal.
+              A confirm/cancel flow: each button closes with <code>request-close</code> and
+              its <code>value</code>, read back from <code>returnValue</code>.
             </p>
           </div>
-          <cinq-modal-button class="block shrink-0">
-            <button
-              type="button"
-              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 shrink-0"
-              aria-controls="confirm-modal"
-              aria-pressed="false"
-            >
-              Open confirm
-            </button>
-          </cinq-modal-button>
+          <button
+            type="button"
+            class="shrink-0 px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 shrink-0"
+            commandfor="confirm-modal"
+            command="show-modal"
+          >
+            Open confirm
+          </button>
         </div>
 
         <p
@@ -35,8 +33,11 @@ import RegisterComponents from './RegisterComponents.astro';
           Waiting for your choice...
         </p>
 
-        <cinq-modal id="confirm-modal">
-          <dialog aria-labelledby="memorize-fireball-title"
+        <cinq-modal>
+          <dialog
+            id="confirm-modal"
+            closedby="any"
+            aria-labelledby="memorize-fireball-title"
             class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
             data-modal="confirm"
           >
@@ -47,28 +48,24 @@ import RegisterComponents from './RegisterComponents.astro';
             </p>
 
             <div class="flex justify-end gap-2">
-              <cinq-modal-button class="block">
-                <button
-                  type="button"
-                  class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
-                  aria-controls="confirm-modal"
-                  aria-pressed="false"
-                  data-action="cancel"
-                >
-                  Cancel
-                </button>
-              </cinq-modal-button>
-              <cinq-modal-button class="block">
-                <button
-                  type="button"
-                  class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
-                  aria-controls="confirm-modal"
-                  aria-pressed="false"
-                  data-action="confirm"
-                >
-                  Confirm
-                </button>
-              </cinq-modal-button>
+              <button
+                type="button"
+                class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+                commandfor="confirm-modal"
+                command="request-close"
+                value="cancel"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+                commandfor="confirm-modal"
+                command="request-close"
+                value="confirm"
+              >
+                Confirm
+              </button>
             </div>
           </dialog>
         </cinq-modal>
@@ -85,16 +82,14 @@ import RegisterComponents from './RegisterComponents.astro';
               outside.
             </p>
           </div>
-          <cinq-modal-button class="block shrink-0">
-            <button
-              type="button"
-              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 shrink-0"
-              aria-controls="character-modal"
-              aria-pressed="false"
-            >
-              Edit character
-            </button>
-          </cinq-modal-button>
+          <button
+            type="button"
+            class="shrink-0 px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 shrink-0"
+            commandfor="character-modal"
+            command="show-modal"
+          >
+            Edit character
+          </button>
         </div>
 
         <p
@@ -104,8 +99,11 @@ import RegisterComponents from './RegisterComponents.astro';
           No character saved yet.
         </p>
 
-        <cinq-modal id="character-modal">
-          <dialog aria-labelledby="character-sheet-title"
+        <cinq-modal>
+          <dialog
+            id="character-modal"
+            closedby="any"
+            aria-labelledby="character-sheet-title"
             class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
             data-modal="character"
           >
@@ -138,16 +136,14 @@ import RegisterComponents from './RegisterComponents.astro';
               </label>
 
               <div class="flex justify-end gap-2">
-                <cinq-modal-button class="block">
-                  <button
-                    type="button"
-                    class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
-                    aria-controls="character-modal"
-                    aria-pressed="false"
-                  >
-                    Cancel
-                  </button>
-                </cinq-modal-button>
+                <button
+                  type="button"
+                  class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  commandfor="character-modal"
+                  command="request-close"
+                >
+                  Cancel
+                </button>
 
                 <button
                   type="submit"
@@ -165,18 +161,24 @@ import RegisterComponents from './RegisterComponents.astro';
 </div>
 
 <script>
-  // Confirm modal status
+  // Confirm modal status: each button closes with its value as returnValue.
   {
-    const root = document.querySelector('[data-modal="confirm"]')?.closest('section');
+    const dialog = document.querySelector('[data-modal="confirm"]') as HTMLDialogElement | null;
     const status = document.querySelector('[data-modal-status="confirm"]');
-    if (root && status) {
-      root.querySelector('[data-action="confirm"]')?.addEventListener('click', () => {
-        status.textContent = 'You memorise the spell. Fireball is ready when you need it.';
-      });
-      root.querySelector('[data-action="cancel"]')?.addEventListener('click', () => {
-        status.textContent = 'You leave the spell unmemorised and keep the slot free.';
-      });
-    }
+
+    dialog?.addEventListener('toggle', (event) => {
+      if ((event as ToggleEvent).newState === 'open') {
+        dialog.returnValue = '';
+        return;
+      }
+
+      if (status) {
+        status.textContent =
+          dialog.returnValue === 'confirm'
+            ? 'You memorise the spell. Fireball is ready when you need it.'
+            : 'You leave the spell unmemorised and keep the slot free.';
+      }
+    });
   }
 
   // Character form modal

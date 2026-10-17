@@ -45,39 +45,39 @@
     }
   }
 
-  #docs-pixelate-modal dialog[open] {
+  #docs-pixelate-modal[open] {
     opacity: 1;
     transition:
       opacity 700ms cubic-bezier(0.4, 0, 0.2, 1),
       overlay 700ms allow-discrete;
   }
 
-  #docs-pixelate-modal dialog[open].is-closing {
+  #docs-pixelate-modal[open].is-closing {
     opacity: 0;
   }
 
-  #docs-pixelate-modal dialog[open]::backdrop {
+  #docs-pixelate-modal[open]::backdrop {
     background-color: rgb(0 0 0 / 50%);
     transition: background-color 700ms allow-discrete;
   }
 
-  #docs-pixelate-modal dialog[open].is-closing::backdrop {
+  #docs-pixelate-modal[open].is-closing::backdrop {
     background-color: rgb(0 0 0 / 0%);
   }
 
   @starting-style {
-    #docs-pixelate-modal dialog[open] {
+    #docs-pixelate-modal[open] {
       opacity: 0;
     }
 
-    #docs-pixelate-modal dialog[open]::backdrop {
+    #docs-pixelate-modal[open]::backdrop {
       background-color: rgb(0 0 0 / 0%);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #docs-pixelate-modal dialog[open],
-    #docs-pixelate-modal dialog[open]::backdrop {
+    #docs-pixelate-modal[open],
+    #docs-pixelate-modal[open]::backdrop {
       transition: none;
     }
   }

@@ -50,6 +50,8 @@ pnpm-debug.log*
 # Testing
 coverage/
 .nyc_output
+__screenshots__/
+.vitest-attachments/
 
 # OS specific
 thumbs.db

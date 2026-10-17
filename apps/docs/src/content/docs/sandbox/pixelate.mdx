@@ -13,7 +13,6 @@ import DemoSpinbutton from '../_components/pixelate/DemoSpinbutton.astro';
 import DemoSwitch from '../_components/pixelate/DemoSwitch.astro';
 import DemoDisclosure from '../_components/pixelate/DemoDisclosure.astro';
 import DemoHover from '../_components/pixelate/DemoHover.astro';
-import DemoLoad from '../_components/pixelate/DemoLoad.astro';
 import DemoPointer from '../_components/pixelate/DemoPointer.astro';
 import DemoComparison from '../_components/pixelate/DemoComparison.astro';
 import DemoGrid from '../_components/pixelate/DemoGrid.astro';
@@ -511,42 +510,6 @@ $card.addEventListener("mouseleave", () => {
 
 <DemoHover />
 
-## Load reveal
-
-Use `loading="lazy"` on the `<img>` so the fetch waits until the host is near
-the viewport. The reveal runs on `load` (uses the
-[animation helper](#animation-helper)):
-
-```html
-<cinq-pixelate pixel="256">
-  <img
-    src="photo.jpg"
-    loading="lazy"
-    crossorigin="anonymous"
-    alt="Desert dunes"
-    width="960"
-    height="540"
-  />
-  <canvas role="img" aria-label="Desert dunes"></canvas>
-</cinq-pixelate>
-```
-
-```js
-import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
-
-const $host = document.querySelector("cinq-pixelate")
-const $img = $host.$img
-
-function reveal() {
-  animate($host, PIXEL_MAX, PIXEL_MIN, 900)
-}
-
-if ($img.complete) reveal()
-else $img.addEventListener("load", reveal, { once: true })
-```
-
-<DemoLoad />
-
 ## Pointer position
 
 Map cursor position to `pixel`. The live demo shows both mappings side by side.
@@ -675,27 +638,43 @@ $host.sync()
 
 ## Modal
 
-**CINQ UI:** [`cinq-modal`](../components/modal/), [`cinq-modal-button`](../components/modal/).
+**CINQ UI:** [`cinq-modal`](../components/modal/), opened and closed with
+invoker commands.
 
-**Open:** listen for `modal:open`, then reveal. Uses the
+```html
+<button commandfor="photo-modal" command="show-modal">Open photo</button>
+
+<cinq-modal>
+  <dialog id="photo-modal" closedby="any" aria-label="Northern lights">
+    <cinq-pixelate pixel="256">…</cinq-pixelate>
+    <button commandfor="photo-modal" command="request-close">Close</button>
+  </dialog>
+</cinq-modal>
+```
+
+**Open:** listen for the dialog's `toggle`, then reveal. Uses the
 [animation helper](#animation-helper):
 
 ```js
 import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
 import { EVENTS } from "@agencecinq/utils"
 
-const $host = document.querySelector("cinq-pixelate")
+const $dialog = document.querySelector("#photo-modal")
+const $host = $dialog.querySelector("cinq-pixelate")
 
-document.documentElement.addEventListener(EVENTS.MODAL_OPEN, (event) => {
-  if (event.detail.modal !== "photo-modal") return
+$dialog.addEventListener("toggle", (event) => {
   $host.setAttribute("pixel", String(PIXEL_MAX))
   $host.sync()
-  animate($host, PIXEL_MAX, PIXEL_MIN, 700)
+
+  if (event.newState === "open") {
+    animate($host, PIXEL_MAX, PIXEL_MIN, 700)
+  }
 })
 ```
 
 **Close:** listen for `modal:before-close` and pass the pixelate animation to
-`event.detail.waitUntil()`. Same `$host` and `animate` as above.
+`event.detail.waitUntil()`. Escape, the Close button and the backdrop click all
+go through it. Same `$dialog`, `$host` and `animate` as above.
 
 ```js
 document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {

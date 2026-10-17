@@ -16,25 +16,25 @@ import RegisterComponents from "./RegisterComponents.astro";
       </p>
     </div>
 
-    <cinq-modal-button class="block">
-      <button
-        type="button"
-        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-        aria-controls="stacked-modal-address"
-        aria-pressed="false"
-      >
-        Add delivery address
-      </button>
-    </cinq-modal-button>
+    <button
+      type="button"
+      class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+      commandfor="stacked-modal-address"
+      command="show-modal"
+    >
+      Add delivery address
+    </button>
 
     <p class="text-xs text-gray-500">
-      Red ring = <code>aria-pressed="false"</code>, green = <code>aria-pressed="true"</code>.
       Flow: open address to verify to close verify (focus on Verify) to close address
       (focus on Add delivery address).
     </p>
 
-    <cinq-modal id="stacked-modal-address">
-      <dialog aria-labelledby="add-delivery-address-title"
+    <cinq-modal>
+      <dialog
+        id="stacked-modal-address"
+        closedby="any"
+        aria-labelledby="add-delivery-address-title"
         class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
       >
         <div class="flex flex-col gap-4">
@@ -45,43 +45,44 @@ import RegisterComponents from "./RegisterComponents.astro";
                 Street and city for the next encounter drop.
               </p>
             </div>
-            <cinq-modal-button class="block">
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-                aria-controls="stacked-modal-address"
-                aria-pressed="false"
-                aria-label="Close address dialog"
-              >
-                ✕
-              </button>
-            </cinq-modal-button>
+            <button
+              type="button"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+              commandfor="stacked-modal-address"
+              command="request-close"
+              aria-label="Close address dialog"
+            >
+              ✕
+            </button>
           </div>
 
           <label class="block">
             <span class="block text-sm font-medium text-gray-700 mb-1">Street</span>
             <input
+              id="stacked-street"
+              name="street"
               class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
               placeholder="12 Goblin Alley"
             />
           </label>
 
-          <cinq-modal-button class="block">
-            <button
-              type="button"
-              class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-              aria-controls="stacked-modal-verify"
-              aria-pressed="false"
-            >
-              Verify address
-            </button>
-          </cinq-modal-button>
+          <button
+            type="button"
+            class="self-start px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+            commandfor="stacked-modal-verify"
+            command="show-modal"
+          >
+            Verify address
+          </button>
         </div>
       </dialog>
     </cinq-modal>
 
-    <cinq-modal id="stacked-modal-verify">
-      <dialog aria-labelledby="verification-result-title"
+    <cinq-modal>
+      <dialog
+        id="stacked-modal-verify"
+        closedby="any"
+        aria-labelledby="verification-result-title"
         class="fixed left-1/2 top-1/2 w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
       >
         <div class="flex flex-col gap-4">
@@ -92,20 +93,39 @@ import RegisterComponents from "./RegisterComponents.astro";
               address dialog stays open underneath.
             </p>
           </div>
+          <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+            Deliver to <strong data-stacked-street>an unnamed street</strong>.
+          </p>
           <div class="flex justify-end">
-            <cinq-modal-button class="block">
-              <button
-                type="button"
-                class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[pressed=true]:ring-emerald-500"
-                aria-controls="stacked-modal-verify"
-                aria-pressed="false"
-              >
-                OK
-              </button>
-            </cinq-modal-button>
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+              commandfor="stacked-modal-verify"
+              command="request-close"
+            >
+              OK
+            </button>
           </div>
         </div>
       </dialog>
     </cinq-modal>
   </section>
 </div>
+
+<script>
+  import { EVENTS } from "@agencecinq/utils";
+
+  // Fill the verification before it opens, so it never shows a stale street.
+  document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_OPEN, (event) => {
+    if (!(event instanceof CustomEvent) || event.detail.modal !== "stacked-modal-verify") {
+      return;
+    }
+
+    const street = document.querySelector<HTMLInputElement>("#stacked-street")?.value.trim();
+    const output = document.querySelector("[data-stacked-street]");
+
+    if (output) {
+      output.textContent = street || "an unnamed street";
+    }
+  });
+</script>
