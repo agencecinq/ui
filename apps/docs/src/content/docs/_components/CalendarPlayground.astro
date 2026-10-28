@@ -20,17 +20,17 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-calendar header button {
     appearance: none;
-    border: 1px solid #d1d5db;
-    background: #fff;
+    border: 1px solid var(--border-color-control);
+    background: var(--background-color-elevated);
     border-radius: 0.375rem;
     padding: 0.35rem 0.6rem;
     cursor: pointer;
     font: inherit;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-calendar header button:hover {
-    background: #f3f4f6;
+    background: var(--background-color-surface-hover);
   }
 
 
@@ -39,7 +39,7 @@ import RegisterComponents from './RegisterComponents.astro';
     margin: 0;
     font-size: inherit;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color-primary);
     text-align: center;
     text-transform: capitalize;
   }
@@ -53,7 +53,7 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-calendar th {
     padding: 0.35rem 0;
     font-weight: 500;
-    color: #6b7280;
+    color: var(--text-color-muted);
     font-size: 0.75rem;
   }
 
@@ -71,40 +71,40 @@ import RegisterComponents from './RegisterComponents.astro';
     background: transparent;
     cursor: pointer;
     font: inherit;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-calendar td:not([aria-selected='true'], [data-range]) [data-day]:hover:not([aria-disabled='true']) {
-    background: #f3f4f6;
+    background: var(--background-color-surface-hover);
   }
 
   .docs-calendar [data-day][aria-current='date'] {
-    outline: 1px solid #111827;
+    outline: 1px solid var(--color-focus-ring);
     outline-offset: -1px;
   }
 
   /* Picked day. The rules below weigh the same: the last one wins. */
   .docs-calendar td[aria-selected='true'] [data-day] {
-    background: #111827;
-    color: #fff;
+    background: var(--color-accent-default);
+    color: var(--text-color-on-accent);
   }
 
   /* Inside a range, ends included, picked or previewed. */
   .docs-calendar td[data-range] [data-day] {
-    background: #e5e7eb;
+    background: var(--background-color-surface-hover);
     border-radius: 0;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-calendar td[data-range]:not([data-start], [data-end]) [data-day]:hover {
-    background: #d1d5db;
+    background: var(--background-color-surface-hover);
   }
 
   /* Range ends keep the strong contrast. */
   .docs-calendar td[data-start] [data-day],
   .docs-calendar td[data-end] [data-day] {
-    background: #111827;
-    color: #fff;
+    background: var(--color-accent-default);
+    color: var(--text-color-on-accent);
   }
 
   /* Logical corners: the start of a range sits on the right in a right-to-left grid. */
@@ -123,7 +123,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-calendar [data-day][aria-disabled='true'] {
-    color: #9ca3af;
+    color: var(--text-color-subtle);
     cursor: not-allowed;
   }
 
@@ -132,7 +132,7 @@ import RegisterComponents from './RegisterComponents.astro';
     min-block-size: 1lh;
     margin-top: 0.75rem;
     font-size: 0.75rem;
-    color: #4b5563;
+    color: var(--text-color-muted);
   }
 
   .docs-calendar:not(:state(empty)) [data-hint='empty'],
@@ -164,38 +164,38 @@ import RegisterComponents from './RegisterComponents.astro';
     width: 0.35rem;
     height: 0.35rem;
     border-radius: 9999px;
-    background: #111827;
+    background: var(--color-accent-default);
   }
 
   .docs-calendar-events td[aria-selected='true'] [data-day][data-has-event]::after {
-    background: #fff;
+    background: var(--background-color-elevated);
   }
 
   .docs-calendar td:not([aria-selected='true']) [data-day][data-weekend] {
-    color: #9ca3af;
+    color: var(--text-color-muted);
   }
 
   .docs-calendar-dialog {
     margin: auto;
-    background: #fff;
-    color: #111827;
-    border: 1px solid #e5e7eb;
+    background: var(--background-color-elevated);
+    color: var(--text-color-primary);
+    border: 1px solid var(--border-color-default);
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
   }
 
   .docs-calendar-dialog::backdrop {
-    background: rgb(17 24 39 / 0.4);
+    background: var(--color-overlay-scrim);
   }
 </style>
 
 <div class="not-content flex flex-col gap-10">
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Single date</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Single date</h3>
+        <p class="text-sm text-muted">
           Locale <code>fr</code> and <code>deselectable</code>.
           Click the selected day again to clear. Try the keyboard once a day is focused:
           arrows, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>Page Up</kbd>/<kbd>Page Down</kbd>.
@@ -223,17 +223,17 @@ import RegisterComponents from './RegisterComponents.astro';
         </table>
       </cinq-calendar>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="single" class="font-medium text-gray-900">Aucune date</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="single" class="font-medium text-primary">Aucune date</span>
       </p>
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Date range</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Date range</h3>
+        <p class="text-sm text-muted">
           <code>mode="range"</code>. Pick a start day, then an end day. Hover (or move focus)
           paints the in-between preview. A third click resets the range. The hint under the
           grid follows <code>:state(empty)</code>, <code>:state(picking)</code> and <code>:state(pending)</code>:
@@ -267,17 +267,17 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
       </cinq-calendar>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="range" class="font-medium text-gray-900">Aucune date</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="range" class="font-medium text-primary">Aucune date</span>
       </p>
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Multiple dates</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Multiple dates</h3>
+        <p class="text-sm text-muted">
           <code>mode="multiple"</code>. Toggle discrete days in and out of the
           selection. No range painting. Click a selected day again to remove it.
           Capped at 3 days here by canceling <code>calendar:before-change</code>.
@@ -305,17 +305,17 @@ import RegisterComponents from './RegisterComponents.astro';
         </table>
       </cinq-calendar>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="multiple" class="font-medium text-gray-900">Aucune date</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="multiple" class="font-medium text-primary">Aucune date</span>
       </p>
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Preselected dates</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Preselected dates</h3>
+        <p class="text-sm text-muted">
           Seed the view with <code>data-month</code>, <code>data-year</code>, and <code>data-picked</code>. Here a range covering mid-November 2025.
         </p>
       </div>
@@ -344,17 +344,17 @@ import RegisterComponents from './RegisterComponents.astro';
         </table>
       </cinq-calendar>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="preselected" class="font-medium text-gray-900">2025-11-10 to 2025-11-18</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="preselected" class="font-medium text-primary">2025-11-10 to 2025-11-18</span>
       </p>
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Form</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Form</h3>
+        <p class="text-sm text-muted">
           <code>&lt;cinq-calendar&gt;</code> is a form field: <code>name="stay"</code>,{' '}
           <code>mode="range"</code> and <code>required</code>. Submit with a missing end to get the
           browser's own message. Reset brings back the initial selection.
@@ -362,7 +362,7 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <form class="flex flex-col gap-4" data-calendar-form>
-        <p id="docs-calendar-form-field" class="text-sm font-medium text-gray-900">Dates du séjour</p>
+        <p id="docs-calendar-form-field" class="text-sm font-medium text-primary">Dates du séjour</p>
 
         <cinq-calendar
           id="docs-calendar-form"
@@ -391,26 +391,26 @@ import RegisterComponents from './RegisterComponents.astro';
         </cinq-calendar>
 
         <div class="flex gap-2">
-          <button type="submit" class="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white">
+          <button type="submit" class="rounded-md bg-accent-default px-3 py-1.5 text-sm font-medium text-on-accent">
             Réserver
           </button>
-          <button type="reset" class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-900">
+          <button type="reset" class="rounded-md border border-control bg-elevated px-3 py-1.5 text-sm font-medium text-primary">
             Réinitialiser
           </button>
         </div>
       </form>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        FormData&nbsp;:&nbsp;<span data-calendar-form-output class="font-medium text-gray-900">-</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        FormData&nbsp;:&nbsp;<span data-calendar-form-output class="font-medium text-primary">-</span>
       </p>
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">In a dialog</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">In a dialog</h3>
+        <p class="text-sm text-muted">
           A native <code>&lt;input type="date"&gt;</code> stays the field. The button opens the
           calendar in a <code>&lt;dialog&gt;</code> with <code>command="show-modal"</code>, without a
           script. A picked day fills the input and closes the dialog. <kbd>Escape</kbd> closes it
@@ -419,19 +419,19 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <div class="flex flex-wrap items-end gap-3">
-        <label class="flex flex-col gap-1 text-sm text-gray-700">
-          <span class="text-xs font-medium uppercase tracking-wide text-gray-500">Arrivée</span>
+        <label class="flex flex-col gap-1 text-sm text-body">
+          <span class="text-xs font-medium uppercase tracking-wide text-muted">Arrivée</span>
           <input
             type="date"
             id="docs-calendar-dialog-input"
-            class="rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm text-gray-900"
+            class="rounded-md border border-control bg-elevated px-2.5 py-1.5 text-sm text-primary"
           />
         </label>
         <button
           type="button"
           command="show-modal"
           commandfor="docs-calendar-dialog"
-          class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900"
+          class="rounded-md border border-control bg-elevated px-3 py-1.5 text-sm text-primary"
         >
           Choisir dans le calendrier
         </button>
@@ -442,7 +442,7 @@ import RegisterComponents from './RegisterComponents.astro';
         class="docs-calendar-dialog"
         aria-labelledby="docs-calendar-dialog-title"
       >
-        <h4 id="docs-calendar-dialog-title" class="mb-3 text-base font-semibold text-gray-900">
+        <h4 id="docs-calendar-dialog-title" class="mb-3 text-base font-semibold text-primary">
           Date d'arrivée
         </h4>
         <cinq-calendar id="docs-calendar-dialog-calendar" class="docs-calendar" lang="fr">
@@ -465,7 +465,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           command="close"
           commandfor="docs-calendar-dialog"
-          class="mt-3 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900"
+          class="mt-3 rounded-md border border-control bg-elevated px-3 py-1.5 text-sm text-primary"
         >
           Fermer
         </button>
@@ -473,11 +473,11 @@ import RegisterComponents from './RegisterComponents.astro';
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Bounds</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Bounds</h3>
+        <p class="text-sm text-muted">
           The page script sets <code>min</code> to today and <code>max</code> 60 days later. Days outside are <code>aria-disabled</code> and cannot be selected (still in the keyboard grid).
         </p>
       </div>
@@ -503,17 +503,17 @@ import RegisterComponents from './RegisterComponents.astro';
         </table>
       </cinq-calendar>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="future" class="font-medium text-gray-900">Aucune date</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="future" class="font-medium text-primary">Aucune date</span>
       </p>
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Language & week start</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Language & week start</h3>
+        <p class="text-sm text-muted">
           The select sets <code>lang</code> on the calendar, an observed attribute: labels
           follow through <code>Intl</code>, the week starts on the language's first day unless{' '}
           <code>first-day</code> says otherwise, and the language's weekend from{' '}
@@ -525,11 +525,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
 
       <div class="flex flex-wrap items-end gap-3">
-        <label class="flex flex-col gap-1 text-sm text-gray-700">
-          <span class="text-xs font-medium uppercase tracking-wide text-gray-500">Language</span>
+        <label class="flex flex-col gap-1 text-sm text-body">
+          <span class="text-xs font-medium uppercase tracking-wide text-muted">Language</span>
           <select
             data-calendar-locale-select
-            class="rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            class="rounded-md border border-control bg-elevated px-2.5 py-1.5 text-sm text-primary shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-focus-ring"
           >
             <option value="en" lang="en">English (en)</option>
             <option value="fr" lang="fr" selected>Français (fr)</option>
@@ -541,9 +541,9 @@ import RegisterComponents from './RegisterComponents.astro';
             <option value="th" lang="th">ไทย (th)</option>
           </select>
         </label>
-        <p class="pb-1.5 font-mono text-xs text-gray-500">
+        <p class="pb-1.5 font-mono text-xs text-muted">
           firstDay&nbsp;=&nbsp;<span data-calendar-first-day>1</span>
-          <span class="text-gray-400">(0=Sun ... 6=Sat)</span>
+          <span class="text-muted">(0=Sun ... 6=Sat)</span>
         </p>
       </div>
 
@@ -568,17 +568,17 @@ import RegisterComponents from './RegisterComponents.astro';
         </table>
       </cinq-calendar>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="locale" class="font-medium text-gray-900">Aucune date</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="locale" class="font-medium text-primary">Aucune date</span>
       </p>
     </div>
   </section>
 
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Advanced: event markers</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Advanced: event markers</h3>
+        <p class="text-sm text-muted">
           Decorate the days on <code>calendar:render</code>: wrap each one in{' '}
           <code>&lt;time&gt;</code>, mark weekends, and paint dots on days that have events.
           Only event days are selectable. Others get <code>aria-disabled</code>.
@@ -608,16 +608,16 @@ import RegisterComponents from './RegisterComponents.astro';
         </cinq-calendar>
 
         <aside
-          class="min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700"
+          class="min-w-0 flex-1 rounded-xl border border-default bg-surface p-4 text-sm text-body"
           data-calendar-event-panel
           aria-live="polite"
         >
-          <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Événement</p>
-          <p class="mt-1 font-medium text-gray-900" data-calendar-event-title>
+          <p class="text-xs font-medium uppercase tracking-wide text-muted">Événement</p>
+          <p class="mt-1 font-medium text-primary" data-calendar-event-title>
             Sélectionnez un jour marqué
           </p>
-          <p class="mt-1 font-mono text-xs text-gray-500" data-calendar-event-date></p>
-          <ul class="mt-3 space-y-1 text-xs text-gray-500">
+          <p class="mt-1 font-mono text-xs text-muted" data-calendar-event-date></p>
+          <ul class="mt-3 space-y-1 text-xs text-muted">
             <li>• Point = jour avec événement</li>
             <li>• Week-ends en gris</li>
             <li>• Jours sans événement désactivés</li>
@@ -625,8 +625,8 @@ import RegisterComponents from './RegisterComponents.astro';
         </aside>
       </div>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-        Selection&nbsp;:&nbsp;<span data-calendar-output="events" class="font-medium text-gray-900">Aucune date</span>
+      <p class="rounded-lg bg-surface px-3 py-2 font-mono text-sm text-body">
+        Selection&nbsp;:&nbsp;<span data-calendar-output="events" class="font-medium text-primary">Aucune date</span>
       </p>
     </div>
   </section>

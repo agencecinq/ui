@@ -22,14 +22,14 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-slider__label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-slider__value {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-color-body);
     font-variant-numeric: tabular-nums;
   }
 
@@ -58,7 +58,7 @@ import RegisterComponents from './RegisterComponents.astro';
     top: 50%;
     block-size: 0.375rem;
     border-radius: 9999px;
-    background: #e5e7eb;
+    background: var(--background-color-surface-hover);
     transform: translateY(-50%);
     pointer-events: none;
   }
@@ -71,7 +71,7 @@ import RegisterComponents from './RegisterComponents.astro';
     width: calc(var(--ratio) * (100% - var(--docs-slider-thumb)));
     block-size: 0.375rem;
     border-radius: 9999px;
-    background: #111827;
+    background: var(--color-accent-default);
     transform: translateY(-50%);
     pointer-events: none;
   }
@@ -133,8 +133,8 @@ import RegisterComponents from './RegisterComponents.astro';
     width: var(--docs-slider-thumb);
     height: 3rem;
     border-radius: 0.3125rem;
-    background: #fff;
-    border: 2px solid #111827;
+    background: var(--background-color-elevated);
+    border: 2px solid var(--border-color-accent);
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
   }
 
@@ -147,13 +147,13 @@ import RegisterComponents from './RegisterComponents.astro';
     width: var(--docs-slider-thumb);
     height: var(--docs-slider-thumb);
     border-radius: 50%;
-    background: #fff;
-    border: 2px solid #111827;
+    background: var(--background-color-elevated);
+    border: 2px solid var(--border-color-accent);
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
   }
 
   .docs-slider-rail [role='slider']:focus-visible {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: 3px;
   }
 
@@ -168,7 +168,7 @@ import RegisterComponents from './RegisterComponents.astro';
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color-primary);
     pointer-events: none;
     white-space: nowrap;
     transform: translate(-50%, calc(-100% - 0.35rem));
@@ -181,7 +181,7 @@ import RegisterComponents from './RegisterComponents.astro';
     padding-inline: calc(var(--docs-slider-thumb) / 2);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.6875rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
     list-style: none;
   }
 
@@ -202,7 +202,7 @@ import RegisterComponents from './RegisterComponents.astro';
     width: 100%;
     max-width: 5rem;
     border-radius: 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     background: rgb(128 64 32);
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 5%);
   }
@@ -218,15 +218,15 @@ import RegisterComponents from './RegisterComponents.astro';
     justify-content: space-between;
     padding-inline: calc(var(--docs-slider-thumb) / 2);
     font-size: 0.6875rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 
   .docs-slider-status {
     font-size: 0.875rem;
-    color: #374151;
-    border: 1px solid #e5e7eb;
+    color: var(--text-color-body);
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #f9fafb;
+    background: var(--background-color-surface);
     padding: 0.5rem 0.75rem;
   }
 
@@ -257,7 +257,7 @@ import RegisterComponents from './RegisterComponents.astro';
     justify-content: space-between;
     padding-inline: calc(var(--docs-slider-thumb) / 2);
     font-size: 0.6875rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 
   .docs-slider-step-ticks {
@@ -267,7 +267,7 @@ import RegisterComponents from './RegisterComponents.astro';
     padding-inline: calc(var(--docs-slider-thumb) / 2);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.6875rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
     list-style: none;
   }
 
@@ -353,7 +353,7 @@ import RegisterComponents from './RegisterComponents.astro';
     margin: 0;
     list-style: none;
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
     font-variant-numeric: tabular-nums;
   }
 
@@ -378,13 +378,13 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-slider-advanced-log {
     margin: 0;
     padding: 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #f9fafb;
+    background: var(--background-color-surface);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.6875rem;
     line-height: 1.5;
-    color: #374151;
+    color: var(--text-color-body);
     max-height: 10rem;
     overflow: auto;
     white-space: pre-wrap;
@@ -393,10 +393,10 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-slider-advanced-output {
     margin: 0;
     padding: 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #111827;
-    color: #f9fafb;
+    background: var(--color-accent-default);
+    color: var(--text-color-on-accent);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.6875rem;
     line-height: 1.5;
@@ -417,17 +417,17 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-slider-party-split__total {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 </style>
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Tabard colors</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Tabard colors</h3>
+          <p class="text-sm text-muted">
             Three sliders mix crimson, verdant, and azure dye for your character token.
           </p>
         </div>
@@ -484,18 +484,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           Heraldry preview:{' '}
-          <span id="docs-slider-color-hex" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-color-hex" class="font-mono font-medium text-primary">
             #804020
           </span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Encounter difficulty</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Encounter difficulty</h3>
+          <p class="text-sm text-muted">
             Rate the last fight from 0 to 10 with readable <code>aria-valuetext</code>.
           </p>
         </div>
@@ -532,18 +532,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           <code>aria-valuetext</code>:{' '}
-          <span id="docs-slider-rating-status" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-rating-status" class="font-mono font-medium text-primary">
             Rate the encounter from 1 to 10, where 10 is a total party kill
           </span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Battle replay</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Battle replay</h3>
+          <p class="text-sm text-muted">
             Scrub through a five-minute combat log. Values read as minutes and seconds.
           </p>
         </div>
@@ -584,18 +584,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           <code>aria-valuetext</code>:{' '}
-          <span id="docs-slider-seek-status" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-seek-status" class="font-mono font-medium text-primary">
             1 minute 30 seconds
           </span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Loot split</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Loot split</h3>
+          <p class="text-sm text-muted">
             Two thumbs pick a gold piece range for the party treasury split. Tab between handles.
             Arrow keys move the focused one.
           </p>
@@ -643,18 +643,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           Split:{' '}
-          <span id="docs-slider-price-status" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-price-status" class="font-mono font-medium text-primary">
             200 gp to 800 gp
           </span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Party loot (1000 gp)</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Party loot (1000 gp)</h3>
+          <p class="text-sm text-muted">
             Split a fixed 1000 gp treasury between three characters. Each slider is that
             hero&apos;s share. The three values always sum to 1000 (app code on{' '}
             <code>slider:change</code> takes from the others when one share grows).
@@ -768,18 +768,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           Split:{' '}
-          <span id="docs-slider-party-status" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-party-status" class="font-mono font-medium text-primary">
             300 + 350 + 350 = 1000 gp
           </span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Party treasury</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Party treasury</h3>
+          <p class="text-sm text-muted">
             Multi-thumb range with <code>data-step="50"</code>. Gold snaps on pointer, keyboard, and
             Page Up/Down (<code>data-page="150"</code>).
           </p>
@@ -838,20 +838,20 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           Fund:{' '}
-          <span id="docs-slider-budget-status" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-budget-status" class="font-mono font-medium text-primary">
             100 gp to 350 gp
           </span>
           {' '}
-          <span class="text-gray-500">(step 50 gp)</span>
+          <span class="text-muted">(step 50 gp)</span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Potion potency</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Potion potency</h3>
+          <p class="text-sm text-muted">
             Vertical slider for a healing potion strength from 1 (weak) to 10 (legendary).
           </p>
         </div>
@@ -891,18 +891,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           <code>aria-valuetext</code>:{' '}
-          <span id="docs-slider-temp-status" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-temp-status" class="font-mono font-medium text-primary">
             Potency 5 out of 10
           </span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">HP comfort band</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">HP comfort band</h3>
+          <p class="text-sm text-muted">
             Vertical range for hit points you want to keep between rests. High values at the top
             (<code>aria-valuemax</code>), low at the bottom. Tick labels follow the same order.
           </p>
@@ -956,18 +956,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <p class="docs-slider-status">
           Band:{' '}
-          <span id="docs-slider-temp-range-status" class="font-mono font-medium text-gray-900">
+          <span id="docs-slider-temp-range-status" class="font-mono font-medium text-primary">
             18 HP to 26 HP
           </span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow" dir="rtl">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default" dir="rtl">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Underdark torch</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Underdark torch</h3>
+          <p class="text-sm text-muted">
             Horizontal slider with <code>dir="rtl"</code>. Pointer and arrow keys mirror on the
             rail.
           </p>
@@ -1004,11 +1004,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Encounter builder (advanced)</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Encounter builder (advanced)</h3>
+          <p class="text-sm text-muted">
             Presets via <code>setValues(..., &#123; emit: false &#125;)</code>, last moved thumb from{' '}
             <code>event.detail.$thumb</code>, and hidden inputs for form submit.
           </p>
@@ -1018,28 +1018,28 @@ import RegisterComponents from './RegisterComponents.astro';
           <button
             type="button"
             id="docs-slider-advanced-preset-wilderness"
-            class="rounded-lg bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+            class="rounded-lg bg-accent-default px-3 py-2 text-sm text-on-accent hover:bg-accent-hover"
           >
             Wilderness skirmish
           </button>
           <button
             type="button"
             id="docs-slider-advanced-preset-dungeon"
-            class="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
+            class="rounded-lg bg-surface px-3 py-2 text-sm text-body hover:bg-surface-hover"
           >
             Dungeon delve
           </button>
           <button
             type="button"
             id="docs-slider-advanced-preset-epic"
-            class="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
+            class="rounded-lg bg-surface px-3 py-2 text-sm text-body hover:bg-surface-hover"
           >
             Epic showdown
           </button>
           <button
             type="button"
             id="docs-slider-advanced-reset"
-            class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+            class="rounded-lg border border-default bg-elevated px-3 py-2 text-sm text-body hover:bg-surface"
           >
             Reset band
           </button>
@@ -1091,16 +1091,16 @@ import RegisterComponents from './RegisterComponents.astro';
 
             <p class="docs-slider-status">
               Band:{' '}
-              <span id="docs-slider-advanced-status" class="font-mono font-medium text-gray-900">
+              <span id="docs-slider-advanced-status" class="font-mono font-medium text-primary">
                 CR 4 to CR 10
               </span>
             </p>
 
-            <p class="text-sm text-gray-600" aria-live="polite">
+            <p class="text-sm text-muted" aria-live="polite">
               Last moved:{' '}
               <span
                 id="docs-slider-advanced-active"
-                class="font-mono font-medium text-gray-900"
+                class="font-mono font-medium text-primary"
               >
                 -
               </span>
@@ -1117,13 +1117,13 @@ import RegisterComponents from './RegisterComponents.astro';
             <input type="hidden" name="cr_min" id="docs-slider-advanced-min-input" value="4" />
             <input type="hidden" name="cr_max" id="docs-slider-advanced-max-input" value="10" />
 
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-muted">
               Hidden fields stay in sync with the range. Submit to read <code>FormData</code>.
             </p>
 
             <button
               type="submit"
-              class="self-start rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+              class="self-start rounded-lg bg-accent-default px-4 py-2 text-sm text-on-accent hover:bg-accent-hover"
             >
               Save encounter band
             </button>

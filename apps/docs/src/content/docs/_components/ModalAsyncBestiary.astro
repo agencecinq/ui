@@ -6,19 +6,19 @@ import RegisterComponents from "./RegisterComponents.astro";
 
 <div class="not-content">
   <section
-    class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4"
+    class="rounded-2xl bg-elevated p-6 shadow flex flex-col gap-4 border border-default"
     data-demo-root="async-bestiary-modal"
   >
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Bestiary modal</h3>
-        <p class="text-sm text-gray-600" data-bestiary-status>
+        <h3 class="text-lg font-semibold text-primary">Bestiary modal</h3>
+        <p class="text-sm text-muted" data-bestiary-status>
           Open the modal to load a creature. Close it to archive the entry.
         </p>
       </div>
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+        class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover text-sm"
         commandfor="async-bestiary-modal"
         command="show-modal"
       >
@@ -31,14 +31,14 @@ import RegisterComponents from "./RegisterComponents.astro";
         id="async-bestiary-modal"
         closedby="any"
         aria-labelledby="monster-entry-title"
-        class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] max-h-[min(92vh,36rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white shadow-2xl backdrop:bg-black/50 text-gray-900"
+        class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] max-h-[min(92vh,36rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-elevated shadow-2xl backdrop:bg-overlay-scrim text-primary border border-default"
       >
         <div class="relative flex max-h-[min(92vh,36rem)] flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
-            <h2 id="monster-entry-title" class="text-lg font-semibold text-gray-900">Monster entry</h2>
+            <h2 id="monster-entry-title" class="text-lg font-semibold text-primary">Monster entry</h2>
             <button
               type="button"
-              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-focus-ring/20"
               commandfor="async-bestiary-modal"
               command="request-close"
             >
@@ -48,9 +48,9 @@ import RegisterComponents from "./RegisterComponents.astro";
 
           <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
             <label class="flex flex-col gap-1.5">
-              <span class="text-sm font-medium text-gray-700">Creature</span>
+              <span class="text-sm font-medium text-body">Creature</span>
               <select
-                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white"
+                class="w-full rounded-lg border border-default px-3 py-2 text-sm bg-elevated"
                 data-monster-select
               >
                 <option value="troll">Troll</option>
@@ -59,17 +59,17 @@ import RegisterComponents from "./RegisterComponents.astro";
               </select>
             </label>
 
-            <div class="rounded-xl bg-gray-50 p-4 flex flex-col gap-2">
-              <h3 class="text-base font-semibold text-gray-900" data-monster-name>Creature</h3>
-              <p class="text-sm text-gray-600" data-monster-meta>Pick a creature and open the modal.</p>
-              <p class="text-sm text-gray-700" data-monster-desc></p>
+            <div class="rounded-xl bg-surface p-4 flex flex-col gap-2">
+              <h3 class="text-base font-semibold text-primary" data-monster-name>Creature</h3>
+              <p class="text-sm text-muted" data-monster-meta>Pick a creature and open the modal.</p>
+              <p class="text-sm text-body" data-monster-desc></p>
             </div>
           </div>
 
           <footer class="border-t px-6 py-4">
             <button
               type="button"
-              class="w-full px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+              class="w-full px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover text-sm"
               commandfor="async-bestiary-modal"
               command="request-close"
             >
@@ -78,7 +78,7 @@ import RegisterComponents from "./RegisterComponents.astro";
           </footer>
 
           <div
-            class="absolute inset-0 flex items-center justify-center bg-white/90 px-6 text-center text-sm font-medium text-gray-800"
+            class="absolute inset-0 flex items-center justify-center bg-elevated/90 px-6 text-center text-sm font-medium text-body"
             data-busy
             hidden
           >

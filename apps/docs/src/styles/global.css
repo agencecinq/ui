@@ -2,3 +2,5 @@
 @layer base, starlight, theme, components, utilities;
 
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./starlight.css";

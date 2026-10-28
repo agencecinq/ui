@@ -6,13 +6,13 @@ import { drawerImage } from './images';
 
 <PixelateDemoFrame>
   <div class="flex flex-wrap items-start justify-between gap-4">
-    <p class="text-sm text-gray-600">
+    <p class="text-sm text-muted">
       Uses <code>cinq-drawer</code> and <code>cinq-drawer-button</code>.
     </p>
     <cinq-drawer-button class="block shrink-0">
       <button
         type="button"
-        class="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+        class="rounded-lg bg-accent-default px-4 py-2 text-sm text-on-accent hover:bg-accent-hover"
         aria-controls="docs-pixelate-drawer"
         aria-expanded="false"
       >
@@ -24,15 +24,15 @@ import { drawerImage } from './images';
   <cinq-drawer id="docs-pixelate-drawer">
     <dialog
       aria-label="Photo drawer"
-      class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl backdrop:bg-black/50"
+      class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-elevated shadow-2xl backdrop:bg-overlay-scrim"
     >
       <div class="flex h-full flex-col">
         <header class="flex items-center justify-between border-b px-4 py-3">
-          <h2 class="text-base font-semibold text-gray-900">Gallery</h2>
+          <h2 class="text-base font-semibold text-primary">Gallery</h2>
           <cinq-drawer-button class="block">
             <button
               type="button"
-              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover"
               aria-controls="docs-pixelate-drawer"
               aria-expanded="false"
             >

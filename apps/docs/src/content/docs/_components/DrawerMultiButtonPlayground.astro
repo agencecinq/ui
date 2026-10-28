@@ -6,10 +6,10 @@ import RegisterComponents from "./RegisterComponents.astro";
 <RegisterComponents />
 
 <div class="not-content">
-  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+  <section class="rounded-2xl bg-elevated p-6 shadow flex flex-col gap-4 border border-default">
     <div>
-      <h3 class="text-lg font-semibold text-gray-900">Shared drawer, many buttons</h3>
-      <p class="text-sm text-gray-600">
+      <h3 class="text-lg font-semibold text-primary">Shared drawer, many buttons</h3>
+      <p class="text-sm text-muted">
         Every <code class="text-xs">cinq-drawer-button</code> that points at the
         same <code class="text-xs">id</code> updates its nested <code class="text-xs">aria-expanded</code> from <code class="text-xs">drawer:open</code> / <code class="text-xs">drawer:close</code>. Not from the click itself.
         Open or close from any control. All of them stay in sync.
@@ -19,7 +19,7 @@ import RegisterComponents from "./RegisterComponents.astro";
     <div class="flex flex-wrap items-center gap-3">
       <cinq-drawer-button class="block">
         <button
-          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
+          class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
           aria-controls="shared-drawer-demo"
           aria-expanded="false"
         >
@@ -28,7 +28,7 @@ import RegisterComponents from "./RegisterComponents.astro";
       </cinq-drawer-button>
       <cinq-drawer-button class="block">
         <button
-          class="px-3 py-2 rounded-lg border border-gray-300 text-gray-900 hover:bg-gray-50 ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
+          class="px-3 py-2 rounded-lg border border-control text-primary hover:bg-surface ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
           aria-controls="shared-drawer-demo"
           aria-expanded="false"
         >
@@ -37,7 +37,7 @@ import RegisterComponents from "./RegisterComponents.astro";
       </cinq-drawer-button>
       <cinq-drawer-button class="block">
         <button
-          class="px-3 py-2 rounded-lg border border-dashed border-gray-400 text-sm text-gray-700 hover:bg-gray-50 ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
+          class="px-3 py-2 rounded-lg border border-dashed border-control text-sm text-body hover:bg-surface ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
           aria-controls="shared-drawer-demo"
           aria-expanded="false"
         >
@@ -46,26 +46,26 @@ import RegisterComponents from "./RegisterComponents.astro";
       </cinq-drawer-button>
     </div>
 
-    <p class="text-xs text-gray-500">
+    <p class="text-xs text-muted">
       Red ring = <code>aria-expanded="false"</code>, green = <code>aria-expanded="true"</code>.
     </p>
 
     <cinq-drawer id="shared-drawer-demo">
       <dialog
         aria-labelledby="shared-drawer-demo-title"
-        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-elevated shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-overlay-scrim backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
             <h2
               id="shared-drawer-demo-title"
-              class="text-lg font-semibold text-gray-900"
+              class="text-lg font-semibold text-primary"
             >
               Shared bestiary
             </h2>
             <cinq-drawer-button class="block">
               <button
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover focus:outline-none ring-2 ring-offset-2 ring-red-500 aria-[expanded=true]:ring-emerald-500"
                 aria-controls="shared-drawer-demo"
                 aria-expanded="false"
                 aria-label="Close"
@@ -75,7 +75,7 @@ import RegisterComponents from "./RegisterComponents.astro";
             </cinq-drawer-button>
           </header>
           <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-3">
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-muted">
               Close from here or from any of the three triggers outside. All
               four buttons flip <code class="text-xs">aria-expanded</code> together.
             </p>

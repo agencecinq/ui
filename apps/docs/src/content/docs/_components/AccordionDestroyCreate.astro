@@ -43,7 +43,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-accordion-runtime [data-header].focus {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: -2px;
   }
 
@@ -57,12 +57,12 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 </style>
 
-<section class="rounded-2xl bg-white p-6 shadow not-content" data-demo-root="accordion-destroy">
+<section class="rounded-2xl bg-elevated p-6 shadow not-content border border-default" data-demo-root="accordion-destroy">
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Destroy / Create</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Destroy / Create</h3>
+        <p class="text-sm text-muted">
           Useful when you mutate the DOM and want to re-bind events.
           Pattern: <code class="font-mono">destroy()</code>, mutate,{' '}
           <code class="font-mono">init()</code>.
@@ -71,14 +71,14 @@ import RegisterComponents from './RegisterComponents.astro';
       <div class="flex items-center gap-2 shrink-0">
         <button
           type="button"
-          class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+          class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
           data-action="destroy"
         >
           Destroy
         </button>
         <button
           type="button"
-          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
           data-action="create"
         >
           Create
@@ -87,7 +87,7 @@ import RegisterComponents from './RegisterComponents.astro';
     </div>
 
     <cinq-accordion
-      class="docs-accordion-runtime max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+      class="docs-accordion-runtime max-w-xl overflow-hidden rounded-xl border border-default divide-y divide-default"
       data-hash="false"
       data-demo="accordion-destroy"
     >
@@ -96,7 +96,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           data-header
           id="docs-accordion-dc-1-header"
-          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
           aria-expanded="true"
           aria-controls="docs-accordion-dc-1-body"
         >
@@ -110,7 +110,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div
             data-inner
-            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+            class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
           >
             <p class="m-0">Trolls regenerate 3 hp per round unless burned or acid-treated.</p>
           </div>
@@ -122,7 +122,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           data-header
           id="docs-accordion-dc-2-header"
-          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
           aria-expanded="false"
           aria-controls="docs-accordion-dc-2-body"
         >
@@ -137,7 +137,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div
             data-inner
-            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+            class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
           >
             <p class="m-0">Looks like a boulder until it animates. Then the fists start flying.</p>
           </div>
@@ -145,8 +145,8 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </cinq-accordion>
 
-    <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-      Status&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-gray-900">Bound. Headers respond</span>
+    <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+      Status&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-primary">Bound. Headers respond</span>
     </p>
   </div>
 </section>

@@ -164,11 +164,11 @@ Below, `data-delay="300"` means that when you move focus with Left/Right arrows,
     <div
       role="tablist"
       aria-label="Monster tabs (auto activation)"
-      class="inline-flex gap-2 rounded-lg bg-white p-1 shadow-sm"
+      class="inline-flex gap-2 rounded-lg bg-elevated p-1 shadow-sm border border-default"
     >
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="true"
         aria-controls="auto-troll-panel"
@@ -178,7 +178,7 @@ Below, `data-delay="300"` means that when you move focus with Left/Right arrows,
       </button>
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="false"
         aria-controls="auto-dracolich-panel"
@@ -194,9 +194,9 @@ Below, `data-delay="300"` means that when you move focus with Left/Right arrows,
       role="tabpanel"
       aria-labelledby="auto-troll"
       id="auto-troll-panel"
-      class="rounded-xl bg-white p-4 shadow"
+      class="rounded-xl bg-elevated p-4 shadow border border-default"
     >
-      <p class="text-gray-700">
+      <p class="text-body">
         Trolls regenerate quickly. Automatic activation makes cycling through their stats fast with
         only the arrow keys.
       </p>
@@ -206,10 +206,10 @@ Below, `data-delay="300"` means that when you move focus with Left/Right arrows,
       role="tabpanel"
       aria-labelledby="auto-dracolich"
       id="auto-dracolich-panel"
-      class="rounded-xl bg-white p-4 shadow"
+      class="rounded-xl bg-elevated p-4 shadow border border-default"
       hidden
     >
-      <p class="text-gray-700">
+      <p class="text-body">
         The dracolich panel becomes active after a short delay once focus moves to its tab.
       </p>
     </section>
@@ -343,11 +343,11 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
     <div
       role="tablist"
       aria-label="Bestiary tabs"
-      class="inline-flex gap-2 rounded-lg bg-white p-1 shadow-sm"
+      class="inline-flex gap-2 rounded-lg bg-elevated p-1 shadow-sm border border-default"
     >
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="true"
         aria-controls="tabs-barracuda-panel"
@@ -357,7 +357,7 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
       </button>
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="false"
         aria-controls="tabs-dracolich-panel"
@@ -368,7 +368,7 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
       </button>
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="false"
         aria-controls="tabs-jermlaine-panel"
@@ -385,9 +385,9 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
       role="tabpanel"
       aria-labelledby="tabs-barracuda"
       id="tabs-barracuda-panel"
-      class="rounded-xl bg-white p-4 shadow"
+      class="rounded-xl bg-elevated p-4 shadow border border-default"
     >
-      <p class="text-gray-700">Barracudas are swift marauders of warm salt waters.</p>
+      <p class="text-body">Barracudas are swift marauders of warm salt waters.</p>
     </section>
 
     <section
@@ -395,10 +395,10 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
       role="tabpanel"
       aria-labelledby="tabs-dracolich"
       id="tabs-dracolich-panel"
-      class="rounded-xl bg-white p-4 shadow"
+      class="rounded-xl bg-elevated p-4 shadow border border-default"
       hidden
     >
-      <p class="text-gray-700">A dracolich is an undead dragon created by forbidden rites.</p>
+      <p class="text-body">A dracolich is an undead dragon created by forbidden rites.</p>
     </section>
 
     <section
@@ -406,10 +406,10 @@ tabsEl.querySelectorAll('[role="tab"]').forEach(tab => {
       role="tabpanel"
       aria-labelledby="tabs-jermlaine"
       id="tabs-jermlaine-panel"
-      class="rounded-xl bg-white p-4 shadow"
+      class="rounded-xl bg-elevated p-4 shadow border border-default"
       hidden
     >
-      <p class="text-gray-700">A galeb duhr looks like a boulder until it moves.</p>
+      <p class="text-body">A galeb duhr looks like a boulder until it moves.</p>
     </section>
 
   </cinq-tabs>
@@ -428,11 +428,11 @@ When `data-hash="true"`, activating a tab updates `location.hash` with the tab i
     <div
       role="tablist"
       aria-label="Monster tabs (hash)"
-      class="inline-flex gap-2 rounded-lg bg-white p-1 shadow-sm"
+      class="inline-flex gap-2 rounded-lg bg-elevated p-1 shadow-sm border border-default"
     >
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="true"
         aria-controls="hash-galeb-panel"
@@ -442,7 +442,7 @@ When `data-hash="true"`, activating a tab updates `location.hash` with the tab i
       </button>
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="false"
         aria-controls="hash-cloaker-panel"
@@ -458,9 +458,9 @@ When `data-hash="true"`, activating a tab updates `location.hash` with the tab i
       role="tabpanel"
       aria-labelledby="hash-galeb"
       id="hash-galeb-panel"
-      class="rounded-xl bg-white p-4 shadow"
+      class="rounded-xl bg-elevated p-4 shadow border border-default"
     >
-      <p class="text-gray-700">
+      <p class="text-body">
         The galeb duhr looks like a boulder until it moves. Its tab id
         <code>#hash-galeb</code> is reflected in the URL when active.
       </p>
@@ -470,10 +470,10 @@ When `data-hash="true"`, activating a tab updates `location.hash` with the tab i
       role="tabpanel"
       aria-labelledby="hash-cloaker"
       id="hash-cloaker-panel"
-      class="rounded-xl bg-white p-4 shadow"
+      class="rounded-xl bg-elevated p-4 shadow border border-default"
       hidden
     >
-      <p class="text-gray-700">
+      <p class="text-body">
         Cloakers lurk like ordinary cloaks until they unfold. Activating this tab sets
         <code>#hash-cloaker</code> in the address bar.
       </p>
@@ -492,11 +492,11 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
       <div
         role="tablist"
         aria-label="Outer tabs"
-        class="inline-flex gap-2 rounded-lg bg-white p-1 shadow-sm"
+        class="inline-flex gap-2 rounded-lg bg-elevated p-1 shadow-sm border border-default"
       >
         <button
           type="button"
-          class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+          class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
           role="tab"
           aria-selected="true"
           aria-controls="outer-nested-panel"
@@ -506,7 +506,7 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
         </button>
         <button
           type="button"
-          class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+          class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
           role="tab"
           aria-selected="false"
           aria-controls="outer-other-panel"
@@ -522,9 +522,9 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
         role="tabpanel"
         aria-labelledby="outer-nested"
         id="outer-nested-panel"
-        class="rounded-xl bg-white p-4 shadow flex flex-col gap-4"
+        class="rounded-xl bg-elevated p-4 shadow flex flex-col gap-4 border border-default"
       >
-        <p class="text-gray-700 text-sm">
+        <p class="text-body text-sm">
           Inner tabs are fully independent: keyboard navigation and ARIA state are scoped to each
           `cinq-tabs` instance.
         </p>
@@ -533,11 +533,11 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
           <div
             role="tablist"
             aria-label="Inner tabs"
-            class="inline-flex gap-2 rounded-lg bg-gray-50 p-1"
+            class="inline-flex gap-2 rounded-lg bg-surface p-1"
           >
             <button
               type="button"
-              class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-xs font-medium rounded-md"
+              class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-xs font-medium rounded-md"
               role="tab"
               aria-selected="true"
               aria-controls="inner-adherer-panel"
@@ -547,7 +547,7 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
             </button>
             <button
               type="button"
-              class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-xs font-medium rounded-md"
+              class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-xs font-medium rounded-md"
               role="tab"
               aria-selected="false"
               aria-controls="inner-crimbil-panel"
@@ -563,9 +563,9 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
             role="tabpanel"
             aria-labelledby="inner-adherer"
             id="inner-adherer-panel"
-            class="rounded-lg bg-gray-50 p-3"
+            class="rounded-lg bg-surface p-3"
           >
-            <p class="text-gray-700 text-sm">
+            <p class="text-body text-sm">
               The adherer looks like a mummy, with folds of off-white skin resembling filthy
               bandages.
             </p>
@@ -575,10 +575,10 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
             role="tabpanel"
             aria-labelledby="inner-crimbil"
             id="inner-crimbil-panel"
-            class="rounded-lg bg-gray-50 p-3"
+            class="rounded-lg bg-surface p-3"
             hidden
           >
-            <p class="text-gray-700 text-sm">
+            <p class="text-body text-sm">
               Crimbils are malicious fey rumored to be a corrupted bloodline of wood gnomes.
             </p>
           </section>
@@ -590,10 +590,10 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
         role="tabpanel"
         aria-labelledby="outer-other"
         id="outer-other-panel"
-        class="rounded-xl bg-white p-4 shadow"
+        class="rounded-xl bg-elevated p-4 shadow border border-default"
         hidden
       >
-        <p class="text-gray-700">
+        <p class="text-body">
           Plush golems are every parent’s nightmare. They start as toys and quickly become
           full-fledged family members.
         </p>

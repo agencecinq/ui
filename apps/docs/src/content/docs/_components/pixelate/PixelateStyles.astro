@@ -121,7 +121,7 @@
     position: relative;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.75rem;
     user-select: none;
     touch-action: none;
@@ -170,7 +170,7 @@
     left: 50%;
     width: 2px;
     transform: translateX(-50%);
-    background: #fff;
+    background: var(--background-color-elevated);
   }
 
   .docs-pixelate-comparison__handle {
@@ -181,8 +181,8 @@
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 9999px;
-    background: #fff;
-    color: #111827;
+    background: var(--background-color-elevated);
+    color: var(--text-color-primary);
     box-shadow:
       0 1px 2px rgb(0 0 0 / 6%),
       0 4px 12px rgb(0 0 0 / 12%);
@@ -195,7 +195,7 @@
   }
 
   .docs-pixelate-comparison > [role='separator']:focus-visible .docs-pixelate-comparison__handle {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
   }
 
@@ -218,14 +218,14 @@
 
   .docs-switch:hover,
   .docs-switch:focus-visible {
-    background-color: #f3f4f6;
-    outline-color: #111827;
+    background-color: var(--background-color-surface-hover);
+    outline-color: var(--color-focus-ring);
   }
 
   .docs-switch .label {
     flex: 1;
     font-size: 0.875rem;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-switch .slider {
@@ -237,8 +237,8 @@
     min-width: 1.75rem;
     height: 1rem;
     border-radius: 0.5rem;
-    border: 1px solid #adb5bd;
-    background-color: #fff;
+    border: 1px solid var(--border-color-control);
+    background-color: var(--background-color-elevated);
     transition:
       background-color 0.15s ease-in-out,
       border-color 0.15s ease-in-out;
@@ -250,18 +250,18 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background-color: #adb5bd;
+    background-color: var(--border-color-control);
     transform: translateX(0.1rem);
     transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .docs-switch[aria-checked='true'] .slider {
-    border-color: #111827;
-    background-color: #111827;
+    border-color: var(--border-color-accent);
+    background-color: var(--color-accent-default);
   }
 
   .docs-switch[aria-checked='true'] .slider::before {
-    background-color: #fff;
+    background-color: var(--background-color-elevated);
     transform: translateX(0.65rem);
   }
 
