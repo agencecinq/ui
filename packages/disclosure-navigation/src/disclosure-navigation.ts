@@ -117,9 +117,13 @@ export class DisclosureNavigation extends HTMLElement {
     return this.#buttons.filter(isExpanded);
   }
 
-  /** Items inside `containers`, outside the submenus nested in them. */
-  #items(containers: HTMLElement[], selector: string): HTMLElement[] {
-    const submenus = this.#buttons
+  /** Items inside `containers`, outside the submenus of `buttons` nested in them. */
+  #items(
+    containers: HTMLElement[],
+    selector: string,
+    buttons = this.#buttons,
+  ): HTMLElement[] {
+    const submenus = buttons
       .flatMap(controlledElements)
       .filter(($submenu) =>
         containers.some(
@@ -133,6 +137,13 @@ export class DisclosureNavigation extends HTMLElement {
         ...$container.querySelectorAll<HTMLElement>(selector),
       ])
       .filter(($item) => !submenus.some(($submenu) => $submenu.contains($item)));
+  }
+
+  /** The visible items of the submenus of `$button`, open nested ones included, in reading order. */
+  #menuItems($button: HTMLButtonElement): HTMLElement[] {
+    const collapsed = this.#buttons.filter(($other) => !isExpanded($other));
+
+    return this.#items(controlledElements($button), MENU_ITEMS, collapsed);
   }
 
   /** Closes the submenus of `buttons`, innermost first, as nested popovers do. */
@@ -301,12 +312,15 @@ export class DisclosureNavigation extends HTMLElement {
     }
 
     const $target = event.target as HTMLElement;
-    // The innermost open submenu holding the focus, none at the top level
-    const $button = this.#expandedButtons.findLast(($expanded) =>
+    const holding = this.#expandedButtons.filter(($expanded) =>
       controls($expanded, $target),
     );
+    // The outermost open submenu holding the focus, none at the top level
+    const $button = holding.find(
+      ($expanded) => !holding.some(($other) => controls($other, $expanded)),
+    );
     const items = $button
-      ? this.#items(controlledElements($button), MENU_ITEMS)
+      ? this.#menuItems($button)
       : this.#items([this], TOP_LEVEL_ITEMS);
     const index = items.indexOf($target);
 
@@ -315,7 +329,7 @@ export class DisclosureNavigation extends HTMLElement {
     }
 
     // Move focus into the submenu of an expanded top-level button. In a submenu,
-    // ArrowDown stays at its level, as ArrowUp does: Tab enters a nested submenu
+    // the items of an open nested submenu already follow its button, as with Tab
     if (
       !$button &&
       "ArrowDown" === event.key &&
@@ -324,7 +338,7 @@ export class DisclosureNavigation extends HTMLElement {
     ) {
       event.preventDefault();
 
-      return this.#items(controlledElements($target), MENU_ITEMS)[0]?.focus();
+      return this.#menuItems($target)[0]?.focus();
     }
 
     return focusByKey(event, items, index);

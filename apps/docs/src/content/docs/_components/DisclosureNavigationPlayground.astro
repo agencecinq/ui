@@ -1,11 +1,15 @@
 ---
 import RegisterComponents from './RegisterComponents.astro';
 
-const button =
-  'inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-gray-100';
-const link =
-  'block rounded-lg px-3 py-2 text-sm text-gray-900 no-underline transition-colors hover:bg-gray-100 aria-[current=page]:font-semibold';
-const panel = 'm-0 w-56 list-none rounded-xl border border-gray-200 bg-white p-2 shadow-lg';
+// One style per level, for links and buttons alike. The font is set on the lists:
+// Starlight's reset makes buttons inherit it, over Tailwind utilities on them.
+const item =
+  'inline-flex items-center gap-1 rounded-lg px-3 py-2 text-gray-900 no-underline transition-colors hover:bg-gray-100 aria-expanded:bg-gray-100 aria-[current=page]:underline aria-[current=page]:underline-offset-4';
+const menuItem =
+  'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-gray-900 no-underline transition-colors hover:bg-gray-100 aria-expanded:bg-gray-100';
+const chevron = 'text-xs text-gray-500';
+const panel =
+  'm-0 w-56 list-none rounded-xl border border-gray-200 bg-white p-2 text-sm font-normal shadow-lg';
 ---
 
 <RegisterComponents />
@@ -16,8 +20,9 @@ const panel = 'm-0 w-56 list-none rounded-xl border border-gray-200 bg-white p-2
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Guild hall navigation</h3>
         <p class="text-sm text-gray-600">
-          One branch open at a time, a nested submenu under Quests, arrow keys between the
-          entries and Escape to close. With <code>data-hover</code>, the mouse opens the
+          One branch open at a time, a nested submenu under Quests, arrow keys in reading
+          order and Escape to close: Enter on Dungeons, then ArrowDown, reaches the Tomb
+          of Horrors. With <code>data-hover</code>, the mouse opens the
           submenus: the first click after it keeps them open. The Armory is
           <code>hidden="until-found"</code>: search the page for “Vorpal” and it opens.
         </p>
@@ -34,62 +39,62 @@ const panel = 'm-0 w-56 list-none rounded-xl border border-gray-200 bg-white p-2
         data-hover
       >
         <nav aria-label="Guild hall">
-          <ul class="m-0 flex list-none flex-wrap items-start gap-2 p-0">
-            <li><a href="#" class={button} aria-current="page">Tavern</a></li>
+          <ul class="m-0 flex list-none flex-wrap items-start gap-2 p-0 text-sm font-medium">
+            <li><a href="#" class={item} aria-current="page">Tavern</a></li>
             <li class="relative">
               <button
                 type="button"
-                class={button}
+                class={item}
                 aria-expanded="false"
                 aria-controls="docs-disclosure-navigation-quests"
                 id="docs-disclosure-navigation-quests-button"
               >
-                Quests <span aria-hidden="true">▾</span>
+                Quests <span aria-hidden="true" class={chevron}>▾</span>
               </button>
               <div id="docs-disclosure-navigation-quests" class="absolute top-full left-0 z-10 pt-2" hidden>
                 <ul class={panel}>
-                  <li><a href="#" class={link}>Bounty board</a></li>
+                  <li><a href="#" class={menuItem}>Bounty board</a></li>
                   <li class="relative">
                     <button
                       type="button"
-                      class:list={[button, 'w-full justify-between']}
+                      class={menuItem}
                       aria-expanded="false"
                       aria-controls="docs-disclosure-navigation-dungeons"
                       id="docs-disclosure-navigation-dungeons-button"
                     >
-                      Dungeons <span aria-hidden="true">▸</span>
+                      Dungeons <span aria-hidden="true" class={chevron}>▸</span>
                     </button>
                     <div id="docs-disclosure-navigation-dungeons" class="absolute top-0 left-full z-10 pl-3" hidden>
                       <ul class={panel}>
-                        <li><a href="#" class={link}>Tomb of Horrors</a></li>
-                        <li><a href="#" class={link}>Undermountain</a></li>
-                        <li><a href="#" class={link}>Castle Ravenloft</a></li>
+                        <li><a href="#" class={menuItem}>Tomb of Horrors</a></li>
+                        <li><a href="#" class={menuItem}>Undermountain</a></li>
+                        <li><a href="#" class={menuItem}>Castle Ravenloft</a></li>
                       </ul>
                     </div>
                   </li>
-                  <li><a href="#" class={link}>Escort missions</a></li>
+                  <li><a href="#" class={menuItem}>Escort missions</a></li>
                 </ul>
               </div>
             </li>
             <li class="relative">
               <button
                 type="button"
-                class={button}
+                class={item}
                 aria-expanded="false"
                 aria-controls="docs-disclosure-navigation-armory"
                 id="docs-disclosure-navigation-armory-button"
               >
-                Armory <span aria-hidden="true">▾</span>
+                Armory <span aria-hidden="true" class={chevron}>▾</span>
               </button>
               <div id="docs-disclosure-navigation-armory" class="absolute top-full left-0 z-10 pt-2" hidden="until-found">
                 <ul class={panel}>
-                  <li><a href="#" class={link}>Vorpal sword</a></li>
-                  <li><a href="#" class={link}>Mithral chain mail</a></li>
-                  <li><a href="#" class={link}>Bag of holding</a></li>
+                  <li><a href="#" class={menuItem}>Vorpal sword</a></li>
+                  <li><a href="#" class={menuItem}>Mithral chain mail</a></li>
+                  <li><a href="#" class={menuItem}>Bag of holding</a></li>
                 </ul>
               </div>
             </li>
-            <li><a href="#" class={button}>Stables</a></li>
+            <li><a href="#" class={item}>Stables</a></li>
           </ul>
         </nav>
       </cinq-disclosure-navigation>

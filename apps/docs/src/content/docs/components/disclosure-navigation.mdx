@@ -62,8 +62,9 @@ Then write the markup: the component only adds interactivity.
 
 To render a submenu open, write `aria-expanded="true"` on its button and leave out
 `hidden`. A submenu can hold buttons with their own submenus: opening one keeps its
-parents open and closes the other branches. In a submenu, the arrow keys stay at its
-level: Tab moves into a nested submenu, and Escape back to its button.
+parents open and closes the other branches. In a submenu, the arrow keys follow the
+reading order of its visible items, as Tab does: Enter on a nested button opens its
+submenu, ArrowDown moves into it, and Escape closes it and focuses its button.
 
 ## Attributes
 
@@ -139,7 +140,8 @@ $navigation.addEventListener(
 | Escape | Submenu | Closes the innermost one and focuses its button. |
 | Escape | Button, top-level link or outside | Closes the open submenu. |
 | ArrowDown | Expanded top-level button | Moves focus to the first item of its submenu. |
-| Arrow keys | Top-level or submenu item | Previous or next item, wrapping. |
+| Arrow keys | Top-level item | Previous or next button or link, wrapping. |
+| Arrow keys | Submenu item | Previous or next visible item, open nested submenus included, wrapping. |
 | Home / End | Top-level or submenu item | First or last item. |
 
 Moving focus out of the navigation closes the open submenu. Inside a dialog, Escape
