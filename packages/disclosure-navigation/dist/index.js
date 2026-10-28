@@ -117,7 +117,7 @@ var e = (e) => e === "open" ? "closed" : "open", t = /* @__PURE__ */ new WeakMap
 	#h = (e) => {
 		if (this.dataset.arrowKeys === "false") return;
 		let t = e.target, n = this.#i.findLast((e) => u(e, t)), r = n ? this.#a(l(n), s) : this.#a([this], o), a = r.indexOf(t);
-		if (a !== -1) return e.key === "ArrowDown" && t instanceof HTMLButtonElement && c(t) ? (e.preventDefault(), this.#a(l(t), s)[0]?.focus()) : i(e, r, a);
+		if (a !== -1) return !n && e.key === "ArrowDown" && t instanceof HTMLButtonElement && c(t) ? (e.preventDefault(), this.#a(l(t), s)[0]?.focus()) : i(e, r, a);
 	};
 };
 customElements.get("cinq-disclosure-navigation") || customElements.define("cinq-disclosure-navigation", p);

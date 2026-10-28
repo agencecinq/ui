@@ -104,6 +104,9 @@ if you lay it out.
 A submenu can hold buttons with their own submenus. Opening one keeps its parents open
 and closes the other branches. Closing a submenu closes the ones nested in it.
 
+In a submenu, the arrow keys stay at its level, whatever the layout: Tab moves into a
+nested submenu, and Escape back to its button.
+
 ### Opening on hover
 
 With `data-hover`, a mouse opens a submenu when it enters its button, and closes it when
@@ -148,7 +151,7 @@ canceling `beforetoggle` leaves the button collapsed next to a visible submenu.
 | Escape              | Button or top-level link   | Closes the open submenu.                         |
 | Escape              | Submenu                    | Closes the innermost one and focuses its button. |
 | Escape              | Outside the navigation     | Closes the open submenu, focus stays.            |
-| ArrowDown           | Expanded button, any level | Moves focus to the first item of its submenu.    |
+| ArrowDown           | Expanded top-level button  | Moves focus to the first item of its submenu.    |
 | Arrow keys          | Top-level item             | Previous or next button or link, wrapping.       |
 | Arrow keys          | Submenu item               | Previous or next item, wrapping.                 |
 | Home / End          | Top-level or submenu item  | First or last item.                              |
@@ -260,6 +263,13 @@ Find in page relies on `hidden="until-found"`: Chrome and Edge 102, Firefox 139,
 Safari 26.2. Elsewhere it acts as `hidden`. The package is an ES module.
 
 ## Migration
+
+### From 1.x to 2.0
+
+1. **Expect ArrowDown to stay at the level of a submenu.** On an expanded button in a
+   submenu, it moved into the nested submenu, while ArrowUp went to the previous item.
+   It now goes to the next item. Tab still moves into the nested submenu. ArrowDown on
+   an expanded top-level button moves into its submenu, as before.
 
 ### From `@19h47/disclosure-navigation` 5.x
 
