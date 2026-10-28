@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.33
+
+### Patch Changes
+
+- Updated dependencies [41cde32]
+  - @agencecinq/disclosure-navigation@3.0.0
+
 ## 4.4.32
 
 ### Patch Changes
