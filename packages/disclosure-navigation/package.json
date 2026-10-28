@@ -1,0 +1,52 @@
+{
+  "name": "@agencecinq/disclosure-navigation",
+  "version": "0.0.0",
+  "description": "Accessible WAI-ARIA disclosure navigation Web Component: submenus opened by buttons, on hover too.",
+  "keywords": [
+    "disclosure",
+    "navigation",
+    "nav",
+    "menu",
+    "web-component",
+    "accessibility",
+    "a11y",
+    "wai-aria",
+    "apg"
+  ],
+  "type": "module",
+  "license": "MIT",
+  "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agencecinq/ui.git",
+    "directory": "packages/disclosure-navigation"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@vitest/browser-playwright": "^4.1.11",
+    "playwright": "^1.64.1",
+    "vite": "^8.2.0",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.1.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -21,6 +21,7 @@
     "@agencecinq/dual-scroll": "workspace:*",
     "@agencecinq/snake": "workspace:*",
     "@agencecinq/disclosure-button": "workspace:*",
+    "@agencecinq/disclosure-navigation": "workspace:*",
     "@agencecinq/drilldown": "workspace:*",
     "@agencecinq/dropzone": "workspace:*",
     "@agencecinq/drawer": "workspace:*",

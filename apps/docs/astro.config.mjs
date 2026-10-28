@@ -27,6 +27,7 @@ export default defineConfig({
             { label: 'Spinbutton', slug: 'components/spinbutton' },
             { label: 'Slider', slug: 'components/slider' },
             { label: 'Disclosure Button', slug: 'components/disclosure-button' },
+            { label: 'Disclosure Navigation', slug: 'components/disclosure-navigation' },
             { label: 'Drilldown', slug: 'components/drilldown' },
             { label: 'Dropzone', slug: 'components/dropzone' },
             { label: 'Switch', slug: 'components/switch' },

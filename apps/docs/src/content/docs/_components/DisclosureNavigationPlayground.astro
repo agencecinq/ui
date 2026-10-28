@@ -1,0 +1,127 @@
+---
+import RegisterComponents from './RegisterComponents.astro';
+
+const button =
+  'inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-gray-100';
+const link =
+  'block rounded-lg px-3 py-2 text-sm text-gray-900 no-underline transition-colors hover:bg-gray-100 aria-[current=page]:font-semibold';
+const panel = 'm-0 w-56 list-none rounded-xl border border-gray-200 bg-white p-2 shadow-lg';
+---
+
+<RegisterComponents />
+
+<div class="not-content">
+  <section class="rounded-2xl bg-white p-6 shadow">
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Guild hall navigation</h3>
+        <p class="text-sm text-gray-600">
+          One branch open at a time, a nested submenu under Quests, arrow keys between the
+          entries and Escape to close. With <code>data-hover</code>, the mouse opens the
+          submenus: the first click after it keeps them open. The Armory is
+          <code>hidden="until-found"</code>: search the page for “Vorpal” and it opens.
+        </p>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-gray-900">
+        <input id="docs-disclosure-navigation-hover" type="checkbox" checked />
+        Open on hover (<code>data-hover</code>)
+      </label>
+
+      <cinq-disclosure-navigation
+        id="docs-disclosure-navigation"
+        class="h-72 rounded-lg border border-gray-200 bg-gray-50 p-4"
+        data-hover
+      >
+        <nav aria-label="Guild hall">
+          <ul class="m-0 flex list-none flex-wrap items-start gap-2 p-0">
+            <li><a href="#" class={button} aria-current="page">Tavern</a></li>
+            <li class="relative">
+              <button
+                type="button"
+                class={button}
+                aria-expanded="false"
+                aria-controls="docs-disclosure-navigation-quests"
+                id="docs-disclosure-navigation-quests-button"
+              >
+                Quests <span aria-hidden="true">▾</span>
+              </button>
+              <div id="docs-disclosure-navigation-quests" class="absolute top-full left-0 z-10 pt-2" hidden>
+                <ul class={panel}>
+                  <li><a href="#" class={link}>Bounty board</a></li>
+                  <li class="relative">
+                    <button
+                      type="button"
+                      class:list={[button, 'w-full justify-between']}
+                      aria-expanded="false"
+                      aria-controls="docs-disclosure-navigation-dungeons"
+                      id="docs-disclosure-navigation-dungeons-button"
+                    >
+                      Dungeons <span aria-hidden="true">▸</span>
+                    </button>
+                    <div id="docs-disclosure-navigation-dungeons" class="absolute top-0 left-full z-10 pl-3" hidden>
+                      <ul class={panel}>
+                        <li><a href="#" class={link}>Tomb of Horrors</a></li>
+                        <li><a href="#" class={link}>Undermountain</a></li>
+                        <li><a href="#" class={link}>Castle Ravenloft</a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li><a href="#" class={link}>Escort missions</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="relative">
+              <button
+                type="button"
+                class={button}
+                aria-expanded="false"
+                aria-controls="docs-disclosure-navigation-armory"
+                id="docs-disclosure-navigation-armory-button"
+              >
+                Armory <span aria-hidden="true">▾</span>
+              </button>
+              <div id="docs-disclosure-navigation-armory" class="absolute top-full left-0 z-10 pt-2" hidden="until-found">
+                <ul class={panel}>
+                  <li><a href="#" class={link}>Vorpal sword</a></li>
+                  <li><a href="#" class={link}>Mithral chain mail</a></li>
+                  <li><a href="#" class={link}>Bag of holding</a></li>
+                </ul>
+              </div>
+            </li>
+            <li><a href="#" class={button}>Stables</a></li>
+          </ul>
+        </nav>
+      </cinq-disclosure-navigation>
+
+      <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+        Last event: <span id="docs-disclosure-navigation-status" class="font-mono font-medium text-gray-900">-</span>
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>
+  import type { DisclosureNavigation } from '@agencecinq/disclosure-navigation';
+
+  const $navigation = document.getElementById('docs-disclosure-navigation') as DisclosureNavigation | null;
+  const $hover = document.getElementById('docs-disclosure-navigation-hover') as HTMLInputElement | null;
+  const $status = document.getElementById('docs-disclosure-navigation-status');
+
+  $hover?.addEventListener('change', () => {
+    $navigation?.toggleAttribute('data-hover', $hover.checked);
+  });
+
+  $navigation?.addEventListener(
+    'toggle',
+    (event) => {
+      const { oldState, newState, source, target } = event as ToggleEvent;
+      const $submenu = target as HTMLElement;
+
+      if ($status) {
+        $status.textContent = `toggle #${$submenu.id} ${oldState} → ${newState}, source #${source?.id}`;
+      }
+    },
+    { capture: true },
+  );
+</script>
