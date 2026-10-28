@@ -663,16 +663,25 @@ describe("nested submenus", () => {
     expect(document.activeElement).toBe($("team"));
   });
 
-  it("stays at the level of an expanded nested button with the arrow keys", async () => {
+  it("follows the reading order through an open nested submenu", async () => {
     mount();
     await userEvent.click($("about"));
-    await userEvent.click($("team"));
+    await press($("team"), "Enter");
 
-    await press($("team"), "ArrowDown");
+    await userEvent.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe($("leadership"));
+
+    await userEvent.keyboard("{ArrowUp}");
+    expect(document.activeElement).toBe($("team"));
+
+    await press($("designers"), "ArrowDown");
     expect(document.activeElement).toBe($("history"));
 
-    await press($("team"), "ArrowUp");
-    expect(document.activeElement).toBe($("overview"));
+    await userEvent.keyboard("{ArrowUp}");
+    expect(document.activeElement).toBe($("designers"));
+
+    await userEvent.keyboard("{End}");
+    expect(document.activeElement).toBe($("history"));
   });
 
   // WebKit, as Safari, tabs to links only with Option + Tab or its setting
@@ -687,13 +696,14 @@ describe("nested submenus", () => {
     expect(document.activeElement).toBe($("leadership"));
   });
 
-  it("skips the items of nested submenus when moving within a submenu", async () => {
+  it("skips the items of collapsed nested submenus", async () => {
     mount();
     await userEvent.click($("about"));
-    await userEvent.click($("team"));
 
-    await press($("history"), "ArrowUp");
+    await press($("team"), "ArrowDown");
+    expect(document.activeElement).toBe($("history"));
 
+    await userEvent.keyboard("{ArrowUp}");
     expect(document.activeElement).toBe($("team"));
   });
 });

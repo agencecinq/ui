@@ -104,8 +104,10 @@ if you lay it out.
 A submenu can hold buttons with their own submenus. Opening one keeps its parents open
 and closes the other branches. Closing a submenu closes the ones nested in it.
 
-In a submenu, the arrow keys stay at its level, whatever the layout: Tab moves into a
-nested submenu, and Escape back to its button.
+In a submenu, the arrow keys follow the reading order of its visible items, as Tab
+does, whatever the layout: the items of an open nested submenu follow its button. Enter
+on a nested button opens its submenu, ArrowDown moves into it, and Escape closes it and
+focuses its button.
 
 ### Opening on hover
 
@@ -153,7 +155,7 @@ canceling `beforetoggle` leaves the button collapsed next to a visible submenu.
 | Escape              | Outside the navigation     | Closes the open submenu, focus stays.            |
 | ArrowDown           | Expanded top-level button  | Moves focus to the first item of its submenu.    |
 | Arrow keys          | Top-level item             | Previous or next button or link, wrapping.       |
-| Arrow keys          | Submenu item               | Previous or next item, wrapping.                 |
+| Arrow keys          | Submenu item               | Previous or next visible item, open nested submenus included, wrapping. |
 | Home / End          | Top-level or submenu item  | First or last item.                              |
 
 Moving focus out of the navigation closes the open submenu. Keys pressed with Alt, Ctrl
@@ -263,6 +265,14 @@ Find in page relies on `hidden="until-found"`: Chrome and Edge 102, Firefox 139,
 Safari 26.2. Elsewhere it acts as `hidden`. The package is an ES module.
 
 ## Migration
+
+### From 2.x to 3.0
+
+1. **Expect the arrow keys to follow the reading order in a submenu.** They stayed at
+   the level of the focused item, so only Tab moved into an open nested submenu. They now
+   go through the visible items in reading order, as Tab does: ArrowDown on an expanded
+   nested button moves to the first item of its submenu, and ArrowDown on its last item
+   to the item after the button. Home and End reach the first and last visible items.
 
 ### From 1.x to 2.0
 

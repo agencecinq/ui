@@ -46,7 +46,7 @@ var e = (e) => e === "open" ? "closed" : "open", t = /* @__PURE__ */ new WeakMap
 	init() {
 		this.#e = new AbortController();
 		let { signal: e } = this.#e;
-		this.addEventListener("click", this.#l, { signal: e }), this.addEventListener("keydown", this.#h, { signal: e }), this.addEventListener("focusout", this.#f, { signal: e }), this.addEventListener("beforematch", this.#p, { signal: e }), this.addEventListener("pointerover", this.#u, { signal: e }), this.addEventListener("pointerout", this.#d, { signal: e }), document.addEventListener("keydown", this.#m, { signal: e });
+		this.addEventListener("click", this.#u, { signal: e }), this.addEventListener("keydown", this.#g, { signal: e }), this.addEventListener("focusout", this.#p, { signal: e }), this.addEventListener("beforematch", this.#m, { signal: e }), this.addEventListener("pointerover", this.#d, { signal: e }), this.addEventListener("pointerout", this.#f, { signal: e }), document.addEventListener("keydown", this.#h, { signal: e });
 	}
 	destroy() {
 		this.#e?.abort(), this.#n = null;
@@ -54,11 +54,11 @@ var e = (e) => e === "open" ? "closed" : "open", t = /* @__PURE__ */ new WeakMap
 	open(e) {
 		if (c(e) || !f(e, "open")) return;
 		let t = this.#i.filter((t) => !u(t, e) && !u(e, t));
-		this.#o(t), this.#s(e, !0);
+		this.#s(t), this.#c(e, !0);
 	}
 	close(e) {
 		let t = e ? this.#i.filter((t) => t === e || u(e, t)) : this.#i;
-		this.#o(t);
+		this.#s(t);
 	}
 	toggle(e) {
 		return c(e) ? this.close(e) : this.open(e);
@@ -69,55 +69,59 @@ var e = (e) => e === "open" ? "closed" : "open", t = /* @__PURE__ */ new WeakMap
 	get #i() {
 		return this.#r.filter(c);
 	}
-	#a(e, t) {
-		let n = this.#r.flatMap(l).filter((t) => e.some((e) => e !== t && e.contains(t)));
-		return e.flatMap((e) => [...e.querySelectorAll(t)]).filter((e) => !n.some((t) => t.contains(e)));
+	#a(e, t, n = this.#r) {
+		let r = n.flatMap(l).filter((t) => e.some((e) => e !== t && e.contains(t)));
+		return e.flatMap((e) => [...e.querySelectorAll(t)]).filter((e) => !r.some((t) => t.contains(e)));
 	}
 	#o(e) {
+		let t = this.#r.filter((e) => !c(e));
+		return this.#a(l(e), s, t);
+	}
+	#s(e) {
 		e.toReversed().forEach((e) => {
-			f(e, "closed"), this.#s(e, !1);
+			f(e, "closed"), this.#c(e, !1);
 		});
 	}
-	#s(e, t) {
+	#c(e, t) {
 		let n = t ? "open" : "closed";
 		e.ariaExpanded = t.toString(), !t && e === this.#n && (this.#n = null), l(e).forEach((i) => {
 			r(i, n, e), t ? (this.#t.set(i, i.hidden || !0), i.hidden = !1) : (i.matches(":focus-within") && e.focus(), i.hidden = this.#t.get(i) ?? !0);
 		});
 	}
-	#c(e) {
+	#l(e) {
 		return e.pointerType === "mouse" && this.hasAttribute("data-hover");
 	}
-	#l = (e) => {
+	#u = (e) => {
 		let t = e.target.closest(a);
 		if (!t || !this.contains(t)) return;
 		let n = t === this.#n;
 		this.#n = null, n || this.toggle(t);
 	};
-	#u = (e) => {
-		let t = e.target.closest(a), n = e.relatedTarget;
-		this.#c(e) && t && this.contains(t) && !c(t) && !d(t, n) && (this.open(t), c(t) && (this.#n = t));
-	};
 	#d = (e) => {
-		if (!this.#c(e)) return;
+		let t = e.target.closest(a), n = e.relatedTarget;
+		this.#l(e) && t && this.contains(t) && !c(t) && !d(t, n) && (this.open(t), c(t) && (this.#n = t));
+	};
+	#f = (e) => {
+		if (!this.#l(e)) return;
 		let t = e.target, n = e.relatedTarget;
 		this.#i.filter((e) => d(e, t) && !d(e, n)).forEach((e) => this.close(e));
 	};
-	#f = (e) => {
+	#p = (e) => {
 		this.contains(e.relatedTarget) || this.matches(":active") || this.close();
 	};
-	#p = (e) => {
+	#m = (e) => {
 		let t = e.target, n = this.#r.find((e) => l(e).includes(t));
 		n && (this.open(n), t.hidden = "until-found");
 	};
-	#m = (e) => {
+	#h = (e) => {
 		if (e.key !== "Escape" || e.defaultPrevented || !this.#i.length) return;
 		let t = e.target;
 		return this.contains(t) ? (e.preventDefault(), this.close(this.#i.findLast((e) => u(e, t)))) : this.close();
 	};
-	#h = (e) => {
+	#g = (e) => {
 		if (this.dataset.arrowKeys === "false") return;
-		let t = e.target, n = this.#i.findLast((e) => u(e, t)), r = n ? this.#a(l(n), s) : this.#a([this], o), a = r.indexOf(t);
-		if (a !== -1) return !n && e.key === "ArrowDown" && t instanceof HTMLButtonElement && c(t) ? (e.preventDefault(), this.#a(l(t), s)[0]?.focus()) : i(e, r, a);
+		let t = e.target, n = this.#i.filter((e) => u(e, t)), r = n.find((e) => !n.some((t) => u(t, e))), a = r ? this.#o(r) : this.#a([this], o), s = a.indexOf(t);
+		if (s !== -1) return !r && e.key === "ArrowDown" && t instanceof HTMLButtonElement && c(t) ? (e.preventDefault(), this.#o(t)[0]?.focus()) : i(e, a, s);
 	};
 };
 customElements.get("cinq-disclosure-navigation") || customElements.define("cinq-disclosure-navigation", p);
