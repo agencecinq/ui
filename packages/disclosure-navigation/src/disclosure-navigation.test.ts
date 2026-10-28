@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { userEvent } from "vitest/browser";
+import { server, userEvent } from "vitest/browser";
 import type { DisclosureNavigation } from "./index.js";
 import "./index.js";
 
@@ -663,12 +663,26 @@ describe("nested submenus", () => {
     expect(document.activeElement).toBe($("team"));
   });
 
-  it("moves into a nested submenu on ArrowDown on its expanded button", async () => {
+  it("stays at the level of an expanded nested button with the arrow keys", async () => {
     mount();
     await userEvent.click($("about"));
     await userEvent.click($("team"));
 
     await press($("team"), "ArrowDown");
+    expect(document.activeElement).toBe($("history"));
+
+    await press($("team"), "ArrowUp");
+    expect(document.activeElement).toBe($("overview"));
+  });
+
+  // WebKit, as Safari, tabs to links only with Option + Tab or its setting
+  it.skipIf(server.browser === "webkit")("moves into a nested submenu with Tab", async () => {
+    mount();
+    await userEvent.click($("about"));
+    await userEvent.click($("team"));
+
+    $("team").focus();
+    await userEvent.tab();
 
     expect(document.activeElement).toBe($("leadership"));
   });

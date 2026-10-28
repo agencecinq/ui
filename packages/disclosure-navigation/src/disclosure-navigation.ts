@@ -314,8 +314,10 @@ export class DisclosureNavigation extends HTMLElement {
       return;
     }
 
-    // Move focus into the submenu of an expanded button
+    // Move focus into the submenu of an expanded top-level button. In a submenu,
+    // ArrowDown stays at its level, as ArrowUp does: Tab enters a nested submenu
     if (
+      !$button &&
       "ArrowDown" === event.key &&
       $target instanceof HTMLButtonElement &&
       isExpanded($target)
