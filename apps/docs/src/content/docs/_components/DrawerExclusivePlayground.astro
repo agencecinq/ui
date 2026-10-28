@@ -6,10 +6,10 @@ import RegisterComponents from "./RegisterComponents.astro";
 <RegisterComponents />
 
 <div class="not-content">
-  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+  <section class="rounded-2xl bg-elevated p-6 shadow flex flex-col gap-4 border border-default">
     <div>
-      <h3 class="text-lg font-semibold text-gray-900">Exclusive drawers</h3>
-      <p class="text-sm text-gray-600">
+      <h3 class="text-lg font-semibold text-primary">Exclusive drawers</h3>
+      <p class="text-sm text-muted">
         Opening one drawer closes any other that is already open. Focus return is
         shared: only a trigger <em>outside</em> any <code class="text-xs">cinq-drawer</code> is
         remembered, so closing the chain returns to the page button that started it.
@@ -19,7 +19,7 @@ import RegisterComponents from "./RegisterComponents.astro";
     <div class="flex flex-wrap gap-3">
       <cinq-drawer-button class="block">
         <button
-          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
           aria-controls="exclusive-drawer-left"
           aria-expanded="false"
         >
@@ -28,7 +28,7 @@ import RegisterComponents from "./RegisterComponents.astro";
       </cinq-drawer-button>
       <cinq-drawer-button class="block">
         <button
-          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+          class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
           aria-controls="exclusive-drawer-right"
           aria-expanded="false"
         >
@@ -40,19 +40,19 @@ import RegisterComponents from "./RegisterComponents.astro";
     <cinq-drawer id="exclusive-drawer-left">
       <dialog
         aria-labelledby="exclusive-drawer-left-title"
-        class="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 -translate-x-full starting:open:-translate-x-full"
+        class="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-elevated shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-overlay-scrim backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 -translate-x-full starting:open:-translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
             <h2
               id="exclusive-drawer-left-title"
-              class="text-lg font-semibold text-gray-900"
+              class="text-lg font-semibold text-primary"
             >
               Encounter notes
             </h2>
             <cinq-drawer-button class="block">
               <button
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-focus-ring/20"
                 aria-controls="exclusive-drawer-left"
                 aria-expanded="false"
                 aria-label="Close notes"
@@ -62,20 +62,20 @@ import RegisterComponents from "./RegisterComponents.astro";
             </cinq-drawer-button>
           </header>
           <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-muted">
               Party enters from the west corridor. Two trolls wait behind the
               collapsed arch.
             </p>
             <cinq-drawer-button class="block">
               <button
-                class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+                class="px-3 py-2 rounded-lg border border-control text-sm text-primary hover:bg-surface"
                 aria-controls="exclusive-drawer-left exclusive-drawer-right"
                 aria-expanded="false"
               >
                 Switch to bestiary
               </button>
             </cinq-drawer-button>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-muted">
               This control targets both drawers. Closing the bestiary returns
               focus to <strong>Open left</strong>, not this button.
             </p>
@@ -87,19 +87,19 @@ import RegisterComponents from "./RegisterComponents.astro";
     <cinq-drawer id="exclusive-drawer-right">
       <dialog
         aria-labelledby="exclusive-drawer-right-title"
-        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-elevated shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-overlay-scrim backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
             <h2
               id="exclusive-drawer-right-title"
-              class="text-lg font-semibold text-gray-900"
+              class="text-lg font-semibold text-primary"
             >
               Bestiary
             </h2>
             <cinq-drawer-button class="block">
               <button
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-focus-ring/20"
                 aria-controls="exclusive-drawer-right"
                 aria-expanded="false"
                 aria-label="Close bestiary"
@@ -109,12 +109,12 @@ import RegisterComponents from "./RegisterComponents.astro";
             </cinq-drawer-button>
           </header>
           <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-muted">
               Troll. Regenerates unless hit with fire or acid.
             </p>
             <cinq-drawer-button class="block">
               <button
-                class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+                class="px-3 py-2 rounded-lg border border-control text-sm text-primary hover:bg-surface"
                 aria-controls="exclusive-drawer-right exclusive-drawer-left"
                 aria-expanded="false"
               >

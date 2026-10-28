@@ -5,10 +5,10 @@ import RegisterComponents from "./RegisterComponents.astro";
 <RegisterComponents />
 
 <div class="not-content">
-  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+  <section class="rounded-2xl bg-elevated p-6 shadow flex flex-col gap-4 border border-default">
     <div>
-      <h3 class="text-lg font-semibold text-gray-900">Stacked modals (APG)</h3>
-      <p class="text-sm text-gray-600">
+      <h3 class="text-lg font-semibold text-primary">Stacked modals (APG)</h3>
+      <p class="text-sm text-muted">
         A modal can open over another. The lower dialog stays open but inert
         (native <code class="text-xs">showModal()</code> top layer). Closing the top
         dialog returns focus to the control that opened it. Inside the parent
@@ -18,14 +18,14 @@ import RegisterComponents from "./RegisterComponents.astro";
 
     <button
       type="button"
-      class="self-start px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+      class="self-start px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
       commandfor="stacked-modal-address"
       command="show-modal"
     >
       Add delivery address
     </button>
 
-    <p class="text-xs text-gray-500">
+    <p class="text-xs text-muted">
       Flow: open address to verify to close verify (focus on Verify) to close address
       (focus on Add delivery address).
     </p>
@@ -35,19 +35,19 @@ import RegisterComponents from "./RegisterComponents.astro";
         id="stacked-modal-address"
         closedby="any"
         aria-labelledby="add-delivery-address-title"
-        class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+        class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-elevated p-6 shadow-2xl backdrop:bg-overlay-scrim text-primary border border-default"
       >
         <div class="flex flex-col gap-4">
           <div class="flex items-start justify-between gap-4">
             <div>
               <h2 id="add-delivery-address-title" class="text-xl font-semibold mb-1">Add delivery address</h2>
-              <p class="text-sm text-gray-600">
+              <p class="text-sm text-muted">
                 Street and city for the next encounter drop.
               </p>
             </div>
             <button
               type="button"
-              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover"
               commandfor="stacked-modal-address"
               command="request-close"
               aria-label="Close address dialog"
@@ -57,18 +57,18 @@ import RegisterComponents from "./RegisterComponents.astro";
           </div>
 
           <label class="block">
-            <span class="block text-sm font-medium text-gray-700 mb-1">Street</span>
+            <span class="block text-sm font-medium text-body mb-1">Street</span>
             <input
               id="stacked-street"
               name="street"
-              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+              class="w-full rounded-lg border border-default px-3 py-2 text-sm"
               placeholder="12 Goblin Alley"
             />
           </label>
 
           <button
             type="button"
-            class="self-start px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+            class="self-start px-3 py-2 rounded-lg border border-control text-sm text-primary hover:bg-surface"
             commandfor="stacked-modal-verify"
             command="show-modal"
           >
@@ -83,23 +83,23 @@ import RegisterComponents from "./RegisterComponents.astro";
         id="stacked-modal-verify"
         closedby="any"
         aria-labelledby="verification-result-title"
-        class="fixed left-1/2 top-1/2 w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+        class="fixed left-1/2 top-1/2 w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-elevated p-6 shadow-2xl backdrop:bg-overlay-scrim text-primary border border-default"
       >
         <div class="flex flex-col gap-4">
           <div>
             <h2 id="verification-result-title" class="text-xl font-semibold mb-1">Verification result</h2>
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-muted">
               Address looks valid. Close this dialog to return to the form. The
               address dialog stays open underneath.
             </p>
           </div>
-          <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
             Deliver to <strong data-stacked-street>an unnamed street</strong>.
           </p>
           <div class="flex justify-end">
             <button
               type="button"
-              class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+              class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
               commandfor="stacked-modal-verify"
               command="request-close"
             >

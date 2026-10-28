@@ -1,0 +1,70 @@
+---
+/**
+ * Footer: Starlight's (edit link, last update, pagination), then the Figma Section/Footer: the logo
+ * and its line, one column of links per group, the copyright. Starlight renders it inside <main>,
+ * so it is no contentinfo landmark: its links are a named navigation.
+ */
+import Default from '@astrojs/starlight/components/Footer.astro';
+import Logo from './Logo.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const year = new Date().getFullYear();
+const columns = [
+  {
+    id: 'footer-docs',
+    title: 'Docs',
+    links: [
+      { label: 'Overview', href: base },
+      { label: 'Utils', href: `${base}reference/utils/` },
+      { label: 'Store', href: `${base}reference/store/` },
+      { label: 'Sandbox', href: `${base}sandbox/` },
+    ],
+  },
+  {
+    id: 'footer-cinq',
+    title: 'CINQ',
+    links: [
+      { label: 'agencecinq.com', href: 'https://agencecinq.com' },
+      { label: 'GitHub', href: 'https://github.com/agencecinq/ui' },
+      { label: 'npm', href: 'https://www.npmjs.com/org/agencecinq' },
+    ],
+  },
+];
+const link =
+  'text-primary focus-visible:outline-focus-ring no-underline hover:underline focus-visible:underline focus-visible:outline-2 focus-visible:outline-offset-2';
+---
+
+<Default />
+
+<div class="border-default mt-14 flex flex-col gap-10 border-t pt-14 print:hidden">
+  <div class="grid gap-10 sm:grid-cols-2">
+    <div class="flex flex-col items-start gap-4">
+      <a href={base} class="text-primary focus-visible:outline-focus-ring block h-6 w-20 focus-visible:outline-2 focus-visible:outline-offset-2" aria-label="CINQ UI, home">
+        <Logo class="size-full" />
+      </a>
+      <p class="text-body m-0 text-lg">Accessible Web Components, built on the platform.</p>
+    </div>
+
+    <nav class="grid grid-cols-2 gap-10" aria-label="Footer">
+      {
+        columns.map(({ id, title, links }) => (
+          <div class="flex flex-col gap-3">
+            <p id={id} class="text-muted m-0 text-sm font-medium">{title}</p>
+            <ul class="m-0 flex list-none flex-col gap-3 p-0 text-sm" aria-labelledby={id}>
+              {links.map(({ label, href }) => (
+                <li class="m-0">
+                  <a class={link} href={href}>{label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+  </div>
+
+  <div class="border-default text-muted flex flex-col gap-3 border-t pt-6 text-sm sm:flex-row sm:justify-between">
+    <p class="m-0">© {year} CINQ</p>
+    <p class="m-0">Released under the MIT License.</p>
+  </div>
+</div>

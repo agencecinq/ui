@@ -24,8 +24,8 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-switch:hover,
   .docs-switch:focus-visible {
-    background-color: #f3f4f6;
-    outline-color: #111827;
+    background-color: var(--background-color-surface-hover);
+    outline-color: var(--color-focus-ring);
   }
 
   .docs-switch:disabled,
@@ -45,7 +45,7 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-switch .label {
     flex: 1;
     font-size: 0.875rem;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-switch .slider {
@@ -57,8 +57,8 @@ import RegisterComponents from './RegisterComponents.astro';
     min-width: 1.75rem;
     height: 1rem;
     border-radius: 0.5rem;
-    border: 1px solid #adb5bd;
-    background-color: #fff;
+    border: 1px solid var(--border-color-control);
+    background-color: var(--background-color-elevated);
     transition:
       background-color 0.15s ease-in-out,
       border-color 0.15s ease-in-out;
@@ -70,18 +70,18 @@ import RegisterComponents from './RegisterComponents.astro';
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background-color: #adb5bd;
+    background-color: var(--border-color-control);
     transform: translateX(0.1rem);
     transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .docs-switch[aria-checked='true'] .slider {
-    border-color: #111827;
-    background-color: #111827;
+    border-color: var(--border-color-accent);
+    background-color: var(--color-accent-default);
   }
 
   .docs-switch[aria-checked='true'] .slider::before {
-    background-color: #fff;
+    background-color: var(--background-color-elevated);
     transform: translateX(0.75rem);
   }
 
@@ -131,16 +131,16 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-switch[aria-checked='true'] .label {
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-switch-minimal {
     font-size: 0.875rem;
     padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-color-control);
     border-radius: 0.5rem;
-    background-color: #f9fafb;
-    color: #6b7280;
+    background-color: var(--background-color-surface);
+    color: var(--text-color-muted);
     transition:
       background-color 0.15s ease-in-out,
       border-color 0.15s ease-in-out,
@@ -148,31 +148,31 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-switch-minimal[aria-checked='true'] {
-    border-color: #111827;
-    background-color: #111827;
-    color: #fff;
+    border-color: var(--border-color-accent);
+    background-color: var(--color-accent-default);
+    color: var(--text-color-on-accent);
     font-weight: 600;
   }
 
   .docs-switch-minimal[aria-checked='true']:hover,
   .docs-switch-minimal[aria-checked='true']:focus-visible {
-    background-color: #1f2937;
-    outline-color: #111827;
+    background-color: var(--color-accent-hover);
+    outline-color: var(--color-focus-ring);
   }
 
   .docs-switch-advanced-panel {
     margin: 0;
     padding: 1rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.75rem;
-    background: #fafafa;
+    background: var(--background-color-surface);
   }
 
   .docs-switch-advanced-panel legend {
     padding: 0 0.25rem;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-switch-advanced-panel .docs-switch + .docs-switch {
@@ -191,20 +191,20 @@ import RegisterComponents from './RegisterComponents.astro';
     font-size: 0.75rem;
     padding: 0.75rem;
     border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    color: #374151;
+    border: 1px solid var(--border-color-default);
+    background: var(--background-color-elevated);
+    color: var(--text-color-body);
     white-space: pre-wrap;
   }
 </style>
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Basic switch</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Basic switch</h3>
+          <p class="text-sm text-muted">
             Click or press <kbd>Space</kbd> / <kbd>Enter</kbd> to toggle. Activate and deactivate
             events are logged below.
           </p>
@@ -221,17 +221,17 @@ import RegisterComponents from './RegisterComponents.astro';
           <span class="slider" aria-hidden="true"></span>
         </cinq-switch>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last event: <span id="docs-switch-status" class="font-mono font-medium text-gray-900">-</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+          Last event: <span id="docs-switch-status" class="font-mono font-medium text-primary">-</span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">On / Off labels</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">On / Off labels</h3>
+          <p class="text-sm text-muted">
             A larger track can reveal <strong>On</strong> and <strong>Off</strong> text inside the
             slider. Style with <code>[aria-checked="true"]</code> on the host.
           </p>
@@ -251,17 +251,17 @@ import RegisterComponents from './RegisterComponents.astro';
           </span>
         </cinq-switch>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          State: <span id="docs-switch-labels-status" class="font-mono font-medium text-gray-900">off</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+          State: <span id="docs-switch-labels-status" class="font-mono font-medium text-primary">off</span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Accessible naming</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Accessible naming</h3>
+          <p class="text-sm text-muted">
             Per the <a href="https://www.w3.org/WAI/ARIA/apg/patterns/switch/">APG</a>, the switch
             needs an accessible name via visible text, <code>aria-label</code>,
             <code>aria-labelledby</code>, or a <code>&lt;label&gt;</code> (see <strong>Like a native field</strong>).
@@ -270,7 +270,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="flex flex-col gap-2">
-            <span class="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <span class="text-xs font-medium uppercase tracking-wide text-muted">
               <code>aria-label</code>
             </span>
             <cinq-switch
@@ -282,13 +282,13 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <span class="slider" aria-hidden="true"></span>
             </cinq-switch>
-            <p class="text-xs text-gray-500">No visible label. Name comes from <code>aria-label</code>.</p>
+            <p class="text-xs text-muted">No visible label. Name comes from <code>aria-label</code>.</p>
           </div>
 
           <div class="flex flex-col gap-2">
             <span
               id="docs-switch-aria-labelledby-label"
-              class="text-xs font-medium uppercase tracking-wide text-gray-500"
+              class="text-xs font-medium uppercase tracking-wide text-muted"
             >
               <code>aria-labelledby</code>
             </span>
@@ -301,7 +301,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <span class="slider" aria-hidden="true"></span>
             </cinq-switch>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-muted">
               The visible heading above is referenced by <code>aria-labelledby</code>.
             </p>
           </div>
@@ -309,11 +309,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Minimal markup</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Minimal markup</h3>
+          <p class="text-sm text-muted">
             No slider. The visible text inside the host provides the accessible name. Style the on
             state with <code>[aria-checked="true"]</code>.
           </p>
@@ -330,11 +330,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Pre-checked state</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Pre-checked state</h3>
+          <p class="text-sm text-muted">
             Set <code>aria-checked="true"</code> in markup for an initially on switch. It is also
             the state <code>form.reset()</code> brings back.
           </p>
@@ -352,11 +352,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Description</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Description</h3>
+          <p class="text-sm text-muted">
             Use <code>aria-describedby</code> when additional static help text should be announced
             with the switch.
           </p>
@@ -373,7 +373,7 @@ import RegisterComponents from './RegisterComponents.astro';
           <span class="slider" aria-hidden="true"></span>
         </cinq-switch>
 
-        <p id="docs-switch-push-desc" class="text-sm text-gray-600">
+        <p id="docs-switch-push-desc" class="text-sm text-muted">
           Keeps a dim light source active while the party explores underground.
         </p>
       </div>
@@ -381,11 +381,11 @@ import RegisterComponents from './RegisterComponents.astro';
 
 
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Like a native field</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Like a native field</h3>
+          <p class="text-sm text-muted">
             Plain HTML, no script: with a <code>name</code>, the switch submits its
             <code>value</code> while on (<code>"on"</code> by default), and Reset brings back the
             markup state. A <code>&lt;label for&gt;</code> or a wrapping <code>&lt;label&gt;</code>
@@ -395,8 +395,8 @@ import RegisterComponents from './RegisterComponents.astro';
           </p>
         </div>
 
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="docs-switch-native-lock" class="rounded border-gray-300" />
+        <label class="flex items-center gap-2 text-sm text-body">
+          <input type="checkbox" id="docs-switch-native-lock" class="rounded border-control" />
           Disable the fieldset
         </label>
 
@@ -406,7 +406,7 @@ import RegisterComponents from './RegisterComponents.astro';
             <legend>Party notifications</legend>
 
             <div class="flex items-center justify-between gap-3">
-              <label for="docs-switch-native-loot" class="text-sm text-gray-900">Loot found</label>
+              <label for="docs-switch-native-loot" class="text-sm text-primary">Loot found</label>
               <cinq-switch
                 id="docs-switch-native-loot"
                 class="docs-switch"
@@ -419,7 +419,7 @@ import RegisterComponents from './RegisterComponents.astro';
               </cinq-switch>
             </div>
 
-            <label class="flex items-center justify-between gap-3 text-sm text-gray-900">
+            <label class="flex items-center justify-between gap-3 text-sm text-primary">
               Level up
               <cinq-switch
                 class="docs-switch"
@@ -437,13 +437,13 @@ import RegisterComponents from './RegisterComponents.astro';
           <div class="flex flex-wrap gap-2">
             <button
               type="submit"
-              class="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+              class="rounded-lg bg-accent-default px-4 py-2 text-sm text-on-accent hover:bg-accent-hover"
             >
               Submit
             </button>
             <button
               type="reset"
-              class="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200"
+              class="rounded-lg bg-surface px-4 py-2 text-sm text-body hover:bg-surface-hover"
             >
               Reset
             </button>
@@ -457,11 +457,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Disabled</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Disabled</h3>
+          <p class="text-sm text-muted">
             <code>disabled</code> works as on a native field: the switch leaves the tab order and
             the form, matches <code>:disabled</code>, and is announced as disabled.
             <code>aria-disabled="true"</code> alone keeps it focusable and submitted.
@@ -470,7 +470,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-2">
-            <span class="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <span class="text-xs font-medium uppercase tracking-wide text-muted">
               <code>disabled</code>
             </span>
             <cinq-switch
@@ -486,7 +486,7 @@ import RegisterComponents from './RegisterComponents.astro';
           </div>
 
           <div class="flex flex-col gap-2">
-            <span class="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <span class="text-xs font-medium uppercase tracking-wide text-muted">
               <code>aria-disabled</code> only
             </span>
             <cinq-switch
@@ -504,11 +504,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Programmatic API</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Programmatic API</h3>
+          <p class="text-sm text-muted">
             Call <code>activate()</code>, <code>deactivate()</code>, or <code>toggle()</code> from
             external controls.
           </p>
@@ -529,60 +529,60 @@ import RegisterComponents from './RegisterComponents.astro';
           <button
             type="button"
             id="docs-switch-programmatic-on"
-            class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+            class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
           >
             Turn on
           </button>
           <button
             type="button"
             id="docs-switch-programmatic-off"
-            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+            class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
           >
             Turn off
           </button>
           <button
             type="button"
             id="docs-switch-programmatic-toggle"
-            class="px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-50"
+            class="px-3 py-2 rounded-lg border border-default bg-elevated text-body hover:bg-surface"
           >
             Toggle
           </button>
           <button
             type="button"
             id="docs-switch-programmatic-silent"
-            class="px-3 py-2 rounded-lg border border-dashed border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
+            class="px-3 py-2 rounded-lg border border-dashed border-control bg-elevated text-muted hover:bg-surface"
           >
             Sync on (silent)
           </button>
         </div>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          State: <span id="docs-switch-programmatic-status" class="font-mono font-medium text-gray-900">off</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+          State: <span id="docs-switch-programmatic-status" class="font-mono font-medium text-primary">off</span>
         </p>
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-muted">
           Events:
-          <span id="docs-switch-programmatic-events" class="font-mono font-medium text-gray-900">none</span>
+          <span id="docs-switch-programmatic-events" class="font-mono font-medium text-primary">none</span>
           (silent sync skips them)
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Cancellable events</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Cancellable events</h3>
+          <p class="text-sm text-muted">
             Activate and deactivate events fire <em>before</em> the state changes. Call <code>event.preventDefault()</code> to abort. Useful for confirmations or gating access.
           </p>
         </div>
 
-        <div class="flex flex-wrap gap-4 text-sm text-gray-700">
+        <div class="flex flex-wrap gap-4 text-sm text-body">
           <label class="flex items-center gap-2">
-            <input type="checkbox" id="docs-switch-cancel-allow-on" class="rounded border-gray-300" checked />
+            <input type="checkbox" id="docs-switch-cancel-allow-on" class="rounded border-control" checked />
             Allow activation
           </label>
           <label class="flex items-center gap-2">
-            <input type="checkbox" id="docs-switch-cancel-allow-off" class="rounded border-gray-300" checked />
+            <input type="checkbox" id="docs-switch-cancel-allow-off" class="rounded border-control" checked />
             Allow deactivation
           </label>
         </div>
@@ -598,17 +598,17 @@ import RegisterComponents from './RegisterComponents.astro';
           <span class="slider" aria-hidden="true"></span>
         </cinq-switch>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last attempt: <span id="docs-switch-cancel-status" class="font-mono font-medium text-gray-900">-</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+          Last attempt: <span id="docs-switch-cancel-status" class="font-mono font-medium text-primary">-</span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Campaign settings (advanced)</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Campaign settings (advanced)</h3>
+          <p class="text-sm text-muted">
             Form submit, a master switch that enables/disables a child, preset loading via{' '}
             <code>activate(false)</code>, <code>form.reset()</code>, and a disabled
             <code>&lt;fieldset&gt;</code> that locks the whole panel.
@@ -619,21 +619,21 @@ import RegisterComponents from './RegisterComponents.astro';
           <button
             type="button"
             id="docs-switch-advanced-preset"
-            class="rounded-lg bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+            class="rounded-lg bg-accent-default px-3 py-2 text-sm text-on-accent hover:bg-accent-hover"
           >
             Load veteran preset
           </button>
           <button
             type="button"
             id="docs-switch-advanced-reset"
-            class="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
+            class="rounded-lg bg-surface px-3 py-2 text-sm text-body hover:bg-surface-hover"
           >
             Reset defaults
           </button>
           <button
             type="button"
             id="docs-switch-advanced-lock"
-            class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+            class="rounded-lg border border-default bg-elevated px-3 py-2 text-sm text-body hover:bg-surface"
           >
             Lock panel
           </button>
@@ -686,7 +686,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
           <button
             type="submit"
-            class="self-start rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+            class="self-start rounded-lg bg-accent-default px-4 py-2 text-sm text-on-accent hover:bg-accent-hover"
           >
             Save campaign settings
           </button>

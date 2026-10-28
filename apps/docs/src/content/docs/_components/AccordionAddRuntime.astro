@@ -43,16 +43,16 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-accordion-add [data-header].focus {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: -2px;
   }
 </style>
 
-<section class="rounded-2xl bg-white p-6 shadow not-content" data-demo-root="accordion-add">
+<section class="rounded-2xl bg-elevated p-6 shadow not-content border border-default" data-demo-root="accordion-add">
   <div class="flex flex-col gap-4">
     <div>
-      <h3 class="text-lg font-semibold text-gray-900">Add panels at runtime</h3>
-      <p class="text-sm text-gray-600">
+      <h3 class="text-lg font-semibold text-primary">Add panels at runtime</h3>
+      <p class="text-sm text-muted">
         The pattern is: <code class="font-mono">destroy()</code>, mutate DOM,{' '}
         <code class="font-mono">init()</code>.
       </p>
@@ -60,18 +60,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
     <div class="grid gap-3 sm:grid-cols-2 max-w-xl">
       <label class="block">
-        <span class="mb-1 block text-sm font-medium text-gray-700">Label</span>
+        <span class="mb-1 block text-sm font-medium text-body">Label</span>
         <input
-          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          class="w-full rounded-lg border border-default px-3 py-2 text-sm"
           type="text"
           placeholder="E.g. Cloaker"
           data-input="label"
         />
       </label>
       <label class="block">
-        <span class="mb-1 block text-sm font-medium text-gray-700">Content</span>
+        <span class="mb-1 block text-sm font-medium text-body">Content</span>
         <input
-          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          class="w-full rounded-lg border border-default px-3 py-2 text-sm"
           type="text"
           placeholder="E.g. Hangs from the ceiling..."
           data-input="content"
@@ -82,21 +82,21 @@ import RegisterComponents from './RegisterComponents.astro';
     <div class="flex flex-wrap items-center gap-2">
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
         data-action="add"
       >
         Add
       </button>
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+        class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
         data-action="destroy"
       >
         Destroy
       </button>
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+        class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
         data-action="create"
       >
         Create
@@ -104,7 +104,7 @@ import RegisterComponents from './RegisterComponents.astro';
     </div>
 
     <cinq-accordion
-      class="docs-accordion-add max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+      class="docs-accordion-add max-w-xl overflow-hidden rounded-xl border border-default divide-y divide-default"
       data-hash="false"
       data-demo="accordion-add"
     >
@@ -113,7 +113,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           data-header
           id="docs-accordion-add-galeb-header"
-          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
           aria-expanded="true"
           aria-controls="docs-accordion-add-galeb-body"
         >
@@ -127,7 +127,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div
             data-inner
-            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+            class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
           >
             <p class="m-0">
               The galeb duhr is a curious boulder-like creature with appendages that act as hands and
@@ -142,7 +142,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           data-header
           id="docs-accordion-add-troll-header"
-          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
           aria-expanded="false"
           aria-controls="docs-accordion-add-troll-body"
         >
@@ -157,7 +157,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div
             data-inner
-            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+            class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
           >
             <p class="m-0">
               Trolls are horrid carnivores found in all climes, from arctic wastelands to tropical
@@ -187,10 +187,10 @@ import RegisterComponents from './RegisterComponents.astro';
       .replace(/"/g, '&quot;');
 
   const headerClass =
-    'flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800';
+    'flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover';
 
   const innerClass =
-    'border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700';
+    'border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body';
 
   {
     const root = document.querySelector('[data-demo-root="accordion-add"]');

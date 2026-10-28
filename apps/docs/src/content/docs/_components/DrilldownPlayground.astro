@@ -56,11 +56,11 @@ import RegisterComponents from './RegisterComponents.astro';
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Bestiary navigation</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Bestiary navigation</h3>
+          <p class="text-sm text-muted">
             Three levels deep. Triggers open their child panel, the back button returns to the
             parent and focus goes back to the trigger. The Undead panel focuses its heading
             with <code>data-autofocus</code>. Open/close events are logged below.
@@ -69,14 +69,14 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <cinq-drilldown
           id="docs-drilldown"
-          class="relative h-80 overflow-hidden rounded-lg border border-gray-200"
+          class="relative h-80 overflow-hidden rounded-lg border border-default"
         >
-          <nav id="docs-drilldown-root" aria-label="Bestiary" class="h-full overflow-y-auto bg-white p-4 text-gray-900">
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+          <nav id="docs-drilldown-root" aria-label="Bestiary" class="h-full overflow-y-auto bg-elevated p-4 text-primary">
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
               <li>
                 <button
                   type="button"
-                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                   aria-expanded="false"
                   aria-controls="docs-drilldown-dragons"
                 >
@@ -86,7 +86,7 @@ import RegisterComponents from './RegisterComponents.astro';
               <li>
                 <button
                   type="button"
-                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                   aria-expanded="false"
                   aria-controls="docs-drilldown-undead"
                 >
@@ -94,24 +94,24 @@ import RegisterComponents from './RegisterComponents.astro';
                 </button>
               </li>
               <li>
-                <a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Random encounter table</a>
+                <a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Random encounter table</a>
               </li>
             </ul>
           </nav>
 
-          <nav id="docs-drilldown-dragons" aria-label="Dragons" class="h-full overflow-y-auto bg-white p-4 text-gray-900" hidden>
+          <nav id="docs-drilldown-dragons" aria-label="Dragons" class="h-full overflow-y-auto bg-elevated p-4 text-primary" hidden>
             <button
               type="button"
-              class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+              class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
               data-close
             >
               <span aria-hidden="true">←</span> Back to bestiary
             </button>
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
               <li>
                 <button
                   type="button"
-                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                   aria-expanded="false"
                   aria-controls="docs-drilldown-chromatic"
                 >
@@ -119,39 +119,39 @@ import RegisterComponents from './RegisterComponents.astro';
                 </button>
               </li>
               <li>
-                <a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Metallic</a>
+                <a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Metallic</a>
               </li>
             </ul>
           </nav>
 
-          <nav id="docs-drilldown-chromatic" aria-label="Chromatic dragons" class="h-full overflow-y-auto bg-white p-4 text-gray-900" hidden>
+          <nav id="docs-drilldown-chromatic" aria-label="Chromatic dragons" class="h-full overflow-y-auto bg-elevated p-4 text-primary" hidden>
             <button
               type="button"
-              class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+              class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
               data-close
             >
               <span aria-hidden="true">←</span> Back to dragons
             </button>
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Red dragon</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Blue dragon</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Green dragon</a></li>
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Red dragon</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Blue dragon</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Green dragon</a></li>
             </ul>
           </nav>
 
-          <nav id="docs-drilldown-undead" aria-labelledby="docs-drilldown-undead-title" class="h-full overflow-y-auto bg-white p-4 text-gray-900" hidden>
+          <nav id="docs-drilldown-undead" aria-labelledby="docs-drilldown-undead-title" class="h-full overflow-y-auto bg-elevated p-4 text-primary" hidden>
             <button
               type="button"
-              class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+              class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
               data-close
             >
               <span aria-hidden="true">←</span> Back to bestiary
             </button>
-            <h4 id="docs-drilldown-undead-title" tabindex="-1" data-autofocus class="mt-0 mb-3 px-1 text-base font-semibold text-gray-900">Undead</h4>
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Lich</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Vampire</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Beholder zombie</a></li>
+            <h4 id="docs-drilldown-undead-title" tabindex="-1" data-autofocus class="mt-0 mb-3 px-1 text-base font-semibold text-primary">Undead</h4>
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Lich</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Vampire</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Beholder zombie</a></li>
             </ul>
           </nav>
         </cinq-drilldown>
@@ -160,23 +160,23 @@ import RegisterComponents from './RegisterComponents.astro';
           <button
             type="button"
             id="docs-drilldown-close-all"
-            class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
+            class="rounded-lg bg-accent-default px-3 py-2 text-on-accent hover:bg-accent-hover"
           >
             closeAll()
           </button>
         </div>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last event: <span id="docs-drilldown-status" class="font-mono font-medium text-gray-900">-</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+          Last event: <span id="docs-drilldown-status" class="font-mono font-medium text-primary">-</span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Portal of summoning</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Portal of summoning</h3>
+          <p class="text-sm text-muted">
             Deliberately over the top, to show what <code>data-direction</code> allows. The host
             reflects <code>forward</code> or <code>back</code> before each change, and pure CSS
             spins the panels through a portal: 3D turn, scale, blur and hue shift, with an
@@ -187,14 +187,14 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <cinq-drilldown
           id="docs-drilldown-portal"
-          class="relative block h-80 rounded-lg bg-gray-900"
+          class="relative block h-80 rounded-lg bg-accent-default"
         >
-          <nav id="docs-drilldown-portal-root" aria-label="Planes of existence" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900">
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+          <nav id="docs-drilldown-portal-root" aria-label="Planes of existence" class="absolute inset-0 overflow-y-auto rounded-lg bg-elevated p-4 text-primary">
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
               <li>
                 <button
                   type="button"
-                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                   aria-expanded="false"
                   aria-controls="docs-drilldown-portal-outer"
                 >
@@ -204,7 +204,7 @@ import RegisterComponents from './RegisterComponents.astro';
               <li>
                 <button
                   type="button"
-                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                   aria-expanded="false"
                   aria-controls="docs-drilldown-portal-elemental"
                 >
@@ -212,50 +212,50 @@ import RegisterComponents from './RegisterComponents.astro';
                 </button>
               </li>
               <li>
-                <a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Material plane</a>
+                <a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Material plane</a>
               </li>
             </ul>
           </nav>
 
-          <nav id="docs-drilldown-portal-outer" aria-label="Outer planes" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900" hidden>
-            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100" data-close>
+          <nav id="docs-drilldown-portal-outer" aria-label="Outer planes" class="absolute inset-0 overflow-y-auto rounded-lg bg-elevated p-4 text-primary" hidden>
+            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover" data-close>
               <span aria-hidden="true">←</span> Back to the planes
             </button>
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
               <li>
                 <button
                   type="button"
-                  class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                  class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                   aria-expanded="false"
                   aria-controls="docs-drilldown-portal-abyss"
                 >
                   The Abyss <span aria-hidden="true">→</span>
                 </button>
               </li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Mount Celestia</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Limbo</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Mount Celestia</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Limbo</a></li>
             </ul>
           </nav>
 
-          <nav id="docs-drilldown-portal-abyss" aria-label="The Abyss" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900" hidden>
-            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100" data-close>
+          <nav id="docs-drilldown-portal-abyss" aria-label="The Abyss" class="absolute inset-0 overflow-y-auto rounded-lg bg-elevated p-4 text-primary" hidden>
+            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover" data-close>
               <span aria-hidden="true">←</span> Back to the outer planes
             </button>
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Demogorgon</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Orcus</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Lolth</a></li>
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Demogorgon</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Orcus</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Lolth</a></li>
             </ul>
           </nav>
 
-          <nav id="docs-drilldown-portal-elemental" aria-label="Elemental planes" class="absolute inset-0 overflow-y-auto rounded-lg bg-white p-4 text-gray-900" hidden>
-            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100" data-close>
+          <nav id="docs-drilldown-portal-elemental" aria-label="Elemental planes" class="absolute inset-0 overflow-y-auto rounded-lg bg-elevated p-4 text-primary" hidden>
+            <button type="button" class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover" data-close>
               <span aria-hidden="true">←</span> Back to the planes
             </button>
-            <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Plane of Fire</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Plane of Water</a></li>
-              <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Plane of Air</a></li>
+            <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Plane of Fire</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Plane of Water</a></li>
+              <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Plane of Air</a></li>
             </ul>
           </nav>
         </cinq-drilldown>
@@ -264,23 +264,23 @@ import RegisterComponents from './RegisterComponents.astro';
           <button
             type="button"
             id="docs-drilldown-portal-close-all"
-            class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
+            class="rounded-lg bg-accent-default px-3 py-2 text-on-accent hover:bg-accent-hover"
           >
             closeAll()
           </button>
         </div>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          <code>data-direction</code>: <span id="docs-drilldown-portal-status" class="font-mono font-medium text-gray-900">none</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+          <code>data-direction</code>: <span id="docs-drilldown-portal-status" class="font-mono font-medium text-primary">none</span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex items-center justify-between gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Inside a drawer</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Inside a drawer</h3>
+          <p class="text-sm text-muted">
             The drawer's modal dialog makes the page inert and hidden panels are not focusable,
             so Tab only cycles through the drawer header and the visible panel. Closing the
             drawer resets the drilldown with <code>closeAll()</code>.
@@ -289,7 +289,7 @@ import RegisterComponents from './RegisterComponents.astro';
         <cinq-drawer-button class="block shrink-0">
           <button
             type="button"
-            class="rounded-lg bg-black px-3 py-2 text-white hover:bg-gray-800"
+            class="rounded-lg bg-accent-default px-3 py-2 text-on-accent hover:bg-accent-hover"
             aria-controls="docs-drilldown-drawer"
             aria-expanded="false"
           >
@@ -302,15 +302,15 @@ import RegisterComponents from './RegisterComponents.astro';
     <cinq-drawer id="docs-drilldown-drawer">
       <dialog
         aria-labelledby="docs-drilldown-drawer-title"
-        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-sm border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-sm border-0 p-0 bg-elevated shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-overlay-scrim backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
-            <h2 id="docs-drilldown-drawer-title" class="text-lg font-semibold text-gray-900">Grimoire</h2>
+            <h2 id="docs-drilldown-drawer-title" class="text-lg font-semibold text-primary">Grimoire</h2>
             <cinq-drawer-button class="block">
               <button
                 type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover"
                 aria-label="Close menu"
                 aria-controls="docs-drilldown-drawer"
                 aria-expanded="false"
@@ -321,12 +321,12 @@ import RegisterComponents from './RegisterComponents.astro';
           </header>
 
           <cinq-drilldown id="docs-drilldown-in-drawer" class="relative min-h-0 flex-1">
-            <nav id="docs-drilldown-in-drawer-root" aria-label="Grimoire" class="h-full overflow-y-auto bg-white p-4 text-gray-900">
-              <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
+            <nav id="docs-drilldown-in-drawer-root" aria-label="Grimoire" class="h-full overflow-y-auto bg-elevated p-4 text-primary">
+              <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
                 <li>
                   <button
                     type="button"
-                    class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                    class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                     aria-expanded="false"
                     aria-controls="docs-drilldown-in-drawer-arcane"
                   >
@@ -336,7 +336,7 @@ import RegisterComponents from './RegisterComponents.astro';
                 <li>
                   <button
                     type="button"
-                    class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                    class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                     aria-expanded="false"
                     aria-controls="docs-drilldown-in-drawer-divine"
                   >
@@ -344,38 +344,38 @@ import RegisterComponents from './RegisterComponents.astro';
                   </button>
                 </li>
                 <li>
-                  <a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Spell components</a>
+                  <a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Spell components</a>
                 </li>
               </ul>
             </nav>
 
-            <nav id="docs-drilldown-in-drawer-arcane" aria-label="Arcane spells" class="h-full overflow-y-auto bg-white p-4 text-gray-900" hidden>
+            <nav id="docs-drilldown-in-drawer-arcane" aria-label="Arcane spells" class="h-full overflow-y-auto bg-elevated p-4 text-primary" hidden>
               <button
                 type="button"
-                class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                 data-close
               >
                 <span aria-hidden="true">←</span> Back to grimoire
               </button>
-              <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
-                <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Magic missile</a></li>
-                <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Fireball</a></li>
-                <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Lightning bolt</a></li>
+              <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
+                <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Magic missile</a></li>
+                <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Fireball</a></li>
+                <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Lightning bolt</a></li>
               </ul>
             </nav>
 
-            <nav id="docs-drilldown-in-drawer-divine" aria-label="Divine spells" class="h-full overflow-y-auto bg-white p-4 text-gray-900" hidden>
+            <nav id="docs-drilldown-in-drawer-divine" aria-label="Divine spells" class="h-full overflow-y-auto bg-elevated p-4 text-primary" hidden>
               <button
                 type="button"
-                class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100"
+                class="mb-3 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-hover"
                 data-close
               >
                 <span aria-hidden="true">←</span> Back to grimoire
               </button>
-              <ul class="m-0 list-none divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 p-0">
-                <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Cure light wounds</a></li>
-                <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Bless</a></li>
-                <li><a href="#" class="block bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 no-underline transition-colors hover:bg-gray-100">Turn undead</a></li>
+              <ul class="m-0 list-none divide-y divide-default overflow-hidden rounded-xl border border-default p-0">
+                <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Cure light wounds</a></li>
+                <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Bless</a></li>
+                <li><a href="#" class="block bg-surface px-4 py-3 text-sm font-medium text-primary no-underline transition-colors hover:bg-surface-hover">Turn undead</a></li>
               </ul>
             </nav>
           </cinq-drilldown>
