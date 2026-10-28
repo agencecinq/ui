@@ -1,0 +1,167 @@
+---
+title: Disclosure Navigation
+description: Accessible WAI-ARIA disclosure navigation Web Component, with submenus opened by buttons and on hover.
+---
+
+import DisclosureNavigationPlayground from '../_components/DisclosureNavigationPlayground.astro';
+
+A site navigation whose buttons show and hide submenus. `<cinq-disclosure-navigation>`
+updates `aria-expanded` and `hidden`, keeps one branch open at a time, adds the keyboard
+support of the APG example, and can open the submenus on hover.
+
+Follows the
+[WAI-ARIA Authoring Practices disclosure navigation example](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/).
+Inspired by [`@19h47/disclosure-navigation`](https://github.com/19h47/19h47-disclosure-navigation).
+
+## Install
+
+```bash
+pnpm add @agencecinq/disclosure-navigation
+```
+
+## Usage
+
+Import once:
+
+```js
+import "@agencecinq/disclosure-navigation";
+```
+
+Then write the markup: the component only adds interactivity.
+
+> **HTML is the source of truth.** The component does not set a missing
+> `aria-expanded`, `hidden` or label, nor warns about them. Run an a11y linter (axe,
+> Lighthouse) to catch invalid markup.
+
+```html
+<cinq-disclosure-navigation data-hover>
+  <nav aria-label="Main">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li>
+        <button type="button" aria-expanded="false" aria-controls="about-menu">About</button>
+        <ul id="about-menu" hidden>
+          <li><a href="/about/overview">Overview</a></li>
+          <li><a href="/about/team" aria-current="page">Team</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</cinq-disclosure-navigation>
+```
+
+## Required markup
+
+| Attribute | On | Role |
+| --------- | -- | ---- |
+| `aria-expanded` | `<button>` | **Required.** The state. A button without it is ignored. The component updates it. |
+| `aria-controls` | `<button>` | **Required.** ID(s) of the submenu(s), inside the host. |
+| `hidden` | Submenu | Present while collapsed, or `hidden="until-found"` to keep its links searchable. |
+| `aria-label` | `<nav>` | Names the landmark when the page has more than one navigation. |
+| `aria-current` | `<a>` | Optional: marks the current page. |
+
+To render a submenu open, write `aria-expanded="true"` on its button and leave out
+`hidden`. A submenu can hold buttons with their own submenus: opening one keeps its
+parents open and closes the other branches.
+
+## Attributes
+
+| Attribute | On | Effect |
+| --------- | -- | ------ |
+| `data-hover` | Host | A mouse opens the submenus on hover. |
+| `data-arrow-keys="false"` | Host | Leaves the arrow, Home and End keys to the browser. |
+
+Both are read on each interaction: setting or removing them needs no call.
+
+### Opening on hover
+
+With `data-hover`, a mouse opens a submenu when it enters its button, and closes it when
+it leaves the button and the submenu. Touch and pen keep the click.
+
+- **The click still works.** The first click after the mouse opened a submenu keeps it
+  open, as the user meant to open it. The next click closes it.
+- **No gap.** The pointer goes from the button to the submenu: leave no space between
+  them, or fill it with the submenu's padding.
+- **Escape closes it wherever the focus is**, as
+  [WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html)
+  asks of content shown on hover.
+
+### Find in page
+
+Write `hidden="until-found"` on collapsed submenus and their links stay searchable. When
+find in page or a link to a fragment reveals a submenu, the component opens it, nested
+ones included, and keeps `until-found` when it closes again. Tailwind 4's preflight
+leaves `until-found` out of its `[hidden]` rule; Bootstrap's Reboot does not.
+
+## API
+
+| Method | Description |
+| ------ | ----------- |
+| `init()` | Binds listeners. Runs on connect. Call `destroy()` first if already bound. |
+| `destroy()` | Removes listeners. Runs on disconnect. The markup stays as it is. |
+| `open($button)` | Opens the submenu of `$button` and closes the other branches. |
+| `close($button?)` | Closes the submenu of `$button`, or every open submenu. |
+| `toggle($button)` | Opens or closes the submenu of `$button`. |
+
+Buttons are read from the DOM on each interaction: adding or removing items needs no
+call.
+
+## Events
+
+The component fires the platform's
+[`ToggleEvent`](https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent)s at each
+submenu, the way a popover does.
+
+| Event | Cancelable | Description |
+| ----- | ---------- | ----------- |
+| `beforetoggle` | When the submenu opens | Fired **before** the DOM changes. |
+| `toggle` | No | Fired after, in a later task. Changes in a row coalesce into one event. |
+
+`event.target` is the submenu, `event.source` its button. The events do not bubble:
+listen on the submenu, or on the host in the capture phase.
+
+```js
+const $navigation = document.querySelector("cinq-disclosure-navigation");
+
+$navigation.addEventListener(
+  "toggle",
+  (event) => console.log(event.target.id, event.newState),
+  { capture: true },
+);
+```
+
+## Keyboard & focus
+
+| Key | Focus on | Action |
+| --- | -------- | ------ |
+| Enter / Space | Button | Toggles its submenu. |
+| Escape | Submenu | Closes the innermost one and focuses its button. |
+| Escape | Button, top-level link or outside | Closes the open submenu. |
+| ArrowDown | Expanded button | Moves focus to the first item of its submenu. |
+| Arrow keys | Top-level or submenu item | Previous or next item, wrapping. |
+| Home / End | Top-level or submenu item | First or last item. |
+
+Moving focus out of the navigation closes the open submenu. Inside a dialog, Escape
+closes the submenu first, then the dialog. In a right-to-left context, ArrowLeft and
+ArrowRight swap.
+
+## Accessibility
+
+- **Not a menubar:** keep `<nav>`, `<button>` and `<a>`, without `menu` / `menuitem`
+  roles. The APG reserves the
+  [menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) for application
+  menus.
+- **Parents that are also pages:** an element can't be both a link and a button. Put a
+  link to the parent page in its submenu, or a link and a separate button side by side.
+- **Hover only adds:** keyboard and screen reader users open the same submenus with the
+  buttons.
+
+## Browser support
+
+Chrome and Edge 135, Firefox 136 and Safari 17. `event.source` needs Chrome 140,
+Firefox 145 and Safari 26.5. `hidden="until-found"` needs Chrome 102, Firefox 139 and
+Safari 26.2, and acts as `hidden` elsewhere.
+
+## Playground (live)
+
+<DisclosureNavigationPlayground />
