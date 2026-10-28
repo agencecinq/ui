@@ -1,1 +1,4 @@
+/* Tailwind utilities over Starlight, Starlight over the Tailwind preflight */
+@layer base, starlight, theme, components, utilities;
+
 @import "tailwindcss";
