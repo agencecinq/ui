@@ -1,7 +1,6 @@
 ---
-description: TypeScript style for CINQ UI package source
-globs: packages/*/src/**/*.ts
-alwaysApply: false
+paths:
+  - "packages/*/src/**/*.ts"
 ---
 
 # TypeScript style

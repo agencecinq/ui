@@ -1,7 +1,6 @@
 ---
-description: CINQ UI Web Component host lifecycle — public init/destroy bind-unbind pair
-globs: packages/*/src/**/*.ts
-alwaysApply: false
+paths:
+  - "packages/*/src/**/*.ts"
 ---
 
 # Package host lifecycle: `init` / `destroy`
