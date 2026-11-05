@@ -1,7 +1,6 @@
 ---
-description: Use ECMAScript # private fields/methods on CINQ Web Component hosts (not TS private or _prefix)
-globs: packages/*/src/**/*.ts
-alwaysApply: false
+paths:
+  - "packages/*/src/**/*.ts"
 ---
 
 # TypeScript encapsulation: `#` private members
@@ -14,7 +13,7 @@ CINQ UI ships **Web Components** consumed as DOM nodes. Internal state must not 
 - Vanilla JS — enforced by the engine, not erased at compile time like TypeScript `private`.
 - TypeScript still type-checks `#` members.
 
-See also `.cursor/rules/typescript-style.mdc` (destructuring preferences).
+See also `.claude/rules/typescript-style.md` (destructuring preferences).
 
 ```ts
 class Spinbutton extends HTMLElement {
@@ -38,7 +37,7 @@ class Spinbutton extends HTMLElement {
 
 - `private _foo` — redundant (`private` already marks intent; `_` adds noise).
 - `private foo` on **fields** that must stay hidden from `element.foo` introspection — it compiles to a public property.
-- `#init()` / `#destroy()` — these stay **public** (see `package-lifecycle.mdc`).
+- `#init()` / `#destroy()` — these stay **public** (see `package-lifecycle.md`).
 
 ## Public surface
 
