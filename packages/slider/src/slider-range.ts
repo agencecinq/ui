@@ -157,12 +157,12 @@ export class SliderRange extends SliderBase {
     const { offsetHeight, offsetWidth } = $thumb;
     const which = $thumb === this.$min ? "min" : "max";
     const thumbSize = this.isVertical ? offsetHeight : offsetWidth;
-    const clientCoord = this.isVertical
-      ? clientY + this.offset
-      : clientX + this.offset;
+    const client = this.isVertical ? clientY : clientX;
+    // The offset keeps the thumb center under the pointer, the range geometry maps the thumb leading edge.
+    const edge = client + this.offset - thumbSize / 2;
 
     return multiValueFromPointer(
-      clientCoord,
+      edge,
       this.getBoundingClientRect(),
       which,
       this.#boundsMin,

@@ -321,11 +321,12 @@ cinq-slider-range::after {
   content: "";
   position: absolute;
   inset-inline-start: calc(
-    var(--thumb-size) / 2 + var(--min-ratio) * (100% - var(--thumb-size))
+    var(--thumb-size) / 2 + var(--min-ratio) * (100% - 2 * var(--thumb-size))
   );
   top: 50%;
   width: calc(
-    (var(--max-ratio) - var(--min-ratio)) * (100% - var(--thumb-size))
+    var(--thumb-size) +
+      (var(--max-ratio) - var(--min-ratio)) * (100% - 2 * var(--thumb-size))
   );
   block-size: 0.375rem;
   border-radius: 0;
@@ -335,42 +336,25 @@ cinq-slider-range::after {
 }
 ```
 
-**Thumbs:**
+**Thumbs:** the two thumbs share a track two thumbs shorter than the host, the
+max thumb one thumb further. At equal values they sit side by side, never over
+each other, and the pointer maps each thumb from where it stands. The same
+declarations hold in right-to-left, where `inset-inline-start` is the right edge.
 
 ```css
 cinq-slider-range [role="slider"]:first-child {
-  inset-inline-start: calc(var(--max-ratio) * (100% - var(--thumb-size)));
-  z-index: 2;
+  inset-inline-start: calc(
+    var(--thumb-size) + var(--max-ratio) * (100% - 2 * var(--thumb-size))
+  );
 }
 
 cinq-slider-range [role="slider"]:last-child {
-  inset-inline-start: calc(var(--min-ratio) * (100% - var(--thumb-size)));
+  inset-inline-start: calc(var(--min-ratio) * (100% - 2 * var(--thumb-size)));
 }
 ```
 
-**Collapsed range** (`min === max`): the host gets `[data-collapsed]`. Offset the min
-handle by one thumb width on the low side so both handles stay visible and
-selectable (consumer CSS):
-
-```css
-cinq-slider-range[data-collapsed] [role="slider"]:last-child {
-  inset-inline-start: calc(
-    var(--min-ratio) * (100% - var(--thumb-size)) - var(--thumb-size)
-  );
-}
-
-[dir="rtl"] cinq-slider-range[data-collapsed] [role="slider"]:last-child {
-  inset-inline-start: calc(
-    var(--min-ratio) * (100% - var(--thumb-size)) + var(--thumb-size)
-  );
-}
-
-cinq-slider-range:has([aria-orientation="vertical"])[data-collapsed] [role="slider"]:last-child {
-  inset-block-end: calc(
-    var(--min-ratio) * (100% - var(--thumb-size)) - var(--thumb-size)
-  );
-}
-```
+When the values are equal, the host gets `[data-collapsed]`, to style the
+fill for instance.
 
 When handles differ, raise the active thumb with `[data-active]`:
 
@@ -459,6 +443,62 @@ host.destroy();
 // mutate light DOM...
 host.init();
 ```
+
+## Migration
+
+### From 6.x to 7.0
+
+Range only: `<cinq-slider>` does not change.
+
+The range thumbs now share a track two thumbs shorter than the host, as the
+range geometry always assumed. A press no longer moves the min thumb by half a
+thumb, and at equal values the thumbs sit side by side instead of overlapping
+then jumping apart. Update the range CSS:
+
+**1. Thumbs.** Map both over `100% - 2 * var(--thumb-size)`, the max thumb one
+thumb further:
+
+```css
+/* Before */
+cinq-slider-range [role="slider"]:first-child {
+  inset-inline-start: calc(var(--max-ratio) * (100% - var(--thumb-size)));
+}
+
+cinq-slider-range [role="slider"]:last-child {
+  inset-inline-start: calc(var(--min-ratio) * (100% - var(--thumb-size)));
+}
+
+/* After */
+cinq-slider-range [role="slider"]:first-child {
+  inset-inline-start: calc(
+    var(--thumb-size) + var(--max-ratio) * (100% - 2 * var(--thumb-size))
+  );
+}
+
+cinq-slider-range [role="slider"]:last-child {
+  inset-inline-start: calc(var(--min-ratio) * (100% - 2 * var(--thumb-size)));
+}
+```
+
+A vertical range uses the same formulas on `inset-block-end`.
+
+**2. Fill.** From the center of the min thumb to the center of the max thumb:
+
+```css
+cinq-slider-range::after {
+  inset-inline-start: calc(
+    var(--thumb-size) / 2 + var(--min-ratio) * (100% - 2 * var(--thumb-size))
+  );
+  width: calc(
+    var(--thumb-size) +
+      (var(--max-ratio) - var(--min-ratio)) * (100% - 2 * var(--thumb-size))
+  );
+}
+```
+
+**3. Collapsed range.** Remove the rules that offset the min thumb on
+`[data-collapsed]`: the thumbs no longer overlap. The host still gets
+`[data-collapsed]` when the values are equal.
 
 ## Build setup
 
