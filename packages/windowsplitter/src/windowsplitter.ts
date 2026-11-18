@@ -1,4 +1,13 @@
-import { EVENTS, clamp, dispatchEvent, parseBoolean, parseNumber } from "@agencecinq/utils";
+import {
+  EVENTS,
+  clamp,
+  dispatchEvent,
+  parseBoolean,
+  parseNumber,
+  trackDrag,
+  type DragTracker,
+  type DragValues,
+} from "@agencecinq/utils";
 import Keyboard from "./keyboard.js";
 import type {
   FormatSize,
@@ -50,13 +59,9 @@ export class WindowSplitter extends HTMLElement {
   #resizeObserver: ResizeObserver | null = null;
   #keyboard: Keyboard | null = null;
   #bound = false;
-  /** Active pointer drag; `null` when idle. `id` is `PointerEvent.pointerId`. */
-  #drag: {
-    offset: number;
-    origin: number;
-    length: number;
-    id: number;
-  } | null = null;
+  #tracker: DragTracker | null = null;
+  /** Ratio and host length at the press while dragging; `null` when idle. */
+  #drag: { ratio: number; length: number } | null = null;
 
   connectedCallback(): void {
     this.init();
@@ -85,14 +90,14 @@ export class WindowSplitter extends HTMLElement {
 
     this.#keyboard = new Keyboard(this);
     this.$separator.addEventListener("keydown", this.#keyboard.handle);
-    this.$separator.addEventListener("pointerdown", this.#handlePointerdown);
-    this.$separator.addEventListener("pointermove", this.#handlePointermove);
-    this.$separator.addEventListener("pointerup", this.#handlePointerup);
-    this.$separator.addEventListener("pointercancel", this.#handlePointerup);
-    this.$separator.addEventListener(
-      "lostpointercapture",
-      this.#handlePointerup,
-    );
+    this.$separator.addEventListener("pointerdown", this.#handleFixedPress);
+    this.#tracker = trackDrag(this.$separator, {
+      host: this,
+      target: this.#dragTarget,
+      start: this.#handleDragStart,
+      move: this.#handleDragMove,
+      end: this.#handleDragEnd,
+    });
 
     this.#bound = true;
     this.#observe();
@@ -105,22 +110,17 @@ export class WindowSplitter extends HTMLElement {
       if (this.#keyboard) {
         this.$separator.removeEventListener("keydown", this.#keyboard.handle);
       }
-      this.$separator.removeEventListener("pointerdown", this.#handlePointerdown);
-      this.$separator.removeEventListener("pointermove", this.#handlePointermove);
-      this.$separator.removeEventListener("pointerup", this.#handlePointerup);
-      this.$separator.removeEventListener("pointercancel", this.#handlePointerup);
-      this.$separator.removeEventListener(
-        "lostpointercapture",
-        this.#handlePointerup,
-      );
+      this.$separator.removeEventListener("pointerdown", this.#handleFixedPress);
       this.$separator.style.removeProperty("touch-action");
       this.#bound = false;
     }
 
+    this.#tracker?.destroy();
+    this.#tracker = null;
+    this.#drag = null;
     this.#resizeObserver?.disconnect();
     this.#resizeObserver = null;
     this.#keyboard = null;
-    this.removeAttribute("dragging");
     this.$separator = null;
   }
 
@@ -377,7 +377,8 @@ export class WindowSplitter extends HTMLElement {
     });
   }
 
-  #valueFromPointer(event: PointerEvent): number {
+  /** Value from the ratio at the press and the distance the pointer has moved. */
+  #valueFromDrag({ dx, dy }: DragValues): number {
     const { min, max } = this;
     const drag = this.#drag;
 
@@ -385,71 +386,46 @@ export class WindowSplitter extends HTMLElement {
       return this.value;
     }
 
-    const span = max - min;
-    const client =
-      this.orientation === "vertical" ? event.clientX : event.clientY;
-    const ratio =
-      drag.length > 0
-        ? (client - drag.origin - drag.offset) / drag.length
-        : 0;
-    return clamp(Math.round(min + span * ratio), min, max);
+    const distance = this.orientation === "vertical" ? dx : dy;
+    const ratio = drag.length > 0 ? drag.ratio + distance / drag.length : 0;
+
+    return clamp(Math.round(min + (max - min) * ratio), min, max);
   }
 
-  #handlePointerdown = (event: PointerEvent): void => {
-    if (!this.$separator || this.disabled || event.button !== 0) {
+  /** A fixed or disabled separator never drags. */
+  #dragTarget = (): Element | null =>
+    this.disabled || this.fixed ? null : this.$separator;
+
+  /** A press on a fixed separator collapses or restores the primary pane. */
+  #handleFixedPress = (event: PointerEvent): void => {
+    if (!this.$separator || !this.fixed || this.disabled || event.button !== 0) {
       return;
     }
 
     this.$separator.focus({ preventScroll: true });
     event.preventDefault();
-
-    if (this.fixed) {
-      this.toggle();
-      return;
-    }
-
-    const { left, top, width, height } = this.getBoundingClientRect();
-    const vertical = this.orientation === "vertical";
-    const length = vertical ? width : height;
-    const origin = vertical ? left : top;
-    const client = vertical ? event.clientX : event.clientY;
-
-    this.#drag = {
-      length,
-      origin,
-      offset: client - origin - this.ratio * length,
-      id: event.pointerId,
-    };
-    this.setAttribute("dragging", "");
-    this.$separator.setPointerCapture(event.pointerId);
+    this.toggle();
   };
 
-  #handlePointermove = (event: PointerEvent): void => {
-    if (!this.#drag || event.pointerId !== this.#drag.id) {
-      return;
-    }
+  #handleDragStart = (event: PointerEvent): void => {
+    const { width, height } = this.getBoundingClientRect();
 
-    this.setValue(this.#valueFromPointer(event));
+    this.$separator?.focus({ preventScroll: true });
+    event.preventDefault();
+
+    this.#drag = {
+      ratio: this.ratio,
+      length: this.orientation === "vertical" ? width : height,
+    };
+  };
+
+  #handleDragMove = (event: PointerEvent, values: DragValues): void => {
+    this.setValue(this.#valueFromDrag(values));
     event.preventDefault();
   };
 
-  #handlePointerup = (event: PointerEvent): void => {
-    if (!this.#drag) {
-      return;
-    }
-
-    if (event.pointerId !== this.#drag.id) {
-      return;
-    }
-
-    const { id } = this.#drag;
-
+  #handleDragEnd = (): void => {
     this.#drag = null;
-    this.removeAttribute("dragging");
-
-    if (this.$separator?.hasPointerCapture?.(id)) {
-      this.$separator.releasePointerCapture(id);
-    }
   };
 }
 
