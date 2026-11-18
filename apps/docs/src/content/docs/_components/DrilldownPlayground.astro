@@ -1,5 +1,4 @@
 ---
-import PortalToBody from './PortalToBody.astro';
 import RegisterComponents from './RegisterComponents.astro';
 ---
 
@@ -286,38 +285,36 @@ import RegisterComponents from './RegisterComponents.astro';
             drawer resets the drilldown with <code>closeAll()</code>.
           </p>
         </div>
-        <cinq-drawer-button class="block shrink-0">
-          <button
-            type="button"
-            class="rounded-lg bg-accent-default px-3 py-2 text-on-accent hover:bg-accent-hover"
-            aria-controls="docs-drilldown-drawer"
-            aria-expanded="false"
-          >
-            Open menu
-          </button>
-        </cinq-drawer-button>
+        <button
+          type="button"
+          class="rounded-lg bg-accent-default px-3 py-2 text-on-accent hover:bg-accent-hover"
+          commandfor="docs-drilldown-drawer"
+          command="show-modal"
+        >
+          Open menu
+        </button>
       </div>
     </section>
 
-    <cinq-drawer id="docs-drilldown-drawer">
+    <cinq-drawer>
       <dialog
+        id="docs-drilldown-drawer"
+        closedby="any"
         aria-labelledby="docs-drilldown-drawer-title"
         class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-sm border-0 p-0 bg-elevated shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-overlay-scrim backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
             <h2 id="docs-drilldown-drawer-title" class="text-lg font-semibold text-primary">Grimoire</h2>
-            <cinq-drawer-button class="block">
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover"
-                aria-label="Close menu"
-                aria-controls="docs-drilldown-drawer"
-                aria-expanded="false"
-              >
-                ✕
-              </button>
-            </cinq-drawer-button>
+            <button
+              type="button"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover"
+              aria-label="Close menu"
+              commandfor="docs-drilldown-drawer"
+              command="request-close"
+            >
+              ✕
+            </button>
           </header>
 
           <cinq-drilldown id="docs-drilldown-in-drawer" class="relative min-h-0 flex-1">
@@ -383,7 +380,6 @@ import RegisterComponents from './RegisterComponents.astro';
       </dialog>
     </cinq-drawer>
 
-    <PortalToBody selector="#docs-drilldown-drawer" />
   </div>
 </div>
 
@@ -422,8 +418,8 @@ import RegisterComponents from './RegisterComponents.astro';
 
   const $drawerDrilldown = document.getElementById('docs-drilldown-in-drawer') as Drilldown | null;
 
-  document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, (event) => {
-    if ((event as CustomEvent<{ drawer: string }>).detail.drawer === 'docs-drilldown-drawer') {
+  document.getElementById('docs-drilldown-drawer')?.addEventListener('toggle', (event) => {
+    if ((event as ToggleEvent).newState === 'closed') {
       $drawerDrilldown?.closeAll();
     }
   });

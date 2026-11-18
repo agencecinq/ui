@@ -1,14 +1,8 @@
 export declare const EVENTS: {
     DRAWER_BEFORE_CLOSE: string;
     DRAWER_BEFORE_OPEN: string;
-    DRAWER_CLOSE: string;
-    DRAWER_OPEN: string;
-    DRAWER_TOGGLE: string;
     SHEET_BEFORE_CLOSE: string;
     SHEET_BEFORE_OPEN: string;
-    SHEET_CLOSE: string;
-    SHEET_OPEN: string;
-    SHEET_TOGGLE: string;
     MODAL_BEFORE_CLOSE: string;
     MODAL_BEFORE_OPEN: string;
     SPINBUTTON_CHANGE: string;

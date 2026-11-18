@@ -20,9 +20,7 @@
     cinq-slider-range,
     cinq-modal,
     cinq-drawer,
-    cinq-drawer-button,
     cinq-sheet,
-    cinq-sheet-button,
     cinq-tabs {
       display: block;
     }
@@ -31,6 +29,12 @@
     cinq-snake {
       display: block;
     }
+  }
+
+  /* The drawer leaves scroll to the page: lock it while a drawer is open. */
+  html:has(cinq-drawer > dialog:is(:modal, :popover-open)) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
   }
 </style>
 

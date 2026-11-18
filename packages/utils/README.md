@@ -23,8 +23,8 @@ constants rather than string literals:
 ```js
 import { EVENTS } from "@agencecinq/utils";
 
-document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
-  console.log(event.detail.drawer);
+document.querySelector("cinq-tabs").addEventListener(EVENTS.TABS_ACTIVATE, (event) => {
+  console.log(event.detail);
 });
 ```
 
@@ -108,6 +108,15 @@ Types: `WaitUntil`, `BeforeEventDetail<T>`.
 | `debounce(fn, wait)` | Trailing debounce. |
 
 ## Migration
+
+### From 8.x to 9.0
+
+`DRAWER_TOGGLE`, `DRAWER_OPEN`, `DRAWER_CLOSE`, `SHEET_TOGGLE`, `SHEET_OPEN` and
+`SHEET_CLOSE` are gone: `@agencecinq/drawer` 9.0 and `@agencecinq/sheet` 3.0 open
+with invoker commands and leave the after-events to the native `toggle` event.
+See the [drawer](https://github.com/agencecinq/ui/tree/main/packages/drawer#migration)
+and [sheet](https://github.com/agencecinq/ui/tree/main/packages/sheet#migration)
+migrations.
 
 ### From 7.x to 8.0
 

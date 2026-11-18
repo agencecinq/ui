@@ -312,9 +312,11 @@
     const $sequenceHosts = document.querySelectorAll('[data-pixelate-sequence]');
     const $modal = document.querySelector('#docs-pixelate-modal');
     const $modalHost = document.querySelector('#docs-pixelate-modal-host');
+    const $drawer = document.querySelector('#docs-pixelate-drawer');
     const $drawerHost = document.querySelector('#docs-pixelate-drawer-host');
 
-    function bindModalReveal($host, $dialog) {
+    /** Reveals on the dialog's `toggle`, pixelates and fades out on its before-close hook. */
+    function bindDialogReveal($host, $dialog, beforeClose, key) {
       if (!($host instanceof HTMLElement) || !($dialog instanceof HTMLDialogElement)) {
         return;
       }
@@ -332,8 +334,8 @@
         $dialog.classList.remove('is-closing');
       });
 
-      document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => {
-        if (!(event instanceof CustomEvent) || event.detail.modal !== $dialog.id) {
+      document.documentElement.addEventListener(beforeClose, (event) => {
+        if (!(event instanceof CustomEvent) || event.detail[key] !== $dialog.id) {
           return;
         }
 
@@ -348,133 +350,8 @@
       });
     }
 
-    function bindDrawerReveal($host, overlayId) {
-      if (!($host instanceof HTMLElement)) {
-        return;
-      }
-
-      let closing = false;
-
-      function drawerElement() {
-        const element = document.getElementById(overlayId);
-
-        return element instanceof HTMLElement ? element : null;
-      }
-
-      function isOverlayOpen() {
-        return drawerElement()?.hasAttribute('open') ?? false;
-      }
-
-      function beginCloseTransition() {
-        const drawer = drawerElement();
-
-        if (!drawer) {
-          return null;
-        }
-
-        drawer.classList.remove('is-closing', 'is-opening');
-        void drawer.offsetWidth;
-        drawer.classList.add('is-closing');
-
-        const $panel = drawer.querySelector('dialog');
-
-        return $panel instanceof HTMLElement ? $panel : drawer;
-      }
-
-      function runCloseAnimation() {
-        if (closing || !isOverlayOpen()) {
-          return Promise.resolve();
-        }
-
-        closing = true;
-        const from = readPixel($host);
-        const pixelAnimation = animate($host, from, PIXEL_MAX, ANIMATE_MS);
-        const fadeTarget = beginCloseTransition();
-        const overlayAnimation = fadeTarget
-          ? waitForOverlayFade(fadeTarget, ANIMATE_MS)
-          : Promise.resolve();
-
-        return Promise.all([pixelAnimation, overlayAnimation])
-          .finally(() => {
-            closing = false;
-            drawerElement()?.classList.remove('is-closing', 'is-opening');
-          });
-      }
-
-      document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {
-        if (!(event instanceof CustomEvent)) {
-          return;
-        }
-
-        const detail = event.detail;
-
-        if (detail?.drawer !== overlayId) {
-          return;
-        }
-
-        detail.waitUntil(runCloseAnimation());
-      });
-
-      document.documentElement.addEventListener(
-        EVENTS.DRAWER_TOGGLE,
-        (event) => {
-          if (!(event instanceof CustomEvent)) {
-            return;
-          }
-
-          if (event.detail?.drawer !== overlayId || isOverlayOpen()) {
-            return;
-          }
-
-          event.stopImmediatePropagation();
-          runOpenAnimation(event);
-        },
-        { capture: true },
-      );
-
-      function runOpenAnimation(event) {
-        const drawer = drawerElement();
-
-        if (!drawer || isOverlayOpen()) {
-          return;
-        }
-
-        if (event.detail?.trigger) {
-          drawer.trigger = event.detail.trigger;
-        }
-
-        drawer.classList.remove('is-closing');
-        drawer.classList.add('is-opening');
-        drawer.setAttribute('open', '');
-
-        const $panel = drawer.querySelector('dialog');
-        void ($panel ?? drawer).offsetWidth;
-
-        setPixel($host, PIXEL_MAX);
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            drawer.classList.remove('is-opening');
-            animate($host, PIXEL_MAX, PIXEL_MIN, ANIMATE_MS);
-          });
-        });
-      }
-
-      document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, (event) => {
-        if (!(event instanceof CustomEvent)) {
-          return;
-        }
-
-        if (event.detail?.drawer !== overlayId) {
-          return;
-        }
-
-        setPixel($host, PIXEL_MAX);
-      });
-    }
-
-    bindModalReveal($modalHost, $modal);
-    bindDrawerReveal($drawerHost, 'docs-pixelate-drawer');
+    bindDialogReveal($modalHost, $modal, EVENTS.MODAL_BEFORE_CLOSE, 'modal');
+    bindDialogReveal($drawerHost, $drawer, EVENTS.DRAWER_BEFORE_CLOSE, 'drawer');
 
     function syncScrollPixelate() {
       if (!($scrollHost instanceof HTMLElement)) {

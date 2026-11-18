@@ -1,20 +1,27 @@
 ---
 title: Drawer
-description: Slide-in drawer Web Component (`<cinq-drawer>`).
+description: Before-hooks for an off-canvas native `<dialog>` (`<cinq-drawer>`).
 ---
 
 import DrawerPlayground from "../_components/DrawerPlayground.astro";
-import DrawerExclusivePlayground from "../_components/DrawerExclusivePlayground.astro";
-import DrawerMultiButtonPlayground from "../_components/DrawerMultiButtonPlayground.astro";
+import DrawerReplacePlayground from "../_components/DrawerReplacePlayground.astro";
+import DrawerPopoverPlayground from "../_components/DrawerPopoverPlayground.astro";
 import DrawerAsyncBestiary from "../_components/DrawerAsyncBestiary.astro";
 
-A drawer slides a panel in from the edge of the viewport. `<cinq-drawer>` wraps
-a native `<dialog>`, opens it with `showModal()`, locks scroll, and dispatches
-open/close events. `<cinq-drawer-button>` connects triggers through
-`aria-controls`.
+A drawer slides a panel in from the edge of the viewport. The platform already
+does the work: buttons open and close a native `<dialog>` with
+[invoker commands](https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API),
+`showModal()` puts it in the top layer, makes the page inert, focuses the
+dialog content and returns focus on close.
 
-The browser handles the rest: top layer (no `z-index`), inert page behind the
-drawer, focus containment, Escape, and focus return.
+`<cinq-drawer>` wraps the `<dialog>` and adds only what the platform lacks:
+
+- `drawer:before-open` / `drawer:before-close`, to cancel or defer an open or a
+  close with `waitUntil(promise)`
+- `data-replace` on a button, to open the next drawer in place of the current
+  one instead of over it
+- the backdrop click of `closedby="any"` in Safari, which does not support it
+  yet
 
 ## Install
 
@@ -30,29 +37,26 @@ Import once:
 import "@agencecinq/drawer";
 ```
 
-Then write the markup: a `<dialog>` inside `<cinq-drawer>`, and buttons with
-matching `aria-controls`. The component adds interactivity only.
+Then write the markup: a `<dialog>` inside `<cinq-drawer>`, and buttons that
+target its `id` with `commandfor`. Without JavaScript, the buttons still open
+and close the drawer: only the hooks are missing.
 
 > **HTML is the source of truth.** The component will not auto-set labels,
 > auto-migrate attributes, or warn about missing names. Run an a11y linter (axe,
 > Lighthouse) to catch invalid markup.
 
 ```html
-<cinq-drawer-button class="block">
-  <button aria-controls="demo-drawer" aria-expanded="false">Open drawer</button>
-</cinq-drawer-button>
+<button type="button" commandfor="demo-drawer" command="show-modal">Open drawer</button>
 
-<cinq-drawer id="demo-drawer">
-  <dialog aria-labelledby="demo-drawer-title" class="drawer">
+<cinq-drawer>
+  <dialog id="demo-drawer" closedby="any" aria-labelledby="demo-drawer-title" class="drawer">
     <div class="p-8 flex flex-col gap-4">
       <h2 id="demo-drawer-title" class="text-2xl font-bold">Bestiary drawer</h2>
       <p class="text-gray-600">
         Use the drawer as a sliding panel listing creatures from your AD&amp;D bestiary: trolls,
         dracoliches, or galeb duhrs guarding the dungeon entrance.
       </p>
-      <cinq-drawer-button class="block">
-        <button aria-controls="demo-drawer" aria-expanded="false">Close</button>
-      </cinq-drawer-button>
+      <button type="button" commandfor="demo-drawer" command="request-close">Close</button>
     </div>
   </dialog>
 </cinq-drawer>
@@ -61,7 +65,7 @@ matching `aria-controls`. The component adds interactivity only.
 ## Styling
 
 The component never writes inline styles. Position and animate the `<dialog>`
-and its `::backdrop` from CSS with `[open]`:
+and its `::backdrop` from CSS:
 
 - `@starting-style` sets where the entry animation starts.
 - `transition-behavior: allow-discrete` on `display` and `overlay` keeps the
@@ -81,12 +85,12 @@ and its `::backdrop` from CSS with `[open]`:
   transition: translate 300ms, display 300ms allow-discrete, overlay 300ms allow-discrete;
 }
 
-.drawer[open] {
+.drawer:is([open], :popover-open) {
   translate: 0 0;
 }
 
 @starting-style {
-  .drawer[open] {
+  .drawer:is([open], :popover-open) {
     translate: 100% 0;
   }
 }
@@ -108,7 +112,7 @@ and its `::backdrop` from CSS with `[open]`:
 }
 ```
 
-With Tailwind:
+With Tailwind, where `open:` matches both `[open]` and `:popover-open`:
 
 ```text
 fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0
@@ -125,31 +129,51 @@ The UA stylesheet sets `color: CanvasText` and `background: Canvas` on the
 `<dialog>`, so it does not inherit the page text color. Set both on the dialog
 or its content, or a dark color scheme renders white text on a white panel.
 
-### Non-modal drawer
+## Background scroll
 
-Add `data-modal="false"` when a control outside the drawer must stay usable
-while it is open, such as a burger menu in a header above the drawer. The
-dialog opens with `show()`: no top layer, no inert page, no `::backdrop`.
+The package does **not** lock document scroll. A modal dialog makes the page
+inert but the page can still scroll underneath. Lock it in CSS:
+
+```css
+html:has(cinq-drawer > dialog:is(:modal, :popover-open)) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+```
+
+## Non-modal drawer
+
+Add `popover` to the `<dialog>` when a control outside the drawer must stay
+usable while it is open, such as a burger menu in a header above the drawer.
+The burger toggles it with `command="toggle-popover"`:
 
 ```html
 <header class="sticky top-0 z-20">
-  <cinq-drawer-button>
-    <button aria-controls="menu-drawer" aria-expanded="false">Menu</button>
-  </cinq-drawer-button>
+  <button type="button" commandfor="menu-drawer" command="toggle-popover">Menu</button>
 </header>
 
-<cinq-drawer id="menu-drawer" data-modal="false">
-  <div class="scrim" aria-hidden="true"></div>
-  <dialog aria-label="Menu" class="drawer">...</dialog>
+<cinq-drawer>
+  <dialog id="menu-drawer" popover aria-label="Menu" class="drawer peer">...</dialog>
+  <div class="scrim peer-open:opacity-100" aria-hidden="true"></div>
 </cinq-drawer>
 ```
 
-The drawer still locks scroll, moves focus in, closes on Escape and restores
-focus. A press outside the dialog closes it, except on its triggers so their
-click toggles. Give the dialog a `z-index` below the header, and style the
-scrim from `cinq-drawer[open]` since `::backdrop` only exists for modal
-dialogs. Focus is not contained: Tab can leave the drawer, as in a disclosure
-menu.
+The browser handles the rest: `aria-expanded` on the burger, Escape, a press
+outside the drawer, focus moved into the dialog and back to the burger on
+close, and one drawer open at a time. Focus is not contained: Tab can leave the
+drawer, as in a disclosure menu.
+
+The popover sits in the top layer, above the header: offset it from the top
+(`margin-top`) to leave the header visible. Its `::backdrop` would cover the
+header too, so dim the page with a scrim placed after the dialog, below the
+header, and shown with `dialog:popover-open + .scrim` (Tailwind: `peer` on the
+dialog, `peer-open:` on the scrim). Give the scrim pointer events while it
+shows, so a press on it closes the drawer instead of reaching the page below.
+
+Escape and a press outside close the drawer without `drawer:before-close`: the
+browser does not let a popover cancel them. Buttons and `close()` still go
+through the hook. A `<form method="dialog">` does not close a popover: close it
+on `submit`.
 
 When the drawer covers the page, make the covered regions inert while it is
 open, so Tab and screen readers stay out of what they cannot see. The drawer
@@ -157,63 +181,74 @@ leaves this to the page, which alone knows the regions it covers. Leave out the
 region holding the triggers, here the header:
 
 ```js
-import { EVENTS } from "@agencecinq/utils";
-
-const setPageInert = (event, inert) => {
-  if (event.detail.drawer !== "menu-drawer") return;
+document.querySelector("#menu-drawer").addEventListener("beforetoggle", (event) => {
+  const inert = event.newState === "open";
 
   document.querySelectorAll("main, footer").forEach(($element) => {
     $element.inert = inert;
   });
-};
-
-document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => setPageInert(event, true));
-document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, (event) => setPageInert(event, false));
+});
 ```
 
-`drawer:close` fires before focus returns, so an opener inside a covered region
+`beforetoggle` fires before focus returns, so an opener inside a covered region
 still gets its focus back.
 
 ## API
 
-### Attributes
+### Markup
 
-| Attribute | Required | Description                                      |
-| --------- | -------- | ------------------------------------------------ |
-| `id`      | Yes      | Drawer identifier (must match button `aria-controls`). |
-| `open`    | No       | Reflected state attribute, mirrored on the inner `<dialog>`. Set it in the markup to render the drawer open. |
-| `data-modal` | No     | `false` opens with `show()` instead of `showModal()`. Read on open. See [Non-modal drawer](#non-modal-drawer). |
+| Element / attribute | Required | Role |
+| ------------------- | -------- | ---- |
+| `<cinq-drawer>` | Yes | Host. Wraps one `<dialog>`. |
+| `<dialog id>` | Yes | The drawer. Buttons target its `id` with `commandfor`. |
+| `closedby="any"` on `<dialog>` | No | Closes a modal drawer on a backdrop click. Without it, only Escape and buttons close it. |
+| `popover` on `<dialog>` | No | Makes a non-modal drawer. See [Non-modal drawer](#non-modal-drawer). |
+| `autofocus` | No | Element focused on open. Defaults to the first focusable element. |
+| `data-replace` on a button that opens | No | Opens the target in place of the drawer holding the button. The target's `drawer:before-open` runs first: if it cancels, the current drawer stays open. |
+
+### Commands
+
+| Button | Drawer | Effect | Hook |
+| ------ | ------ | ------ | ---- |
+| `command="show-modal"` | Modal | Opens the dialog. | `drawer:before-open` |
+| `command="request-close"` | Modal | Closes the dialog. The button `value` becomes `dialog.returnValue`. | `drawer:before-close` |
+| `command="close"` | Modal | Closes the dialog at once. | None |
+| `command="toggle-popover"` | Non-modal | Opens or closes the dialog. | `drawer:before-open` or `drawer:before-close` |
+| `command="show-popover"` | Non-modal | Opens the dialog. | `drawer:before-open` |
+| `command="hide-popover"` | Non-modal | Closes the dialog. | `drawer:before-close` |
+
+On a modal drawer, Escape and the backdrop click (`closedby="any"`) go through
+`drawer:before-close` too. Direct calls skip the hooks, like on the platform:
+`dialog.showModal()`, `dialog.close()`, `<form method="dialog">`, and Escape
+when the browser forces the close.
 
 ### Methods
 
-| Method     | Description                                                                 |
-| ---------- | --------------------------------------------------------------------------- |
-| `open()`   | Opens the drawer. Resolves `true` if this call opened it, `false` if already open or canceled.    |
-| `close()`  | Closes the drawer. Resolves `true` if this call closed it, `false` if already closed or canceled. |
-| `toggle({ trigger? })` | Toggles between open and closed. Resolves whether the drawer is open. |
-| `init()`   | Binds listeners and opens the dialog if `open` is already set. Called on connect. |
-| `destroy()` | Removes listeners, releases scroll lock and focus. Called on disconnect. |
+| Method | Description |
+| ------ | ----------- |
+| `show()` | Opens the drawer. Resolves `true` if this call opened it, `false` if already open or canceled. |
+| `close(returnValue?)` | Closes the drawer. Resolves `true` if this call closed it, `false` if already closed or canceled. |
+| `init()` | Binds listeners. Called on connect. |
+| `destroy()` | Removes listeners and closes the dialog. Called on disconnect. |
 
 ### Events
 
 Prefer the constants from `@agencecinq/utils` (`EVENTS.DRAWER_*`). Events are
 dispatched on `document.documentElement`.
 
-| Event                 | Cancelable | Detail payload                         | Description                                                                 |
-| --------------------- | ---------- | -------------------------------------- | --------------------------------------------------------------------------- |
-| `drawer:toggle`       | No         | `{ drawer, trigger }`                 | Request open/close from a button.                                           |
-| `drawer:before-open`  | Yes        | `{ drawer, instance, trigger, waitUntil }` | Fired **before** `open` is set. `preventDefault()` cancels, `waitUntil(promise)` defers. |
-| `drawer:before-close` | Yes        | `{ drawer, instance, waitUntil }`       | Fired **before** `open` is removed. `preventDefault()` cancels, `waitUntil(promise)` defers. |
-| `drawer:open`         | No         | `{ drawer, trigger? }`                | Fired after `open` is set (scroll lock, side effects).                      |
-| `drawer:close`        | No         | `{ drawer }`                          | Fired after `open` is removed (scroll unlock, focus restore, side effects). |
+| Event | Cancelable | Detail payload | Description |
+| ----- | ---------- | -------------- | ----------- |
+| `drawer:before-open` | Yes | `{ drawer, instance, trigger, waitUntil }` | Fired **before** the dialog opens. `preventDefault()` cancels, `waitUntil(promise)` defers. |
+| `drawer:before-close` | Yes | `{ drawer, instance, waitUntil }` | Fired **before** the dialog closes. `preventDefault()` cancels, `waitUntil(promise)` defers. |
+
+`detail.drawer` is the dialog `id`. Once the dialog opens or closes, it fires
+the native `toggle` event (`event.newState` is `"open"` or `"closed"`), in both
+modes.
 
 ### Deferring open or close
 
-Every open path (toggle or `open()`) dispatches cancelable `drawer:before-open`
-first. Every close path (toggle, backdrop click or outside press, Escape, or `close()`)
-dispatches cancelable `drawer:before-close` first. Without a listener, the drawer opens or
-closes immediately. Call `preventDefault()` to cancel, or pass a promise to
-`detail.waitUntil()` to defer until async work finishes:
+Call `preventDefault()` to cancel, or pass a promise to `detail.waitUntil()` to
+defer until async work finishes:
 
 ```js
 import { EVENTS } from "@agencecinq/utils";
@@ -233,13 +268,12 @@ document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) =>
 
 Several listeners can defer the same action: the drawer waits for every
 promise, and a rejected one cancels the action. Call `waitUntil()`
-synchronously in the listener. `drawer:open` and `drawer:close` fire only once
-the action commits, when side effects run.
+synchronously in the listener.
 
 **UX:** defer **open** with `before-open` when the fetch is short (roughly under
 500 ms) and the panel would feel broken if empty: show loading on the trigger
 while the promise is pending. For slower or unpredictable loads, skip
-the defer: let the drawer open immediately and fetch on `drawer:open` with a
+the defer: let the drawer open immediately and fetch on `toggle` with a
 skeleton or spinner inside the panel. Defer **close** with `before-close` when
 you need to save, archive, or run an exit animation before dismissing.
 
@@ -265,10 +299,11 @@ This copies the package snippet to your theme:
 
 - `snippets/cinq-drawer.html.liquid`
 
-Snippet params: `id`, `content`, `label` (ID of the element labelling the
-dialog), `modal` (`false` for a non-modal drawer with a scrim), `direction`
-(`from-right`, `from-left` or `from-bottom`), `classes` (added to the
-`<dialog>`), `margin_top` and `background`.
+Snippet params: `id` (the dialog `id`), `content`, `label` (ID of the element
+labelling the dialog), `modal` (`false` for a non-modal drawer with a scrim),
+`direction` (`from-right`, `from-left` or `from-bottom`), `classes` (added to
+the `<dialog>`), `margin_top` and `background`. A modal drawer closes on a
+backdrop click.
 
 ### 2) Render the snippet
 
@@ -279,44 +314,47 @@ dialog), `modal` (`false` for a non-modal drawer with a scrim), `direction`
   content: '<div class="p-8"><h2 id="bestiary-drawer-title">Bestiary</h2><p class="mb-2">The galeb duhr looks like a boulder until it moves.</p><p class="mb-0">Trolls and jermlaines skulk deeper in the dungeon corridors.</p></div>'
 %}
 
-<cinq-drawer-button class="block">
-  <button aria-controls="bestiary-drawer" aria-expanded="false">Open bestiary</button>
-</cinq-drawer-button>
+<button type="button" commandfor="bestiary-drawer" command="show-modal">Open bestiary</button>
 ```
 
-## Migration from 7.x
+## Older browsers
 
-Version 8.0 rebuilds the drawer on `<dialog>`: replace the overlay and panel
-with a `<dialog>`, style `::backdrop`, swap `detail.resolve()` for
-`detail.waitUntil(promise)`, and `await` the methods. Step-by-step guide in the
+Invoker commands need Chrome 135, Firefox 144 or Safari 26.2. For older
+browsers, load the [invokers polyfill](https://keithcirkel.co.uk/invokers-polyfill)
+before the component.
+
+## Migration from 8.x
+
+Version 9.0 drops `<cinq-drawer-button>`: buttons target the dialog with
+`commandfor`, the `id` moves to the `<dialog>`, `data-modal="false"` becomes
+`popover`, and `drawer:toggle`, `drawer:open` and `drawer:close` give way to the
+native `toggle` event. Scroll lock moves to CSS. Step-by-step guide in the
 [README](https://github.com/agencecinq/ui/tree/main/packages/drawer#migration).
 
 ## Playground (live)
 
 <DrawerPlayground />
 
-### Exclusive drawers
+### Replace: open next, close current
 
-Only one drawer stays open at a time. A shared return-focus target remembers the
-page control that started the chain (triggers inside a drawer are ignored). Open
-notes, switch to bestiary to close: focus lands back on **Open left**.
+A button with `data-replace` opens the other drawer in place of the one holding
+it. The next drawer accepts the open first (`drawer:before-open`), then the
+current one closes (`drawer:before-close`). Open notes, switch to bestiary,
+then close it: focus lands back on **Open left**.
 
-<DrawerExclusivePlayground />
+<DrawerReplacePlayground />
 
-### Multiple buttons, one drawer
+### Non-modal drawer (`popover`)
 
-Several triggers can share the same `aria-controls` id. Each
-`<cinq-drawer-button>` listens for `drawer:open` / `drawer:close` and updates its
-own `aria-expanded`. Open or close from any control and they all stay in sync
-(red ring when collapsed, green when expanded).
+The page stays usable while the drawer is open. The same button opens and
+closes it, and the browser sets its `aria-expanded`.
 
-<DrawerMultiButtonPlayground />
+<DrawerPopoverPlayground />
 
 ### Async bestiary (`before-open` / `before-close`)
 
 Try opening and closing the drawer below. Each transition is deferred until async
-work finishes: the creature loads before `open` is set, then archives before `open`
-is removed. The panel shows the wait state while the hook is pending.
+work finishes: the creature loads before the dialog opens, then archives before
+it closes. The panel shows the wait state while the hook is pending.
 
 <DrawerAsyncBestiary />
-

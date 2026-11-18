@@ -232,15 +232,13 @@ controls (e.g. its close button) and the visible panel. Nothing else to wire for
 focus.
 
 ```html
-<cinq-drawer id="menu-drawer">
-  <dialog aria-labelledby="menu-drawer-title">
+<cinq-drawer>
+  <dialog id="menu-drawer" closedby="any" aria-labelledby="menu-drawer-title">
     <header>
       <h2 id="menu-drawer-title">Menu</h2>
-      <cinq-drawer-button>
-        <button type="button" aria-label="Close menu" aria-controls="menu-drawer" aria-expanded="false">
-          ✕
-        </button>
-      </cinq-drawer-button>
+      <button type="button" aria-label="Close menu" commandfor="menu-drawer" command="request-close">
+        ✕
+      </button>
     </header>
 
     <cinq-drilldown id="menu-drilldown">
@@ -260,15 +258,13 @@ focus.
 ```
 
 Reset the drilldown when the drawer closes, so it reopens on the root panel.
-`drawer:close` is dispatched on `document.documentElement` with the drawer's ID:
+The dialog fires the native `toggle` event:
 
 ```js
-import { EVENTS } from "@agencecinq/utils";
-
 const $drilldown = document.getElementById("menu-drilldown");
 
-document.documentElement.addEventListener(EVENTS.DRAWER_CLOSE, (event) => {
-  if (event.detail.drawer === "menu-drawer") {
+document.getElementById("menu-drawer").addEventListener("toggle", (event) => {
+  if (event.newState === "closed") {
     $drilldown.closeAll();
   }
 });

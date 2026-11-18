@@ -2,6 +2,7 @@ import type { WaitUntil } from "@agencecinq/utils";
 import type { Drawer } from "./drawer.js";
 
 export type BeforeOpenDetail = {
+  /** The dialog's `id`. */
   drawer: string;
   instance: Drawer;
   trigger: HTMLElement | null;
@@ -10,6 +11,7 @@ export type BeforeOpenDetail = {
 };
 
 export type BeforeCloseDetail = {
+  /** The dialog's `id`. */
   drawer: string;
   instance: Drawer;
   /** Defers the close until `promise` settles. A rejection cancels it. */

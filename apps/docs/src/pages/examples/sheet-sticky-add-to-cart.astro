@@ -1,0 +1,370 @@
+---
+import "../../styles/example.css";
+
+const colors = [
+  { name: "Moss", value: "#7a8b5c" },
+  { name: "Dusk", value: "#8fa6bf" },
+  { name: "Ash", value: "#b9b4ab" },
+  { name: "Ember", value: "#c26a5a" },
+];
+
+const sizes = [
+  { name: "Halfling", price: 3500, soldOut: false, chest: "70 to 80" },
+  { name: "Gnome", price: 4200, soldOut: false, chest: "80 to 90" },
+  { name: "Elf", price: 6000, soldOut: false, chest: "85 to 95" },
+  { name: "Human", price: 6500, soldOut: false, chest: "95 to 110" },
+  { name: "Ogre", price: 15000, soldOut: true, chest: "150 to 190" },
+];
+
+const gallery = [
+  { tone: "#e4e0d8", caption: "The cloak, folded on a moss-green stone." },
+  { tone: "#d6d9d2", caption: "Its hood blends into the forest light." },
+  { tone: "#cfd6de", caption: "Dusk thread, woven by the elves of Evermeet." },
+];
+
+const selectedColor = colors[1];
+const firstAvailableSize = sizes.find((size) => !size.soldOut);
+const formatPrice = (value: number) => `${value.toLocaleString("en").replace(/,/g, " ")} gp`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Sticky add to cart | CINQ UI</title>
+  </head>
+  <body class="bg-white font-sans text-[#2a343a] antialiased">
+    <header class="sticky top-0 z-10 flex items-center justify-center border-b border-[#e9e9e9] bg-white py-4">
+      <p class="font-serif text-xl italic">Elven Outfitters</p>
+    </header>
+
+    <main class="flex flex-col pb-48">
+      <div class="flex flex-col gap-px">
+        {gallery.map((image) => (
+          <div class="flex aspect-3/4 items-end p-6" style={`background: ${image.tone}`}>
+            <p class="font-serif text-sm italic opacity-70">{image.caption}</p>
+          </div>
+        ))}
+      </div>
+
+      <section class="flex flex-col gap-4 px-5 pt-6" aria-labelledby="product-title">
+        <h1 id="product-title" class="font-serif text-2xl italic">Cloak of Elvenkind</h1>
+        <p class="text-sm" data-dom="price" aria-live="polite">{formatPrice(firstAvailableSize?.price ?? 0)}</p>
+        <button
+          type="button"
+          class="h-11.25 w-full bg-[#171717] text-sm text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171717]"
+          commandfor="cloak-sheet"
+          command="show-modal"
+          data-dom="primary"
+        >
+          Select a size
+        </button>
+        <div class="flex flex-col gap-3 text-sm leading-relaxed">
+          <p>
+            Woven by the elves of Evermeet, this cloak blends its wearer into leaves, stone and dusk.
+            Rangers swear by it, and halflings borrow it without asking.
+          </p>
+          <p>
+            Wool and moonthread. Hand-stitched hood. Dry clean only, never by fire.
+          </p>
+          <p>
+            Delivered by griffon within three days, or collected at the guildhall.
+          </p>
+        </div>
+      </section>
+
+      <section class="flex flex-col gap-4 px-5 pt-10" aria-labelledby="lore-title">
+        <h2 id="lore-title" class="font-serif text-xl italic">Lore</h2>
+        <p class="text-sm leading-relaxed">
+          Worn hood up, the cloak grants advantage on hiding in the wild. Its weave shifts with the
+          light, from moss at noon to dusk at nightfall. No two cloaks share the same pattern: each is
+          sung into shape over seven nights.
+        </p>
+        <p class="text-sm leading-relaxed">
+          The elves of Evermeet sell only a handful each season, to adventurers who swear to return
+          them to the forest when their travels end.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-4 px-5 pt-10" aria-labelledby="more-title">
+        <h2 id="more-title" class="font-serif text-xl italic">More from the outfitters</h2>
+        <ul class="grid grid-cols-2 gap-4">
+          {["Boots of Striding", "Gloves of Thievery", "Bracers of Archery", "Hat of Disguise"].map((name, index) => (
+            <li class="flex flex-col gap-2">
+              <div class="aspect-3/4" style={`background: ${gallery[index % gallery.length].tone}`}></div>
+              <p class="font-serif text-sm italic">{name}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+
+    <div
+      data-dom="bar"
+      role="region"
+      aria-label="Purchase bar"
+      inert
+      class="fixed inset-x-0 bottom-0 z-20 translate-y-full border-t border-[#e9e9e9] bg-white transition-transform duration-300 ease-out not-inert:translate-y-0 motion-reduce:transition-none"
+    >
+      <div class="flex flex-col gap-3 px-5 pt-2 pb-5">
+        <button
+          type="button"
+          class="-mb-1 flex w-full cursor-grab touch-none justify-center pb-1 active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-[#171717]"
+          commandfor="cloak-sheet"
+          command="show-modal"
+          aria-label="Show sizes"
+        >
+          <span class="h-0.75 w-9 rounded-full bg-[#e9e9e9]"></span>
+        </button>
+
+        <p class="font-serif text-[0.984rem] leading-snug italic">Cloak of Elvenkind</p>
+
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-[0.844rem]" data-dom="bar-price">{formatPrice(firstAvailableSize?.price ?? 0)}</p>
+          <ul class="flex items-center gap-3" aria-label="Colors" data-dom="bar-colors">
+            {colors.map((color) => (
+              <li
+                data-color={color.name}
+                aria-current={color === selectedColor ? "true" : undefined}
+                class="size-4 rounded-full border border-[#e9e9e9] aria-[current=true]:size-5.5 aria-[current=true]:p-0.5 aria-[current=true]:ring-1 aria-[current=true]:ring-[#2a343a] aria-[current=true]:ring-inset"
+              >
+                <span class="block size-full rounded-full" style={`background: ${color.value}`}></span>
+                <span class="sr-only">{color.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <button
+          type="button"
+          class="h-11.25 w-full bg-[#171717] text-[0.844rem] text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171717]"
+          commandfor="cloak-sheet"
+          command="show-modal"
+          data-dom="summary"
+        >
+          Select a size
+        </button>
+      </div>
+    </div>
+
+    <cinq-sheet>
+      <dialog
+        id="cloak-sheet"
+        closedby="any"
+        aria-labelledby="cloak-sheet-title"
+        class="fixed inset-x-0 top-auto -bottom-4 m-0 w-auto max-w-none max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-0 border-t border-[#e9e9e9] bg-white p-0 pb-4 text-[#2a343a] translate-y-[max(-1rem,var(--cinq-sheet-drag-offset,0px))] not-open:translate-y-full starting:open:translate-y-full transition-[translate,display,overlay] transition-discrete duration-300 ease-out in-[[dragging]]:transition-none motion-reduce:transition-none backdrop:bg-[#171717]/30 backdrop:opacity-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 backdrop:transition-[opacity,display,overlay] backdrop:transition-discrete backdrop:duration-300"
+      >
+        <div
+          data-dom="drag-indicator"
+          class="flex cursor-grab touch-none justify-center pt-2 pb-3 active:cursor-grabbing"
+          aria-hidden="true"
+        >
+          <span class="h-0.75 w-9 rounded-full bg-[#e9e9e9]"></span>
+        </div>
+
+        <form method="dialog" autocomplete="off" class="flex flex-col gap-4 px-5 pb-6">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-3">
+              <h2 id="cloak-sheet-title" class="font-serif text-[0.984rem] leading-snug font-normal italic">
+                Cloak of Elvenkind
+              </h2>
+              <button
+                type="button"
+                class="grid size-6 place-items-center focus-visible:outline-2 focus-visible:outline-[#171717]"
+                commandfor="cloak-sheet"
+                command="request-close"
+                aria-label="Close"
+              >
+                <svg class="size-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M1 1l12 12M13 1L1 13" />
+                </svg>
+              </button>
+            </div>
+            <p class="text-[0.844rem]" data-dom="sheet-price">{formatPrice(firstAvailableSize?.price ?? 0)}</p>
+          </div>
+
+          <hr class="border-[#e9e9e9]" />
+
+          <fieldset>
+            <legend class="mb-3 flex gap-2 text-[0.844rem]">
+              Color: <span data-dom="color" class="font-serif italic">{selectedColor.name}</span>
+            </legend>
+            <div class="flex items-center gap-3">
+              {colors.map((color) => (
+                <label class="grid size-5.5 cursor-pointer place-items-center rounded-full has-checked:ring-1 has-checked:ring-[#2a343a] has-focus-visible:outline-2 has-focus-visible:outline-[#171717]">
+                  <input type="radio" name="color" value={color.name} checked={color === selectedColor} class="sr-only" />
+                  <span class="size-4 rounded-full border border-[#e9e9e9]" style={`background: ${color.value}`}></span>
+                  <span class="sr-only">{color.name}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <hr class="border-[#e9e9e9]" />
+
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between gap-3 text-[0.844rem]">
+              <p id="cloak-size-label" class="flex gap-2">
+                Size: <span class="font-serif italic">Wearer sizes</span>
+              </p>
+              <button
+                type="button"
+                class="underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#171717]"
+                commandfor="size-guide"
+                command="show-modal"
+              >
+                Size guide
+              </button>
+            </div>
+            <div role="radiogroup" aria-labelledby="cloak-size-label" class="flex flex-wrap items-center gap-x-5.5 gap-y-2 text-[0.844rem]">
+              {sizes.map((size) => (
+                <label
+                  class:list={[
+                    "cursor-pointer has-checked:font-serif has-checked:italic has-checked:underline has-checked:underline-offset-4 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-[#171717]",
+                    size.soldOut && "cursor-not-allowed text-[#9a9a9a] line-through",
+                  ]}
+                >
+                  <input
+                    type="radio"
+                    name="size"
+                    value={size.name}
+                    data-price={size.price}
+                    disabled={size.soldOut}
+                    autofocus={size === firstAvailableSize}
+                    class="sr-only"
+                  />
+                  {size.name}
+                  {size.soldOut && <span class="sr-only">, sold out</span>}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled
+            class="h-11.25 w-full bg-[#171717] text-[0.844rem] text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171717]"
+            data-dom="add"
+          >
+            Select a size
+          </button>
+
+          <p class="text-[0.844rem]">Delivered by griffon within three days.</p>
+        </form>
+      </dialog>
+    </cinq-sheet>
+
+    <cinq-drawer>
+      <dialog
+        id="size-guide"
+        closedby="any"
+        aria-labelledby="size-guide-title"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-sm border-0 bg-white p-0 text-[#2a343a] translate-x-full open:translate-x-0 starting:open:translate-x-full transition-[translate,overlay,display] transition-discrete duration-300 ease-out motion-reduce:transition-none backdrop:bg-[#171717]/30"
+      >
+        <div class="flex flex-col gap-4 p-5">
+          <div class="flex items-center justify-between gap-3">
+            <h2 id="size-guide-title" class="font-serif text-[0.984rem] italic">Size guide</h2>
+            <button
+              type="button"
+              class="grid size-6 place-items-center focus-visible:outline-2 focus-visible:outline-[#171717]"
+              commandfor="size-guide"
+              command="request-close"
+              aria-label="Close size guide"
+            >
+              <svg class="size-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M1 1l12 12M13 1L1 13" />
+              </svg>
+            </button>
+          </div>
+          <table class="w-full text-left text-[0.844rem]">
+            <caption class="sr-only">Chest measurements by wearer size</caption>
+            <thead>
+              <tr class="border-b border-[#e9e9e9]">
+                <th scope="col" class="py-2 font-normal">Size</th>
+                <th scope="col" class="py-2 font-normal">Chest (cm)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sizes.map((size) => (
+                <tr class="border-b border-[#e9e9e9]">
+                  <th scope="row" class="py-2 font-serif font-normal italic">{size.name}</th>
+                  <td class="py-2">{size.chest}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </dialog>
+    </cinq-drawer>
+
+    <script>
+      import "@agencecinq/sheet";
+      import "@agencecinq/drawer";
+
+      const bar = document.querySelector<HTMLElement>('[data-dom="bar"]');
+      const primary = document.querySelector('[data-dom="primary"]');
+      const form = document.querySelector<HTMLFormElement>("#cloak-sheet form");
+      const add = form?.querySelector<HTMLButtonElement>('[data-dom="add"]');
+      const color = form?.querySelector('[data-dom="color"]');
+      const summary = document.querySelector('[data-dom="summary"]');
+      const prices = document.querySelectorAll('[data-dom="price"], [data-dom="bar-price"], [data-dom="sheet-price"]');
+      const swatches = document.querySelectorAll<HTMLElement>('[data-dom="bar-colors"] [data-color]');
+
+      const formatPrice = (value: string) => `${value.replace(/\B(?=(\d{3})+(?!\d))/g, " ")} gp`;
+
+      // The bar stands in for the main button whenever it is out of view, below
+      // or above. The document as root keeps this page's viewport in an iframe.
+      if (bar && primary) {
+        new IntersectionObserver(([entry]) => {
+          bar.inert = entry.isIntersecting;
+        }, { root: document }).observe(primary);
+      }
+
+      form?.addEventListener("change", (event) => {
+        const input = event.target as HTMLInputElement;
+
+        if (input.name === "color") {
+          if (color) {
+            color.textContent = input.value;
+          }
+
+          swatches.forEach((swatch) => {
+            if (swatch.dataset.color === input.value) {
+              swatch.setAttribute("aria-current", "true");
+            } else {
+              swatch.removeAttribute("aria-current");
+            }
+          });
+          return;
+        }
+
+        if (input.name !== "size" || !add) {
+          return;
+        }
+
+        form.querySelector("[autofocus]")?.removeAttribute("autofocus");
+        input.autofocus = true;
+        add.disabled = false;
+        add.textContent = `Add to hoard (${input.value})`;
+
+        if (input.dataset.price) {
+          const price = formatPrice(input.dataset.price);
+
+          prices.forEach((element) => {
+            element.textContent = price;
+          });
+        }
+      });
+
+      form?.addEventListener("submit", () => {
+        const size = new FormData(form).get("size");
+
+        if (summary && size) {
+          summary.textContent = `In your hoard (${size})`;
+        }
+      });
+    </script>
+  </body>
+</html>

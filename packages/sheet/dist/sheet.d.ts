@@ -1,34 +1,34 @@
+export type { BeforeCloseDetail, BeforeOpenDetail } from './types.js';
 export declare class Sheet extends HTMLElement {
     #private;
-    static observedAttributes: string[];
     /** Element that last requested the sheet to open. */
     trigger: HTMLElement | null;
     $dialog: HTMLDialogElement | null;
     $handle: HTMLElement | null;
-    get modal(): boolean;
     /** Pulls dismiss unless the dialog opts out with `closedby="none"`. */
     get dismissible(): boolean;
     connectedCallback(): void;
     disconnectedCallback(): void;
-    init(): void;
-    /** Removes listeners and closes the native dialog. Leaves `open` as is. */
-    destroy(): void;
-    /** @returns Whether the sheet is open once the request settles. */
-    toggle(trigger?: HTMLElement | null): Promise<boolean>;
     /**
-     * Dispatches cancelable `sheet:before-open`: listeners cancel with
-     * `preventDefault()` or defer with `detail.waitUntil(promise)`.
+     * Bind dialog, handle and trigger listeners. Call {@link destroy} first if already bound.
+     */
+    init(): void;
+    /** Detaches listeners and closes the dialog. Safe to call from outside while the host stays mounted. */
+    destroy(): void;
+    /**
+     * Opens the sheet. Dispatches cancelable `sheet:before-open`: listeners
+     * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
      * @returns Whether this call opened the sheet.
      */
-    open(trigger?: HTMLElement | null): Promise<boolean>;
+    show(): Promise<boolean>;
     /**
-     * Dispatches cancelable `sheet:before-close`: listeners cancel with
-     * `preventDefault()` or defer with `detail.waitUntil(promise)`.
+     * Closes the sheet. Dispatches cancelable `sheet:before-close`: listeners
+     * cancel with `preventDefault()` or defer with `detail.waitUntil(promise)`.
      *
+     * @param returnValue - Becomes the dialog's `returnValue` on a modal sheet, as with `dialog.close()`.
      * @returns Whether this call closed the sheet.
      */
-    close(): Promise<boolean>;
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
+    close(returnValue?: string): Promise<boolean>;
 }
 //# sourceMappingURL=sheet.d.ts.map
