@@ -128,6 +128,25 @@ once every deferred promise fulfills, and is canceled by `preventDefault()` or a
 rejected promise. `waitUntil()` throws if called after dispatch. Types:
 `WaitUntil`, `BeforeEventDetail<T>`.
 
+## Drag
+
+`trackDrag(element, options)` follows one pointer gesture at a time: it captures
+the pointer, follows that pointer only, sets `[dragging]` on a host, and hands
+back the distance and speed of the drag. The [Drag](../drag/) page has the
+options, the values and a live example.
+
+```js
+import { trackDrag } from "@agencecinq/utils";
+
+const drag = trackDrag($handle, {
+  host: this,
+  move: (event, { dx, dy }) => {},
+  end: (event, { dx, dy, vx, vy, canceled }) => {},
+});
+
+drag.destroy();
+```
+
 ## Focus helpers
 
 The return-focus helpers bring focus back to the page control that opened an

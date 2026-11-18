@@ -153,6 +153,78 @@ function E(e = null) {
 }
 //#endregion
 //#region src/clamp.ts
-var D = (e, t, n) => Math.min(Math.max(e, t), n);
+var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
+	let { host: n, target: r, start: i, move: a, end: o } = t, s = null, c = ({ startX: e, startY: t, samples: n }) => {
+		let r = n[0], i = n[n.length - 1], a = i.time - r.time, o = {
+			dx: i.x - e,
+			dy: i.y - t,
+			vx: 0,
+			vy: 0
+		};
+		return a <= 0 ? o : {
+			...o,
+			vx: (i.x - r.x) / a,
+			vy: (i.y - r.y) / a
+		};
+	}, l = ({ samples: e }, { clientX: t, clientY: n, timeStamp: r }) => {
+		let i = r - O;
+		for (e.push({
+			x: t,
+			y: n,
+			time: r
+		}); e.length > 1 && e[0].time < i;) e.shift();
+	}, u = (e) => {
+		let { pointerId: t, $target: r } = e;
+		s = null, n?.removeAttribute("dragging"), r.hasPointerCapture(t) && r.releasePointerCapture(t);
+	}, d = (e) => {
+		let { button: t, pointerId: a, clientX: o, clientY: c, timeStamp: l } = e;
+		if (s || t !== 0) return;
+		let u = r ? r(e) : e.currentTarget;
+		u && i?.(e) !== !1 && (s = {
+			pointerId: a,
+			$target: u,
+			startX: o,
+			startY: c,
+			samples: [{
+				x: o,
+				y: c,
+				time: l
+			}]
+		}, n?.setAttribute("dragging", ""), u.setPointerCapture(a));
+	}, f = (e) => {
+		let t = s;
+		t && e.pointerId === t.pointerId && (l(t, e), a?.(e, c(t)));
+	}, p = (e) => {
+		let t = s, { pointerId: n, type: r } = e;
+		if (!t || n !== t.pointerId) return;
+		let i = r !== "pointerup";
+		i || l(t, e);
+		let a = {
+			...c(t),
+			canceled: i
+		};
+		u(t), o?.(e, a);
+	}, m = [
+		["pointerdown", d],
+		["pointermove", f],
+		["pointerup", p],
+		["pointercancel", p],
+		["lostpointercapture", p]
+	];
+	m.forEach(([t, n]) => {
+		e.addEventListener(t, n);
+	});
+	let h = () => {
+		s && u(s);
+	};
+	return {
+		cancel: h,
+		destroy: () => {
+			h(), m.forEach(([t, n]) => {
+				e.removeEventListener(t, n);
+			});
+		}
+	};
+};
 //#endregion
-export { e as EVENTS, T as addTrapFocus, c as body, f as breakpoints, D as clamp, _ as debounce, h as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, g as enableScroll, x as getFocusableElements, s as html, l as isDebug, d as mouse, a as parseBoolean, r as parseList, i as parseNumber, p as production, S as rememberReturnFocus, E as removeTrapFocus, C as restoreReturnFocus, w as scheduleRestoreReturnFocus, u as scroll, o as throttle };
+export { e as EVENTS, T as addTrapFocus, c as body, f as breakpoints, D as clamp, _ as debounce, h as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, g as enableScroll, x as getFocusableElements, s as html, l as isDebug, d as mouse, a as parseBoolean, r as parseList, i as parseNumber, p as production, S as rememberReturnFocus, E as removeTrapFocus, C as restoreReturnFocus, w as scheduleRestoreReturnFocus, u as scroll, o as throttle, k as trackDrag };
