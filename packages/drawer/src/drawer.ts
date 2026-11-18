@@ -21,9 +21,11 @@ export class Drawer extends HTMLElement {
       return false;
     }
 
-    return this.#popover
-      ? this.$dialog.matches(":popover-open")
-      : this.$dialog.open;
+    if (this.#popover) {
+      return this.$dialog.matches(":popover-open");
+    }
+
+    return this.$dialog.open;
   }
 
   /**
@@ -32,8 +34,9 @@ export class Drawer extends HTMLElement {
    * the one it sits in.
    */
   #handleCommand = (event: CommandEvent): void => {
-    const source = event.source instanceof HTMLElement ? event.source : null;
-    const action = this.#action(event.command);
+    const { source, command } = event;
+    const $source = source instanceof HTMLElement ? source : null;
+    const action = this.#action(command);
 
     if (!action) {
       return;
@@ -43,23 +46,24 @@ export class Drawer extends HTMLElement {
 
     if (action === "close") {
       // The button's value becomes the dialog's returnValue, as natively.
-      const returnValue = source?.getAttribute("value") ?? undefined;
+      const returnValue = $source?.getAttribute("value") ?? undefined;
 
       this.close(returnValue);
       return;
     }
 
-    const current = source?.hasAttribute("data-replace")
-      ? source.closest("cinq-drawer")
+    const $current = $source?.hasAttribute("data-replace")
+      ? $source.closest("cinq-drawer")
       : null;
 
-    this.trigger = source;
+    this.trigger = $source;
 
-    if (current instanceof Drawer && current !== this) {
-      this.#replace(current);
-    } else {
-      this.show();
+    if ($current instanceof Drawer && $current !== this) {
+      this.#replace($current);
+      return;
     }
+
+    this.show();
   };
 
   /** Escape and light dismiss of a modal drawer: route through `close()` unless the browser forces the close. */
@@ -75,21 +79,19 @@ export class Drawer extends HTMLElement {
   /** `closedby="any"` fallback: a click outside the dialog box closes it. */
   #handleClick = (event: MouseEvent): void => {
     const $dialog = this.$dialog;
+    const { target, clientX, clientY } = event;
 
     if (
       !$dialog ||
-      event.target !== $dialog ||
+      target !== $dialog ||
       $dialog.getAttribute("closedby") !== "any"
     ) {
       return;
     }
 
-    const rect = $dialog.getBoundingClientRect();
+    const { top, right, bottom, left } = $dialog.getBoundingClientRect();
     const inside =
-      event.clientX >= rect.left &&
-      event.clientX <= rect.right &&
-      event.clientY >= rect.top &&
-      event.clientY <= rect.bottom;
+      clientX >= left && clientX <= right && clientY >= top && clientY <= bottom;
 
     if (!inside) {
       this.close();
@@ -201,12 +203,12 @@ export class Drawer extends HTMLElement {
   }
 
   /**
-   * Opens in place of `current`. Like a navigation, this drawer accepts the
-   * open first, so `current` stays open when its `drawer:before-open` cancels.
+   * Opens in place of `$current`. Like a navigation, this drawer accepts the
+   * open first, so `$current` stays open when its `drawer:before-open` cancels.
    */
-  #replace(current: Drawer): Promise<boolean> {
+  #replace($current: Drawer): Promise<boolean> {
     return this.#show(async () => {
-      const closed = await current.close();
+      const closed = await $current.close();
 
       return closed && this.#commit(true);
     });
@@ -234,21 +236,25 @@ export class Drawer extends HTMLElement {
       return false;
     }
 
-    if (this.#popover) {
+    if (this.#popover && open) {
       // The source makes the trigger the invoker: its click toggles instead of light dismissing.
-      const source = this.trigger ?? undefined;
+      const $source = this.trigger ?? undefined;
 
-      if (open) {
-        $dialog.showPopover({ source });
-      } else {
-        $dialog.hidePopover();
-      }
-    } else if (open) {
-      $dialog.showModal();
-    } else {
-      $dialog.close(returnValue);
+      $dialog.showPopover({ source: $source });
+      return true;
     }
 
+    if (this.#popover) {
+      $dialog.hidePopover();
+      return true;
+    }
+
+    if (open) {
+      $dialog.showModal();
+      return true;
+    }
+
+    $dialog.close(returnValue);
     return true;
   }
 
