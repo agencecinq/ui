@@ -47,6 +47,12 @@ describe("cinq-snake, swipe", () => {
     expect(turns).toEqual([]);
   });
 
+  it("ignores a swipe with a non-primary button", async () => {
+    await commands.drag("canvas", { dx: 60, button: "right" });
+
+    expect(turns).toEqual([]);
+  });
+
   it("focuses the board on a press, so the arrow keys follow", async () => {
     await commands.drag("canvas");
 

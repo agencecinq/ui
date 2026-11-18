@@ -1,11 +1,11 @@
-import { EVENTS as e, dispatchEvent as t, parseNumber as n } from "@agencecinq/utils";
+import { EVENTS as e, dispatchEvent as t, parseNumber as n, trackDrag as r } from "@agencecinq/utils";
 //#region src/config.ts
-var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
+var i = "#2a2a2a", a = 21, o = 15, s = 130, c = {
 	up: "down",
 	down: "up",
 	left: "right",
 	right: "left"
-}, c = {
+}, l = {
 	up: {
 		x: 0,
 		y: -1
@@ -22,7 +22,7 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 		x: 1,
 		y: 0
 	}
-}, l = class {
+}, u = class {
 	#e;
 	#t;
 	#n = [];
@@ -71,13 +71,13 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 		this.#n = r, this.#r = "right", this.#i = "right", this.#o = 0, this.#s = !0, this.#c = !1, this.#d();
 	}
 	setDirection(e) {
-		e !== s[this.#r] && (this.#i = e, !this.#c && this.#s && (this.#c = !0));
+		e !== c[this.#r] && (this.#i = e, !this.#c && this.#s && (this.#c = !0));
 	}
 	tick() {
 		if (!this.#s) return "dead";
 		if (!this.#c) return "idle";
 		this.#r = this.#i;
-		let { x: e, y: t } = c[this.#r], n = this.#n[0], r = {
+		let { x: e, y: t } = l[this.#r], n = this.#n[0], r = {
 			x: n.x + e,
 			y: n.y + t
 		};
@@ -104,35 +104,19 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 		});
 		t.length !== 0 && (this.#a = t[Math.floor(Math.random() * t.length)]);
 	}
-}, u = {
+}, d = {
 	ArrowUp: "up",
 	ArrowDown: "down",
 	ArrowLeft: "left",
 	ArrowRight: "right"
-}, d = 24, f = class {
+}, f = class {
 	#e;
-	#t = null;
 	constructor(e) {
 		this.#e = e;
 	}
 	handle = (e) => {
-		let t = u[e.key];
+		let t = d[e.key];
 		t && (e.preventDefault(), this.#e(t));
-	};
-	handlePointerDown = (e) => {
-		this.#t = {
-			x: e.clientX,
-			y: e.clientY
-		};
-	};
-	handlePointerUp = (e) => {
-		let t = this.#t;
-		if (this.#t = null, !t) return;
-		let { clientX: n, clientY: r } = e, i = n - t.x, a = r - t.y;
-		Math.hypot(i, a) < d || (Math.abs(i) > Math.abs(a) ? this.#e(i > 0 ? "right" : "left") : this.#e(a > 0 ? "down" : "up"));
-	};
-	handlePointerCancel = () => {
-		this.#t = null;
 	};
 }, p = class {
 	#e;
@@ -206,10 +190,11 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 }, h = class extends HTMLElement {
 	static observedAttributes = ["cols", "rows"];
 	$canvas = null;
-	#e = new l();
+	#e = new u();
 	#t = null;
 	#n = null;
 	#r = null;
+	#i = null;
 	connectedCallback() {
 		this.init();
 	}
@@ -217,25 +202,26 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 		this.destroy(), this.$canvas = null, this.#n = null, this.#r = null;
 	}
 	attributeChangedCallback(e, t, n) {
-		(e === "cols" || e === "rows") && this.#t && t !== n && this.#a(!0);
+		(e === "cols" || e === "rows") && this.#t && t !== n && this.#o(!0);
 	}
 	init() {
 		if (this.#t) return;
 		if (this.$canvas = this.querySelector("canvas"), !this.$canvas) throw Error("Snake must contain a canvas element");
 		let e = this.$canvas.getContext("2d");
 		if (!e) throw Error("Snake could not get a 2d canvas context");
-		this.#n = new m(this.$canvas, e), this.#r = new f(this.#o), this.#t = new p(130, this.#s, this.#c), this.addEventListener("keydown", this.#f), this.$canvas.addEventListener("pointerdown", this.#p), this.$canvas.addEventListener("pointerup", this.#r.handlePointerUp), this.$canvas.addEventListener("pointercancel", this.#r.handlePointerCancel), this.#a(!1), this.sync(), this.#t.start();
+		this.#n = new m(this.$canvas, e), this.#r = new f(this.#s), this.#t = new p(130, this.#c, this.#l), this.addEventListener("keydown", this.#p), this.#i = r(this.$canvas, {
+			start: this.#m,
+			end: this.#h
+		}), this.#o(!1), this.sync(), this.#t.start();
 	}
 	destroy() {
-		if (!this.#t) return;
-		let { $canvas: e } = this, t = this.#r;
-		this.#t.stop(), this.#t = null, this.removeEventListener("keydown", this.#f), e?.removeEventListener("pointerdown", this.#p), e && t && (e.removeEventListener("pointerup", t.handlePointerUp), e.removeEventListener("pointercancel", t.handlePointerCancel)), this.#n = null, this.#r = null;
+		this.#t && (this.#t.stop(), this.#t = null, this.removeEventListener("keydown", this.#p), this.#i?.destroy(), this.#i = null, this.#n = null, this.#r = null);
 	}
 	sync() {
-		this.#n?.resize(), this.#c();
+		this.#n?.resize(), this.#l();
 	}
 	replay() {
-		this.#e.reset(), this.#u(), this.sync(), this.#t?.start(), this.$canvas?.focus(), t(this, e.SNAKE_REPLAY, { score: this.#e.score }, { cancelable: !1 });
+		this.#e.reset(), this.#d(), this.sync(), this.#t?.start(), this.$canvas?.focus(), t(this, e.SNAKE_REPLAY, { score: this.#e.score }, { cancelable: !1 });
 	}
 	get score() {
 		return this.#e.score;
@@ -246,44 +232,44 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 	get rows() {
 		return this.#e.rows;
 	}
-	#i() {
+	#a() {
 		return {
 			cols: Math.max(1, Math.floor(n(this.getAttribute("cols"), 21))),
 			rows: Math.max(1, Math.floor(n(this.getAttribute("rows"), 15)))
 		};
 	}
-	#a(n) {
-		let { cols: r, rows: i } = this.#i();
-		(r !== this.#e.cols || i !== this.#e.rows) && (this.#e.setSize(r, i), this.#u(), this.sync(), this.#t?.start(), n && t(this, e.SNAKE_REPLAY, { score: this.#e.score }, { cancelable: !1 }));
+	#o(n) {
+		let { cols: r, rows: i } = this.#a();
+		(r !== this.#e.cols || i !== this.#e.rows) && (this.#e.setSize(r, i), this.#d(), this.sync(), this.#t?.start(), n && t(this, e.SNAKE_REPLAY, { score: this.#e.score }, { cancelable: !1 }));
 	}
-	#o = (e) => {
+	#s = (e) => {
 		if (!this.#e.alive) return;
 		let t = !this.#e.started;
-		this.#e.setDirection(e), t && this.#e.started && (this.#s(), this.#t?.hold());
-	};
-	#s = () => {
-		let n = this.#e.tick();
-		n === "eat" ? (this.#u(), t(this, e.SNAKE_EAT, { score: this.#e.score }, { cancelable: !1 })) : n === "dead" && this.#l();
+		this.#e.setDirection(e), t && this.#e.started && (this.#c(), this.#t?.hold());
 	};
 	#c = () => {
+		let n = this.#e.tick();
+		n === "eat" ? (this.#d(), t(this, e.SNAKE_EAT, { score: this.#e.score }, { cancelable: !1 })) : n === "dead" && this.#u();
+	};
+	#l = () => {
 		this.#n && this.$canvas && this.#n.draw({
 			snake: this.#e.snake,
 			food: this.#e.food,
 			cols: this.#e.cols,
 			rows: this.#e.rows
-		}, this.#d());
+		}, this.#f());
 	};
-	#l() {
-		this.#t?.stop(), this.#c(), t(this, e.SNAKE_OVER, { score: this.#e.score }, { cancelable: !1 });
-	}
 	#u() {
-		this.#t && (this.#t.stepMs = Math.max(70, 130 - this.#e.score * 5));
+		this.#t?.stop(), this.#l(), t(this, e.SNAKE_OVER, { score: this.#e.score }, { cancelable: !1 });
 	}
 	#d() {
-		let { $canvas: e } = this;
-		return e ? getComputedStyle(e).color || "#2a2a2a" : r;
+		this.#t && (this.#t.stepMs = Math.max(70, 130 - this.#e.score * 5));
 	}
-	#f = (e) => {
+	#f() {
+		let { $canvas: e } = this;
+		return e ? getComputedStyle(e).color || "#2a2a2a" : i;
+	}
+	#p = (e) => {
 		let { key: t, target: n } = e;
 		if (this.#e.alive) this.#r?.handle(e);
 		else {
@@ -291,11 +277,13 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 			(t === "Enter" || t === " ") && (e.preventDefault(), this.replay());
 		}
 	};
-	#p = (e) => {
-		let { $canvas: t } = this;
-		t && (t.focus(), t.setPointerCapture(e.pointerId), this.#r?.handlePointerDown(e));
+	#m = () => {
+		this.$canvas?.focus();
+	};
+	#h = (e, { dx: t, dy: n, canceled: r }) => {
+		r || Math.hypot(t, n) < 24 || (Math.abs(t) > Math.abs(n) ? this.#s(t > 0 ? "right" : "left") : this.#s(n > 0 ? "down" : "up"));
 	};
 };
 customElements.get("cinq-snake") || customElements.define("cinq-snake", h);
 //#endregion
-export { i as COLS, a as ROWS, o as STEP_MS, h as Snake, r as color };
+export { a as COLS, o as ROWS, s as STEP_MS, h as Snake, i as color };

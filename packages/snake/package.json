@@ -29,7 +29,7 @@
     "test:watch": "vitest"
   },
   "peerDependencies": {
-    "@agencecinq/utils": ">=7.3.0"
+    "@agencecinq/utils": ">=9.1.1"
   },
   "devDependencies": {
     "@agencecinq/utils": "workspace:*",
