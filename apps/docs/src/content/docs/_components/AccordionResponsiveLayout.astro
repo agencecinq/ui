@@ -43,7 +43,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-accordion-layout [data-header].focus {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: -2px;
   }
 
@@ -58,7 +58,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-accordion-layout[data-layout='list'] > [data-panel] {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.75rem;
     margin-bottom: 0.75rem;
     overflow: hidden;
@@ -72,12 +72,12 @@ import RegisterComponents from './RegisterComponents.astro';
     pointer-events: none;
     cursor: default;
     border-radius: 0;
-    background: #fff;
-    color: #111827;
+    background: var(--background-color-elevated);
+    color: var(--text-color-primary);
   }
 
   .docs-accordion-layout[data-layout='list'] > [data-panel] > [data-header]:hover {
-    background: #fff;
+    background: var(--background-color-elevated);
   }
 
   .docs-accordion-layout[data-layout='list'] .docs-accordion-layout-chevron {
@@ -89,12 +89,12 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 </style>
 
-<section class="rounded-2xl bg-white p-6 shadow not-content" data-demo-root="accordion-layout">
+<section class="rounded-2xl bg-elevated p-6 shadow not-content border border-default" data-demo-root="accordion-layout">
   <div class="flex flex-col gap-4">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Responsive layout</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Responsive layout</h3>
+        <p class="text-sm text-muted">
           Emulate a breakpoint: on “mobile” the accordion is unbound with
           {' '}<code class="font-mono">destroy()</code> and reads as a stacked list;
           on “desktop”{' '}<code class="font-mono">init()</code> restores accordion
@@ -105,7 +105,7 @@ import RegisterComponents from './RegisterComponents.astro';
       <div class="flex items-center gap-2 shrink-0" role="group" aria-label="Layout mode">
         <button
           type="button"
-          class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-40 disabled:pointer-events-none"
+          class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover disabled:opacity-40 disabled:pointer-events-none"
           data-action="desktop"
           aria-pressed="true"
         >
@@ -113,7 +113,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </button>
         <button
           type="button"
-          class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 disabled:opacity-40 disabled:pointer-events-none"
+          class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover disabled:opacity-40 disabled:pointer-events-none"
           data-action="mobile"
           aria-pressed="false"
         >
@@ -123,7 +123,7 @@ import RegisterComponents from './RegisterComponents.astro';
     </div>
 
     <cinq-accordion
-      class="docs-accordion-layout max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+      class="docs-accordion-layout max-w-xl overflow-hidden rounded-xl border border-default divide-y divide-default"
       data-hash="false"
       data-demo="accordion-layout"
       data-layout="accordion"
@@ -133,7 +133,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           data-header
           id="docs-accordion-layout-1-header"
-          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
           aria-expanded="true"
           aria-controls="docs-accordion-layout-1-body"
         >
@@ -147,7 +147,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div
             data-inner
-            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+            class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
           >
             <p class="m-0">
               Roll 3d6 for each ability and assign the results to Strength,
@@ -162,7 +162,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           data-header
           id="docs-accordion-layout-2-header"
-          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
           aria-expanded="false"
           aria-controls="docs-accordion-layout-2-body"
         >
@@ -177,7 +177,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div
             data-inner
-            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+            class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
           >
             <p class="m-0">
               Check minimum ability scores for the class, then pick a kit for
@@ -192,7 +192,7 @@ import RegisterComponents from './RegisterComponents.astro';
           type="button"
           data-header
           id="docs-accordion-layout-3-header"
-          class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+          class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
           aria-expanded="false"
           aria-controls="docs-accordion-layout-3-body"
         >
@@ -207,7 +207,7 @@ import RegisterComponents from './RegisterComponents.astro';
         >
           <div
             data-inner
-            class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+            class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
           >
             <p class="m-0">
               Pick Lawful, Neutral, or Chaotic on the ethical axis, and Good,
@@ -218,8 +218,8 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </cinq-accordion>
 
-    <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-      Mode&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-gray-900"
+    <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+      Mode&nbsp;:&nbsp;<span data-status class="font-mono font-medium text-primary"
         >Desktop. Accordion bound</span
       >
     </p>
@@ -293,18 +293,18 @@ import RegisterComponents from './RegisterComponents.astro';
 
       desktopBtn?.setAttribute('aria-pressed', String(isDesktop));
       mobileBtn?.setAttribute('aria-pressed', String(!isDesktop));
-      desktopBtn?.classList.toggle('bg-black', isDesktop);
-      desktopBtn?.classList.toggle('text-white', isDesktop);
-      desktopBtn?.classList.toggle('hover:bg-gray-800', isDesktop);
-      desktopBtn?.classList.toggle('bg-gray-100', !isDesktop);
-      desktopBtn?.classList.toggle('text-gray-800', !isDesktop);
-      desktopBtn?.classList.toggle('hover:bg-gray-200', !isDesktop);
-      mobileBtn?.classList.toggle('bg-black', !isDesktop);
-      mobileBtn?.classList.toggle('text-white', !isDesktop);
-      mobileBtn?.classList.toggle('hover:bg-gray-800', !isDesktop);
-      mobileBtn?.classList.toggle('bg-gray-100', isDesktop);
-      mobileBtn?.classList.toggle('text-gray-800', isDesktop);
-      mobileBtn?.classList.toggle('hover:bg-gray-200', isDesktop);
+      desktopBtn?.classList.toggle('bg-accent-default', isDesktop);
+      desktopBtn?.classList.toggle('text-on-accent', isDesktop);
+      desktopBtn?.classList.toggle('hover:bg-accent-hover', isDesktop);
+      desktopBtn?.classList.toggle('bg-surface', !isDesktop);
+      desktopBtn?.classList.toggle('text-body', !isDesktop);
+      desktopBtn?.classList.toggle('hover:bg-surface-hover', !isDesktop);
+      mobileBtn?.classList.toggle('bg-accent-default', !isDesktop);
+      mobileBtn?.classList.toggle('text-on-accent', !isDesktop);
+      mobileBtn?.classList.toggle('hover:bg-accent-hover', !isDesktop);
+      mobileBtn?.classList.toggle('bg-surface', isDesktop);
+      mobileBtn?.classList.toggle('text-body', isDesktop);
+      mobileBtn?.classList.toggle('hover:bg-surface-hover', isDesktop);
     };
 
     desktopBtn?.addEventListener('click', () => setMode('desktop'));

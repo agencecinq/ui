@@ -4,22 +4,22 @@ import RegisterComponents from './RegisterComponents.astro';
 // One style per level, for links and buttons alike: the font is set on the lists,
 // and the items inherit it.
 const item =
-  'inline-flex items-center gap-1 rounded-lg px-3 py-2 text-gray-900 no-underline transition-colors hover:bg-gray-100 aria-expanded:bg-gray-100 aria-[current=page]:underline aria-[current=page]:underline-offset-4';
+  'inline-flex items-center gap-1 rounded-lg px-3 py-2 text-primary no-underline transition-colors hover:bg-surface-hover aria-expanded:bg-surface-hover aria-[current=page]:underline aria-[current=page]:underline-offset-4';
 const menuItem =
-  'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-gray-900 no-underline transition-colors hover:bg-gray-100 aria-expanded:bg-gray-100';
-const chevron = 'text-xs text-gray-500';
+  'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-primary no-underline transition-colors hover:bg-surface-hover aria-expanded:bg-surface-hover';
+const chevron = 'text-xs text-muted';
 const panel =
-  'm-0 w-56 list-none rounded-xl border border-gray-200 bg-white p-2 text-sm font-normal shadow-lg';
+  'm-0 w-56 list-none rounded-xl border border-default bg-elevated p-2 text-sm font-normal shadow-lg';
 ---
 
 <RegisterComponents />
 
 <div class="not-content">
-  <section class="rounded-2xl bg-white p-6 shadow">
+  <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
     <div class="flex flex-col gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Guild hall navigation</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Guild hall navigation</h3>
+        <p class="text-sm text-muted">
           One branch open at a time, a nested submenu under Quests, arrow keys in reading
           order and Escape to close: Enter on Dungeons, then ArrowDown, reaches the Tomb
           of Horrors. With <code>data-hover</code>, the mouse opens the
@@ -28,14 +28,14 @@ const panel =
         </p>
       </div>
 
-      <label class="flex items-center gap-2 text-sm text-gray-900">
+      <label class="flex items-center gap-2 text-sm text-primary">
         <input id="docs-disclosure-navigation-hover" type="checkbox" checked />
         Open on hover (<code>data-hover</code>)
       </label>
 
       <cinq-disclosure-navigation
         id="docs-disclosure-navigation"
-        class="h-72 rounded-lg border border-gray-200 bg-gray-50 p-4"
+        class="h-72 rounded-lg border border-default bg-surface p-4"
         data-hover
       >
         <nav aria-label="Guild hall">
@@ -99,8 +99,8 @@ const panel =
         </nav>
       </cinq-disclosure-navigation>
 
-      <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-        Last event: <span id="docs-disclosure-navigation-status" class="font-mono font-medium text-gray-900">-</span>
+      <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+        Last event: <span id="docs-disclosure-navigation-status" class="font-mono font-medium text-primary">-</span>
       </p>
     </div>
   </section>

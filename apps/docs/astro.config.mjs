@@ -15,6 +15,10 @@ export default defineConfig({
         { icon: 'github', label: 'GitHub', href: 'https://github.com/agencecinq/ui' },
       ],
       customCss: ['./src/styles/global.css'],
+      components: {
+        SiteTitle: './src/components/SiteTitle.astro',
+        Footer: './src/components/Footer.astro',
+      },
       sidebar: [
         { label: 'Getting started', items: [{ label: 'Overview', slug: '' }] },
         {

@@ -6,19 +6,19 @@ import RegisterComponents from './RegisterComponents.astro';
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div class="flex items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900">Confirm dialog</h3>
-            <p class="text-sm text-gray-600">
+            <h3 class="text-lg font-semibold text-primary">Confirm dialog</h3>
+            <p class="text-sm text-muted">
               A confirm/cancel flow: each button closes with <code>request-close</code> and
               its <code>value</code>, read back from <code>returnValue</code>.
             </p>
           </div>
           <button
             type="button"
-            class="shrink-0 px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 shrink-0"
+            class="shrink-0 px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover shrink-0"
             commandfor="confirm-modal"
             command="show-modal"
           >
@@ -27,7 +27,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
 
         <p
-          class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800"
+          class="rounded-lg bg-surface px-3 py-2 text-sm text-body"
           data-modal-status="confirm"
         >
           Waiting for your choice...
@@ -38,11 +38,11 @@ import RegisterComponents from './RegisterComponents.astro';
             id="confirm-modal"
             closedby="any"
             aria-labelledby="memorize-fireball-title"
-            class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+            class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-elevated p-6 shadow-2xl backdrop:bg-overlay-scrim text-primary border border-default"
             data-modal="confirm"
           >
             <h2 id="memorize-fireball-title" class="text-xl font-semibold mb-2">Memorize fireball?</h2>
-            <p class="text-gray-800 mb-4">
+            <p class="text-body mb-4">
               Memorizing <span class="font-semibold">fireball</span> uses one of your wizard's
               3rd-level spell slots for the day.
             </p>
@@ -50,7 +50,7 @@ import RegisterComponents from './RegisterComponents.astro';
             <div class="flex justify-end gap-2">
               <button
                 type="button"
-                class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+                class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
                 commandfor="confirm-modal"
                 command="request-close"
                 value="cancel"
@@ -59,7 +59,7 @@ import RegisterComponents from './RegisterComponents.astro';
               </button>
               <button
                 type="button"
-                class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+                class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
                 commandfor="confirm-modal"
                 command="request-close"
                 value="confirm"
@@ -72,19 +72,19 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div class="flex items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900">Inline form</h3>
-            <p class="text-sm text-gray-600">
+            <h3 class="text-lg font-semibold text-primary">Inline form</h3>
+            <p class="text-sm text-muted">
               A small form inside the modal. The dialog closes on submit and shows the result
               outside.
             </p>
           </div>
           <button
             type="button"
-            class="shrink-0 px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 shrink-0"
+            class="shrink-0 px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover shrink-0"
             commandfor="character-modal"
             command="show-modal"
           >
@@ -93,7 +93,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
 
         <p
-          class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800"
+          class="rounded-lg bg-surface px-3 py-2 text-sm text-body"
           data-modal-status="character"
         >
           No character saved yet.
@@ -104,33 +104,33 @@ import RegisterComponents from './RegisterComponents.astro';
             id="character-modal"
             closedby="any"
             aria-labelledby="character-sheet-title"
-            class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl backdrop:bg-black/50 text-gray-900"
+            class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-elevated p-6 shadow-2xl backdrop:bg-overlay-scrim text-primary border border-default"
             data-modal="character"
           >
             <form class="flex flex-col gap-4" data-character-form>
               <div>
                 <h2 id="character-sheet-title" class="text-xl font-semibold mb-2">Character sheet</h2>
-                <p class="text-gray-800 text-sm">
+                <p class="text-body text-sm">
                   Enter a name and class for your adventurer.
                 </p>
               </div>
 
               <label class="block">
-                <span class="block text-sm font-medium text-gray-700 mb-1">Name</span>
+                <span class="block text-sm font-medium text-body mb-1">Name</span>
                 <input
                   name="name"
                   required
-                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                  class="w-full rounded-lg border border-default px-3 py-2 text-sm"
                   placeholder="Mialee"
                 />
               </label>
 
               <label class="block">
-                <span class="block text-sm font-medium text-gray-700 mb-1">Class</span>
+                <span class="block text-sm font-medium text-body mb-1">Class</span>
                 <input
                   name="class"
                   required
-                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                  class="w-full rounded-lg border border-default px-3 py-2 text-sm"
                   placeholder="Wizard"
                 />
               </label>
@@ -138,7 +138,7 @@ import RegisterComponents from './RegisterComponents.astro';
               <div class="flex justify-end gap-2">
                 <button
                   type="button"
-                  class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
                   commandfor="character-modal"
                   command="request-close"
                 >
@@ -147,7 +147,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
                 <button
                   type="submit"
-                  class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+                  class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
                 >
                   Save
                 </button>

@@ -4,14 +4,14 @@ import { pointerImage } from './images';
 ---
 
 <PixelateDemoFrame>
-  <p class="text-sm text-gray-600">
+  <p class="text-sm text-muted">
     Map pointer position to <code>pixel</code>. Two mappings, side by side.
   </p>
 
   <div class="grid gap-6 lg:grid-cols-2">
     <div class="flex flex-col gap-2">
-      <p class="text-sm font-medium text-gray-900">From center</p>
-      <p class="text-sm text-gray-600">
+      <p class="text-sm font-medium text-primary">From center</p>
+      <p class="text-sm text-muted">
         Sharp in the middle, blocky at the edges. Resets on mouseleave.
       </p>
       <cinq-pixelate
@@ -28,11 +28,11 @@ import { pointerImage } from './images';
         />
         <canvas role="img" aria-label="City skyline at night"></canvas>
       </cinq-pixelate>
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-muted">
         <code>pixel</code>:{' '}
         <span
           id="docs-pixelate-pointer-center-value"
-          class="font-mono font-medium text-gray-900"
+          class="font-mono font-medium text-primary"
         >
           256
         </span>
@@ -40,8 +40,8 @@ import { pointerImage } from './images';
     </div>
 
     <div class="flex flex-col gap-2">
-      <p class="text-sm font-medium text-gray-900">Horizontal</p>
-      <p class="text-sm text-gray-600">
+      <p class="text-sm font-medium text-primary">Horizontal</p>
+      <p class="text-sm text-muted">
         Left blocky, right sharp. Last value persists on mouseleave.
       </p>
       <cinq-pixelate
@@ -58,11 +58,11 @@ import { pointerImage } from './images';
         />
         <canvas role="img" aria-label="City skyline at night"></canvas>
       </cinq-pixelate>
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-muted">
         <code>pixel</code>:{' '}
         <span
           id="docs-pixelate-pointer-horizontal-value"
-          class="font-mono font-medium text-gray-900"
+          class="font-mono font-medium text-primary"
         >
           256
         </span>

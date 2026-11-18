@@ -1,9 +1,3 @@
----
-description: CINQ UI copy style — no quadratins or semicolons in user-facing prose
-globs: apps/docs/**/*.{mdx,astro}, packages/**/README.md
-alwaysApply: true
----
-
 # Copy style
 
 In user-facing copy (docs, README prose, playground descriptions, commit messages for this repo):

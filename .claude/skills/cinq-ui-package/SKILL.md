@@ -74,7 +74,7 @@ host.destroy();
 host.init();
 ```
 
-See `.cursor/rules/package-lifecycle.mdc` and `.cursor/rules/typescript-private-fields.mdc`.
+See `.claude/rules/package-lifecycle.md` and `.claude/rules/typescript-private-fields.md`.
 
 ## SPEC.md outline
 

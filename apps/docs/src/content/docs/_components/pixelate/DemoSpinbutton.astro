@@ -8,14 +8,14 @@ import { sliderImage } from './images';
       <cinq-spinbutton
         id="docs-pixelate-spinbutton"
         data-step="8"
-        class="inline-flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 text-gray-900 focus-within:ring-2 focus-within:ring-black"
+        class="inline-flex w-fit items-center gap-2 rounded-lg border border-default bg-surface p-1 text-primary focus-within:ring-2 focus-within:ring-focus-ring"
       >
       <button
         type="button"
         name="decrease"
         tabindex="-1"
         aria-label="Decrease block size"
-        class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+        class="grid h-8 w-8 place-items-center rounded-md bg-elevated shadow-sm hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-40 border border-default"
       >
         −
       </button>
@@ -36,27 +36,27 @@ import { sliderImage } from './images';
         name="increase"
         tabindex="-1"
         aria-label="Increase block size"
-        class="grid h-8 w-8 place-items-center rounded-md bg-white shadow-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+        class="grid h-8 w-8 place-items-center rounded-md bg-elevated shadow-sm hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-40 border border-default"
       >
         +
       </button>
     </cinq-spinbutton>
 
     <div class="flex flex-col gap-2 sm:items-end">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-muted">
         <code>pixel</code> block size (px):{' '}
-        <span id="docs-pixelate-spinbutton-value" class="font-mono font-medium text-gray-900">
+        <span id="docs-pixelate-spinbutton-value" class="font-mono font-medium text-primary">
           160
         </span>
         {', '}
-        <span id="docs-pixelate-spinbutton-buffer" class="font-mono text-gray-700">
+        <span id="docs-pixelate-spinbutton-buffer" class="font-mono text-body">
           ...
         </span>
       </p>
       <button
         type="button"
         id="docs-pixelate-spinbutton-download"
-        class="rounded-lg bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+        class="rounded-lg bg-accent-default px-3 py-2 text-sm text-on-accent hover:bg-accent-hover"
       >
         Download PNG
       </button>

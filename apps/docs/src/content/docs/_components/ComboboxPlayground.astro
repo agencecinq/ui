@@ -11,9 +11,9 @@ import RegisterComponents from './RegisterComponents.astro';
     max-width: 28rem;
     align-items: stretch;
     gap: 0;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #fff;
+    background: var(--background-color-elevated);
   }
 
   @supports (anchor-name: --x) and (position-anchor: --x) {
@@ -24,7 +24,7 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-combobox:focus-within {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
   }
 
@@ -35,7 +35,7 @@ import RegisterComponents from './RegisterComponents.astro';
     background: transparent;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-combobox input[role='combobox']:focus {
@@ -45,15 +45,15 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-combobox button[aria-controls] {
     flex-shrink: 0;
     border: 0;
-    border-left: 1px solid #e5e7eb;
-    background: #f9fafb;
+    border-left: 1px solid var(--border-color-default);
+    background: var(--background-color-surface);
     padding: 0 0.75rem;
-    color: #374151;
+    color: var(--text-color-body);
     cursor: pointer;
   }
 
   .docs-combobox button[aria-controls]:hover {
-    background: #f3f4f6;
+    background: var(--background-color-surface-hover);
   }
 
   .docs-combobox [role='listbox'] {
@@ -65,9 +65,9 @@ import RegisterComponents from './RegisterComponents.astro';
     margin: 0;
     padding: 0.25rem;
     list-style: none;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #fff;
+    background: var(--background-color-elevated);
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     max-height: 16rem;
     overflow: auto;
@@ -96,12 +96,12 @@ import RegisterComponents from './RegisterComponents.astro';
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: var(--text-color-primary);
     cursor: pointer;
   }
 
   .docs-combobox [role='option'][aria-selected='true'] {
-    background: #f3f4f6;
+    background: var(--background-color-surface-hover);
   }
 
   .docs-combobox[busy] input[role='combobox'],
@@ -116,8 +116,8 @@ import RegisterComponents from './RegisterComponents.astro';
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #6b7280;
-    background: #f9fafb;
+    color: var(--text-color-muted);
+    background: var(--background-color-surface);
   }
 
   .docs-combobox-option-link {
@@ -131,15 +131,15 @@ import RegisterComponents from './RegisterComponents.astro';
     font-size: 0.75rem;
     max-height: 10rem;
     overflow-y: auto;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #f9fafb;
+    background: var(--background-color-surface);
     padding: 0.5rem 0.75rem;
   }
 
   .docs-combobox-event-log:empty::before {
     content: 'No events yet.';
-    color: #9ca3af;
+    color: var(--text-color-subtle);
   }
 
   .docs-combobox-empty {
@@ -147,7 +147,7 @@ import RegisterComponents from './RegisterComponents.astro';
     margin: 0;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 
   .docs-combobox-empty.is-visible {
@@ -200,8 +200,8 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-combobox--palette [role='option'][aria-selected='true'] .docs-combobox-rich-option {
-    background: #f3f4f6;
-    outline: 1px solid #d1d5db;
+    background: var(--background-color-surface-hover);
+    outline: 1px solid var(--border-color-control);
   }
 
   .docs-combobox-rich-option {
@@ -219,8 +219,8 @@ import RegisterComponents from './RegisterComponents.astro';
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 0.5rem;
-    background: #111827;
-    color: #fff;
+    background: var(--color-accent-default);
+    color: var(--text-color-on-accent);
     font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -235,14 +235,14 @@ import RegisterComponents from './RegisterComponents.astro';
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-combobox-rich-option__meta {
     display: block;
     margin-top: 0.125rem;
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 
   .docs-combobox-rich-option__badge {
@@ -259,9 +259,9 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-combobox-detail {
     min-height: 14rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.75rem;
-    background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+    background: linear-gradient(180deg, var(--background-color-surface) 0%, var(--background-color-elevated) 100%);
     padding: 1.25rem;
   }
 
@@ -271,7 +271,7 @@ import RegisterComponents from './RegisterComponents.astro';
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 
   .docs-combobox-detail__eyebrow {
@@ -280,14 +280,14 @@ import RegisterComponents from './RegisterComponents.astro';
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 
   .docs-combobox-detail__title {
     margin: 0;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-combobox-detail__stats {
@@ -302,8 +302,8 @@ import RegisterComponents from './RegisterComponents.astro';
   .docs-combobox-detail__stat {
     padding: 0.75rem;
     border-radius: 0.5rem;
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: var(--background-color-elevated);
+    border: 1px solid var(--border-color-default);
   }
 
   .docs-combobox-detail__stat dt {
@@ -311,21 +311,21 @@ import RegisterComponents from './RegisterComponents.astro';
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #9ca3af;
+    color: var(--text-color-subtle);
   }
 
   .docs-combobox-detail__stat dd {
     margin: 0.25rem 0 0;
     font-size: 0.9375rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-combobox-detail__blurb {
     margin: 1rem 0 0;
     font-size: 0.875rem;
     line-height: 1.5;
-    color: #374151;
+    color: var(--text-color-body);
   }
 
   .docs-combobox-advanced-toolbar {
@@ -338,24 +338,24 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-combobox-advanced-kbd {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-color-muted);
   }
 </style>
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
     <!-- 1. Managed: sync local list -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Local list</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Local list</h3>
+          <p class="text-sm text-muted">
             Managed mode: sync <code>search</code>, optional open button, and{' '}
             <code>data-autoselect</code> (first match highlighted on open).
           </p>
         </div>
 
-        <label for="docs-monster-local" class="text-sm font-medium text-gray-700">Monster</label>
+        <label for="docs-monster-local" class="text-sm font-medium text-body">Monster</label>
         <cinq-combobox id="docs-monster-local" class="docs-combobox" data-autoselect>
           <input
             id="docs-monster-local-input"
@@ -384,24 +384,24 @@ import RegisterComponents from './RegisterComponents.astro';
           ></ul>
         </cinq-combobox>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800" aria-live="polite">
-          Status: <span data-combobox-status="local" class="font-mono font-medium text-gray-900">-</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body" aria-live="polite">
+          Status: <span data-combobox-status="local" class="font-mono font-medium text-primary">-</span>
         </p>
       </div>
     </section>
 
     <!-- 2. Managed: async fetch + event log -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Async search</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Async search</h3>
+          <p class="text-sm text-muted">
             Managed mode: async <code>search</code>, <code>AbortSignal</code>, event log, and{' '}
             <code>[busy]</code> while loading.
           </p>
         </div>
 
-        <label for="docs-monster-api" class="text-sm font-medium text-gray-700">Monster</label>
+        <label for="docs-monster-api" class="text-sm font-medium text-body">Monster</label>
         <cinq-combobox id="docs-monster-api" class="docs-combobox">
           <input
             id="docs-monster-api-input"
@@ -421,8 +421,8 @@ import RegisterComponents from './RegisterComponents.astro';
           ></ul>
         </cinq-combobox>
 
-        <p class="text-sm text-gray-600" aria-live="polite">
-          Status: <span data-combobox-status="api" class="font-mono font-medium text-gray-900">Idle</span>
+        <p class="text-sm text-muted" aria-live="polite">
+          Status: <span data-combobox-status="api" class="font-mono font-medium text-primary">Idle</span>
         </p>
         <div
           data-combobox-log="api"
@@ -433,17 +433,17 @@ import RegisterComponents from './RegisterComponents.astro';
     </section>
 
     <!-- 3. External: grouped HTML -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">External mode</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">External mode</h3>
+          <p class="text-sm text-muted">
             Grouped HTML, debounce, <code>minLength</code>, and <code>combobox:empty</code>.
           </p>
         </div>
 
         <form data-combobox-form="external" action="#" method="get" role="search" class="flex flex-col gap-2 max-w-md">
-          <label for="docs-monster-external" class="text-sm font-medium text-gray-700">Query</label>
+          <label for="docs-monster-external" class="text-sm font-medium text-body">Query</label>
           <cinq-combobox
             id="docs-monster-external"
             class="docs-combobox"
@@ -472,29 +472,29 @@ import RegisterComponents from './RegisterComponents.astro';
           </cinq-combobox>
           <p
             data-combobox-empty="external"
-            class="docs-combobox-empty rounded-lg border border-gray-200 bg-gray-50"
+            class="docs-combobox-empty rounded-lg border border-default bg-surface"
             role="status"
           ></p>
           <p class="sr-only" data-combobox-live="external" aria-live="polite" aria-atomic="true"></p>
         </form>
 
-        <p class="text-sm text-gray-600" aria-live="polite">
-          Hint: <span data-combobox-hint="external" class="font-mono font-medium text-gray-900">Idle. Try "be", "mi", or "xx".</span>
+        <p class="text-sm text-muted" aria-live="polite">
+          Hint: <span data-combobox-hint="external" class="font-mono font-medium text-primary">Idle. Try "be", "mi", or "xx".</span>
         </p>
       </div>
     </section>
 
     <!-- 4. Custom select: picker without filling the input -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Custom select</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Custom select</h3>
+          <p class="text-sm text-muted">
             By default, choosing an option fills the input (see <strong>Local list</strong> above).
             With <code>data-select-mode="custom"</code>, the input stays your filter. Handle the
             choice in <code>combobox:submit</code>.
           </p>
-          <ol class="list-decimal pl-5 text-sm text-gray-600 space-y-1">
+          <ol class="list-decimal pl-5 text-sm text-muted space-y-1">
             <li>Type <code class="text-xs">be</code> in the field below.</li>
             <li>Open the list (Down arrow or click the input).</li>
             <li>Pick an option (click or Enter).</li>
@@ -504,7 +504,7 @@ import RegisterComponents from './RegisterComponents.astro';
           </ol>
         </div>
 
-        <label for="docs-monster-custom" class="text-sm font-medium text-gray-700">Filter</label>
+        <label for="docs-monster-custom" class="text-sm font-medium text-body">Filter</label>
         <cinq-combobox
           id="docs-monster-custom"
           class="docs-combobox"
@@ -528,15 +528,15 @@ import RegisterComponents from './RegisterComponents.astro';
           ></ul>
         </cinq-combobox>
 
-        <dl class="grid gap-2 text-sm text-gray-800 sm:grid-cols-2">
-          <div class="rounded-lg bg-gray-50 px-3 py-2">
-            <dt class="text-gray-600">Query (unchanged on pick)</dt>
+        <dl class="grid gap-2 text-sm text-body sm:grid-cols-2">
+          <div class="rounded-lg bg-surface px-3 py-2">
+            <dt class="text-muted">Query (unchanged on pick)</dt>
             <dd>
-              <span data-combobox-query="custom" class="font-mono font-medium text-gray-900">-</span>
+              <span data-combobox-query="custom" class="font-mono font-medium text-primary">-</span>
             </dd>
           </div>
-          <div class="rounded-lg bg-gray-50 px-3 py-2">
-            <dt class="text-gray-600">Picked</dt>
+          <div class="rounded-lg bg-surface px-3 py-2">
+            <dt class="text-muted">Picked</dt>
             <dd>
               <span data-combobox-picked="custom" class="docs-combobox-picked">-</span>
             </dd>
@@ -546,11 +546,11 @@ import RegisterComponents from './RegisterComponents.astro';
     </section>
 
     <!-- 5. Advanced: rich external UI + detail panel -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Compendium (advanced)</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Compendium (advanced)</h3>
+          <p class="text-sm text-muted">
             External mode and <code>selectMode: custom</code>: rich grouped options, debounced async
             search, empty state, and a detail panel fed from <code>combobox:submit</code>.
           </p>
@@ -558,7 +558,7 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <div class="docs-combobox-advanced-layout">
           <div class="flex flex-col gap-3">
-            <label for="docs-monster-advanced-input" class="text-sm font-medium text-gray-700">
+            <label for="docs-monster-advanced-input" class="text-sm font-medium text-body">
               Search compendium
             </label>
             <cinq-combobox
@@ -593,14 +593,14 @@ import RegisterComponents from './RegisterComponents.astro';
               role="status"
             ></p>
             <div class="docs-combobox-advanced-toolbar">
-              <p class="text-sm text-gray-600" aria-live="polite">
+              <p class="text-sm text-muted" aria-live="polite">
                 Filter:
-                <span data-combobox-filter="advanced" class="font-mono font-medium text-gray-900">-</span>
+                <span data-combobox-filter="advanced" class="font-mono font-medium text-primary">-</span>
               </p>
               <button
                 type="button"
                 data-combobox-clear="advanced"
-                class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                class="rounded-lg border border-default bg-elevated px-3 py-1.5 text-sm text-body hover:bg-surface"
               >
                 Clear selection
               </button>
@@ -616,7 +616,7 @@ import RegisterComponents from './RegisterComponents.astro';
             aria-live="polite"
           >
             <p class="text-sm">Pick a creature from the list.</p>
-            <p class="mt-1 text-xs text-gray-500">The search field keeps your filter.</p>
+            <p class="mt-1 text-xs text-muted">The search field keeps your filter.</p>
           </aside>
         </div>
       </div>
@@ -1098,7 +1098,7 @@ import RegisterComponents from './RegisterComponents.astro';
         detailEl.classList.add('is-empty');
         detailEl.innerHTML = `
           <p class="text-sm">Pick a creature from the list.</p>
-          <p class="mt-1 text-xs text-gray-500">The search field keeps your filter.</p>
+          <p class="mt-1 text-xs text-muted">The search field keeps your filter.</p>
         `;
       };
 

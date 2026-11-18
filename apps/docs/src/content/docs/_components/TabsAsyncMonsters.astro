@@ -3,14 +3,14 @@
 
 <div class="not-content mt-6">
   <section
-    class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4"
+    class="rounded-2xl bg-elevated p-6 shadow flex flex-col gap-4 border border-default"
     data-demo-root="async-monsters"
   >
     <div class="flex flex-wrap items-end gap-3">
       <label class="flex min-w-[220px] flex-1 flex-col gap-1.5">
-        <span class="text-sm font-medium text-gray-700">Add a monster tab</span>
+        <span class="text-sm font-medium text-body">Add a monster tab</span>
         <select
-          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white"
+          class="w-full rounded-lg border border-default px-3 py-2 text-sm bg-elevated"
           data-monster-select
         >
           <option value="adult-black-dragon">Adult Black Dragon</option>
@@ -22,7 +22,7 @@
       </label>
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-sm"
+        class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover text-sm"
         data-monster-add
       >
         Add monster tab
@@ -38,11 +38,11 @@
     <div
       role="tablist"
       aria-label="Monster manual (async)"
-      class="inline-flex gap-2 rounded-lg bg-gray-50 p-1 shadow-sm"
+      class="inline-flex gap-2 rounded-lg bg-surface p-1 shadow-sm"
     >
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="true"
         aria-controls="adult-black-dragon-panel"
@@ -52,7 +52,7 @@
       </button>
       <button
         type="button"
-        class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+        class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
         role="tab"
         aria-selected="false"
         aria-controls="ancient-gold-dragon-panel"
@@ -69,11 +69,11 @@
         role="tabpanel"
         aria-labelledby="adult-black-dragon"
         id="adult-black-dragon-panel"
-        class="rounded-xl bg-white p-4 shadow"
+        class="rounded-xl bg-elevated p-4 shadow border border-default"
       >
-        <h3 class="text-lg font-semibold text-gray-900" data-monster-name>Adult Black Dragon</h3>
-        <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary...</p>
-        <p class="mt-2 text-gray-700" data-monster-desc>
+        <h3 class="text-lg font-semibold text-primary" data-monster-name>Adult Black Dragon</h3>
+        <p class="text-sm text-muted" data-monster-meta>Consulting bestiary...</p>
+        <p class="mt-2 text-body" data-monster-desc>
           This panel is populated from a public monster reference API on first activation.
         </p>
       </section>
@@ -83,12 +83,12 @@
         role="tabpanel"
         aria-labelledby="ancient-gold-dragon"
         id="ancient-gold-dragon-panel"
-        class="rounded-xl bg-white p-4 shadow"
+        class="rounded-xl bg-elevated p-4 shadow border border-default"
         hidden
       >
-        <h3 class="text-lg font-semibold text-gray-900" data-monster-name>Ancient Gold Dragon</h3>
-        <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary...</p>
-        <p class="mt-2 text-gray-700" data-monster-desc>
+        <h3 class="text-lg font-semibold text-primary" data-monster-name>Ancient Gold Dragon</h3>
+        <p class="text-sm text-muted" data-monster-meta>Consulting bestiary...</p>
+        <p class="mt-2 text-body" data-monster-desc>
           Open this tab to fetch another creature entry.
         </p>
       </section>
@@ -210,7 +210,7 @@
         'beforeend',
         `<button
           type="button"
-          class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+          class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
           role="tab"
           aria-selected="false"
           aria-controls="${controlsId}"
@@ -226,12 +226,12 @@
           role="tabpanel"
           aria-labelledby="${slug}"
           id="${controlsId}"
-          class="rounded-xl bg-white p-4 shadow"
+          class="rounded-xl bg-elevated p-4 shadow border border-default"
           hidden
         >
-          <h3 class="text-lg font-semibold text-gray-900" data-monster-name>${label}</h3>
-          <p class="text-sm text-gray-600" data-monster-meta>Consulting bestiary...</p>
-          <p class="mt-2 text-gray-700" data-monster-desc>
+          <h3 class="text-lg font-semibold text-primary" data-monster-name>${label}</h3>
+          <p class="text-sm text-muted" data-monster-meta>Consulting bestiary...</p>
+          <p class="mt-2 text-body" data-monster-desc>
             This panel is populated from a public monster reference API on activation.
           </p>
         </section>`,

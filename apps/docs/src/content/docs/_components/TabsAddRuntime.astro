@@ -1,29 +1,29 @@
 ---
 ---
 
-<section class="rounded-2xl bg-white p-6 shadow not-content" data-demo-root="add">
+<section class="rounded-2xl bg-elevated p-6 shadow not-content border border-default" data-demo-root="add">
   <div class="flex flex-col gap-4">
     <div>
-      <h3 class="text-lg font-semibold text-gray-900">Add tabs at runtime</h3>
-      <p class="text-sm text-gray-600">
+      <h3 class="text-lg font-semibold text-primary">Add tabs at runtime</h3>
+      <p class="text-sm text-muted">
         The pattern is: <span class="font-mono">destroy()</span>, mutate DOM, <span class="font-mono">init()</span>.
       </p>
     </div>
 
     <div class="grid gap-3 sm:grid-cols-2">
       <label class="block">
-        <span class="block text-sm font-medium text-gray-700 mb-1 block">Label</span>
+        <span class="block text-sm font-medium text-body mb-1 block">Label</span>
         <input
-          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          class="w-full rounded-lg border border-default px-3 py-2 text-sm"
           type="text"
           placeholder="E.g. Galeb Duhr"
           data-input="label"
         />
       </label>
       <label class="block">
-        <span class="block text-sm font-medium text-gray-700 mb-1">Content</span>
+        <span class="block text-sm font-medium text-body mb-1">Content</span>
         <input
-          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          class="w-full rounded-lg border border-default px-3 py-2 text-sm"
           type="text"
           placeholder="E.g. Boulder-like creature..."
           data-input="content"
@@ -34,21 +34,21 @@
     <div class="flex items-center gap-2">
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        class="px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
         data-action="add"
       >
         Add
       </button>
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+        class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
         data-action="destroy"
       >
         Destroy
       </button>
       <button
         type="button"
-        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+        class="px-3 py-2 rounded-lg bg-surface text-body hover:bg-surface-hover"
         data-action="create"
       >
         Create
@@ -64,11 +64,11 @@
       <div
         role="tablist"
         aria-label="Add tabs example"
-        class="inline-flex flex-wrap gap-2 rounded-lg bg-gray-50 p-1"
+        class="inline-flex flex-wrap gap-2 rounded-lg bg-surface p-1"
       >
         <button
           type="button"
-          class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+          class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
           role="tab"
           aria-selected="true"
           aria-controls="demo-add-galeb-panel"
@@ -78,7 +78,7 @@
         </button>
         <button
           type="button"
-          class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+          class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
           role="tab"
           aria-selected="false"
           aria-controls="demo-add-troll-panel"
@@ -89,7 +89,7 @@
         </button>
         <button
           type="button"
-          class="aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md"
+          class="aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md"
           role="tab"
           aria-selected="false"
           aria-controls="demo-add-jermlaine-panel"
@@ -107,9 +107,9 @@
           role="tabpanel"
           aria-labelledby="demo-add-galeb"
           id="demo-add-galeb-panel"
-          class="rounded-xl bg-gray-50 p-4"
+          class="rounded-xl bg-surface p-4"
         >
-          <p class="text-gray-700">
+          <p class="text-body">
             The galeb duhr is a curious boulder-like creature with appendages that act as hands and feet.
           </p>
         </section>
@@ -118,10 +118,10 @@
           role="tabpanel"
           aria-labelledby="demo-add-troll"
           id="demo-add-troll-panel"
-          class="rounded-xl bg-gray-50 p-4"
+          class="rounded-xl bg-surface p-4"
           hidden
         >
-          <p class="text-gray-700">
+          <p class="text-body">
             Trolls are horrid carnivores found in all climes, from arctic wastelands to tropical jungles.
           </p>
         </section>
@@ -130,10 +130,10 @@
           role="tabpanel"
           aria-labelledby="demo-add-jermlaine"
           id="demo-add-jermlaine-panel"
-          class="rounded-xl bg-gray-50 p-4"
+          class="rounded-xl bg-surface p-4"
           hidden
         >
-          <p class="text-gray-700">
+          <p class="text-body">
             Jermlaine are a diminutive humanoid race that dwells in tunnels and ambushes hapless adventurers.
           </p>
         </section>
@@ -152,7 +152,7 @@
       .replace(/^-+|-+$/g, '');
 
   const tabClass =
-    'aria-selected:bg-black aria-selected:text-white text-gray-700 hover:bg-gray-100 px-3 py-1.5 text-sm font-medium rounded-md';
+    'aria-selected:bg-accent-default aria-selected:text-on-accent text-body hover:bg-surface-hover px-3 py-1.5 text-sm font-medium rounded-md';
 
   // Add demo
   {
@@ -202,9 +202,9 @@
           role="tabpanel"
           aria-labelledby="${id}"
           id="${panelId}"
-          class="rounded-xl bg-gray-50 p-4"
+          class="rounded-xl bg-surface p-4"
           hidden
-        ><p class="text-gray-700">${content}</p></section>`,
+        ><p class="text-body">${content}</p></section>`,
       );
 
       tabsEl.init();

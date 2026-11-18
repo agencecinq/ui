@@ -1,0 +1,55 @@
+/*
+ * Starlight in the CINQ colors and fonts: its variables read the color roles of tokens.css, so the
+ * dark and light themes follow the Dark and Light schemes. Unlayered, to win over Starlight's layers.
+ */
+
+:root,
+::backdrop {
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+
+  --sl-color-white: var(--text-color-primary);
+  --sl-color-gray-1: var(--text-color-primary);
+  --sl-color-gray-2: var(--text-color-body);
+  --sl-color-gray-3: var(--text-color-muted);
+  --sl-color-gray-4: var(--text-color-subtle);
+  --sl-color-gray-5: var(--background-color-surface-hover);
+  --sl-color-gray-6: var(--background-color-elevated);
+  --sl-color-gray-7: var(--background-color-default);
+  --sl-color-black: var(--background-color-default);
+
+  /* Starlight writes links in accent-high on dark and accent on light, and the current page in
+     accent-low on them */
+  --sl-color-accent-low: var(--text-color-on-accent);
+  --sl-color-accent: var(--color-accent-default);
+  --sl-color-accent-high: var(--color-accent-hover);
+
+  --sl-color-bg-nav: var(--background-color-default);
+  --sl-color-bg-sidebar: var(--background-color-default);
+  --sl-color-bg-inline-code: var(--background-color-surface);
+  --sl-color-hairline: var(--border-color-default);
+  --sl-color-hairline-light: var(--border-color-default);
+  --sl-color-hairline-shade: var(--border-color-default);
+  --sl-color-backdrop-overlay: var(--color-overlay-scrim);
+
+  /* Figma Section/Header */
+  --sl-nav-height: 4.625rem;
+}
+
+@media (min-width: 72rem) {
+  :root {
+    --sl-nav-height: 5.25rem;
+  }
+}
+
+/* Inter is loaded from 400 to 500, the weights of the Figma: Starlight's 600 renders as 500 instead
+   of a synthesized bold. */
+html {
+  font-synthesis-weight: none;
+}
+
+/* One accent, as on the site: Starlight's cards otherwise cycle through its palette. */
+.card {
+  --sl-card-border: var(--color-accent-default);
+  --sl-card-bg: var(--color-accent-soft);
+}

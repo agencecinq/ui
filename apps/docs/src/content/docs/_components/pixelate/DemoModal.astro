@@ -5,12 +5,12 @@ import { modalImage } from './images';
 
 <PixelateDemoFrame>
   <div class="flex flex-wrap items-start justify-between gap-4">
-    <p class="text-sm text-gray-600">
+    <p class="text-sm text-muted">
       Uses <code>cinq-modal</code>: <code>modal:before-close</code> holds the close until the animation ends.
     </p>
     <button
       type="button"
-      class="shrink-0 rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+      class="shrink-0 rounded-lg bg-accent-default px-4 py-2 text-sm text-on-accent hover:bg-accent-hover"
       commandfor="docs-pixelate-modal"
       command="show-modal"
     >
@@ -23,7 +23,7 @@ import { modalImage } from './images';
       id="docs-pixelate-modal"
       closedby="any"
       aria-label="Northern lights"
-      class="fixed left-1/2 top-1/2 w-[min(92vw,40rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white p-0 opacity-0 shadow-2xl"
+      class="fixed left-1/2 top-1/2 w-[min(92vw,40rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-elevated p-0 opacity-0 shadow-2xl border border-default"
     >
       <cinq-pixelate id="docs-pixelate-modal-host" pixel="256">
         <img
@@ -35,10 +35,10 @@ import { modalImage } from './images';
         />
         <canvas role="img" aria-label="Northern lights" />
       </cinq-pixelate>
-      <div class="flex justify-end border-t border-gray-100 p-4">
+      <div class="flex justify-end border-t border-subtle p-4">
         <button
           type="button"
-          class="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200"
+          class="rounded-lg bg-surface px-4 py-2 text-sm text-body hover:bg-surface-hover"
           commandfor="docs-pixelate-modal"
           command="request-close"
         >

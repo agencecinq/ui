@@ -5,18 +5,18 @@ import RegisterComponents from "./RegisterComponents.astro";
 <RegisterComponents />
 
 <div class="not-content">
-  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+  <section class="rounded-2xl bg-elevated p-6 shadow flex flex-col gap-4 border border-default">
     <div class="flex items-center justify-between gap-4">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900">Spellbook menu</h3>
-        <p class="text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-primary">Spellbook menu</h3>
+        <p class="text-sm text-muted">
           A non-modal drawer: the page stays usable, the same button opens and closes it,
           and a press outside or Escape closes it.
         </p>
       </div>
       <button
         type="button"
-        class="shrink-0 px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        class="shrink-0 px-3 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
         commandfor="spellbook-drawer-demo"
         command="toggle-popover"
       >
@@ -25,7 +25,7 @@ import RegisterComponents from "./RegisterComponents.astro";
     </div>
 
     <p
-      class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800"
+      class="rounded-lg bg-surface px-3 py-2 text-sm text-body"
       data-spellbook-menu-status
     >
       The spellbook is closed.
@@ -36,14 +36,14 @@ import RegisterComponents from "./RegisterComponents.astro";
         id="spellbook-drawer-demo"
         popover
         aria-labelledby="spellbook-drawer-demo-title"
-        class="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-none w-full max-w-xs border-0 p-0 bg-white text-gray-900 shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 -translate-x-full open:translate-x-0 starting:open:-translate-x-full"
+        class="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-none w-full max-w-xs border-0 p-0 bg-elevated text-primary shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 -translate-x-full open:translate-x-0 starting:open:-translate-x-full"
       >
         <div class="flex h-full flex-col">
           <header class="flex items-center justify-between border-b px-6 py-4">
             <h2 id="spellbook-drawer-demo-title" class="text-lg font-semibold">Spellbook</h2>
             <button
               type="button"
-              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-body hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-focus-ring/20"
               commandfor="spellbook-drawer-demo"
               command="hide-popover"
               aria-label="Close spellbook"

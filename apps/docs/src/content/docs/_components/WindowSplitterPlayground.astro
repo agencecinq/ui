@@ -10,9 +10,9 @@ import RegisterComponents from './RegisterComponents.astro';
     display: flex;
     height: 16rem;
     overflow: hidden;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #fff;
+    background: var(--background-color-elevated);
   }
 
   .docs-panes--horizontal {
@@ -26,16 +26,16 @@ import RegisterComponents from './RegisterComponents.astro';
     min-height: 0;
     padding: 1rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: var(--text-color-primary);
   }
 
   .docs-pane--primary {
-    background: #eff6ff;
+    background: var(--color-accent-soft);
   }
 
   .docs-pane--secondary {
     flex: 1;
-    background: #f9fafb;
+    background: var(--background-color-surface);
   }
 
   .docs-panes > [role='separator'],
@@ -46,7 +46,7 @@ import RegisterComponents from './RegisterComponents.astro';
     margin: 0;
     padding: 0;
     border: 0;
-    background: #111827;
+    background: var(--color-accent-default);
     touch-action: none;
     user-select: none;
   }
@@ -78,13 +78,13 @@ import RegisterComponents from './RegisterComponents.astro';
 
   .docs-panes > [role='separator']:focus-visible,
   .docs-panes > [role='slider']:focus-visible {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
   }
 
   .docs-panes[dragging] > [role='separator'],
   .docs-panes[dragging] > [role='slider'] {
-    background: #374151;
+    background: var(--color-accent-hover);
   }
 
   .docs-panes[disabled] > [role='separator'],
@@ -104,7 +104,7 @@ import RegisterComponents from './RegisterComponents.astro';
     position: relative;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
     user-select: none;
     touch-action: none;
@@ -121,8 +121,8 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-comparison__after {
-    background: #111827;
-    color: #fff;
+    background: var(--color-accent-default);
+    color: var(--text-color-on-accent);
   }
 
   .docs-comparison__before {
@@ -155,7 +155,7 @@ import RegisterComponents from './RegisterComponents.astro';
     left: 50%;
     width: 2px;
     transform: translateX(-50%);
-    background: #fff;
+    background: var(--background-color-elevated);
   }
 
   .docs-comparison__handle {
@@ -166,8 +166,8 @@ import RegisterComponents from './RegisterComponents.astro';
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 9999px;
-    background: #fff;
-    color: #111827;
+    background: var(--background-color-elevated);
+    color: var(--text-color-primary);
     box-shadow:
       0 1px 2px rgb(0 0 0 / 6%),
       0 4px 12px rgb(0 0 0 / 12%);
@@ -180,29 +180,29 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-comparison > [role='separator']:focus-visible .docs-comparison__handle {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
   }
 
   .docs-windowsplitter-state {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color-default);
     border-radius: 0.5rem;
-    background: #f9fafb;
+    background: var(--background-color-surface);
     padding: 0.5rem 0.75rem;
-    color: #374151;
+    color: var(--text-color-body);
   }
 </style>
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
     <!-- 1. Vertical resize -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Dungeon map (vertical)</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Dungeon map (vertical)</h3>
+          <p class="text-sm text-muted">
             <code>mode: 'resize'</code>: drag or arrow keys resize the primary pane.{' '}
             <kbd>Enter</kbd> collapses / restores.
           </p>
@@ -237,11 +237,11 @@ import RegisterComponents from './RegisterComponents.astro';
     </section>
 
     <!-- 2. Horizontal -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Spellbook (horizontal)</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Spellbook (horizontal)</h3>
+          <p class="text-sm text-muted">
             <code>aria-orientation="horizontal"</code>: Up / Down move the bar;{' '}
             <kbd>Enter</kbd> collapses the top pane.
           </p>
@@ -276,11 +276,11 @@ import RegisterComponents from './RegisterComponents.astro';
     </section>
 
     <!-- 3. Comparison clip -->
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Before / after (clip)</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Before / after (clip)</h3>
+          <p class="text-sm text-muted">
             <code>data-mode="clip"</code>: overlay panes and clip the primary
             layer (same interaction as a comparison slider).
           </p>

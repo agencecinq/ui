@@ -215,17 +215,17 @@ the native `toggle` event. Details in the
       type="button"
       commandfor="starlight-modal"
       command="show-modal"
-      class="self-start px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+      class="self-start px-4 py-2 rounded-lg bg-accent-default text-on-accent hover:bg-accent-hover"
     >
       Open modal
     </button>
 
     <cinq-modal>
-      <dialog id="starlight-modal" closedby="any" aria-labelledby="starlight-dracolich-lore-title" class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-8 shadow-2xl backdrop:bg-black/50 text-gray-900">
+      <dialog id="starlight-modal" closedby="any" aria-labelledby="starlight-dracolich-lore-title" class="fixed left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-elevated p-8 shadow-2xl backdrop:bg-overlay-scrim text-primary border border-default">
         <div class="flex items-start justify-between gap-6">
           <div>
             <h2 id="starlight-dracolich-lore-title" class="text-2xl font-bold mb-2">Dracolich lore</h2>
-            <p class="text-gray-800">
+            <p class="text-body">
               The dracolich retains the spellcasting and breath weapon of its original form, but its eyes burn with cold, undead hatred.
             </p>
           </div>
@@ -234,7 +234,7 @@ the native `toggle` event. Details in the
             commandfor="starlight-modal"
             command="request-close"
             aria-label="Close"
-            class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+            class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-body hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-focus-ring/20"
           >
             <span class="text-lg leading-none">✕</span>
           </button>

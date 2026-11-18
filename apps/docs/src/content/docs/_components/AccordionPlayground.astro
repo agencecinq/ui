@@ -43,18 +43,18 @@ import RegisterComponents from './RegisterComponents.astro';
   }
 
   .docs-accordion [data-header].focus {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: -2px;
   }
 </style>
 
 <div class="not-content">
   <div class="flex flex-col gap-10">
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Basic accordion</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Basic accordion</h3>
+          <p class="text-sm text-muted">
             One panel open at a time. Use arrow keys to move between headers,{' '}
             <kbd>Space</kbd> / <kbd>Enter</kbd> to toggle.
           </p>
@@ -62,14 +62,14 @@ import RegisterComponents from './RegisterComponents.astro';
 
         <cinq-accordion
           id="docs-accordion-basic"
-          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-default divide-y divide-default"
         >
           <div data-panel data-open="true" data-deselectable="true">
             <button
               type="button"
               data-header
               id="docs-accordion-basic-1-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="true"
               aria-controls="docs-accordion-basic-1-body"
             >
@@ -83,7 +83,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
               >
                 <p class="m-0">
                   Roll 3d6 for each ability, Strength, Dexterity, Constitution,
@@ -98,7 +98,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               data-header
               id="docs-accordion-basic-2-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="false"
               aria-controls="docs-accordion-basic-2-body"
             >
@@ -113,7 +113,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
               >
                 <p class="m-0">
                   Check minimum ability scores for your chosen class. Elves, dwarves,
@@ -128,7 +128,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               data-header
               id="docs-accordion-basic-3-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="false"
               aria-controls="docs-accordion-basic-3-body"
             >
@@ -143,7 +143,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
               >
                 <p class="m-0">
                   Starting gold and gear come from your class and kit tables. Weapons,
@@ -154,24 +154,24 @@ import RegisterComponents from './RegisterComponents.astro';
           </div>
         </cinq-accordion>
 
-        <p class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800">
-          Last event: <span id="docs-accordion-status" class="font-mono font-medium text-gray-900">-</span>
+        <p class="rounded-lg bg-surface px-3 py-2 text-sm text-body">
+          Last event: <span id="docs-accordion-status" class="font-mono font-medium text-primary">-</span>
         </p>
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Multiselectable</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Multiselectable</h3>
+          <p class="text-sm text-muted">
             Set <code>data-multiselectable="true"</code> on the host to
             keep multiple panels open.
           </p>
         </div>
 
         <cinq-accordion
-          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-default divide-y divide-default"
           data-multiselectable="true"
         >
           <div data-panel data-open="true" data-deselectable="true">
@@ -179,7 +179,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               data-header
               id="docs-accordion-multi-1-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="true"
               aria-controls="docs-accordion-multi-1-body"
             >
@@ -193,7 +193,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm text-body"
               >
                 <p class="m-0">Extra weapon slots beyond your class list. Long sword, bow, or staff.</p>
               </div>
@@ -205,7 +205,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               data-header
               id="docs-accordion-multi-2-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="true"
               aria-controls="docs-accordion-multi-2-body"
             >
@@ -219,7 +219,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm text-body"
               >
                 <p class="m-0">Languages, riding, and other NWP slots from your class and Intelligence score.</p>
               </div>
@@ -229,11 +229,11 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Nested accordion</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Nested accordion</h3>
+          <p class="text-sm text-muted">
             Place a second <code>&lt;cinq-accordion&gt;</code> inside a panel body.
             Each instance only binds its own panels. Keyboard navigation stays scoped
             to the focused accordion. Disable hash sync on nested hosts with <code>data-hash="false"</code>.
@@ -241,7 +241,7 @@ import RegisterComponents from './RegisterComponents.astro';
         </div>
 
         <cinq-accordion
-          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-default divide-y divide-default"
           data-hash="false"
         >
           <div data-panel data-open="true" data-deselectable="true">
@@ -249,7 +249,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               data-header
               id="docs-accordion-nested-1-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="true"
               aria-controls="docs-accordion-nested-1-body"
             >
@@ -263,14 +263,14 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="flex flex-col gap-4 border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                class="flex flex-col gap-4 border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
               >
                 <p class="m-0">
                   Roll ability scores, pick a class, then flesh out your adventurer.
                 </p>
 
                 <cinq-accordion
-                  class="docs-accordion overflow-hidden rounded-xl border border-gray-300 bg-white divide-y divide-gray-200"
+                  class="docs-accordion overflow-hidden rounded-xl border border-control bg-elevated divide-y divide-default"
                   data-hash="false"
                 >
                   <div data-panel data-open="true" data-deselectable="true">
@@ -278,7 +278,7 @@ import RegisterComponents from './RegisterComponents.astro';
                       type="button"
                       data-header
                       id="docs-accordion-nested-1-1-header"
-                      class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+                      class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
                       aria-expanded="true"
                       aria-controls="docs-accordion-nested-1-1-body"
                     >
@@ -292,7 +292,7 @@ import RegisterComponents from './RegisterComponents.astro';
                     >
                       <div
                         data-inner
-                        class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                        class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
                       >
                         <p class="m-0">
                           Roll 3d6 for each ability, assign to Strength, Dexterity,
@@ -307,7 +307,7 @@ import RegisterComponents from './RegisterComponents.astro';
                       type="button"
                       data-header
                       id="docs-accordion-nested-1-2-header"
-                      class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+                      class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
                       aria-expanded="false"
                       aria-controls="docs-accordion-nested-1-2-body"
                     >
@@ -322,7 +322,7 @@ import RegisterComponents from './RegisterComponents.astro';
                     >
                       <div
                         data-inner
-                        class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                        class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
                       >
                         <p class="m-0">
                           Check minimum ability scores for your class, then choose a
@@ -341,7 +341,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               data-header
               id="docs-accordion-nested-2-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="false"
               aria-controls="docs-accordion-nested-2-body"
             >
@@ -356,7 +356,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
               >
                 <p class="m-0">
                   Starting gear comes from your class and background tables. Weapons,
@@ -369,25 +369,25 @@ import RegisterComponents from './RegisterComponents.astro';
       </div>
     </section>
 
-    <section class="rounded-2xl bg-white p-6 shadow">
+    <section class="rounded-2xl bg-elevated p-6 shadow border border-default">
       <div class="flex flex-col gap-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Not deselectable</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-semibold text-primary">Not deselectable</h3>
+          <p class="text-sm text-muted">
             Without <code>data-deselectable="true"</code>, clicking an open
             header does not collapse it. Typical accordion behaviour.
           </p>
         </div>
 
         <cinq-accordion
-          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-gray-200 divide-y divide-gray-200"
+          class="docs-accordion max-w-xl overflow-hidden rounded-xl border border-default divide-y divide-default"
         >
           <div data-panel data-open="true">
             <button
               type="button"
               data-header
               id="docs-accordion-lock-1-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="true"
               aria-controls="docs-accordion-lock-1-body"
             >
@@ -401,7 +401,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm leading-relaxed text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm leading-relaxed text-body"
               >
                 <p class="m-0">
                   Try clicking this header again. It stays open until you select
@@ -416,7 +416,7 @@ import RegisterComponents from './RegisterComponents.astro';
               type="button"
               data-header
               id="docs-accordion-lock-2-header"
-              class="flex w-full items-center justify-between gap-3 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 aria-expanded:bg-black aria-expanded:text-white aria-expanded:hover:bg-gray-800"
+              class="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-hover aria-expanded:bg-accent-default aria-expanded:text-on-accent aria-expanded:hover:bg-accent-hover"
               aria-expanded="false"
               aria-controls="docs-accordion-lock-2-body"
             >
@@ -431,7 +431,7 @@ import RegisterComponents from './RegisterComponents.astro';
             >
               <div
                 data-inner
-                class="border-t border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+                class="border-t border-dashed border-default bg-surface px-4 py-4 text-sm text-body"
               >
                 <p class="m-0">Opens when selected and closes the first panel. Typical dual-class flow.</p>
               </div>
