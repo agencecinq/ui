@@ -11,24 +11,24 @@ var n = "closedBy" in HTMLDialogElement.prototype, r = class r extends HTMLEleme
 		return this.$dialog ? this.#t ? this.$dialog.matches(":popover-open") : this.$dialog.open : !1;
 	}
 	#r = (e) => {
-		let t = e.source instanceof HTMLElement ? e.source : null, n = this.#o(e.command);
-		if (!n) return;
-		if (e.preventDefault(), n === "close") {
-			let e = t?.getAttribute("value") ?? void 0;
+		let { source: t, command: n } = e, i = t instanceof HTMLElement ? t : null, a = this.#o(n);
+		if (!a) return;
+		if (e.preventDefault(), a === "close") {
+			let e = i?.getAttribute("value") ?? void 0;
 			this.close(e);
 			return;
 		}
-		let i = t?.hasAttribute("data-replace") ? t.closest("cinq-drawer") : null;
-		this.trigger = t, i instanceof r && i !== this ? this.#s(i) : this.show();
+		let o = i?.hasAttribute("data-replace") ? i.closest("cinq-drawer") : null;
+		this.trigger = i, o instanceof r && o !== this ? this.#s(o) : this.show();
 	};
 	#i = (e) => {
 		e.cancelable && (e.preventDefault(), this.close());
 	};
 	#a = (e) => {
-		let t = this.$dialog;
-		if (!t || e.target !== t || t.getAttribute("closedby") !== "any") return;
-		let n = t.getBoundingClientRect();
-		e.clientX >= n.left && e.clientX <= n.right && e.clientY >= n.top && e.clientY <= n.bottom || this.close();
+		let t = this.$dialog, { target: n, clientX: r, clientY: i } = e;
+		if (!t || n !== t || t.getAttribute("closedby") !== "any") return;
+		let { top: a, right: o, bottom: s, left: c } = t.getBoundingClientRect();
+		r >= c && r <= o && i >= a && i <= s || this.close();
 	};
 	connectedCallback() {
 		this.init();
@@ -85,11 +85,11 @@ var n = "closedBy" in HTMLDialogElement.prototype, r = class r extends HTMLEleme
 	#l(e, t) {
 		let n = this.$dialog;
 		if (!n || this.#n === e) return !1;
-		if (this.#t) {
-			let t = this.trigger ?? void 0;
-			e ? n.showPopover({ source: t }) : n.hidePopover();
-		} else e ? n.showModal() : n.close(t);
-		return !0;
+		if (this.#t && e) {
+			let e = this.trigger ?? void 0;
+			return n.showPopover({ source: e }), !0;
+		}
+		return this.#t ? (n.hidePopover(), !0) : e ? (n.showModal(), !0) : (n.close(t), !0);
 	}
 	#u(e, n, r) {
 		if (this.#e) return this.#e;

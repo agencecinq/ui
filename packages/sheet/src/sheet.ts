@@ -27,22 +27,22 @@ type Drag = {
 };
 
 /** Tracks a pointer: its start, last position and downward speed in px/ms. */
-function startDrag(event: PointerEvent): Drag {
+function startDrag({ pointerId, clientY, timeStamp }: PointerEvent): Drag {
   return {
-    pointerId: event.pointerId,
-    startY: event.clientY,
-    lastY: event.clientY,
-    lastTime: event.timeStamp,
+    pointerId,
+    startY: clientY,
+    lastY: clientY,
+    lastTime: timeStamp,
     velocity: 0,
   };
 }
 
-function moveDrag(drag: Drag, event: PointerEvent): void {
-  const elapsed = Math.max(event.timeStamp - drag.lastTime, 1);
+function moveDrag(drag: Drag, { clientY, timeStamp }: PointerEvent): void {
+  const elapsed = Math.max(timeStamp - drag.lastTime, 1);
 
-  drag.velocity = (event.clientY - drag.lastY) / elapsed;
-  drag.lastY = event.clientY;
-  drag.lastTime = event.timeStamp;
+  drag.velocity = (clientY - drag.lastY) / elapsed;
+  drag.lastY = clientY;
+  drag.lastTime = timeStamp;
 }
 
 export class Sheet extends HTMLElement {
@@ -66,9 +66,11 @@ export class Sheet extends HTMLElement {
       return false;
     }
 
-    return this.#popover
-      ? this.$dialog.matches(":popover-open")
-      : this.$dialog.open;
+    if (this.#popover) {
+      return this.$dialog.matches(":popover-open");
+    }
+
+    return this.$dialog.open;
   }
 
   /** Pulls dismiss unless the dialog opts out with `closedby="none"`. */
@@ -205,8 +207,9 @@ export class Sheet extends HTMLElement {
    * the one it sits in. The trailing click of a pull is ignored.
    */
   #handleCommand = (event: CommandEvent): void => {
-    const source = event.source instanceof HTMLElement ? event.source : null;
-    const action = this.#action(event.command);
+    const { source, command, timeStamp } = event;
+    const $source = source instanceof HTMLElement ? source : null;
+    const action = this.#action(command);
 
     if (!action) {
       return;
@@ -214,30 +217,31 @@ export class Sheet extends HTMLElement {
 
     event.preventDefault();
 
-    if (event.timeStamp < this.#ignoreCommandUntil) {
+    if (timeStamp < this.#ignoreCommandUntil) {
       this.#ignoreCommandUntil = 0;
       return;
     }
 
     if (action === "close") {
       // The button's value becomes the dialog's returnValue, as natively.
-      const returnValue = source?.getAttribute("value") ?? undefined;
+      const returnValue = $source?.getAttribute("value") ?? undefined;
 
       this.close(returnValue);
       return;
     }
 
-    const current = source?.hasAttribute("data-replace")
-      ? source.closest("cinq-sheet")
+    const $current = $source?.hasAttribute("data-replace")
+      ? $source.closest("cinq-sheet")
       : null;
 
-    this.trigger = source;
+    this.trigger = $source;
 
-    if (current instanceof Sheet && current !== this) {
-      this.#replace(current);
-    } else {
-      this.show();
+    if ($current instanceof Sheet && $current !== this) {
+      this.#replace($current);
+      return;
     }
+
+    this.show();
   };
 
   /** Escape and light dismiss of a modal sheet: route through `close()` unless the browser forces the close. */
@@ -261,21 +265,19 @@ export class Sheet extends HTMLElement {
   /** `closedby="any"` fallback: a click outside the dialog box closes it. */
   #handleClick = (event: MouseEvent): void => {
     const $dialog = this.$dialog;
+    const { target, clientX, clientY } = event;
 
     if (
       !$dialog ||
-      event.target !== $dialog ||
+      target !== $dialog ||
       $dialog.getAttribute("closedby") !== "any"
     ) {
       return;
     }
 
-    const rect = $dialog.getBoundingClientRect();
+    const { top, right, bottom, left } = $dialog.getBoundingClientRect();
     const inside =
-      event.clientX >= rect.left &&
-      event.clientX <= rect.right &&
-      event.clientY >= rect.top &&
-      event.clientY <= rect.bottom;
+      clientX >= left && clientX <= right && clientY >= top && clientY <= bottom;
 
     if (!inside) {
       this.close();
@@ -308,12 +310,12 @@ export class Sheet extends HTMLElement {
   }
 
   /**
-   * Opens in place of `current`. Like a navigation, this sheet accepts the
-   * open first, so `current` stays open when its `sheet:before-open` cancels.
+   * Opens in place of `$current`. Like a navigation, this sheet accepts the
+   * open first, so `$current` stays open when its `sheet:before-open` cancels.
    */
-  #replace(current: Sheet): Promise<boolean> {
+  #replace($current: Sheet): Promise<boolean> {
     return this.#show(async () => {
-      const closed = await current.close();
+      const closed = await $current.close();
 
       return closed && this.#commit(true);
     });
@@ -347,21 +349,25 @@ export class Sheet extends HTMLElement {
       this.#setDragOffset(0);
     }
 
-    if (this.#popover) {
+    if (this.#popover && open) {
       // The source makes the trigger the invoker: its click toggles instead of light dismissing.
-      const source = this.trigger ?? undefined;
+      const $source = this.trigger ?? undefined;
 
-      if (open) {
-        $dialog.showPopover({ source });
-      } else {
-        $dialog.hidePopover();
-      }
-    } else if (open) {
-      $dialog.showModal();
-    } else {
-      $dialog.close(returnValue);
+      $dialog.showPopover({ source: $source });
+      return true;
     }
 
+    if (this.#popover) {
+      $dialog.hidePopover();
+      return true;
+    }
+
+    if (open) {
+      $dialog.showModal();
+      return true;
+    }
+
+    $dialog.close(returnValue);
     return true;
   }
 
@@ -397,15 +403,13 @@ export class Sheet extends HTMLElement {
 
   /** A press on a button that opens this closed sheet may turn into a pull up. */
   #handlePullStart = (event: PointerEvent): void => {
-    if (
-      event.button !== 0 ||
-      this.#open ||
-      !(event.target instanceof Element)
-    ) {
+    const { button, target, pointerId } = event;
+
+    if (button !== 0 || this.#open || !(target instanceof Element)) {
       return;
     }
 
-    const $button = event.target.closest("button");
+    const $button = target.closest("button");
 
     if (
       !$button ||
@@ -417,7 +421,7 @@ export class Sheet extends HTMLElement {
 
     this.#ignoreCommandUntil = 0;
     this.#pull = { ...startDrag(event), $button };
-    $button.setPointerCapture(event.pointerId);
+    $button.setPointerCapture(pointerId);
   };
 
   #handlePullMove = (event: PointerEvent): void => {
@@ -431,31 +435,33 @@ export class Sheet extends HTMLElement {
   /** A tap is left to the native command. A pull opens or does nothing. */
   #handlePullEnd = (event: PointerEvent): void => {
     const pull = this.#pull;
+    const { pointerId, clientY, timeStamp } = event;
 
-    if (!pull || event.pointerId !== pull.pointerId) {
+    if (!pull || pointerId !== pull.pointerId) {
       return;
     }
 
     // A pull can end with no pointermove in between.
-    if (event.clientY !== pull.lastY) {
+    if (clientY !== pull.lastY) {
       moveDrag(pull, event);
     }
 
     this.#pull = null;
 
-    const delta = pull.lastY - pull.startY;
+    const { startY, lastY, velocity, $button } = pull;
+    const delta = lastY - startY;
 
     if (Math.abs(delta) < TAP_SLOP) {
       return;
     }
 
-    this.#ignoreCommandUntil = event.timeStamp + PULL_CLICK_WINDOW;
+    this.#ignoreCommandUntil = timeStamp + PULL_CLICK_WINDOW;
 
-    if (delta > -OPEN_DISTANCE && pull.velocity > -OPEN_VELOCITY) {
+    if (delta > -OPEN_DISTANCE && velocity > -OPEN_VELOCITY) {
       return;
     }
 
-    this.trigger = pull.$button;
+    this.trigger = $button;
 
     // After this pointerup: taken outside a freshly open dialog, it would light dismiss it.
     setTimeout(() => this.show());
@@ -466,12 +472,14 @@ export class Sheet extends HTMLElement {
   };
 
   #handleDragStart = (event: PointerEvent): void => {
-    if (event.button !== 0 || !this.#open || !this.$handle) {
+    const { button, pointerId } = event;
+
+    if (button !== 0 || !this.#open || !this.$handle) {
       return;
     }
 
     this.#drag = startDrag(event);
-    this.$handle.setPointerCapture(event.pointerId);
+    this.$handle.setPointerCapture(pointerId);
     this.toggleAttribute("dragging", true);
   };
 
@@ -484,29 +492,31 @@ export class Sheet extends HTMLElement {
 
     moveDrag(drag, event);
 
-    const delta = drag.lastY - drag.startY;
+    const { startY, lastY } = drag;
+    const delta = lastY - startY;
 
     this.#setDragOffset(delta > 0 ? delta : -Math.sqrt(-delta));
   };
 
   #handleDragEnd = (event: PointerEvent): void => {
     const drag = this.#drag;
+    const { pointerId, clientY } = event;
 
-    if (!drag || event.pointerId !== drag.pointerId) {
+    if (!drag || pointerId !== drag.pointerId) {
       return;
     }
 
     // A pull can end with no pointermove in between.
-    if (event.clientY !== drag.lastY) {
+    if (clientY !== drag.lastY) {
       moveDrag(drag, event);
     }
 
     this.#endDrag();
 
+    const { startY, lastY, velocity } = drag;
     const shouldDismiss =
       this.dismissible &&
-      (drag.lastY - drag.startY >= DISMISS_DISTANCE ||
-        drag.velocity >= DISMISS_VELOCITY);
+      (lastY - startY >= DISMISS_DISTANCE || velocity >= DISMISS_VELOCITY);
 
     if (!shouldDismiss) {
       this.#setDragOffset(0);

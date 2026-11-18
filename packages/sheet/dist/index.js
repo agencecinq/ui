@@ -1,18 +1,18 @@
 import { EVENTS as e, dispatchBeforeEvent as t } from "@agencecinq/utils";
 //#region src/sheet.ts
 var n = "closedBy" in HTMLDialogElement.prototype, r = 80, i = .5, a = 8, o = 300;
-function s(e) {
+function s({ pointerId: e, clientY: t, timeStamp: n }) {
 	return {
-		pointerId: e.pointerId,
-		startY: e.clientY,
-		lastY: e.clientY,
-		lastTime: e.timeStamp,
+		pointerId: e,
+		startY: t,
+		lastY: t,
+		lastTime: n,
 		velocity: 0
 	};
 }
-function c(e, t) {
-	let n = Math.max(t.timeStamp - e.lastTime, 1);
-	e.velocity = (t.clientY - e.lastY) / n, e.lastY = t.clientY, e.lastTime = t.timeStamp;
+function c(e, { clientY: t, timeStamp: n }) {
+	let r = Math.max(n - e.lastTime, 1);
+	e.velocity = (t - e.lastY) / r, e.lastY = t, e.lastTime = n;
 }
 var l = class l extends HTMLElement {
 	trigger = null;
@@ -57,19 +57,19 @@ var l = class l extends HTMLElement {
 		return this.#m(e.SHEET_BEFORE_CLOSE, n, () => this.#p(!1, t));
 	}
 	#o = (e) => {
-		let t = e.source instanceof HTMLElement ? e.source : null, n = this.#u(e.command);
-		if (!n) return;
-		if (e.preventDefault(), e.timeStamp < this.#n) {
+		let { source: t, command: n, timeStamp: r } = e, i = t instanceof HTMLElement ? t : null, a = this.#u(n);
+		if (!a) return;
+		if (e.preventDefault(), r < this.#n) {
 			this.#n = 0;
 			return;
 		}
-		if (n === "close") {
-			let e = t?.getAttribute("value") ?? void 0;
+		if (a === "close") {
+			let e = i?.getAttribute("value") ?? void 0;
 			this.close(e);
 			return;
 		}
-		let r = t?.hasAttribute("data-replace") ? t.closest("cinq-sheet") : null;
-		this.trigger = t, r instanceof l && r !== this ? this.#d(r) : this.show();
+		let o = i?.hasAttribute("data-replace") ? i.closest("cinq-sheet") : null;
+		this.trigger = i, o instanceof l && o !== this ? this.#d(o) : this.show();
 	};
 	#s = (e) => {
 		e.cancelable && (e.preventDefault(), this.close());
@@ -78,10 +78,10 @@ var l = class l extends HTMLElement {
 		e.newState === "closed" && (this.#S(), this.#C(0));
 	};
 	#l = (e) => {
-		let t = this.$dialog;
-		if (!t || e.target !== t || t.getAttribute("closedby") !== "any") return;
-		let n = t.getBoundingClientRect();
-		e.clientX >= n.left && e.clientX <= n.right && e.clientY >= n.top && e.clientY <= n.bottom || this.close();
+		let t = this.$dialog, { target: n, clientX: r, clientY: i } = e;
+		if (!t || n !== t || t.getAttribute("closedby") !== "any") return;
+		let { top: a, right: o, bottom: s, left: c } = t.getBoundingClientRect();
+		r >= c && r <= o && i >= a && i <= s || this.close();
 	};
 	#u(e) {
 		if (this.#i) {
@@ -113,11 +113,11 @@ var l = class l extends HTMLElement {
 	#p(e, t) {
 		let n = this.$dialog;
 		if (!n || this.#a === e) return !1;
-		if (e || (this.#S(), this.#C(0)), this.#i) {
-			let t = this.trigger ?? void 0;
-			e ? n.showPopover({ source: t }) : n.hidePopover();
-		} else e ? n.showModal() : n.close(t);
-		return !0;
+		if (e || (this.#S(), this.#C(0)), this.#i && e) {
+			let e = this.trigger ?? void 0;
+			return n.showPopover({ source: e }), !0;
+		}
+		return this.#i ? (n.hidePopover(), !0) : e ? (n.showModal(), !0) : (n.close(t), !0);
 	}
 	#m(e, n, r) {
 		if (this.#r) return this.#r;
@@ -129,42 +129,47 @@ var l = class l extends HTMLElement {
 		}), this.#r);
 	}
 	#h = (e) => {
-		if (e.button !== 0 || this.#a || !(e.target instanceof Element)) return;
-		let t = e.target.closest("button");
-		t && t.commandForElement === this.$dialog && this.#u(t.command) === "show" && (this.#n = 0, this.#t = {
+		let { button: t, target: n, pointerId: r } = e;
+		if (t !== 0 || this.#a || !(n instanceof Element)) return;
+		let i = n.closest("button");
+		i && i.commandForElement === this.$dialog && this.#u(i.command) === "show" && (this.#n = 0, this.#t = {
 			...s(e),
-			$button: t
-		}, t.setPointerCapture(e.pointerId));
+			$button: i
+		}, i.setPointerCapture(r));
 	};
 	#g = (e) => {
 		let t = this.#t;
 		t && e.pointerId === t.pointerId && c(t, e);
 	};
 	#_ = (e) => {
-		let t = this.#t;
-		if (!t || e.pointerId !== t.pointerId) return;
-		e.clientY !== t.lastY && c(t, e), this.#t = null;
-		let n = t.lastY - t.startY;
-		Math.abs(n) < a || (this.#n = e.timeStamp + o, !(n > -40 && t.velocity > -.5) && (this.trigger = t.$button, setTimeout(() => this.show())));
+		let t = this.#t, { pointerId: n, clientY: r, timeStamp: i } = e;
+		if (!t || n !== t.pointerId) return;
+		r !== t.lastY && c(t, e), this.#t = null;
+		let { startY: s, lastY: l, velocity: u, $button: d } = t, f = l - s;
+		Math.abs(f) < a || (this.#n = i + o, !(f > -40 && u > -.5) && (this.trigger = d, setTimeout(() => this.show())));
 	};
 	#v = () => {
 		this.#t = null;
 	};
 	#y = (e) => {
-		e.button === 0 && this.#a && this.$handle && (this.#e = s(e), this.$handle.setPointerCapture(e.pointerId), this.toggleAttribute("dragging", !0));
+		let { button: t, pointerId: n } = e;
+		t === 0 && this.#a && this.$handle && (this.#e = s(e), this.$handle.setPointerCapture(n), this.toggleAttribute("dragging", !0));
 	};
 	#b = (e) => {
 		let t = this.#e;
 		if (!t || e.pointerId !== t.pointerId) return;
 		c(t, e);
-		let n = t.lastY - t.startY;
-		this.#C(n > 0 ? n : -Math.sqrt(-n));
+		let { startY: n, lastY: r } = t, i = r - n;
+		this.#C(i > 0 ? i : -Math.sqrt(-i));
 	};
 	#x = (e) => {
-		let t = this.#e;
-		t && e.pointerId === t.pointerId && (e.clientY !== t.lastY && c(t, e), this.#S(), this.dismissible && (t.lastY - t.startY >= r || t.velocity >= i) ? this.close().then((e) => {
+		let t = this.#e, { pointerId: n, clientY: a } = e;
+		if (!t || n !== t.pointerId) return;
+		a !== t.lastY && c(t, e), this.#S();
+		let { startY: o, lastY: s, velocity: l } = t;
+		this.dismissible && (s - o >= r || l >= i) ? this.close().then((e) => {
 			e || this.#C(0);
-		}) : this.#C(0));
+		}) : this.#C(0);
 	};
 	#S() {
 		let e = this.#e;
