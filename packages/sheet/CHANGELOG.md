@@ -1,5 +1,12 @@
 # @agencecinq/sheet
 
+## 3.1.0
+
+### Minor Changes
+
+- Follow the handle and the pull up to open with `trackDrag()`. Requires `@agencecinq/utils` >= 9.1.0.
+- A drag the browser cancels now snaps back instead of being read as a release.
+
 ## 3.0.0
 
 ### Major Changes
