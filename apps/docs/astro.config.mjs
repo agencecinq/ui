@@ -47,6 +47,7 @@ export default defineConfig({
           label: 'Reference',
           items: [
             { label: 'Utils', slug: 'reference/utils' },
+            { label: 'Drag', slug: 'reference/drag' },
             { label: 'Store', slug: 'reference/store' },
           ],
         },

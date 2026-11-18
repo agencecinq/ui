@@ -1,0 +1,159 @@
+---
+title: Drag
+description: trackDrag() from @agencecinq/utils, the pointer plumbing of a drag, with the distance and speed of the gesture.
+---
+
+import DragDiceTray from '../_components/DragDiceTray.astro';
+
+A slider thumb, a window splitter, the handle of a sheet: each one follows a
+pointer from a press to a release. The plumbing is always the same, and easy to
+get subtly wrong: capture the pointer so the drag survives leaving the element,
+follow only that pointer, end on a release but also when the browser takes the
+pointer back, clean up in every case.
+
+`trackDrag()` owns that plumbing and hands back raw values: the distance from the
+press and the speed over the last 50 ms. The component decides what they mean: a
+value, a ratio, a dismiss, a throw.
+
+## Install
+
+`trackDrag` ships with `@agencecinq/utils` 9.1 and later.
+
+```bash
+pnpm add @agencecinq/utils
+```
+
+## Example
+
+A tray of dice. Drag a die and let go: thrown fast, it slides across the tray,
+bounces off the walls and rolls. A tap, or Enter on a focused die, rolls it in
+place. The panel shows what `trackDrag` reports.
+
+<DragDiceTray />
+
+One tracker listens on the tray. `target()` hands each press to the die it lands
+on, so the dice need no listener of their own, and the tray gets `[dragging]`
+for the cursor:
+
+```ts
+import { trackDrag } from "@agencecinq/utils";
+
+trackDrag($tray, {
+  host: $tray,
+  target: (event) => event.target.closest("[data-die]"),
+  start: (event) => {
+    origin = position(event.target.closest("[data-die]"));
+  },
+  move: (event, { dx, dy }) => {
+    // While the pointer is captured, event.target is the die.
+    place(event.target, { x: origin.x + dx, y: origin.y + dy });
+  },
+  end: (event, { dx, dy, vx, vy, canceled }) => {
+    if (canceled) return;
+
+    if (Math.hypot(dx, dy) < 4) {
+      roll(event.target);
+      return;
+    }
+
+    if (Math.hypot(vx, vy) > 0.4) {
+      throwDie(event.target, { vx, vy });
+    }
+  },
+});
+```
+
+`dx` and `dy` move the die while the pointer moves. `vx` and `vy` decide at the
+release: a slow drag only places the die, a fast one throws it with that speed.
+
+## Values
+
+| Value | Meaning |
+| ----- | ------- |
+| `dx`, `dy` | Distance from the press, in px. |
+| `vx`, `vy` | Speed over the last 50 ms, in px/ms, positive rightward and downward. A flick is a high speed with a short distance. A pause before the release brings it back to 0, and two events close in time do not spike it. |
+| `canceled` | In `end` only: the browser took the pointer back before the release (`pointercancel`, or a lost capture). Snap back rather than act on it. |
+
+## Options
+
+| Option | Role |
+| ------ | ---- |
+| `host` | Element that gets `[dragging]` while a gesture runs. Style the grab cursor or turn transitions off from it. |
+| `target(event)` | Element that takes the pointer for this press, or `null` to ignore it. Defaults to the listened element. |
+| `start(event)` | A primary press. Return `false` to ignore it, for instance while the component is closed. |
+| `move(event, values)` | Each move of the tracked pointer. |
+| `end(event, values)` | The release, or the cancel with `canceled: true`. |
+
+Only the primary button starts a gesture, and only one gesture runs at a time:
+a second finger is ignored until the first one lets go.
+
+## In a component
+
+Track in `init()`, stop in `destroy()`. `cancel()` stops a running gesture
+without calling `end`, when the component closes under the finger for instance:
+
+```ts
+import { trackDrag, type DragTracker } from "@agencecinq/utils";
+
+class Sheet extends HTMLElement {
+  #drag: DragTracker | null = null;
+
+  init(): void {
+    this.#drag = trackDrag(this.$handle, {
+      host: this,
+      start: () => this.open,
+      move: (event, { dy }) => this.style.setProperty("--offset", `${dy}px`),
+      end: (event, { dy, vy, canceled }) => {
+        if (!canceled && (dy > 80 || vy > 0.5)) this.close();
+      },
+    });
+  }
+
+  destroy(): void {
+    this.#drag?.destroy();
+  }
+
+  close(): void {
+    this.#drag?.cancel();
+    // ...
+  }
+}
+```
+
+## Touch
+
+Set `touch-action: none` on the element that takes the pointer. Otherwise the
+browser keeps touch moves for scrolling and sends `pointercancel` after a few
+pixels: the gesture ends with `canceled: true`.
+
+## Keyboard and single pointer
+
+A drag is never the only way to act. WCAG 2.5.7 asks for a single-pointer
+alternative, and the keyboard needs one too: a tap or a click, and Enter or
+Space on a focusable element. The dice roll on a tap through `end`, and on
+Enter through `click`, which the browser fires with `detail` set to `0` for a
+keyboard activation:
+
+```ts
+$die.addEventListener("click", (event) => {
+  if (event.detail === 0) roll($die);
+});
+```
+
+## Testing
+
+Synthetic pointer events cannot take a pointer capture: test with a real mouse.
+In this repository, `packages/utils/vitest.browser.ts` holds the shared Vitest
+browser mode (Chromium, Firefox and WebKit) and a `drag` command that drives the
+Playwright mouse:
+
+```ts
+import { commands } from "vitest/browser";
+
+await commands.drag("#handle", { dy: 200 });
+await commands.drag("#handle", { dy: 80, steps: 2, delay: 0 }); // a flick
+```
+
+Move slowly by default, about one step per frame: a fast move reads as a flick.
+`trackDrag` itself is tested there once, so a component only tests what its
+values mean.

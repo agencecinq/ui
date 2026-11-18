@@ -1,0 +1,233 @@
+---
+const dice = [
+  { faces: 20, label: "d20" },
+  { faces: 12, label: "d12" },
+  { faces: 8, label: "d8" },
+  { faces: 6, label: "d6" },
+];
+---
+
+<div class="not-content">
+  <div class="grid gap-6 lg:grid-cols-[1fr_14rem]">
+    <section class="flex flex-col gap-3 rounded-2xl border border-default bg-elevated p-6 shadow">
+      <div>
+        <h3 class="text-lg font-semibold text-primary">Dice tray</h3>
+        <p class="text-sm text-muted">
+          Drag a die and let go: thrown fast, it rolls across the tray. A tap or Enter rolls it in
+          place.
+        </p>
+      </div>
+
+      <div
+        data-tray
+        class="relative h-72 touch-none overflow-hidden rounded-xl border border-default bg-surface [&[dragging]]:cursor-grabbing"
+      >
+        {
+          dice.map((die) => (
+            <button
+              type="button"
+              data-die
+              data-faces={die.faces}
+              class="absolute top-0 left-0 grid size-14 cursor-grab touch-none place-items-center rounded-xl bg-accent-default font-mono text-lg font-medium text-on-accent shadow-lg select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+              aria-label={`${die.label}, not rolled`}
+            >
+              <span data-value>{die.label}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <p class="text-sm text-body" data-result aria-live="polite">No roll yet.</p>
+    </section>
+
+    <section class="flex flex-col gap-3 rounded-2xl border border-default bg-elevated p-6 shadow">
+      <div>
+        <h3 class="text-lg font-semibold text-primary">Values</h3>
+        <p class="text-sm text-muted">What <code>trackDrag</code> reports for the current gesture.</p>
+      </div>
+      <dl class="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-sm">
+        <dt class="text-muted">dx</dt>
+        <dd class="m-0 text-primary" data-readout="dx">0</dd>
+        <dt class="text-muted">dy</dt>
+        <dd class="m-0 text-primary" data-readout="dy">0</dd>
+        <dt class="text-muted">vx</dt>
+        <dd class="m-0 text-primary" data-readout="vx">0</dd>
+        <dt class="text-muted">vy</dt>
+        <dd class="m-0 text-primary" data-readout="vy">0</dd>
+        <dt class="text-muted">canceled</dt>
+        <dd class="m-0 text-primary" data-readout="canceled">false</dd>
+        <dt class="text-muted">[dragging]</dt>
+        <dd class="m-0 text-primary" data-readout="dragging">no</dd>
+      </dl>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { trackDrag, type DragValues } from "@agencecinq/utils";
+
+  /** Below this distance in px, a press is a tap. */
+  const TAP = 4;
+  /** Above this speed in px/ms, a release throws the die. */
+  const THROW = 0.4;
+  /** Speed kept per 16 ms frame while a die slides. */
+  const FRICTION = 0.94;
+
+  type Point = { x: number; y: number };
+
+  const $tray = document.querySelector<HTMLElement>("[data-tray]");
+  const $result = document.querySelector<HTMLElement>("[data-result]");
+  const $readouts = document.querySelectorAll<HTMLElement>("[data-readout]");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /** Where each die rests in the tray, and where it was when the press started. */
+  const positions = new WeakMap<HTMLElement, Point>();
+  const origins = new WeakMap<HTMLElement, Point>();
+
+  function place($die: HTMLElement, { x, y }: Point): Point {
+    const width = ($tray?.clientWidth ?? 0) - $die.offsetWidth;
+    const height = ($tray?.clientHeight ?? 0) - $die.offsetHeight;
+    const point = { x: Math.min(Math.max(x, 0), width), y: Math.min(Math.max(y, 0), height) };
+
+    positions.set($die, point);
+    $die.style.translate = `${point.x}px ${point.y}px`;
+
+    return point;
+  }
+
+  function show(values: Partial<DragValues> & { canceled?: boolean }): void {
+    $readouts.forEach(($readout) => {
+      const key = $readout.dataset.readout as keyof typeof values | "dragging";
+
+      if (key === "dragging") {
+        $readout.textContent = $tray?.hasAttribute("dragging") ? "yes" : "no";
+        return;
+      }
+
+      const value = values[key];
+
+      if (typeof value === "number") {
+        $readout.textContent = value.toFixed(key.startsWith("v") ? 2 : 0);
+      }
+
+      if (typeof value === "boolean") {
+        $readout.textContent = value.toString();
+      }
+    });
+  }
+
+  function roll($die: HTMLElement): void {
+    const faces = Number($die.dataset.faces);
+    const label = `d${faces}`;
+    const value = 1 + Math.floor(Math.random() * faces);
+    const $value = $die.querySelector("[data-value]");
+
+    if ($value) {
+      $value.textContent = value.toString();
+    }
+
+    $die.setAttribute("aria-label", `${label}, rolled ${value}`);
+
+    if ($result) {
+      $result.textContent = `The ${label} rolls ${value}.`;
+    }
+  }
+
+  /** Slides from the release speed, bounces off the walls, then rolls. */
+  function throwDie($die: HTMLElement, { vx, vy }: DragValues): void {
+    let speed = { x: vx, y: vy };
+    let last = performance.now();
+
+    const frame = (now: number): void => {
+      const elapsed = now - last;
+      const decay = FRICTION ** (elapsed / 16);
+      const { x, y } = positions.get($die) ?? { x: 0, y: 0 };
+      const next = place($die, { x: x + speed.x * elapsed, y: y + speed.y * elapsed });
+
+      last = now;
+
+      // A wall stopped the die on that axis: bounce back, losing some speed.
+      if (next.x !== x + speed.x * elapsed) {
+        speed.x = -speed.x * 0.6;
+      }
+
+      if (next.y !== y + speed.y * elapsed) {
+        speed.y = -speed.y * 0.6;
+      }
+
+      speed = { x: speed.x * decay, y: speed.y * decay };
+
+      if (Math.hypot(speed.x, speed.y) > 0.02) {
+        requestAnimationFrame(frame);
+        return;
+      }
+
+      roll($die);
+    };
+
+    requestAnimationFrame(frame);
+  }
+
+  if ($tray) {
+    const $dice = $tray.querySelectorAll<HTMLElement>("[data-die]");
+
+    $dice.forEach(($die, index) => place($die, { x: 24 + index * 80, y: 24 }));
+
+    // One listener on the tray: target() hands each press to the die it lands on.
+    trackDrag($tray, {
+      host: $tray,
+      target: (event) => (event.target as Element).closest<HTMLElement>("[data-die]"),
+      start: (event) => {
+        const $die = (event.target as Element).closest<HTMLElement>("[data-die]");
+
+        if ($die) {
+          origins.set($die, positions.get($die) ?? { x: 0, y: 0 });
+        }
+
+        show({ dx: 0, dy: 0, vx: 0, vy: 0, canceled: false });
+      },
+      move: (event, values) => {
+        const $die = event.target as HTMLElement;
+        const { x, y } = origins.get($die) ?? { x: 0, y: 0 };
+
+        place($die, { x: x + values.dx, y: y + values.dy });
+        show(values);
+      },
+      end: (event, values) => {
+        const $die = event.target as HTMLElement;
+        const { dx, dy, vx, vy, canceled } = values;
+
+        show(values);
+
+        if (canceled) {
+          return;
+        }
+
+        if (Math.hypot(dx, dy) < TAP) {
+          roll($die);
+          return;
+        }
+
+        if (Math.hypot(vx, vy) < THROW) {
+          return;
+        }
+
+        if (reduceMotion.matches) {
+          roll($die);
+          return;
+        }
+
+        throwDie($die, values);
+      },
+    });
+
+    // Keyboard: Enter or Space fire a click with no pointer (detail 0). Pointer taps go through end().
+    $dice.forEach(($die) => {
+      $die.addEventListener("click", (event) => {
+        if (event.detail === 0) {
+          roll($die);
+        }
+      });
+    });
+  }
+</script>

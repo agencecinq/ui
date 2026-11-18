@@ -130,43 +130,22 @@ rejected promise. `waitUntil()` throws if called after dispatch. Types:
 
 ## Drag
 
-`trackDrag(element, options)` follows one pointer gesture at a time on
-`element`: it captures the pointer on a primary press, follows that pointer
-only, and ends on release, cancel or lost capture. It returns raw values, and
-the component decides what they mean (a value, a ratio, a dismiss).
+`trackDrag(element, options)` follows one pointer gesture at a time: it captures
+the pointer, follows that pointer only, sets `[dragging]` on a host, and hands
+back the distance and speed of the drag. The [Drag](../drag/) page has the
+options, the values and a live example.
 
 ```js
 import { trackDrag } from "@agencecinq/utils";
 
 const drag = trackDrag($handle, {
-  host: this, // gets [dragging] while a gesture runs
-  start: (event) => this.open, // return false to ignore this press
-  move: (event, { dx, dy, vx, vy }) => {},
+  host: this,
+  move: (event, { dx, dy }) => {},
   end: (event, { dx, dy, vx, vy, canceled }) => {},
 });
 
-// in destroy()
 drag.destroy();
 ```
-
-| Value | Meaning |
-| ----- | ------- |
-| `dx`, `dy` | Distance from the press, in px. |
-| `vx`, `vy` | Speed of the last move, in px/ms, positive rightward and downward. |
-| `canceled` | The browser took the pointer back before the release (`pointercancel` or lost capture). |
-
-| Option | Role |
-| ------ | ---- |
-| `host` | Element that gets `[dragging]` while a gesture runs. |
-| `target(event)` | Element that takes the pointer for this press, or `null` to ignore it. Defaults to `element`. Lets one listener on a container start gestures on its children. |
-| `start(event)` | A primary press. Return `false` to ignore it. |
-| `move(event, values)` | Each move of the tracked pointer. |
-| `end(event, values)` | The release, or the cancel with `canceled: true`. |
-
-`cancel()` stops a running gesture without calling `end`, for instance when
-the component closes. `destroy()` also removes the listeners. Set
-`touch-action: none` on the element, or touch drags turn into page scroll.
-Types: `DragOptions`, `DragValues`, `DragEndValues`, `DragTracker`.
 
 ## Focus helpers
 
