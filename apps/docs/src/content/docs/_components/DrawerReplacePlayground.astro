@@ -1,0 +1,121 @@
+---
+import RegisterComponents from "./RegisterComponents.astro";
+---
+
+<RegisterComponents />
+
+<div class="not-content">
+  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">Replace a drawer</h3>
+      <p class="text-sm text-gray-600">
+        A <code class="text-xs">data-replace</code> button opens the other drawer in place of
+        the one holding it, instead of over it. Closing the second drawer returns focus to the
+        page button that opened the first.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <button
+        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        commandfor="replace-drawer-left"
+        command="show-modal"
+      >
+        Open left (notes)
+      </button>
+      <button
+        class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        commandfor="replace-drawer-right"
+        command="show-modal"
+      >
+        Open right (bestiary)
+      </button>
+    </div>
+
+    <cinq-drawer>
+      <dialog
+        id="replace-drawer-left"
+        closedby="any"
+        aria-labelledby="replace-drawer-left-title"
+        class="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 -translate-x-full starting:open:-translate-x-full"
+      >
+        <div class="flex h-full flex-col">
+          <header class="flex items-center justify-between border-b px-6 py-4">
+            <h2
+              id="replace-drawer-left-title"
+              class="text-lg font-semibold text-gray-900"
+            >
+              Encounter notes
+            </h2>
+            <button
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+              commandfor="replace-drawer-left"
+              command="request-close"
+              aria-label="Close notes"
+            >
+              ✕
+            </button>
+          </header>
+          <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
+            <p class="text-sm text-gray-600">
+              Party enters from the west corridor. Two trolls wait behind the
+              collapsed arch.
+            </p>
+            <button
+              class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+              commandfor="replace-drawer-right"
+              command="show-modal"
+              data-replace
+            >
+              Switch to bestiary
+            </button>
+            <p class="text-xs text-gray-500">
+              Closing the bestiary returns focus to <strong>Open left</strong>, not this button.
+            </p>
+          </div>
+        </div>
+      </dialog>
+    </cinq-drawer>
+
+    <cinq-drawer>
+      <dialog
+        id="replace-drawer-right"
+        closedby="any"
+        aria-labelledby="replace-drawer-right-title"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-md border-0 p-0 bg-white shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 translate-x-full starting:open:translate-x-full"
+      >
+        <div class="flex h-full flex-col">
+          <header class="flex items-center justify-between border-b px-6 py-4">
+            <h2
+              id="replace-drawer-right-title"
+              class="text-lg font-semibold text-gray-900"
+            >
+              Bestiary
+            </h2>
+            <button
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+              commandfor="replace-drawer-right"
+              command="request-close"
+              aria-label="Close bestiary"
+            >
+              ✕
+            </button>
+          </header>
+          <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
+            <p class="text-sm text-gray-600">
+              Troll. Regenerates unless hit with fire or acid.
+            </p>
+            <button
+              class="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-50"
+              commandfor="replace-drawer-left"
+              command="show-modal"
+              data-replace
+            >
+              Switch to notes
+            </button>
+          </div>
+        </div>
+      </dialog>
+    </cinq-drawer>
+  </section>
+</div>

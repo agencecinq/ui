@@ -2,14 +2,8 @@
 var e = {
 	DRAWER_BEFORE_CLOSE: "drawer:before-close",
 	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	DRAWER_CLOSE: "drawer:close",
-	DRAWER_OPEN: "drawer:open",
-	DRAWER_TOGGLE: "drawer:toggle",
 	SHEET_BEFORE_CLOSE: "sheet:before-close",
 	SHEET_BEFORE_OPEN: "sheet:before-open",
-	SHEET_CLOSE: "sheet:close",
-	SHEET_OPEN: "sheet:open",
-	SHEET_TOGGLE: "sheet:toggle",
 	MODAL_BEFORE_CLOSE: "modal:before-close",
 	MODAL_BEFORE_OPEN: "modal:before-open",
 	SPINBUTTON_CHANGE: "spinbutton:change",
@@ -130,7 +124,7 @@ function x(e) {
 function S(e) {
 	if (y) return;
 	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-	!t || t === document.body || !t.isConnected || (y = t);
+	t && t !== document.body && t.isConnected && (y = t);
 }
 function C() {
 	y?.focus(), y = null;

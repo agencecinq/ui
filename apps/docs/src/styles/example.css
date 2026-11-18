@@ -1,0 +1,6 @@
+/* Standalone examples, shown in an iframe: Tailwind alone, without Starlight. */
+@import "tailwindcss";
+
+html:has(cinq-sheet > dialog:modal, cinq-drawer > dialog:modal) {
+  overflow: hidden;
+}

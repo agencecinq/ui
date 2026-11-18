@@ -23,10 +23,7 @@ export type Options = {
  * }
  *
  * @example
- * dispatchEvent(document.documentElement, EVENTS.DRAWER_CLOSE, { drawer: id }, {
- *   bubbles: false,
- *   cancelable: false,
- * });
+ * dispatchEvent(toast, EVENTS.TOAST_CLOSE, detail, { cancelable: false });
  */
 export declare const dispatchEvent: <T = unknown>(target: EventTarget, name: string, detail?: T, options?: Options) => boolean;
 //# sourceMappingURL=dispatch-event.d.ts.map

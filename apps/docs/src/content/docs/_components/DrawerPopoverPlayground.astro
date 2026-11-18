@@ -1,0 +1,77 @@
+---
+import RegisterComponents from "./RegisterComponents.astro";
+---
+
+<RegisterComponents />
+
+<div class="not-content">
+  <section class="rounded-2xl bg-white p-6 shadow flex flex-col gap-4">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Spellbook menu</h3>
+        <p class="text-sm text-gray-600">
+          A non-modal drawer: the page stays usable, the same button opens and closes it,
+          and a press outside or Escape closes it.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="shrink-0 px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
+        commandfor="spellbook-drawer-demo"
+        command="toggle-popover"
+      >
+        Spellbook
+      </button>
+    </div>
+
+    <p
+      class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-800"
+      data-spellbook-menu-status
+    >
+      The spellbook is closed.
+    </p>
+
+    <cinq-drawer>
+      <dialog
+        id="spellbook-drawer-demo"
+        popover
+        aria-labelledby="spellbook-drawer-demo-title"
+        class="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-none w-full max-w-xs border-0 p-0 bg-white text-gray-900 shadow-2xl transition-[translate,overlay,display] transition-discrete duration-300 -translate-x-full open:translate-x-0 starting:open:-translate-x-full"
+      >
+        <div class="flex h-full flex-col">
+          <header class="flex items-center justify-between border-b px-6 py-4">
+            <h2 id="spellbook-drawer-demo-title" class="text-lg font-semibold">Spellbook</h2>
+            <button
+              type="button"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+              commandfor="spellbook-drawer-demo"
+              command="hide-popover"
+              aria-label="Close spellbook"
+            >
+              ✕
+            </button>
+          </header>
+          <ul class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-2 text-sm">
+            <li><a class="underline" href="#">Magic missile</a></li>
+            <li><a class="underline" href="#">Sleep</a></li>
+            <li><a class="underline" href="#">Web</a></li>
+            <li><a class="underline" href="#">Fireball</a></li>
+          </ul>
+        </div>
+      </dialog>
+    </cinq-drawer>
+  </section>
+</div>
+
+<script>
+  const $dialog = document.getElementById("spellbook-drawer-demo");
+  const $status = document.querySelector("[data-spellbook-menu-status]");
+
+  $dialog?.addEventListener("toggle", (event) => {
+    if (!$status) return;
+
+    const open = (event as ToggleEvent).newState === "open";
+
+    $status.textContent = open ? "The spellbook is open." : "The spellbook is closed.";
+  });
+</script>

@@ -24,10 +24,7 @@ export type Options = {
  * }
  *
  * @example
- * dispatchEvent(document.documentElement, EVENTS.DRAWER_CLOSE, { drawer: id }, {
- *   bubbles: false,
- *   cancelable: false,
- * });
+ * dispatchEvent(toast, EVENTS.TOAST_CLOSE, detail, { cancelable: false });
  */
 export const dispatchEvent = <T = unknown>(
   target: EventTarget,

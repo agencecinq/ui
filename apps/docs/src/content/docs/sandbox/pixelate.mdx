@@ -695,27 +695,43 @@ document.documentElement.addEventListener(EVENTS.MODAL_BEFORE_CLOSE, (event) => 
 
 ## Drawer
 
-**CINQ UI:** [`cinq-drawer`](../components/drawer/), [`cinq-drawer-button`](../components/drawer/).
+**CINQ UI:** [`cinq-drawer`](../components/drawer/), opened and closed with
+invoker commands.
 
-**Open:** listen for `drawer:open`, then reveal. Uses the
+```html
+<button commandfor="photo-drawer" command="show-modal">Open drawer</button>
+
+<cinq-drawer>
+  <dialog id="photo-drawer" closedby="any" aria-label="Photo drawer">
+    <cinq-pixelate pixel="256">...</cinq-pixelate>
+    <button commandfor="photo-drawer" command="request-close">Close</button>
+  </dialog>
+</cinq-drawer>
+```
+
+**Open:** listen for the dialog's `toggle`, then reveal. Uses the
 [animation helper](#animation-helper):
 
 ```js
 import { PIXEL_MAX, PIXEL_MIN } from "@agencecinq/pixelate"
 import { EVENTS } from "@agencecinq/utils"
 
-const $host = document.querySelector("cinq-pixelate")
+const $dialog = document.querySelector("#photo-drawer")
+const $host = $dialog.querySelector("cinq-pixelate")
 
-document.documentElement.addEventListener(EVENTS.DRAWER_OPEN, (event) => {
-  if (event.detail.drawer !== "photo-drawer") return
+$dialog.addEventListener("toggle", (event) => {
   $host.setAttribute("pixel", String(PIXEL_MAX))
   $host.sync()
-  animate($host, PIXEL_MAX, PIXEL_MIN, 700)
+
+  if (event.newState === "open") {
+    animate($host, PIXEL_MAX, PIXEL_MIN, 700)
+  }
 })
 ```
 
 **Close:** listen for `drawer:before-close` and pass the pixelate animation to
-`event.detail.waitUntil()`. Same `$host` and `animate` as above.
+`event.detail.waitUntil()`. Escape, the Close button and the backdrop click all
+go through it. Same `$dialog`, `$host` and `animate` as above.
 
 ```js
 document.documentElement.addEventListener(EVENTS.DRAWER_BEFORE_CLOSE, (event) => {

@@ -1,15 +1,27 @@
 ---
 title: Sheet
-description: Bottom sheet Web Component (`<cinq-sheet>`) on native `<dialog>` with drag to dismiss.
+description: Bottom sheet (`<cinq-sheet>`) on a native `<dialog>`, with before-hooks, pull to dismiss and pull up to open.
 ---
 
-import SheetPlayground from "../_components/SheetPlayground.astro";
+import ExampleFrame from "../_components/ExampleFrame.astro";
 import SheetSpellbookPlayground from "../_components/SheetSpellbookPlayground.astro";
 
-A sheet presents content from the bottom edge. `<cinq-sheet>` wraps a native
-`<dialog>`, opens it with `showModal()`, closes it on Escape, backdrop press or
-a pull on the handle, and dispatches open and close events.
-`<cinq-sheet-button>` connects triggers through `aria-controls`.
+A sheet presents content from the bottom edge. The platform already does the
+work: buttons open and close a native `<dialog>` with
+[invoker commands](https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API),
+`showModal()` makes the page inert, focuses the dialog content and returns
+focus on close.
+
+`<cinq-sheet>` wraps the `<dialog>` and adds only what the platform lacks:
+
+- `sheet:before-open` / `sheet:before-close`, to cancel or defer an open or a
+  close with `waitUntil(promise)`
+- a drag handle: pull it down to dismiss, it snaps back otherwise
+- pull up on a button that opens the sheet, to open it with a gesture
+- `data-replace` on a button, to open the next sheet in place of the current
+  one instead of over it
+- the backdrop click of `closedby="any"` in Safari, which does not support it
+  yet
 
 Open height follows content. Position, motion and scroll lock stay in your CSS.
 
@@ -28,20 +40,20 @@ import "@agencecinq/sheet";
 ```
 
 Then write the markup: a `<dialog>` inside the host, an optional drag handle,
-and buttons with matching `aria-controls`. The component adds interactivity
-only.
+and buttons that target the dialog `id` with `commandfor`. Without JavaScript,
+the buttons still open and close the sheet: only the hooks and the gestures
+are missing.
 
 > **HTML is the source of truth.** The component will not auto-set `role`,
 > auto-migrate attributes, or warn about missing labels. Run an a11y linter (axe,
 > Lighthouse) to catch invalid markup.
 
 ```html
-<cinq-sheet-button>
-  <button aria-controls="cloak-sheet" aria-expanded="false">Select a size</button>
-</cinq-sheet-button>
+<button type="button" commandfor="cloak-sheet" command="show-modal">Select a size</button>
 
-<cinq-sheet id="cloak-sheet">
+<cinq-sheet>
   <dialog
+    id="cloak-sheet"
     aria-labelledby="cloak-title"
     closedby="any"
     class="fixed inset-x-0 top-auto -bottom-4 m-0 w-auto max-w-none max-h-[calc(100dvh-4rem)] overflow-y-auto border-0 bg-white p-0 pb-4"
@@ -49,6 +61,7 @@ only.
     <div data-dom="drag-indicator" class="touch-none" aria-hidden="true"></div>
     <h2 id="cloak-title">Cloak of Elvenkind</h2>
     ...
+    <button type="button" commandfor="cloak-sheet" command="request-close">Close</button>
   </dialog>
 </cinq-sheet>
 ```
@@ -60,83 +73,95 @@ only.
 
 ## API
 
-### Attributes
+### Markup
 
-| Attribute    | Required | Description                                          |
-| ------------ | -------- | ---------------------------------------------------- |
-| `id`         | Yes      | Sheet identifier (must match button `aria-controls`). |
-| `open`       | No       | Reflected state attribute (useful for styling).      |
-| `dragging`   | No       | Set while the handle is pulled.                      |
-| `data-modal` | No       | `false` opens with `show()`. Read on open.           |
+| Element / attribute | Required | Role |
+| ------------------- | -------- | ---- |
+| `<cinq-sheet>` | Yes | Host. Wraps one `<dialog>`. |
+| `<dialog id>` | Yes | The panel. Buttons target its `id` with `commandfor`. |
+| `closedby` on `<dialog>` | No | Dismissal of a modal sheet. See below. |
+| `popover` on `<dialog>` | No | Makes a non-modal sheet. See [Non-modal sheet](#non-modal-sheet). |
+| `[data-dom="drag-indicator"]` | No | Drag handle inside the dialog. |
+| `autofocus` | No | Element focused on open. Defaults to the first focusable element. |
+| `data-replace` on a button that opens | No | Opens the target in place of the sheet holding the button. |
 
-Dismissal is set on the `<dialog>` with the native `closedby` attribute:
+Dismissal of a modal sheet is the native `closedby` attribute. The handle reads
+it too:
 
-| `closedby`     | Escape     | Backdrop press | Handle pull |
-| -------------- | ---------- | -------------- | ----------- |
-| `any`          | Yes        | Yes            | Yes         |
-| `closerequest` | Yes        | No             | Yes         |
-| absent         | Modal only | No             | Yes         |
-| `none`         | No         | No             | No          |
+| `closedby`     | Escape | Backdrop press | Handle pull |
+| -------------- | ------ | -------------- | ----------- |
+| `any`          | Yes    | Yes            | Yes         |
+| `closerequest` | Yes    | No             | Yes         |
+| absent         | Yes    | No             | Yes         |
+| `none`         | No     | No             | No          |
 
 `[data-dom="drag-indicator"]` inside the dialog is the optional drag handle.
 Release it past 80 px, or with a quick downward flick, to close. Otherwise the
-sheet snaps back. A pull upward gives a damped rubber band.
+sheet snaps back. A pull upward gives a damped rubber band. The host carries
+`[dragging]` while the handle is pulled.
+
+### Commands
+
+| Button | Sheet | Effect | Hook |
+| ------ | ----- | ------ | ---- |
+| `command="show-modal"` | Modal | Opens the dialog. | `sheet:before-open` |
+| `command="request-close"` | Modal | Closes the dialog. The button `value` becomes `dialog.returnValue`. | `sheet:before-close` |
+| `command="close"` | Modal | Closes the dialog at once. | None |
+| `command="toggle-popover"` | Non-modal | Opens or closes the dialog. | `sheet:before-open` or `sheet:before-close` |
+| `command="show-popover"` | Non-modal | Opens the dialog. | `sheet:before-open` |
+| `command="hide-popover"` | Non-modal | Closes the dialog. | `sheet:before-close` |
+
+On a modal sheet, Escape, the backdrop press and the handle pull go through
+`sheet:before-close` too. Direct calls skip the hooks, like on the platform:
+`dialog.showModal()`, `dialog.close()`, `<form method="dialog">`, and Escape
+when the browser forces the close.
 
 ### Pull up to open
 
-A `<cinq-sheet-button>` opens its sheet on a pull up past 40 px, or a quick
-upward flick. A tap still toggles. A pull that falls short does nothing. On
-touch screens, set `touch-action: none` on the button that should take the
-gesture, typically a handle outside the sheet. Buttons without it keep page
-scroll.
+A button that opens the sheet also opens it on a pull up past 40 px, or a
+quick upward flick. A tap still runs the command. A pull that falls short does
+nothing. On touch screens, set `touch-action: none` on the button that should
+take the gesture, typically a handle outside the sheet. Buttons without it keep
+page scroll.
 
 ```html
-<cinq-sheet-button>
-  <button
-    class="touch-none"
-    aria-controls="cloak-sheet"
-    aria-expanded="false"
-    aria-label="Show sizes"
-  >
-    <span class="h-0.75 w-9 rounded-full bg-[#e9e9e9]"></span>
-  </button>
-</cinq-sheet-button>
+<button
+  type="button"
+  class="touch-none"
+  commandfor="cloak-sheet"
+  command="show-modal"
+  aria-label="Show sizes"
+>
+  <span class="h-0.75 w-9 rounded-full bg-[#e9e9e9]"></span>
+</button>
 ```
 
 ### Methods
 
-| Method             | Description                                                                |
-| ------------------ | -------------------------------------------------------------------------- |
-| `open(trigger?)`   | Opens the sheet. Resolves `true` if this call opened it, `false` if already open or canceled.    |
-| `close()`          | Closes the sheet. Resolves `true` if this call closed it, `false` if already closed or canceled. |
-| `toggle(trigger?)` | Toggles between open and closed. Resolves whether the sheet is open.       |
-| `init()`           | Binds listeners and opens the dialog if `open` is already set. Called on connect. |
-| `destroy()`        | Removes listeners and closes the dialog. Called on disconnect.             |
-
-A `<form method="dialog">` submit closes the sheet too.
+| Method | Description |
+| ------ | ----------- |
+| `show()` | Opens the sheet. Resolves `true` if this call opened it, `false` if already open or canceled. |
+| `close(returnValue?)` | Closes the sheet. Resolves `true` if this call closed it, `false` if already closed or canceled. |
+| `init()` | Binds listeners. Called on connect. |
+| `destroy()` | Removes listeners and closes the dialog. Called on disconnect. |
 
 ### Events
 
 Prefer the constants from `@agencecinq/utils` (`EVENTS.SHEET_*`). Events are
 dispatched on `document.documentElement`.
 
-| Event                | Cancelable | Detail payload                          | Description                                                                 |
-| -------------------- | ---------- | --------------------------------------- | --------------------------------------------------------------------------- |
-| `sheet:toggle`       | No         | `{ sheet, trigger }`                    | Request open/close from a button.                                           |
-| `sheet:before-open`  | Yes        | `{ sheet, instance, trigger, waitUntil }` | Fired **before** `open` is set. `preventDefault()` cancels, `waitUntil(promise)` defers. |
-| `sheet:before-close` | Yes        | `{ sheet, instance, waitUntil }`          | Fired **before** `open` is removed. `preventDefault()` cancels, `waitUntil(promise)` defers. |
-| `sheet:open`         | No         | `{ sheet, trigger }`                    | Fired after `open` is set (`showModal()` or `show()`).                      |
-| `sheet:close`        | No         | `{ sheet }`                             | Fired after `open` is removed.                                              |
+| Event | Cancelable | Detail payload | Description |
+| ----- | ---------- | -------------- | ----------- |
+| `sheet:before-open` | Yes | `{ sheet, instance, trigger, waitUntil }` | Fired **before** the dialog opens. `preventDefault()` cancels, `waitUntil(promise)` defers. |
+| `sheet:before-close` | Yes | `{ sheet, instance, waitUntil }` | Fired **before** the dialog closes. `preventDefault()` cancels, `waitUntil(promise)` defers. |
 
-Opening a sheet closes any other open modal sheet.
+`detail.sheet` is the dialog `id`. Once the dialog opens or closes, it fires
+the native `toggle` event (`event.newState` is `"open"` or `"closed"`), in both
+modes.
 
 ### Deferring open or close
 
-Every open path (toggle, pull up or `open()`) dispatches cancelable
-`sheet:before-open` first. Every close path (toggle, Escape, backdrop press,
-handle pull or `close()`) dispatches cancelable `sheet:before-close` first.
-Without a listener, the sheet opens or closes immediately. Call
-`preventDefault()` to cancel, or pass a promise to `detail.waitUntil()` to
+Call `preventDefault()` to cancel, or pass a promise to `detail.waitUntil()` to
 defer until async work finishes:
 
 ```js
@@ -151,24 +176,65 @@ document.documentElement.addEventListener(EVENTS.SHEET_BEFORE_CLOSE, (event) => 
 
 Several listeners can defer the same action: the sheet waits for every
 promise, and a rejected one cancels the action. Call `waitUntil()`
-synchronously in the listener. `sheet:open` and `sheet:close` fire only once
-the action commits. A vetoed handle pull snaps back. A `<form method="dialog">` submit closes natively and skips
-`sheet:before-close`.
+synchronously in the listener. A vetoed handle pull snaps back.
 
 **UX:** defer **open** with `before-open` when the fetch is short (roughly under
 500 ms) and the sheet would feel broken if empty. For slower loads, open
-immediately and fetch on `sheet:open`. Defer **close** with `before-close` when
+immediately and fetch on `toggle`. Defer **close** with `before-close` when
 you need to save or run an exit animation before dismissing.
 
 TypeScript: import `BeforeOpenDetail` and `BeforeCloseDetail` from
 `@agencecinq/sheet` to type listeners.
+
+## Non-modal sheet
+
+Add `popover` to the `<dialog>` when the page must stay usable while the sheet
+is open, such as a sticky purchase bar. Buttons toggle it with
+`command="toggle-popover"`:
+
+```html
+<button type="button" commandfor="size-sheet" command="toggle-popover">Select a size</button>
+
+<cinq-sheet>
+  <dialog id="size-sheet" popover aria-labelledby="size-title">...</dialog>
+</cinq-sheet>
+```
+
+The browser handles the rest: `aria-expanded` on the buttons, Escape, a press
+outside the sheet, focus moved into the dialog and back to the button on close,
+and one sheet open at a time. Focus is not contained.
+
+The popover sits in the top layer: position it against the viewport.
+Escape and a press outside close it without `sheet:before-close`: the browser
+does not let a popover cancel them. Buttons, the handle and `close()` still go
+through the hook. A `<form method="dialog">` does not close a popover: close it
+on `submit`.
+
+With `popover="manual"`, a press outside and Escape leave the sheet open, so the
+page around it stays fully usable, like a map under a place card (see the
+[map example](#map-of-the-sword-coast)). Buttons, the handle and `close()` close
+it. On a popover sheet, `closedby` only matters to the handle: `closedby="none"`
+turns the pull off. Close requests are left to the page: open a
+[`CloseWatcher`](https://developer.mozilla.org/en-US/docs/Web/API/CloseWatcher)
+on `toggle` to close the sheet on Escape or the back gesture, as the map example
+does.
+
+Set `inert` on the content the sheet covers while it is open. Lift it on the
+dialog `beforetoggle`, before the close, so focus can return to the button:
+
+```js
+dialog.addEventListener("beforetoggle", (event) => {
+  covered.inert = event.newState === "open";
+});
+```
 
 ## Motion
 
 While the handle is pulled, the host sets `--cinq-sheet-drag-offset` in px. It
 is negative and damped on an upward pull. Apply it, and the enter and exit
 motion, in your CSS. `max(-1rem, ...)` caps the rubber band at the overhang so
-no gap shows under the panel:
+no gap shows under the panel. Tailwind `open:` matches both `[open]` and
+`:popover-open`.
 
 ```css
 cinq-sheet dialog {
@@ -179,12 +245,12 @@ cinq-sheet dialog {
     overlay 300ms allow-discrete;
 }
 
-cinq-sheet dialog:not([open]) {
+cinq-sheet dialog:not([open], :popover-open) {
   translate: 0 100%;
 }
 
 @starting-style {
-  cinq-sheet dialog[open] {
+  cinq-sheet dialog:is([open], :popover-open) {
     translate: 0 100%;
   }
 }
@@ -200,15 +266,8 @@ cinq-sheet[dragging] dialog {
 }
 ```
 
-Style the scrim with `dialog::backdrop`. Set `touch-action: none` on the
-handle so touch pulls are not taken by page scroll.
-
-A non-modal sheet laid out in the page flow (`position: absolute` inside a
-container) can scroll the page as it opens: the browser moves focus into the
-dialog while it still sits at its `@starting-style` offset, below the fold, and
-scrolls to reveal it. A `fixed` sheet never does: scrolling the page does not
-bring it closer. Prefer `position: fixed` unless the sheet must stay inside a
-container.
+Style the scrim of a modal sheet with `dialog::backdrop`. Set
+`touch-action: none` on the handle so touch pulls are not taken by page scroll.
 
 ## Background scroll
 
@@ -216,28 +275,21 @@ container.
 lock scroll:
 
 ```css
-html:has(cinq-sheet[open] dialog:modal) {
+html:has(cinq-sheet > dialog:modal) {
   overflow: hidden;
 }
 ```
 
 ## Accessibility
 
-Focus on open and restore on close are native `<dialog>` behaviors. The rest is
-markup:
+Focus on open and restore on close are native `<dialog>` and popover
+behaviors. The rest is markup:
 
 - A visible close button. Escape is not discoverable, and the button is the
   only way out with `closedby="none"`
 - `autofocus` on the control the user came for, such as the first size
-- With `data-modal="false"`, `inert` on the content the sheet covers. Lift it on
-  the dialog `beforetoggle`, before the close, so focus can return to the
-  trigger
-
-```js
-dialog.addEventListener('beforetoggle', (event) => {
-  covered.inert = event.newState === 'open';
-});
-```
+- In a non-modal sheet, `inert` on the content the sheet covers, lifted on
+  `beforetoggle`
 
 ## Shopify (Liquid snippet)
 
@@ -273,19 +325,24 @@ This copies the package snippet to your theme:
   content: panel
 %}
 
-<cinq-sheet-button>
-  <button aria-controls="size-sheet" aria-expanded="false">Select a size</button>
-</cinq-sheet-button>
+<button type="button" commandfor="size-sheet" command="show-modal">Select a size</button>
 ```
 
 The snippet sets `closedby="any"` and ships the motion classes. Pass
 `closedby: 'none'` to block every dismissal but your own close control.
 
-## Migration from 1.x
+## Older browsers
 
-Version 2.0 swaps `detail.resolve()` for `detail.waitUntil(promise)` and makes
-`open()`, `close()` and `toggle()` return `Promise<boolean>`. Markup is
-unchanged. Details in the
+Invoker commands need Chrome 135, Firefox 144 or Safari 26.2. For older
+browsers, load the [invokers polyfill](https://keithcirkel.co.uk/invokers-polyfill)
+before the component.
+
+## Migration from 2.x
+
+Version 3.0 drops `<cinq-sheet-button>`: buttons target the dialog with
+`commandfor` and keep the pull up to open, the `id` moves to the `<dialog>`,
+`data-modal="false"` becomes `popover`, and `sheet:toggle`, `sheet:open` and
+`sheet:close` give way to the native `toggle` event. Step-by-step guide in the
 [README](https://github.com/agencecinq/ui/tree/main/packages/sheet#migration).
 
 ## Playground (live)
@@ -293,19 +350,29 @@ unchanged. Details in the
 ### Modal, fixed to the viewport
 
 The usual setup: a modal sheet `fixed` to the bottom of the viewport. Prepare
-up to three spells; the first one gets focus on open and the page does not
+up to three spells. The first one gets focus on open and the page does not
 move. Pull the handle down, press Escape, tap the backdrop or memorize to
 close.
 
 <SheetSpellbookPlayground />
 
-### Non-modal, inside a card
+### Sticky add to cart
 
-A compact purchase bar stays in the card. Tap its button, or tap or pull up its
-handle, to open the sheet on the sizes. Pick a size to see the price change,
-then pull the handle down, tap outside, press Escape or use the close button.
-The demo uses `data-modal="false"` so the panel stays inside the card, and makes
-the bar inert while the sheet is open. The panel is `absolute` in the card, so
-opening it scrolls the page a little (see [Motion](#motion)).
+A product page in a phone frame, with a sticky add to cart. A purchase bar
+stands in for the main button whenever it is out of view. Its button, or a pull
+up on its handle, opens a modal sheet on the sizes. Pick a size, open the
+size guide (a drawer over the sheet), then pull the handle down, tap the
+backdrop, press Escape or add the cloak to your hoard.
 
-<SheetPlayground />
+<ExampleFrame path="sheet-sticky-add-to-cart" title="Product page with a sticky purchase bar and a sheet" />
+
+### Map of the Sword Coast
+
+A non-modal sheet (`popover="manual"`) over a map that stays usable. Tap a place
+to open its card, tap another one to switch the card without closing it, and
+send the party on the road with **Travel here**. Close with the button, a pull
+on the handle or Escape, which the example brings back with `CloseWatcher`
+(and the back gesture on Android), or a plain Escape listener where it is
+missing.
+
+<ExampleFrame path="sheet-map" title="Map of the Sword Coast with a place sheet" />
