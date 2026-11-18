@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { commands, userEvent } from "vitest/browser";
+import type { DragCommandOptions } from "../../utils/vitest.browser";
 import { EVENTS } from "@agencecinq/utils";
 import type { BeforeCloseDetail, BeforeOpenDetail } from "./types.js";
 import "./index.js";
@@ -557,7 +558,7 @@ describe("cinq-sheet, popover", () => {
 
 declare module "vitest/browser" {
   interface BrowserCommands {
-    drag: (selector: string, dy: number) => Promise<void>;
+    drag: (selector: string, options?: DragCommandOptions) => Promise<void>;
   }
 }
 
@@ -581,13 +582,13 @@ describe("cinq-sheet, drag", () => {
     on(EVENTS.SHEET_BEFORE_CLOSE, closes);
 
     await press($("#pull"));
-    await commands.drag("#handle", 20);
+    await commands.drag("#handle", { dy: 20 });
 
     expect(dialog("cloak").open).toBe(true);
     expect($("cinq-sheet").style.getPropertyValue("--cinq-sheet-drag-offset")).toBe("");
     expect($("cinq-sheet").hasAttribute("dragging")).toBe(false);
 
-    await commands.drag("#handle", 200);
+    await commands.drag("#handle", { dy: 200 });
 
     expect(closes).toHaveBeenCalledTimes(1);
     expect(dialog("cloak").open).toBe(false);
@@ -597,7 +598,7 @@ describe("cinq-sheet, drag", () => {
     mount(cloak("none"));
 
     await press($("#pull"));
-    await commands.drag("#handle", 200);
+    await commands.drag("#handle", { dy: 200 });
 
     expect(dialog("cloak").open).toBe(true);
   });
@@ -609,10 +610,10 @@ describe("cinq-sheet, drag", () => {
 
     on<BeforeOpenDetail>(EVENTS.SHEET_BEFORE_OPEN, (event) => opens.push(event.detail));
 
-    await commands.drag("#pull", -25);
+    await commands.drag("#pull", { dy: -25 });
     expect(dialog("cloak").open).toBe(false);
 
-    await commands.drag("#pull", -150);
+    await commands.drag("#pull", { dy: -150 });
 
     await vi.waitFor(() => expect(dialog("cloak").open).toBe(true));
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -629,7 +630,7 @@ describe("cinq-sheet, drag", () => {
       </cinq-sheet>
     `);
 
-    await commands.drag("#pull", -150);
+    await commands.drag("#pull", { dy: -150 });
 
     await vi.waitFor(() => expect(showing("bar")).toBe(true));
     await new Promise((resolve) => setTimeout(resolve, 50));

@@ -152,8 +152,8 @@ document.querySelector("#size-sheet").addEventListener("beforetoggle", (event) =
 ### Drag
 
 Release the handle past 80 px, or with a quick downward flick, to close.
-Otherwise the sheet snaps back. A pull upward gives a damped rubber band. The
-host exposes the pull distance:
+Otherwise the sheet snaps back, as it does when the browser cancels the drag.
+A pull upward gives a damped rubber band. The host exposes the pull distance:
 
 | Hook | Meaning |
 | ---- | ------- |

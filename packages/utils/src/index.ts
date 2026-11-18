@@ -8,3 +8,4 @@ export * from './debounce.js';
 export * from './environment.js';
 export * from './focus.js';
 export * from './clamp.js';
+export * from './drag.js';

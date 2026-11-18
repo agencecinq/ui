@@ -1,4 +1,11 @@
-import { EVENTS, dispatchBeforeEvent } from "@agencecinq/utils";
+import {
+  EVENTS,
+  dispatchBeforeEvent,
+  trackDrag,
+  type DragEndValues,
+  type DragTracker,
+  type DragValues,
+} from "@agencecinq/utils";
 
 export type { BeforeCloseDetail, BeforeOpenDetail } from "./types.js";
 
@@ -18,41 +25,16 @@ const TAP_SLOP = 8;
 /** Time in ms after a pull during which the command of its trailing click is ignored. */
 const PULL_CLICK_WINDOW = 300;
 
-type Drag = {
-  pointerId: number;
-  startY: number;
-  lastY: number;
-  lastTime: number;
-  velocity: number;
-};
-
-/** Tracks a pointer: its start, last position and downward speed in px/ms. */
-function startDrag({ pointerId, clientY, timeStamp }: PointerEvent): Drag {
-  return {
-    pointerId,
-    startY: clientY,
-    lastY: clientY,
-    lastTime: timeStamp,
-    velocity: 0,
-  };
-}
-
-function moveDrag(drag: Drag, { clientY, timeStamp }: PointerEvent): void {
-  const elapsed = Math.max(timeStamp - drag.lastTime, 1);
-
-  drag.velocity = (clientY - drag.lastY) / elapsed;
-  drag.lastY = clientY;
-  drag.lastTime = timeStamp;
-}
-
 export class Sheet extends HTMLElement {
   /** Element that last requested the sheet to open. */
   trigger: HTMLElement | null = null;
   $dialog: HTMLDialogElement | null = null;
   $handle: HTMLElement | null = null;
 
-  #drag: Drag | null = null;
-  #pull: (Drag & { $button: HTMLButtonElement }) | null = null;
+  /** Pull on the handle to dismiss. */
+  #drag: DragTracker | null = null;
+  /** Pull up on a button that opens the sheet. */
+  #pull: DragTracker | null = null;
   #ignoreCommandUntil = 0;
   #pending: Promise<boolean> | null = null;
 
@@ -120,39 +102,27 @@ export class Sheet extends HTMLElement {
     }
 
     if (this.$handle) {
-      this.$handle.addEventListener("pointerdown", this.#handleDragStart);
-      this.$handle.addEventListener("pointermove", this.#handleDragMove);
-      this.$handle.addEventListener("pointerup", this.#handleDragEnd);
-      this.$handle.addEventListener("pointercancel", this.#handleDragEnd);
-      this.$handle.addEventListener("lostpointercapture", this.#handleDragEnd);
+      this.#drag = trackDrag(this.$handle, {
+        host: this,
+        start: () => this.#open,
+        move: this.#handleDragMove,
+        end: this.#handleDragEnd,
+      });
     }
 
-    document.addEventListener("pointerdown", this.#handlePullStart);
-    document.addEventListener("pointermove", this.#handlePullMove);
-    document.addEventListener("pointerup", this.#handlePullEnd);
-    document.addEventListener("pointercancel", this.#handlePullCancel);
+    this.#pull = trackDrag(document, {
+      target: this.#pullTarget,
+      start: this.#handlePullStart,
+      end: this.#handlePullEnd,
+    });
   }
 
   /** Detaches listeners and closes the dialog. Safe to call from outside while the host stays mounted. */
   destroy(): void {
-    this.#endDrag();
+    this.#drag?.destroy();
+    this.#pull?.destroy();
+    this.#drag = null;
     this.#pull = null;
-
-    document.removeEventListener("pointerdown", this.#handlePullStart);
-    document.removeEventListener("pointermove", this.#handlePullMove);
-    document.removeEventListener("pointerup", this.#handlePullEnd);
-    document.removeEventListener("pointercancel", this.#handlePullCancel);
-
-    if (this.$handle) {
-      this.$handle.removeEventListener("pointerdown", this.#handleDragStart);
-      this.$handle.removeEventListener("pointermove", this.#handleDragMove);
-      this.$handle.removeEventListener("pointerup", this.#handleDragEnd);
-      this.$handle.removeEventListener("pointercancel", this.#handleDragEnd);
-      this.$handle.removeEventListener(
-        "lostpointercapture",
-        this.#handleDragEnd,
-      );
-    }
 
     if (!this.$dialog) {
       return;
@@ -257,7 +227,7 @@ export class Sheet extends HTMLElement {
   /** Closed by any path, native ones included: drop the drag state. */
   #handleToggle = (event: ToggleEvent): void => {
     if (event.newState === "closed") {
-      this.#endDrag();
+      this.#drag?.cancel();
       this.#setDragOffset(0);
     }
   };
@@ -345,7 +315,7 @@ export class Sheet extends HTMLElement {
 
     if (!open) {
       // Before the close, so the exit motion starts from the resting place.
-      this.#endDrag();
+      this.#drag?.cancel();
       this.#setDragOffset(0);
     }
 
@@ -401,12 +371,12 @@ export class Sheet extends HTMLElement {
     return this.#pending;
   }
 
-  /** A press on a button that opens this closed sheet may turn into a pull up. */
-  #handlePullStart = (event: PointerEvent): void => {
-    const { button, target, pointerId } = event;
+  /** The button that takes the pull: one that opens this closed sheet, or none. */
+  #pullTarget = (event: PointerEvent): Element | null => {
+    const { target } = event;
 
-    if (button !== 0 || this.#open || !(target instanceof Element)) {
-      return;
+    if (this.#open || !(target instanceof Element)) {
+      return null;
     }
 
     const $button = target.closest("button");
@@ -416,107 +386,47 @@ export class Sheet extends HTMLElement {
       $button.commandForElement !== this.$dialog ||
       this.#action($button.command) !== "show"
     ) {
-      return;
+      return null;
     }
 
-    this.#ignoreCommandUntil = 0;
-    this.#pull = { ...startDrag(event), $button };
-    $button.setPointerCapture(pointerId);
+    return $button;
   };
 
-  #handlePullMove = (event: PointerEvent): void => {
-    const pull = this.#pull;
-
-    if (pull && event.pointerId === pull.pointerId) {
-      moveDrag(pull, event);
-    }
+  #handlePullStart = (): void => {
+    this.#ignoreCommandUntil = 0;
   };
 
   /** A tap is left to the native command. A pull opens or does nothing. */
-  #handlePullEnd = (event: PointerEvent): void => {
-    const pull = this.#pull;
-    const { pointerId, clientY, timeStamp } = event;
+  #handlePullEnd = (event: PointerEvent, { dy, vy, canceled }: DragEndValues): void => {
+    const { target, timeStamp } = event;
 
-    if (!pull || pointerId !== pull.pointerId) {
-      return;
-    }
-
-    // A pull can end with no pointermove in between.
-    if (clientY !== pull.lastY) {
-      moveDrag(pull, event);
-    }
-
-    this.#pull = null;
-
-    const { startY, lastY, velocity, $button } = pull;
-    const delta = lastY - startY;
-
-    if (Math.abs(delta) < TAP_SLOP) {
+    if (canceled || Math.abs(dy) < TAP_SLOP) {
       return;
     }
 
     this.#ignoreCommandUntil = timeStamp + PULL_CLICK_WINDOW;
 
-    if (delta > -OPEN_DISTANCE && velocity > -OPEN_VELOCITY) {
+    if (dy > -OPEN_DISTANCE && vy > -OPEN_VELOCITY) {
       return;
     }
 
-    this.trigger = $button;
+    this.trigger = target instanceof HTMLElement ? target : null;
 
     // After this pointerup: taken outside a freshly open dialog, it would light dismiss it.
     setTimeout(() => this.show());
   };
 
-  #handlePullCancel = (): void => {
-    this.#pull = null;
+  /** Follows the pointer downward, damped upward. */
+  #handleDragMove = (_event: PointerEvent, { dy }: DragValues): void => {
+    this.#setDragOffset(dy > 0 ? dy : -Math.sqrt(-dy));
   };
 
-  #handleDragStart = (event: PointerEvent): void => {
-    const { button, pointerId } = event;
-
-    if (button !== 0 || !this.#open || !this.$handle) {
-      return;
-    }
-
-    this.#drag = startDrag(event);
-    this.$handle.setPointerCapture(pointerId);
-    this.toggleAttribute("dragging", true);
-  };
-
-  #handleDragMove = (event: PointerEvent): void => {
-    const drag = this.#drag;
-
-    if (!drag || event.pointerId !== drag.pointerId) {
-      return;
-    }
-
-    moveDrag(drag, event);
-
-    const { startY, lastY } = drag;
-    const delta = lastY - startY;
-
-    this.#setDragOffset(delta > 0 ? delta : -Math.sqrt(-delta));
-  };
-
-  #handleDragEnd = (event: PointerEvent): void => {
-    const drag = this.#drag;
-    const { pointerId, clientY } = event;
-
-    if (!drag || pointerId !== drag.pointerId) {
-      return;
-    }
-
-    // A pull can end with no pointermove in between.
-    if (clientY !== drag.lastY) {
-      moveDrag(drag, event);
-    }
-
-    this.#endDrag();
-
-    const { startY, lastY, velocity } = drag;
+  /** Far or fast enough down dismisses, through `sheet:before-close`. Otherwise it snaps back. */
+  #handleDragEnd = (_event: PointerEvent, { dy, vy, canceled }: DragEndValues): void => {
     const shouldDismiss =
+      !canceled &&
       this.dismissible &&
-      (lastY - startY >= DISMISS_DISTANCE || velocity >= DISMISS_VELOCITY);
+      (dy >= DISMISS_DISTANCE || vy >= DISMISS_VELOCITY);
 
     if (!shouldDismiss) {
       this.#setDragOffset(0);
@@ -529,21 +439,6 @@ export class Sheet extends HTMLElement {
       }
     });
   };
-
-  #endDrag(): void {
-    const drag = this.#drag;
-
-    if (!drag) {
-      return;
-    }
-
-    this.#drag = null;
-    this.toggleAttribute("dragging", false);
-
-    if (this.$handle?.hasPointerCapture(drag.pointerId)) {
-      this.$handle.releasePointerCapture(drag.pointerId);
-    }
-  }
 
   #setDragOffset(offset: number): void {
     if (offset !== 0) {
