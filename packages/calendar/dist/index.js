@@ -2,14 +2,8 @@
 var e = {
 	DRAWER_BEFORE_CLOSE: "drawer:before-close",
 	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	DRAWER_CLOSE: "drawer:close",
-	DRAWER_OPEN: "drawer:open",
-	DRAWER_TOGGLE: "drawer:toggle",
 	SHEET_BEFORE_CLOSE: "sheet:before-close",
 	SHEET_BEFORE_OPEN: "sheet:before-open",
-	SHEET_CLOSE: "sheet:close",
-	SHEET_OPEN: "sheet:open",
-	SHEET_TOGGLE: "sheet:toggle",
 	MODAL_BEFORE_CLOSE: "modal:before-close",
 	MODAL_BEFORE_OPEN: "modal:before-open",
 	SPINBUTTON_CHANGE: "spinbutton:change",
@@ -129,11 +123,7 @@ var g = class {
 		let r = c(n);
 		this.host.current.day = r, this.host.current.year = n.getFullYear(), this.host.current.month = n.getMonth();
 		let i = this.host.$body?.querySelector(`[data-day="${r}"]`);
-		if (i) {
-			this.setFocusDay(i);
-			return;
-		}
-		this.host.render({ focus: !0 });
+		i ? this.setFocusDay(i) : this.host.render({ focus: !0 });
 	}
 	sync({ focus: e = !1 } = {}) {
 		if (!this.host.$body) return;

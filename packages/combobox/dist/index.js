@@ -2,14 +2,8 @@
 var e = {
 	DRAWER_BEFORE_CLOSE: "drawer:before-close",
 	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	DRAWER_CLOSE: "drawer:close",
-	DRAWER_OPEN: "drawer:open",
-	DRAWER_TOGGLE: "drawer:toggle",
 	SHEET_BEFORE_CLOSE: "sheet:before-close",
 	SHEET_BEFORE_OPEN: "sheet:before-open",
-	SHEET_CLOSE: "sheet:close",
-	SHEET_OPEN: "sheet:open",
-	SHEET_TOGGLE: "sheet:toggle",
 	MODAL_BEFORE_CLOSE: "modal:before-close",
 	MODAL_BEFORE_OPEN: "modal:before-open",
 	SPINBUTTON_CHANGE: "spinbutton:change",
@@ -102,11 +96,7 @@ var s = class {
 	};
 	#t(e) {
 		let t = this.#e;
-		if (t.focused) {
-			e.preventDefault(), t.select();
-			return;
-		}
-		t.expanded && t.hide({
+		t.focused ? (e.preventDefault(), t.select()) : t.expanded && t.hide({
 			force: !0,
 			clear: !1
 		});
@@ -138,19 +128,11 @@ var s = class {
 	#i(e) {
 		e.preventDefault();
 		let t = this.#e;
-		if (t.expanded) {
-			t.hide({ force: !0 });
-			return;
-		}
-		t.write(t.input, ""), t.value = "";
+		t.expanded ? t.hide({ force: !0 }) : (t.write(t.input, ""), t.value = "");
 	}
 	#a() {
 		let e = this.#e;
-		if (e.focused) {
-			e.select();
-			return;
-		}
-		e.hide({ force: !0 });
+		e.focused ? e.select() : e.hide({ force: !0 });
 	}
 	#o(e) {
 		let t = this.#e;
@@ -223,23 +205,9 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		this.destroy(), this.$input = null, this.$listbox = null;
 	}
 	attributeChangedCallback(e, t, n) {
-		if (!(this.#l || t === n)) {
-			if (e === "value") {
-				this.setValue(n ?? "", { reflect: !1 });
-				return;
-			}
-			if (e === "disabled") {
-				this.#f();
-				return;
-			}
-			if (e === "expanded") {
-				n === null ? this.hide({ force: !0 }) : this.ensureOpen().then((e) => {
-					e && this.blurOption();
-				});
-				return;
-			}
-			f.includes(e) && this.#d();
-		}
+		this.#l || t === n || (e === "value" ? this.setValue(n ?? "", { reflect: !1 }) : e === "disabled" ? this.#f() : e === "expanded" ? n === null ? this.hide({ force: !0 }) : this.ensureOpen().then((e) => {
+			e && this.blurOption();
+		}) : f.includes(e) && this.#d());
 	}
 	get value() {
 		return this.#e;
@@ -281,7 +249,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		return this.$listbox;
 	}
 	show() {
-		!this.$input || !this.$listbox || this.disabled || (this.#u.removeAttribute("hidden"), this.#D(!0));
+		this.$input && this.$listbox && !this.disabled && (this.#u.removeAttribute("hidden"), this.#D(!0));
 	}
 	hide({ force: e = !1, clear: t = !0 } = {}) {
 		if (!this.$input || !this.$listbox || !e && !this.#t) return;
@@ -307,13 +275,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		this.#i += 1, this.#P(), this.#F(), this.#c && this.$input && this.$listbox && this.#s && (this.$input.removeEventListener("input", this.#g), this.$input.removeEventListener("keydown", this.#s.handle), this.$input.removeEventListener("click", this.#_), this.$input.removeEventListener("focus", this.#y), this.$input.removeEventListener("blur", this.#b), this.$listbox.removeEventListener("mousedown", this.#h), this.$listbox.removeEventListener("click", this.#v), document.removeEventListener("click", this.#m)), this.#s = null, this.#c = !1;
 	}
 	blurOption() {
-		if (!(!this.$input || !this.$listbox)) {
-			if (!this.focused) {
-				this.$input?.removeAttribute("aria-activedescendant");
-				return;
-			}
-			this.index = -1, this.refresh(this.index);
-		}
+		this.$input && this.$listbox && (this.focused ? (this.index = -1, this.refresh(this.index)) : this.$input?.removeAttribute("aria-activedescendant"));
 	}
 	refresh(t) {
 		if (!this.$input || !this.$listbox) return;
@@ -349,7 +311,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		this.$input && (this.$input.disabled = e, e ? this.$input.setAttribute("disabled", "") : this.$input.removeAttribute("disabled")), e && this.#t && this.hide({ force: !0 });
 	}
 	#p() {
-		!this.$input || !this.$listbox || !this.#s || (this.$input.addEventListener("input", this.#g), this.$input.addEventListener("keydown", this.#s.handle), this.$input.addEventListener("click", this.#_), this.$input.addEventListener("focus", this.#y), this.$input.addEventListener("blur", this.#b), this.$listbox.addEventListener("mousedown", this.#h), this.$listbox.addEventListener("click", this.#v), document.addEventListener("click", this.#m));
+		this.$input && this.$listbox && this.#s && (this.$input.addEventListener("input", this.#g), this.$input.addEventListener("keydown", this.#s.handle), this.$input.addEventListener("click", this.#_), this.$input.addEventListener("focus", this.#y), this.$input.addEventListener("blur", this.#b), this.$listbox.addEventListener("mousedown", this.#h), this.$listbox.addEventListener("click", this.#v), document.addEventListener("click", this.#m));
 	}
 	#m = ({ target: e }) => {
 		e instanceof Node && this.contains(e) || this.hide({ force: !0 });
@@ -381,13 +343,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		e instanceof Node && this.contains(e);
 	};
 	async #x() {
-		if (!this.disabled) {
-			if (this.#t) {
-				this.hide({ force: !0 });
-				return;
-			}
-			await this.ensureOpen() && this.blurOption();
-		}
+		this.disabled || (this.#t ? this.hide({ force: !0 }) : await this.ensureOpen() && this.blurOption());
 	}
 	#S(e, t) {
 		this.#u.innerHTML = "";
@@ -425,11 +381,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		t(this, e, n, { cancelable: !1 });
 	}
 	#E(e) {
-		if (this.loading = e, e) {
-			this.$listbox?.setAttribute("aria-busy", "true"), this.#R(!0);
-			return;
-		}
-		this.$listbox?.removeAttribute("aria-busy"), this.#R(!1);
+		this.loading = e, e ? (this.$listbox?.setAttribute("aria-busy", "true"), this.#R(!0)) : (this.$listbox?.removeAttribute("aria-busy"), this.#R(!1));
 	}
 	#D(e) {
 		this.#t = e, this.$input && this.$input.setAttribute("aria-expanded", e ? "true" : "false"), this.#L();
@@ -443,19 +395,9 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		};
 	}
 	#k(t) {
-		if (!this.disabled) {
-			if (this.#P(), t.trim().length < this.minLength) {
-				this.#F(), this.#i += 1, this.#N(), this.#T(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 });
-				return;
-			}
-			if (0 < this.debounce) {
-				this.#a = setTimeout(() => {
-					this.#a = null, this.#A(t);
-				}, this.debounce);
-				return;
-			}
-			this.#A(t);
-		}
+		this.disabled || (this.#P(), t.trim().length < this.minLength ? (this.#F(), this.#i += 1, this.#N(), this.#T(e.COMBOBOX_EMPTY, { value: t }), this.hide({ force: !0 })) : 0 < this.debounce ? this.#a = setTimeout(() => {
+			this.#a = null, this.#A(t);
+		}, this.debounce) : this.#A(t));
 	}
 	async #A(t, { openWhenEmpty: n = !1 } = {}) {
 		if (!this.#n || this.disabled) return;
@@ -476,16 +418,10 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 					return;
 				}
 				this.hide({ force: !0 });
-				return;
-			}
-			if (!n && t.length === 0 && this.autocomplete === "list") {
-				this.index = -1, this.refresh(this.index), this.hide({
-					force: !0,
-					clear: !1
-				});
-				return;
-			}
-			this.index = this.autoselect ? 0 : -1, this.refresh(this.index), this.show();
+			} else !n && t.length === 0 && this.autocomplete === "list" ? (this.index = -1, this.refresh(this.index), this.hide({
+				force: !0,
+				clear: !1
+			})) : (this.index = this.autoselect ? 0 : -1, this.refresh(this.index), this.show());
 		}
 	}
 	#j(e) {
@@ -502,11 +438,8 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 			return;
 		}
 		let { html: t, options: n } = e;
-		if (t != null && this.mode === "external") {
-			this.#u.innerHTML = t, this.#C(-1);
-			return;
-		}
-		if (n) {
+		if (t != null && this.mode === "external") this.#u.innerHTML = t, this.#C(-1);
+		else if (n) {
 			if (n.length === 0) {
 				this.#N({ clearDom: !0 });
 				return;
@@ -516,13 +449,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 				return;
 			}
 			this.#M(n);
-			return;
-		}
-		if (this.mode === "external") {
-			this.#C(-1);
-			return;
-		}
-		this.#N({ clearDom: !0 });
+		} else this.mode === "external" ? this.#C(-1) : this.#N({ clearDom: !0 });
 	}
 	#M(e) {
 		this.#u.innerHTML = "", e.forEach((e) => {

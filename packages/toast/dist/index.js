@@ -24,13 +24,7 @@ var n = class extends HTMLElement {
 		this.#f(), window.clearTimeout(this.#n), this.#n = 0, this.$dismiss && this.$dismiss.removeEventListener("click", this.#u);
 	}
 	attributeChangedCallback(e, t, n) {
-		if (e === "open") {
-			if (n !== null) {
-				this.#s();
-				return;
-			}
-			this.#c();
-		}
+		e === "open" && (n === null ? this.#c() : this.#s());
 	}
 	get open() {
 		return this.hasAttribute("open");
@@ -90,11 +84,7 @@ var n = class extends HTMLElement {
 		}
 		this.#i &&= (this.#r += e - this.#i, 0);
 		let t = e - this.#r, n = Math.min(100, t / this.#o * 100);
-		if (this.style.setProperty("--toast-progress", `${n}%`), n >= 100) {
-			this.close();
-			return;
-		}
-		this.#t = requestAnimationFrame(this.#p);
+		this.style.setProperty("--toast-progress", `${n}%`), n >= 100 ? this.close() : this.#t = requestAnimationFrame(this.#p);
 	};
 	get #m() {
 		return {

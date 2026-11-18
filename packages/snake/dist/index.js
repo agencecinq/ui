@@ -129,13 +129,7 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 		let t = this.#t;
 		if (this.#t = null, !t) return;
 		let { clientX: n, clientY: r } = e, i = n - t.x, a = r - t.y;
-		if (!(Math.hypot(i, a) < d)) {
-			if (Math.abs(i) > Math.abs(a)) {
-				this.#e(i > 0 ? "right" : "left");
-				return;
-			}
-			this.#e(a > 0 ? "down" : "up");
-		}
+		Math.hypot(i, a) < d || (Math.abs(i) > Math.abs(a) ? this.#e(i > 0 ? "right" : "left") : this.#e(a > 0 ? "down" : "up"));
 	};
 	handlePointerCancel = () => {
 		this.#t = null;
@@ -269,11 +263,7 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 	};
 	#s = () => {
 		let n = this.#e.tick();
-		if (n === "eat") {
-			this.#u(), t(this, e.SNAKE_EAT, { score: this.#e.score }, { cancelable: !1 });
-			return;
-		}
-		n === "dead" && this.#l();
+		n === "eat" ? (this.#u(), t(this, e.SNAKE_EAT, { score: this.#e.score }, { cancelable: !1 })) : n === "dead" && this.#l();
 	};
 	#c = () => {
 		this.#n && this.$canvas && this.#n.draw({
@@ -295,12 +285,11 @@ var r = "#2a2a2a", i = 21, a = 15, o = 130, s = {
 	}
 	#f = (e) => {
 		let { key: t, target: n } = e;
-		if (!this.#e.alive) {
+		if (this.#e.alive) this.#r?.handle(e);
+		else {
 			if (n instanceof Element && n.closest("button, a, input, textarea, select")) return;
 			(t === "Enter" || t === " ") && (e.preventDefault(), this.replay());
-			return;
 		}
-		this.#r?.handle(e);
 	};
 	#p = (e) => {
 		let { $canvas: t } = this;

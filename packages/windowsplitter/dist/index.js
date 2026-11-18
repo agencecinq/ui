@@ -2,14 +2,8 @@
 var e = {
 	DRAWER_BEFORE_CLOSE: "drawer:before-close",
 	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	DRAWER_CLOSE: "drawer:close",
-	DRAWER_OPEN: "drawer:open",
-	DRAWER_TOGGLE: "drawer:toggle",
 	SHEET_BEFORE_CLOSE: "sheet:before-close",
 	SHEET_BEFORE_OPEN: "sheet:before-open",
-	SHEET_CLOSE: "sheet:close",
-	SHEET_OPEN: "sheet:open",
-	SHEET_TOGGLE: "sheet:toggle",
 	MODAL_BEFORE_CLOSE: "modal:before-close",
 	MODAL_BEFORE_OPEN: "modal:before-open",
 	SPINBUTTON_CHANGE: "spinbutton:change",
@@ -76,28 +70,13 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 		let { key: n, shiftKey: r } = e, i = r ? t.page : t.step, a = t.value, o = t.orientation === "vertical", s = (n) => {
 			t.setValue(n), e.preventDefault();
 		};
-		if (n === "Enter") {
-			t.toggle(), e.preventDefault();
-			return;
-		}
-		if (!t.fixed) {
-			if (n === "Home") {
-				s(t.min);
-				return;
-			}
-			if (n === "End") {
-				s(t.max);
-				return;
-			}
-			if (n === "PageUp") {
-				s(a + t.page);
-				return;
-			}
-			if (n === "PageDown") {
-				s(a - t.page);
-				return;
-			}
-			if (o) {
+		if (n === "Enter") t.toggle(), e.preventDefault();
+		else if (!t.fixed) {
+			if (n === "Home") s(t.min);
+			else if (n === "End") s(t.max);
+			else if (n === "PageUp") s(a + t.page);
+			else if (n === "PageDown") s(a - t.page);
+			else if (o) {
 				if (n === "ArrowLeft") {
 					s(a - i);
 					return;
@@ -106,13 +85,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 					s(a + i);
 					return;
 				}
-				return;
-			}
-			if (n === "ArrowUp") {
-				s(a - i);
-				return;
-			}
-			n === "ArrowDown" && s(a + i);
+			} else n === "ArrowUp" ? s(a - i) : n === "ArrowDown" && s(a + i);
 		}
 	};
 }, l = ({ ratio: e }) => `${e * 100}%`, u = (e) => String(e), d = (e) => e === "clip" || e === "none" || e === "resize" ? e : "resize", f = class extends HTMLElement {
@@ -148,21 +121,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 		this.#r && this.$separator && (this.#n && this.$separator.removeEventListener("keydown", this.#n.handle), this.$separator.removeEventListener("pointerdown", this.#d), this.$separator.removeEventListener("pointermove", this.#f), this.$separator.removeEventListener("pointerup", this.#p), this.$separator.removeEventListener("pointercancel", this.#p), this.$separator.removeEventListener("lostpointercapture", this.#p), this.$separator.style.removeProperty("touch-action"), this.#r = !1), this.#t?.disconnect(), this.#t = null, this.#n = null, this.removeAttribute("dragging"), this.$separator = null;
 	}
 	attributeChangedCallback(e, t, i) {
-		if (this.#r) {
-			if (e === "data-mode") {
-				this.mode = d(i), this.sync();
-				return;
-			}
-			if (e === "data-step") {
-				this.step = n(i, 1);
-				return;
-			}
-			if (e === "data-page") {
-				this.page = n(i, 10);
-				return;
-			}
-			e === "data-fixed" && (this.fixed = r(i));
-		}
+		this.#r && (e === "data-mode" ? (this.mode = d(i), this.sync()) : e === "data-step" ? this.step = n(i, 1) : e === "data-page" ? this.page = n(i, 10) : e === "data-fixed" && (this.fixed = r(i)));
 	}
 	get orientation() {
 		return this.$separator?.getAttribute("aria-orientation") ?? null;
@@ -190,11 +149,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 		return this.hasAttribute("disabled") || this.getAttribute("aria-disabled") === "true" || this.$separator?.getAttribute("aria-disabled") === "true";
 	}
 	set disabled(e) {
-		if (e) {
-			this.setAttribute("disabled", ""), this.setAttribute("aria-disabled", "true"), this.$separator?.setAttribute("aria-disabled", "true");
-			return;
-		}
-		this.removeAttribute("disabled"), this.removeAttribute("aria-disabled"), this.$separator?.removeAttribute("aria-disabled");
+		e ? (this.setAttribute("disabled", ""), this.setAttribute("aria-disabled", "true"), this.$separator?.setAttribute("aria-disabled", "true")) : (this.removeAttribute("disabled"), this.removeAttribute("aria-disabled"), this.$separator?.removeAttribute("aria-disabled"));
 	}
 	get collapsed() {
 		return this.value === this.min;
@@ -281,7 +236,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = class {
 		}, this.setAttribute("dragging", ""), this.$separator.setPointerCapture(e.pointerId);
 	};
 	#f = (e) => {
-		!this.#i || e.pointerId !== this.#i.id || (this.setValue(this.#u(e)), e.preventDefault());
+		this.#i && e.pointerId === this.#i.id && (this.setValue(this.#u(e)), e.preventDefault());
 	};
 	#p = (e) => {
 		if (!this.#i || e.pointerId !== this.#i.id) return;
