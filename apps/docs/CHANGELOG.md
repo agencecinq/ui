@@ -1,5 +1,12 @@
 # @agencecinq/docs
 
+## 4.4.37
+
+### Patch Changes
+
+- Updated dependencies [bebda34]
+  - @agencecinq/snake@1.1.0
+
 ## 4.4.36
 
 ### Patch Changes
