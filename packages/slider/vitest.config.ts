@@ -1,14 +1,11 @@
-import { resolve } from "path";
 import { defineConfig } from "vitest/config";
+import { browser } from "../utils/vitest.browser";
 
+// Real browsers: dragging a thumb needs pointer capture and layout, which only
+// a browser engine implements.
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@agencecinq/utils": resolve(import.meta.dirname, "../utils/src/clamp.ts"),
-    },
-  },
   test: {
-    environment: "node",
     include: ["src/**/*.test.ts"],
+    browser,
   },
 });
