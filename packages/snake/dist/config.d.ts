@@ -12,4 +12,6 @@ export declare const STEP_MS = 130;
 export declare const STEP_MS_MIN = 70;
 /** Starting body length, including the head. Faces right from the board center. */
 export declare const INITIAL_LENGTH = 3;
+/** Shortest swipe, in px, that turns the snake. */
+export declare const SWIPE_PX = 24;
 //# sourceMappingURL=config.d.ts.map

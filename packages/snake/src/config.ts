@@ -17,3 +17,6 @@ export const STEP_MS_MIN = 70;
 
 /** Starting body length, including the head. Faces right from the board center. */
 export const INITIAL_LENGTH = 3;
+
+/** Shortest swipe, in px, that turns the snake. */
+export const SWIPE_PX = 24;

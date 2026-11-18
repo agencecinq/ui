@@ -1,5 +1,12 @@
-import { dispatchEvent, EVENTS, parseNumber } from "@agencecinq/utils";
-import { color, COLS, ROWS, STEP_MS, STEP_MS_MIN } from "./config.js";
+import {
+  dispatchEvent,
+  EVENTS,
+  parseNumber,
+  trackDrag,
+  type DragEndValues,
+  type DragTracker,
+} from "@agencecinq/utils";
+import { color, COLS, ROWS, STEP_MS, STEP_MS_MIN, SWIPE_PX } from "./config.js";
 import Game from "./game.js";
 import Keyboard from "./keyboard.js";
 import Loop from "./loop.js";
@@ -25,6 +32,7 @@ export class Snake extends HTMLElement {
   #loop: Loop | null = null;
   #renderer: Renderer | null = null;
   #keyboard: Keyboard | null = null;
+  #swipe: DragTracker | null = null;
 
   connectedCallback(): void {
     this.init();
@@ -76,12 +84,10 @@ export class Snake extends HTMLElement {
     this.#loop = new Loop(STEP_MS, this.#tick, this.#draw);
 
     this.addEventListener("keydown", this.#handleKeydown);
-    this.$canvas.addEventListener("pointerdown", this.#handlePointerDown);
-    this.$canvas.addEventListener("pointerup", this.#keyboard.handlePointerUp);
-    this.$canvas.addEventListener(
-      "pointercancel",
-      this.#keyboard.handlePointerCancel,
-    );
+    this.#swipe = trackDrag(this.$canvas, {
+      start: this.#handleSwipeStart,
+      end: this.#handleSwipeEnd,
+    });
 
     this.#syncGrid(false);
     this.sync();
@@ -94,22 +100,12 @@ export class Snake extends HTMLElement {
       return;
     }
 
-    const { $canvas } = this;
-    const keyboard = this.#keyboard;
-
     this.#loop.stop();
     this.#loop = null;
 
     this.removeEventListener("keydown", this.#handleKeydown);
-    $canvas?.removeEventListener("pointerdown", this.#handlePointerDown);
-
-    if ($canvas && keyboard) {
-      $canvas.removeEventListener("pointerup", keyboard.handlePointerUp);
-      $canvas.removeEventListener(
-        "pointercancel",
-        keyboard.handlePointerCancel,
-      );
-    }
+    this.#swipe?.destroy();
+    this.#swipe = null;
 
     this.#renderer = null;
     this.#keyboard = null;
@@ -289,16 +285,23 @@ export class Snake extends HTMLElement {
     this.#keyboard?.handle(event);
   };
 
-  #handlePointerDown = (event: PointerEvent): void => {
-    const { $canvas } = this;
+  /** A press focuses the board, so the arrow keys follow. */
+  #handleSwipeStart = (): void => {
+    this.$canvas?.focus();
+  };
 
-    if (!$canvas) {
+  /** A swipe of at least {@link SWIPE_PX} turns toward its dominant axis. */
+  #handleSwipeEnd = (_event: PointerEvent, { dx, dy, canceled }: DragEndValues): void => {
+    if (canceled || Math.hypot(dx, dy) < SWIPE_PX) {
       return;
     }
 
-    $canvas.focus();
-    $canvas.setPointerCapture(event.pointerId);
-    this.#keyboard?.handlePointerDown(event);
+    if (Math.abs(dx) > Math.abs(dy)) {
+      this.#turn(dx > 0 ? "right" : "left");
+      return;
+    }
+
+    this.#turn(dy > 0 ? "down" : "up");
   };
 }
 
