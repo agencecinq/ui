@@ -22,7 +22,11 @@ export type DragOptions = {
      * gestures on its children.
      */
     target?: (event: PointerEvent) => Element | null;
-    /** A primary press. Return `false` to ignore it. */
+    /**
+     * A primary press, once the gesture holds the pointer and the host has
+     * `[dragging]`. Return `false` to give the gesture up: both are undone
+     * before the next paint.
+     */
     start?: (event: PointerEvent) => boolean | void;
     move?: (event: PointerEvent, values: DragValues) => void;
     end?: (event: PointerEvent, values: DragEndValues) => void;

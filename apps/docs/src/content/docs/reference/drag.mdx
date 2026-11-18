@@ -80,7 +80,7 @@ release: a slow drag only places the die, a fast one throws it with that speed.
 | ------ | ---- |
 | `host` | Element that gets `[dragging]` while a gesture runs. Style the grab cursor or turn transitions off from it. |
 | `target(event)` | Element that takes the pointer for this press, or `null` to ignore it. Defaults to the listened element. |
-| `start(event)` | A primary press. Return `false` to ignore it, for instance while the component is closed. |
+| `start(event)` | A primary press. The gesture already holds the pointer and the host has `[dragging]`, so it can act on the press. Return `false` to give the gesture up, for instance while the component is closed. |
 | `move(event, values)` | Each move of the tracked pointer. |
 | `end(event, values)` | The release, or the cancel with `canceled: true`. |
 

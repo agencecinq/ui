@@ -139,6 +139,30 @@ describe("trackDrag", () => {
     expect(end).not.toHaveBeenCalled();
   });
 
+  it("holds the pointer and sets [dragging] by the time start runs, and undoes both on false", async () => {
+    const { $host, $knob } = mount();
+    const states: [boolean, boolean][] = [];
+    let accept = true;
+
+    track($knob, {
+      host: $host,
+      start: (event) => {
+        states.push([$host.hasAttribute("dragging"), $knob.hasPointerCapture(event.pointerId)]);
+        return accept;
+      },
+    });
+
+    await commands.drag("#knob", { dy: 20 });
+    accept = false;
+    await commands.drag("#knob", { dy: 20 });
+
+    expect(states).toEqual([
+      [true, true],
+      [true, true],
+    ]);
+    expect($host.hasAttribute("dragging")).toBe(false);
+  });
+
   it("starts the gesture on the element target picks, from one listener on a container", async () => {
     mount();
 

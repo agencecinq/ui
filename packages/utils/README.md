@@ -104,7 +104,7 @@ drag.destroy();
 | ------ | ---- |
 | `host` | Element that gets `[dragging]` while a gesture runs. |
 | `target(event)` | Element that takes the pointer for this press, or `null` to ignore it. Defaults to `element`. Lets one listener on a container start gestures on its children. |
-| `start(event)` | A primary press. Return `false` to ignore it. |
+| `start(event)` | A primary press, once the gesture holds the pointer and the host has `[dragging]`. Return `false` to give it up. |
 | `move(event, values)` | Each move of the tracked pointer. |
 | `end(event, values)` | The release, or the cancel with `canceled: true`. |
 
