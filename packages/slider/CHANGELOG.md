@@ -1,5 +1,17 @@
 # @agencecinq/slider
 
+## 7.0.0
+
+### Major Changes
+
+- Range: lay the thumbs on a track two thumbs shorter than the host, as the range geometry assumes, so they meet side by side instead of overlapping then jumping apart. Update the thumb and fill CSS and drop the `[data-collapsed]` offsets: see the README migration from 6.x. The single slider does not change.
+- Range: map the pointer from the leading edge of the thumb, so a press no longer moves the min thumb by half a thumb.
+
+### Patch Changes
+
+- Follow the thumbs with `trackDrag()` from `@agencecinq/utils` instead of its own pointer handling. Same behavior: the value follows the pointer from the grab offset, `[dragging]` is set from the press, and a non-primary button is ignored.
+- Test the drags in Chromium, Firefox and WebKit.
+
 ## 6.0.1
 
 ### Patch Changes

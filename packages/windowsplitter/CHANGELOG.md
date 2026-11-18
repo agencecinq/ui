@@ -1,5 +1,12 @@
 # @agencecinq/windowsplitter
 
+## 3.0.1
+
+### Patch Changes
+
+- Follow the separator with `trackDrag()` from `@agencecinq/utils` instead of its own pointer handling. Same behavior: the value follows the pointer from the grab offset, `[dragging]` is set from the press, and a fixed separator still toggles on a press without dragging.
+- Test the drags in Chromium, Firefox and WebKit.
+
 ## 3.0.0
 
 ### Major Changes

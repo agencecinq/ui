@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 9.1.1
+
+### Patch Changes
+
+- `trackDrag()` calls `start` once the gesture holds the pointer and the host has `[dragging]`, so a component can act on the press, and undoes both when `start` returns `false`.
+
 ## 9.1.0
 
 ### Minor Changes
