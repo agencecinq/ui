@@ -2,14 +2,8 @@
 var e = {
 	DRAWER_BEFORE_CLOSE: "drawer:before-close",
 	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	DRAWER_CLOSE: "drawer:close",
-	DRAWER_OPEN: "drawer:open",
-	DRAWER_TOGGLE: "drawer:toggle",
 	SHEET_BEFORE_CLOSE: "sheet:before-close",
 	SHEET_BEFORE_OPEN: "sheet:before-open",
-	SHEET_CLOSE: "sheet:close",
-	SHEET_OPEN: "sheet:open",
-	SHEET_TOGGLE: "sheet:toggle",
 	MODAL_BEFORE_CLOSE: "modal:before-close",
 	MODAL_BEFORE_OPEN: "modal:before-open",
 	SPINBUTTON_CHANGE: "spinbutton:change",
@@ -162,11 +156,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 		this.destroy();
 	}
 	attributeChangedCallback(e, t, r) {
-		if (e === "data-step") {
-			this.step = n(r, 1);
-			return;
-		}
-		e === "data-page" && (this.page = n(r, 10));
+		e === "data-step" ? this.step = n(r, 1) : e === "data-page" && (this.page = n(r, 10));
 	}
 	rect() {
 		return this.getBoundingClientRect();
@@ -344,11 +334,7 @@ var y = class extends _ {
 	}
 	commitPointerValue(e, t) {
 		let n = this.valueFromPointer(e, t);
-		if ((t === this.$min ? "min" : "max") == "min") {
-			this.setValues(n, this.max, { active: "min" });
-			return;
-		}
-		this.setValues(this.min, n, { active: "max" });
+		(t === this.$min ? "min" : "max") == "min" ? this.setValues(n, this.max, { active: "min" }) : this.setValues(this.min, n, { active: "max" });
 	}
 	onKeydown(e) {
 		let t = this.#r(e.currentTarget);
@@ -370,13 +356,7 @@ var y = class extends _ {
 		let i = new g(this.step, this.page, this.isRtl, this.isVertical).delta(n);
 		if (!i) return;
 		let { delta: a } = i;
-		if (a !== 0) {
-			if (e.preventDefault(), t === "min") {
-				this.setValues(r + a, this.max, { active: "min" });
-				return;
-			}
-			this.setValues(this.min, r + a, { active: "max" });
-		}
+		a !== 0 && (e.preventDefault(), t === "min" ? this.setValues(r + a, this.max, { active: "min" }) : this.setValues(this.min, r + a, { active: "max" }));
 	}
 	#r(e) {
 		return e === this.$min ? "min" : e === this.$max ? "max" : null;

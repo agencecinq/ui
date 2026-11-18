@@ -2,14 +2,8 @@
 var e = {
 	DRAWER_BEFORE_CLOSE: "drawer:before-close",
 	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	DRAWER_CLOSE: "drawer:close",
-	DRAWER_OPEN: "drawer:open",
-	DRAWER_TOGGLE: "drawer:toggle",
 	SHEET_BEFORE_CLOSE: "sheet:before-close",
 	SHEET_BEFORE_OPEN: "sheet:before-open",
-	SHEET_CLOSE: "sheet:close",
-	SHEET_OPEN: "sheet:open",
-	SHEET_TOGGLE: "sheet:toggle",
 	MODAL_BEFORE_CLOSE: "modal:before-close",
 	MODAL_BEFORE_OPEN: "modal:before-open",
 	SPINBUTTON_CHANGE: "spinbutton:change",
@@ -91,9 +85,9 @@ var { DISCLOSURE_BUTTON_OPEN: a, DISCLOSURE_BUTTON_CLOSE: o } = e, s = class ext
 		}), this.update()));
 	}
 	open(e = !0) {
-		this.$button && (e && this.#e.length !== this.elements.length && !t(this.$button, a, this.#n(!0)) || (this.elements.forEach((e) => {
+		this.$button && (!e || this.#e.length === this.elements.length || t(this.$button, a, this.#n(!0))) && (this.elements.forEach((e) => {
 			e.hidden = !1;
-		}), this.update()));
+		}), this.update());
 	}
 	update() {
 		this.$button && this.$button.setAttribute("aria-expanded", this.#e.length > 0 ? "true" : "false");
