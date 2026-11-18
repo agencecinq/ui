@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 9.0.0
+
+### Major Changes
+
+- 2e34715: Remove `EVENTS.DRAWER_TOGGLE`, `EVENTS.DRAWER_OPEN`, `EVENTS.DRAWER_CLOSE`, `EVENTS.SHEET_TOGGLE`, `EVENTS.SHEET_OPEN` and `EVENTS.SHEET_CLOSE`: `@agencecinq/drawer` 9.0 and `@agencecinq/sheet` 3.0 open with invoker commands and leave the after-events to the native `toggle` event.
+
 ## 8.0.0
 
 ### Major Changes

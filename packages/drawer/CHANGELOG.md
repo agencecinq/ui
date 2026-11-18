@@ -1,5 +1,23 @@
 # @agencecinq/drawer
 
+## 9.0.0
+
+### Major Changes
+
+- Drop `<cinq-drawer-button>`: buttons open and close the dialog with invoker commands (`commandfor` + `command="show-modal"` / `"request-close"`), and `aria-expanded` goes away from modal drawer buttons (APG Dialog uses a plain button).
+- Move the `id` from `<cinq-drawer>` to the `<dialog>`.
+- Replace `data-modal="false"` with `popover` on the dialog: a non-modal drawer is toggled with `command="toggle-popover"`, and the browser handles `aria-expanded`, Escape, a press outside, focus in and out, and one drawer open at a time. Escape and a press outside close it without `drawer:before-close`, since a popover cannot cancel them.
+- Stop reflecting `open` on the host: the dialog is the only state. `<cinq-drawer open>` no longer opens on load.
+- Rename `open()` to `show()`, drop `toggle()`, and let `close(returnValue?)` set `dialog.returnValue` on a modal drawer, keeping the `value` of a `request-close` button.
+- Drop `drawer:toggle`, `drawer:open` and `drawer:close`: script opens with `show()`, and the dialog's native `toggle` event follows the state.
+- Route `show-modal`, `request-close`, `toggle-popover`, `show-popover`, `hide-popover`, Escape and the backdrop click of a modal drawer through `drawer:before-open` / `drawer:before-close`. A forced Escape closes without the hook.
+- Close a modal drawer on a backdrop click only with `closedby="any"`, handled by the component in Safari until it supports the attribute. Clicks on the dialog padding no longer close it.
+- Add `data-replace` on a button that opens: the target opens in place of the drawer holding the button. It replaces the exclusive drawers and the buttons that listed two ids.
+- Stop locking scroll and forcing focus: lock scroll in CSS (`html:has(cinq-drawer > dialog:is(:modal, :popover-open))`), and the browser focuses the dialog content, honoring `autofocus`.
+- Liquid snippet: `id` on the dialog with `closedby="any"`, or `popover` and a scrim after the dialog with `modal: false`.
+- Test in Chromium, Firefox and WebKit.
+- Requires invoker commands: Chrome 135, Firefox 144, Safari 26.2. See the README migration from 8.x.
+
 ## 8.0.0
 
 ### Major Changes

@@ -1,5 +1,22 @@
 # @agencecinq/sheet
 
+## 3.0.0
+
+### Major Changes
+
+- Drop `<cinq-sheet-button>`: buttons open and close the dialog with invoker commands, and `aria-expanded` goes away from modal sheet buttons.
+- Move the `id` from `<cinq-sheet>` to the `<dialog>`.
+- Replace `data-modal="false"` with `popover` on the dialog, toggled with `command="toggle-popover"`. The browser handles `aria-expanded`, Escape, a press outside, focus in and out, and one sheet open at a time. Escape and a press outside close it without `sheet:before-close`, and `<form method="dialog">` does not close it.
+- Move the pull up to open from `<cinq-sheet-button>` to the sheet: any button that opens the closed sheet takes the gesture. The sheet opens after the `pointerup`, so a modal sheet with `closedby="any"` no longer takes it for a light dismiss.
+- Stop reflecting `open` on the host: the dialog is the only state. `[dragging]` and `--cinq-sheet-drag-offset` stay on the host. `<cinq-sheet open>` no longer opens on load.
+- Rename `open(trigger?)` to `show()`, drop `toggle()`, and let `close(returnValue?)` set `dialog.returnValue` on a modal sheet.
+- Drop `sheet:toggle`, `sheet:open` and `sheet:close` with the `SheetDetail`, `ToggleDetail` and `OpenDetail` types: the dialog's native `toggle` event follows the state.
+- Drop the exclusive close among modal sheets: add `data-replace` on a button to open the next sheet in place of the current one.
+- Ignore a forced Escape instead of canceling it, and close on a backdrop click with `closedby="any"` in Safari.
+- Liquid snippet: `id` on the dialog.
+- Test in Chromium, Firefox and WebKit.
+- Requires invoker commands: Chrome 135, Firefox 144, Safari 26.2. See the README migration from 2.x.
+
 ## 2.0.0
 
 ### Major Changes
