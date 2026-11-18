@@ -40,6 +40,7 @@ export declare abstract class SliderBase extends HTMLElement {
     protected setValuetext($el: HTMLElement, value: number): void;
     protected bindThumb($thumb: HTMLElement): void;
     protected unbindThumb($thumb: HTMLElement): void;
+    /** Stops a running drag: its tracker removes `[dragging]`. */
     protected clearDragState(): void;
     /** Pointer-to-thumb-center offset while dragging (`0` when idle). */
     protected get offset(): number;

@@ -59,22 +59,96 @@ var e = {
 	};
 }, i = document.documentElement, { body: a } = document;
 i.hasAttribute("data-debug"), window.addEventListener("pointermove", r(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
+var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
+	let { host: n, target: r, start: i, move: a, end: o } = t, c = null, l = ({ startX: e, startY: t, samples: n }) => {
+		let r = n[0], i = n[n.length - 1], a = i.time - r.time, o = {
+			dx: i.x - e,
+			dy: i.y - t,
+			vx: 0,
+			vy: 0
+		};
+		return a <= 0 ? o : {
+			...o,
+			vx: (i.x - r.x) / a,
+			vy: (i.y - r.y) / a
+		};
+	}, u = ({ samples: e }, { clientX: t, clientY: n, timeStamp: r }) => {
+		let i = r - s;
+		for (e.push({
+			x: t,
+			y: n,
+			time: r
+		}); e.length > 1 && e[0].time < i;) e.shift();
+	}, d = (e) => {
+		let { pointerId: t, $target: r } = e;
+		c = null, n?.removeAttribute("dragging"), r.hasPointerCapture(t) && r.releasePointerCapture(t);
+	}, f = (e) => {
+		let { button: t, pointerId: a, clientX: o, clientY: s, timeStamp: l } = e;
+		if (c || t !== 0) return;
+		let u = r ? r(e) : e.currentTarget;
+		if (!u) return;
+		let f = {
+			pointerId: a,
+			$target: u,
+			startX: o,
+			startY: s,
+			samples: [{
+				x: o,
+				y: s,
+				time: l
+			}]
+		};
+		c = f, n?.setAttribute("dragging", ""), u.setPointerCapture(a), i?.(e) === !1 && d(f);
+	}, p = (e) => {
+		let t = c;
+		t && e.pointerId === t.pointerId && (u(t, e), a?.(e, l(t)));
+	}, m = (e) => {
+		let t = c, { pointerId: n, type: r } = e;
+		if (!t || n !== t.pointerId) return;
+		let i = r !== "pointerup";
+		i || u(t, e);
+		let a = {
+			...l(t),
+			canceled: i
+		};
+		d(t), o?.(e, a);
+	}, h = [
+		["pointerdown", f],
+		["pointermove", p],
+		["pointerup", m],
+		["pointercancel", m],
+		["lostpointercapture", m]
+	];
+	h.forEach(([t, n]) => {
+		e.addEventListener(t, n);
+	});
+	let g = () => {
+		c && d(c);
+	};
+	return {
+		cancel: g,
+		destroy: () => {
+			g(), h.forEach(([t, n]) => {
+				e.removeEventListener(t, n);
+			});
+		}
+	};
+}, l = (e, t, n) => {
 	let r = n - t;
 	return r > 0 ? (e - t) / r : 0;
-}, c = (e, t, n) => t + e * (n - t), l = (e) => e.toString().split(".")[1]?.length ?? 0, u = (e, t, n, r) => {
+}, u = (e, t, n) => t + e * (n - t), d = (e) => e.toString().split(".")[1]?.length ?? 0, f = (e, t, n, r) => {
 	if (r <= 0) return o(e, t, n);
-	let i = t + Math.round((e - t) / r) * r, a = Math.max(l(t), l(r));
+	let i = t + Math.round((e - t) / r) * r, a = Math.max(d(t), d(r));
 	return o(Number(i.toFixed(a)), t, n);
-}, d = (e, t) => Math.max(0, e - t), f = (e, t) => Math.max(0, e - 2 * t), p = (e, t, n, r) => r || n ? e === "min" ? t : 0 : e === "max" ? t : 0, m = (e, t, n, r, i) => {
-	let a = i ? t.height : t.width, s = i ? t.top : t.left, c = d(a, n);
+}, p = (e, t) => Math.max(0, e - t), m = (e, t) => Math.max(0, e - 2 * t), h = (e, t, n, r) => r || n ? e === "min" ? t : 0 : e === "max" ? t : 0, g = (e, t, n, r, i) => {
+	let a = i ? t.height : t.width, s = i ? t.top : t.left, c = p(a, n);
 	if (c <= 0) return 0;
 	let l = o((e - s - n / 2) / c, 0, 1);
 	return i || r ? 1 - l : l;
-}, h = (e, t, n, r, i, a, s, c, l) => {
-	let u = p(n, s, c, l), d = o(e - (l ? t.top : t.left) - u, 0, a), f = a > 0 ? d / a : 0, m = i - r;
-	return l || c ? i - m * f : r + m * f;
-}, g = class {
+}, _ = (e, t, n, r, i, a, s, c, l) => {
+	let u = h(n, s, c, l), d = o(e - (l ? t.top : t.left) - u, 0, a), f = a > 0 ? d / a : 0, p = i - r;
+	return l || c ? i - p * f : r + p * f;
+}, v = class {
 	#e;
 	#t;
 	#n;
@@ -129,13 +203,14 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 	static isEnd(e) {
 		return e === "End";
 	}
-}, _ = class extends HTMLElement {
+}, y = class extends HTMLElement {
 	static observedAttributes = ["data-step", "data-page"];
 	step = 1;
 	page = 10;
 	#e;
 	#t = null;
-	#n = null;
+	#n = /* @__PURE__ */ new Map();
+	#r = null;
 	onThumbFocus(e) {}
 	get formatValue() {
 		return this.#e;
@@ -174,45 +249,44 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 		e.setAttribute("aria-valuetext", n);
 	}
 	bindThumb(e) {
-		e.tabIndex < 0 && !e.hasAttribute("tabindex") && (e.tabIndex = 0), e.style.touchAction = "none", e.addEventListener("keydown", this.#r), e.addEventListener("pointerdown", this.#a), e.addEventListener("pointermove", this.#o), e.addEventListener("pointerup", this.#s), e.addEventListener("pointercancel", this.#s), e.addEventListener("lostpointercapture", this.#s), e.addEventListener("focus", this.#i);
+		e.tabIndex < 0 && !e.hasAttribute("tabindex") && (e.tabIndex = 0), e.style.touchAction = "none", e.addEventListener("keydown", this.#i), this.#n.set(e, c(e, {
+			host: this,
+			start: this.#o,
+			move: this.#s,
+			end: this.#c
+		})), e.addEventListener("focus", this.#a);
 	}
 	unbindThumb(e) {
-		e.removeEventListener("keydown", this.#r), e.removeEventListener("pointerdown", this.#a), e.removeEventListener("pointermove", this.#o), e.removeEventListener("pointerup", this.#s), e.removeEventListener("pointercancel", this.#s), e.removeEventListener("lostpointercapture", this.#s), e.removeEventListener("focus", this.#i), e.style.removeProperty("touch-action");
+		e.removeEventListener("keydown", this.#i), this.#n.get(e)?.destroy(), this.#n.delete(e), e.removeEventListener("focus", this.#a), e.style.removeProperty("touch-action");
 	}
 	clearDragState() {
-		this.#n = null, this.removeAttribute("dragging");
+		this.#n.forEach((e) => e.cancel()), this.#r = null;
 	}
-	#r = (e) => {
+	#i = (e) => {
 		this.onKeydown(e);
 	};
-	#i = (e) => {
+	#a = (e) => {
 		this.onThumbFocus(e);
 	};
-	#a = (e) => {
-		let t = e.currentTarget, { button: n, clientY: r, clientX: i, pointerId: a } = e;
-		if (n !== 0) return;
-		t.focus({ preventScroll: !0 }), e.preventDefault();
-		let { top: o, left: s, width: c, height: l } = t.getBoundingClientRect(), u = s + c / 2 - i;
-		this.isVertical && (u = o + l / 2 - r), this.#n = {
-			id: a,
-			offset: u,
-			$thumb: t
-		}, this.setAttribute("dragging", ""), t.setPointerCapture(a), this.commitPointerValue(e, t);
-	};
 	#o = (e) => {
-		if (!this.#n) return;
-		let { id: t, $thumb: n } = this.#n, { pointerId: r } = e;
-		r === t && (this.commitPointerValue(e, n), e.preventDefault());
+		let t = e.currentTarget, { clientY: n, clientX: r } = e;
+		t.focus({ preventScroll: !0 }), e.preventDefault();
+		let { top: i, left: a, width: o, height: s } = t.getBoundingClientRect(), c = a + o / 2 - r;
+		this.isVertical && (c = i + s / 2 - n), this.#r = {
+			offset: c,
+			$thumb: t
+		}, this.commitPointerValue(e, t);
 	};
 	#s = (e) => {
-		if (!this.#n) return;
-		let { id: t, $thumb: n } = this.#n, { pointerId: r } = e;
-		r === t && (this.#n = null, this.removeAttribute("dragging"), n.hasPointerCapture?.(t) && n.releasePointerCapture(t));
+		this.#r && (this.commitPointerValue(e, this.#r.$thumb), e.preventDefault());
+	};
+	#c = () => {
+		this.#r = null;
 	};
 	get offset() {
-		return this.#n?.offset ?? 0;
+		return this.#r?.offset ?? 0;
 	}
-}, v = class extends _ {
+}, b = class extends y {
 	$thumb = null;
 	get orientation() {
 		return this.$thumb?.getAttribute("aria-orientation") ?? null;
@@ -227,7 +301,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 		return n(this.$thumb?.getAttribute("aria-valuenow"), this.min);
 	}
 	get ratio() {
-		return s(this.value, this.min, this.max);
+		return l(this.value, this.min, this.max);
 	}
 	init() {
 		let e = this.querySelectorAll("[role=\"slider\"]");
@@ -244,12 +318,12 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 		this.#e(this.value, !1);
 	}
 	setValue(e, t = {}) {
-		let { emit: n = !0 } = t, r = u(e, this.min, this.max, this.step);
+		let { emit: n = !0 } = t, r = f(e, this.min, this.max, this.step);
 		this.#e(r, n);
 	}
 	valueFromPointer(e, t) {
-		let { clientY: n, clientX: r } = e, i = this.getBoundingClientRect(), { min: a, max: o } = this, { offsetHeight: s, offsetWidth: l } = t, u = this.isVertical;
-		return c(m((u ? n : r) + this.offset, i, u ? s : l, this.isRtl, u), a, o);
+		let { clientY: n, clientX: r } = e, i = this.getBoundingClientRect(), { min: a, max: o } = this, { offsetHeight: s, offsetWidth: c } = t, l = this.isVertical;
+		return u(g((l ? n : r) + this.offset, i, l ? s : c, this.isRtl, l), a, o);
 	}
 	commitPointerValue(e, t) {
 		this.setValue(this.valueFromPointer(e, t));
@@ -257,22 +331,22 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 	onKeydown(e) {
 		if (!this.$thumb) return;
 		let { key: t } = e;
-		if (g.isHome(t)) {
+		if (v.isHome(t)) {
 			e.preventDefault(), this.setValue(this.min);
 			return;
 		}
-		if (g.isEnd(t)) {
+		if (v.isEnd(t)) {
 			e.preventDefault(), this.setValue(this.max);
 			return;
 		}
-		let n = new g(this.step, this.page, this.isRtl, this.isVertical).delta(t);
+		let n = new v(this.step, this.page, this.isRtl, this.isVertical).delta(t);
 		if (!n) return;
 		let { preventDefault: r, delta: i } = n;
 		r && e.preventDefault(), i !== 0 && this.setValue(this.value + i);
 	}
 	#e(n, r) {
 		if (!this.$thumb) return;
-		let { min: i, max: a } = this, o = s(n, i, a);
+		let { min: i, max: a } = this, o = l(n, i, a);
 		this.$thumb.setAttribute("aria-valuenow", String(n)), this.setValuetext(this.$thumb, n), this.style.setProperty("--value", String(n)), this.style.setProperty("--ratio", String(o)), r && t(this, e.SLIDER_CHANGE, {
 			min: n,
 			max: n,
@@ -280,10 +354,10 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = (e, t, n) => {
 		}, { cancelable: !1 });
 	}
 };
-customElements.get("cinq-slider") || customElements.define("cinq-slider", v);
+customElements.get("cinq-slider") || customElements.define("cinq-slider", b);
 //#endregion
 //#region src/slider-range.ts
-var y = class extends _ {
+var x = class extends y {
 	$max = null;
 	$min = null;
 	#e = "min";
@@ -330,7 +404,7 @@ var y = class extends _ {
 	}
 	valueFromPointer(e, t) {
 		let { clientY: n, clientX: r } = e, { offsetHeight: i, offsetWidth: a } = t, o = t === this.$min ? "min" : "max", s = this.isVertical ? i : a;
-		return h(this.isVertical ? n + this.offset : r + this.offset, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
+		return _(this.isVertical ? n + this.offset : r + this.offset, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
 	}
 	commitPointerValue(e, t) {
 		let n = this.valueFromPointer(e, t);
@@ -341,19 +415,19 @@ var y = class extends _ {
 		if (!t) return;
 		this.#e = t;
 		let { key: n } = e, r = t === "min" ? this.min : this.max;
-		if (g.isHome(n)) {
+		if (v.isHome(n)) {
 			e.preventDefault();
 			let n = t === "min" ? this.#t : this.min;
 			t === "min" ? this.setValues(n, this.max, { active: "min" }) : this.setValues(this.min, n, { active: "max" });
 			return;
 		}
-		if (g.isEnd(n)) {
+		if (v.isEnd(n)) {
 			e.preventDefault();
 			let n = t === "max" ? this.#n : this.max;
 			t === "min" ? this.setValues(n, this.max, { active: "min" }) : this.setValues(this.min, n, { active: "max" });
 			return;
 		}
-		let i = new g(this.step, this.page, this.isRtl, this.isVertical).delta(n);
+		let i = new v(this.step, this.page, this.isRtl, this.isVertical).delta(n);
 		if (!i) return;
 		let { delta: a } = i;
 		a !== 0 && (e.preventDefault(), t === "min" ? this.setValues(r + a, this.max, { active: "min" }) : this.setValues(this.min, r + a, { active: "max" }));
@@ -362,23 +436,23 @@ var y = class extends _ {
 		return e === this.$min ? "min" : e === this.$max ? "max" : null;
 	}
 	#i(e) {
-		return f(this.isVertical ? this.clientHeight : this.clientWidth, e);
+		return m(this.isVertical ? this.clientHeight : this.clientWidth, e);
 	}
 	#a(n, r, i, a) {
 		if (!this.$min || !this.$max) return;
-		let o = this.#t, c = this.#n, l = u(n, o, c, this.step), d = u(r, o, c, this.step);
-		i === "min" ? l = Math.min(l, d) : d = Math.max(d, l), this.#e = i, this.setAttribute("data-active", i), this.$min.setAttribute("aria-valuenow", String(l)), this.$max.setAttribute("aria-valuenow", String(d)), this.$min.setAttribute("aria-valuemax", String(d)), this.$max.setAttribute("aria-valuemin", String(l)), this.setValuetext(this.$min, l), this.setValuetext(this.$max, d);
-		let f = s(l, o, c), p = s(d, o, c);
-		if (this.style.setProperty("--min", String(l)), this.style.setProperty("--max", String(d)), this.style.setProperty("--min-ratio", String(f)), this.style.setProperty("--max-ratio", String(p)), l === d ? this.setAttribute("data-collapsed", "") : this.removeAttribute("data-collapsed"), a) {
+		let o = this.#t, s = this.#n, c = f(n, o, s, this.step), u = f(r, o, s, this.step);
+		i === "min" ? c = Math.min(c, u) : u = Math.max(u, c), this.#e = i, this.setAttribute("data-active", i), this.$min.setAttribute("aria-valuenow", String(c)), this.$max.setAttribute("aria-valuenow", String(u)), this.$min.setAttribute("aria-valuemax", String(u)), this.$max.setAttribute("aria-valuemin", String(c)), this.setValuetext(this.$min, c), this.setValuetext(this.$max, u);
+		let d = l(c, o, s), p = l(u, o, s);
+		if (this.style.setProperty("--min", String(c)), this.style.setProperty("--max", String(u)), this.style.setProperty("--min-ratio", String(d)), this.style.setProperty("--max-ratio", String(p)), c === u ? this.setAttribute("data-collapsed", "") : this.removeAttribute("data-collapsed"), a) {
 			let n = i === "min" ? this.$min : this.$max;
 			t(this, e.SLIDER_CHANGE, {
-				min: l,
-				max: d,
+				min: c,
+				max: u,
 				$thumb: n
 			}, { cancelable: !1 });
 		}
 	}
 };
-customElements.get("cinq-slider-range") || customElements.define("cinq-slider-range", y);
+customElements.get("cinq-slider-range") || customElements.define("cinq-slider-range", x);
 //#endregion
-export { v as Slider, y as SliderRange };
+export { b as Slider, x as SliderRange };

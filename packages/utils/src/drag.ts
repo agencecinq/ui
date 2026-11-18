@@ -24,7 +24,11 @@ export type DragOptions = {
    * gestures on its children.
    */
   target?: (event: PointerEvent) => Element | null;
-  /** A primary press. Return `false` to ignore it. */
+  /**
+   * A primary press, once the gesture holds the pointer and the host has
+   * `[dragging]`. Return `false` to give the gesture up: both are undone
+   * before the next paint.
+   */
   start?: (event: PointerEvent) => boolean | void;
   move?: (event: PointerEvent, values: DragValues) => void;
   end?: (event: PointerEvent, values: DragEndValues) => void;
@@ -133,11 +137,11 @@ export const trackDrag = (
 
     const $target = target ? target(event) : (event.currentTarget as Element | null);
 
-    if (!$target || start?.(event) === false) {
+    if (!$target) {
       return;
     }
 
-    gesture = {
+    const current: Gesture = {
       pointerId,
       $target,
       startX: clientX,
@@ -145,8 +149,14 @@ export const trackDrag = (
       samples: [{ x: clientX, y: clientY, time: timeStamp }],
     };
 
+    gesture = current;
     host?.setAttribute("dragging", "");
     $target.setPointerCapture(pointerId);
+
+    // The gesture already holds the pointer and [dragging]: start can act on the press.
+    if (start?.(event) === false) {
+      stop(current);
+    }
   };
 
   const handleMove = (event: PointerEvent): void => {

@@ -1,4 +1,4 @@
-import { parseNumber } from "@agencecinq/utils";
+import { parseNumber, trackDrag, type DragTracker } from "@agencecinq/utils";
 import type { FormatValue } from "./types.js";
 
 /**
@@ -16,7 +16,10 @@ export abstract class SliderBase extends HTMLElement {
 
   #formatValue?: FormatValue;
   #resizeObserver: ResizeObserver | null = null;
-  #drag: { id: number; offset: number; $thumb: HTMLElement } | null = null;
+  /** One tracker per thumb: a range has two. */
+  #trackers = new Map<HTMLElement, DragTracker>();
+  /** Pointer to thumb center while dragging, so the thumb does not jump under the pointer. */
+  #drag: { offset: number; $thumb: HTMLElement } | null = null;
 
   protected abstract syncValuetext(): void;
 
@@ -123,29 +126,31 @@ export abstract class SliderBase extends HTMLElement {
 
     $thumb.style.touchAction = "none";
     $thumb.addEventListener("keydown", this.#handleKeydown);
-    $thumb.addEventListener("pointerdown", this.#handlePointerdown);
-    $thumb.addEventListener("pointermove", this.#handlePointermove);
-    $thumb.addEventListener("pointerup", this.#handlePointerup);
-    $thumb.addEventListener("pointercancel", this.#handlePointerup);
-    $thumb.addEventListener("lostpointercapture", this.#handlePointerup);
+    this.#trackers.set(
+      $thumb,
+      trackDrag($thumb, {
+        host: this,
+        start: this.#handleDragStart,
+        move: this.#handleDragMove,
+        end: this.#handleDragEnd,
+      }),
+    );
 
     $thumb.addEventListener("focus", this.#handleThumbFocus);
   }
 
   protected unbindThumb($thumb: HTMLElement): void {
     $thumb.removeEventListener("keydown", this.#handleKeydown);
-    $thumb.removeEventListener("pointerdown", this.#handlePointerdown);
-    $thumb.removeEventListener("pointermove", this.#handlePointermove);
-    $thumb.removeEventListener("pointerup", this.#handlePointerup);
-    $thumb.removeEventListener("pointercancel", this.#handlePointerup);
-    $thumb.removeEventListener("lostpointercapture", this.#handlePointerup);
+    this.#trackers.get($thumb)?.destroy();
+    this.#trackers.delete($thumb);
     $thumb.removeEventListener("focus", this.#handleThumbFocus);
     $thumb.style.removeProperty("touch-action");
   }
 
+  /** Stops a running drag: its tracker removes `[dragging]`. */
   protected clearDragState(): void {
+    this.#trackers.forEach((tracker) => tracker.cancel());
     this.#drag = null;
-    this.removeAttribute("dragging");
   }
 
   #handleKeydown = (event: KeyboardEvent): void => {
@@ -156,13 +161,9 @@ export abstract class SliderBase extends HTMLElement {
     this.onThumbFocus(event);
   };
 
-  #handlePointerdown = (event: PointerEvent): void => {
+  #handleDragStart = (event: PointerEvent): void => {
     const $thumb = event.currentTarget as HTMLElement;
-    const { button, clientY, clientX, pointerId } = event;
-
-    if (button !== 0) {
-      return;
-    }
+    const { clientY, clientX } = event;
 
     $thumb.focus({ preventScroll: true });
     event.preventDefault();
@@ -175,51 +176,21 @@ export abstract class SliderBase extends HTMLElement {
       offset = top + height / 2 - clientY;
     }
 
-    this.#drag = {
-      id: pointerId,
-      offset,
-      $thumb,
-    };
-
-    this.setAttribute("dragging", "");
-    $thumb.setPointerCapture(pointerId);
+    this.#drag = { offset, $thumb };
     this.commitPointerValue(event, $thumb);
   };
 
-  #handlePointermove = (event: PointerEvent): void => {
+  #handleDragMove = (event: PointerEvent): void => {
     if (!this.#drag) {
       return;
     }
 
-    const { id, $thumb } = this.#drag;
-    const { pointerId } = event;
-
-    if (pointerId !== id) {
-      return;
-    }
-
-    this.commitPointerValue(event, $thumb);
+    this.commitPointerValue(event, this.#drag.$thumb);
     event.preventDefault();
   };
 
-  #handlePointerup = (event: PointerEvent): void => {
-    if (!this.#drag) {
-      return;
-    }
-
-    const { id, $thumb } = this.#drag;
-    const { pointerId } = event;
-
-    if (pointerId !== id) {
-      return;
-    }
-
+  #handleDragEnd = (): void => {
     this.#drag = null;
-    this.removeAttribute("dragging");
-
-    if ($thumb.hasPointerCapture?.(id)) {
-      $thumb.releasePointerCapture(id);
-    }
   };
 
   /** Pointer-to-thumb-center offset while dragging (`0` when idle). */

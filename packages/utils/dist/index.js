@@ -179,10 +179,11 @@ var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
 	}, d = (e) => {
 		let { button: t, pointerId: a, clientX: o, clientY: c, timeStamp: l } = e;
 		if (s || t !== 0) return;
-		let u = r ? r(e) : e.currentTarget;
-		u && i?.(e) !== !1 && (s = {
+		let d = r ? r(e) : e.currentTarget;
+		if (!d) return;
+		let f = {
 			pointerId: a,
-			$target: u,
+			$target: d,
 			startX: o,
 			startY: c,
 			samples: [{
@@ -190,7 +191,8 @@ var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
 				y: c,
 				time: l
 			}]
-		}, n?.setAttribute("dragging", ""), u.setPointerCapture(a));
+		};
+		s = f, n?.setAttribute("dragging", ""), d.setPointerCapture(a), i?.(e) === !1 && u(f);
 	}, f = (e) => {
 		let t = s;
 		t && e.pointerId === t.pointerId && (l(t, e), a?.(e, c(t)));
