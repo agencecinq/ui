@@ -84,19 +84,44 @@ describe("trackDrag", () => {
     expect($host.hasAttribute("dragging")).toBe(false);
   });
 
-  it("measures a speed: a fast move is faster than a slow one", async () => {
+  it("measures a speed while moving: a fast move is faster than a slow one", async () => {
     const { $knob } = mount();
     const speeds: number[] = [];
+    let peak = 0;
 
-    track($knob, { end: (_event, { vy }) => speeds.push(vy) });
+    // The peak while moving: the speed at the release depends on how soon it follows the last move.
+    track($knob, {
+      move: (_event, { vy }) => {
+        peak = Math.max(peak, vy);
+      },
+      end: () => {
+        speeds.push(peak);
+        peak = 0;
+      },
+    });
 
-    await commands.drag("#knob", { dy: 80, delay: 40 });
+    // Slow but steady: one move per frame, as a real pointer sends them.
+    await commands.drag("#knob", { dy: 80, steps: 16 });
     await commands.drag("#knob", { dy: 80, steps: 2, delay: 0 });
 
     const [slow, fast] = speeds;
 
     expect(slow).toBeGreaterThan(0);
     expect(fast).toBeGreaterThan(slow);
+  });
+
+  it("brings the speed to 0 when the pointer pauses before the release", async () => {
+    const { $knob } = mount();
+    const ends: DragEndValues[] = [];
+
+    track($knob, { end: (_event, values) => ends.push(values) });
+
+    await commands.drag("#knob", { dy: 80, steps: 2, delay: 0, hold: 150 });
+
+    const [{ dy, vy }] = ends;
+
+    expect(dy).toBeGreaterThan(0);
+    expect(vy).toBe(0);
   });
 
   it("ignores a non-primary button, and a press that start refuses", async () => {

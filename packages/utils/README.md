@@ -97,7 +97,7 @@ drag.destroy();
 | Value | Meaning |
 | ----- | ------- |
 | `dx`, `dy` | Distance from the press, in px. |
-| `vx`, `vy` | Speed of the last move, in px/ms, positive rightward and downward. |
+| `vx`, `vy` | Speed over the last 50 ms, in px/ms, positive rightward and downward. A pause before the release brings it back to 0. |
 | `canceled` | The browser took the pointer back before the release (`pointercancel` or lost capture). |
 
 | Option | Role |

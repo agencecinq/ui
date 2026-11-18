@@ -5,7 +5,7 @@
 
 **@agencecinq/utils**
 
-- Add `trackDrag(element, options)`: one pointer gesture at a time, with pointer capture, `[dragging]` on a host, and the distance and speed of the drag. The component decides what the values mean. Types: `DragOptions`, `DragValues`, `DragEndValues`, `DragTracker`.
+- Add `trackDrag(element, options)`: one pointer gesture at a time, with pointer capture, `[dragging]` on a host, and the distance of the drag with its speed over the last 50 ms, so a pause before the release reads as a stop and close events do not spike it. The component decides what the values mean. Types: `DragOptions`, `DragValues`, `DragEndValues`, `DragTracker`.
 - Publish `dist` only: the package no longer ships its sources and build files.
 
 **@agencecinq/sheet**

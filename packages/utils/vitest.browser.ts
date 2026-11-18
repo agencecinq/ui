@@ -9,6 +9,8 @@ export type DragCommandOptions = {
   /** Pause after each move, in ms. About one frame by default: a faster drag reads as a flick. */
   delay?: number;
   button?: "left" | "right" | "middle";
+  /** Pause before the release, in ms. */
+  hold?: number;
 };
 
 /**
@@ -19,7 +21,7 @@ export type DragCommandOptions = {
 const drag: BrowserCommand<[selector: string, options?: DragCommandOptions]> = async (
   context,
   selector,
-  { dx = 0, dy = 0, steps = 8, delay = 16, button = "left" } = {},
+  { dx = 0, dy = 0, steps = 8, delay = 16, button = "left", hold = 0 } = {},
 ) => {
   if (context.provider.name !== "playwright") {
     throw new Error("drag needs the playwright provider");
@@ -43,6 +45,7 @@ const drag: BrowserCommand<[selector: string, options?: DragCommandOptions]> = a
     await context.page.waitForTimeout(delay);
   }
 
+  await context.page.waitForTimeout(hold);
   await mouse.up({ button });
 };
 

@@ -4,9 +4,9 @@ export type DragValues = {
     dx: number;
     /** Vertical distance from the press, in px. */
     dy: number;
-    /** Horizontal speed of the last move, in px/ms, positive rightward. */
+    /** Horizontal speed over the last 50 ms, in px/ms, positive rightward. */
     vx: number;
-    /** Vertical speed of the last move, in px/ms, positive downward. */
+    /** Vertical speed over the last 50 ms, in px/ms, positive downward. */
     vy: number;
 };
 export type DragEndValues = DragValues & {

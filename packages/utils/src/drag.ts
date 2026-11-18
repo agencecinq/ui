@@ -4,9 +4,9 @@ export type DragValues = {
   dx: number;
   /** Vertical distance from the press, in px. */
   dy: number;
-  /** Horizontal speed of the last move, in px/ms, positive rightward. */
+  /** Horizontal speed over the last 50 ms, in px/ms, positive rightward. */
   vx: number;
-  /** Vertical speed of the last move, in px/ms, positive downward. */
+  /** Vertical speed over the last 50 ms, in px/ms, positive downward. */
   vy: number;
 };
 
@@ -37,16 +37,25 @@ export type DragTracker = {
   destroy(): void;
 };
 
+/**
+ * The speed is measured over the positions of the last 50 ms: two events too
+ * close in time would spike it, and a pause before the release brings it to 0.
+ */
+const SPEED_WINDOW = 50;
+
+type Sample = {
+  x: number;
+  y: number;
+  time: number;
+};
+
 type Gesture = {
   pointerId: number;
   $target: Element;
   startX: number;
   startY: number;
-  lastX: number;
-  lastY: number;
-  lastTime: number;
-  vx: number;
-  vy: number;
+  /** Positions of the last {@link SPEED_WINDOW} ms, oldest first. */
+  samples: Sample[];
 };
 
 /**
@@ -75,21 +84,32 @@ export const trackDrag = (
 
   let gesture: Gesture | null = null;
 
-  const valuesOf = ({ startX, startY, lastX, lastY, vx, vy }: Gesture): DragValues => ({
-    dx: lastX - startX,
-    dy: lastY - startY,
-    vx,
-    vy,
-  });
+  const valuesOf = ({ startX, startY, samples }: Gesture): DragValues => {
+    const first = samples[0];
+    const last = samples[samples.length - 1];
+    const elapsed = last.time - first.time;
+    const values = { dx: last.x - startX, dy: last.y - startY, vx: 0, vy: 0 };
 
-  const follow = (current: Gesture, { clientX, clientY, timeStamp }: PointerEvent): void => {
-    const elapsed = Math.max(timeStamp - current.lastTime, 1);
+    if (elapsed <= 0) {
+      return values;
+    }
 
-    current.vx = (clientX - current.lastX) / elapsed;
-    current.vy = (clientY - current.lastY) / elapsed;
-    current.lastX = clientX;
-    current.lastY = clientY;
-    current.lastTime = timeStamp;
+    return {
+      ...values,
+      vx: (last.x - first.x) / elapsed,
+      vy: (last.y - first.y) / elapsed,
+    };
+  };
+
+  /** Records a position and forgets the ones older than the speed window. */
+  const follow = ({ samples }: Gesture, { clientX, clientY, timeStamp }: PointerEvent): void => {
+    const since = timeStamp - SPEED_WINDOW;
+
+    samples.push({ x: clientX, y: clientY, time: timeStamp });
+
+    while (samples.length > 1 && samples[0].time < since) {
+      samples.shift();
+    }
   };
 
   /** Drops the gesture first, so the lost capture that follows is ignored. */
@@ -122,11 +142,7 @@ export const trackDrag = (
       $target,
       startX: clientX,
       startY: clientY,
-      lastX: clientX,
-      lastY: clientY,
-      lastTime: timeStamp,
-      vx: 0,
-      vy: 0,
+      samples: [{ x: clientX, y: clientY, time: timeStamp }],
     };
 
     host?.setAttribute("dragging", "");
@@ -146,7 +162,7 @@ export const trackDrag = (
 
   const handleEnd = (event: PointerEvent): void => {
     const current = gesture;
-    const { pointerId, clientX, clientY, type } = event;
+    const { pointerId, type } = event;
 
     if (!current || pointerId !== current.pointerId) {
       return;
@@ -154,8 +170,8 @@ export const trackDrag = (
 
     const canceled = type !== "pointerup";
 
-    // A release can come with no pointermove since the last position.
-    if (!canceled && (clientX !== current.lastX || clientY !== current.lastY)) {
+    // The release counts too: its position may be new, and its time ends a pause.
+    if (!canceled) {
       follow(current, event);
     }
 
