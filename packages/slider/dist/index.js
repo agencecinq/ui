@@ -404,7 +404,7 @@ var x = class extends y {
 	}
 	valueFromPointer(e, t) {
 		let { clientY: n, clientX: r } = e, { offsetHeight: i, offsetWidth: a } = t, o = t === this.$min ? "min" : "max", s = this.isVertical ? i : a;
-		return _(this.isVertical ? n + this.offset : r + this.offset, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
+		return _((this.isVertical ? n : r) + this.offset - s / 2, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
 	}
 	commitPointerValue(e, t) {
 		let n = this.valueFromPointer(e, t);

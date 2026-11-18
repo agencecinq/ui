@@ -201,11 +201,12 @@ cinq-slider-range::after {
   content: "";
   position: absolute;
   inset-inline-start: calc(
-    var(--thumb-size) / 2 + var(--min-ratio) * (100% - var(--thumb-size))
+    var(--thumb-size) / 2 + var(--min-ratio) * (100% - 2 * var(--thumb-size))
   );
   top: 50%;
   width: calc(
-    (var(--max-ratio) - var(--min-ratio)) * (100% - var(--thumb-size))
+    var(--thumb-size) +
+      (var(--max-ratio) - var(--min-ratio)) * (100% - 2 * var(--thumb-size))
   );
   block-size: 0.375rem;
   border-radius: 0;
@@ -214,26 +215,27 @@ cinq-slider-range::after {
 }
 
 cinq-slider-range [role="slider"]:first-child {
-  inset-inline-start: calc(var(--max-ratio) * (100% - var(--thumb-size)));
+  inset-inline-start: calc(
+    var(--thumb-size) + var(--max-ratio) * (100% - 2 * var(--thumb-size))
+  );
 }
 
 cinq-slider-range [role="slider"]:last-child {
-  inset-inline-start: calc(var(--min-ratio) * (100% - var(--thumb-size)));
+  inset-inline-start: calc(var(--min-ratio) * (100% - 2 * var(--thumb-size)));
 }
 ```
 
-When thumbs share the same value, the host sets `[data-collapsed]`. Offset the min
-handle by one thumb width on the low side so both stay visible (see README).
-When they differ but meet, use `[data-active="min"]` / `[data-active="max"]` to
-raise `z-index` on the active handle.
+The two thumbs share a track two thumbs shorter than the host, the max thumb one
+thumb further: at equal values they sit side by side, never over each other.
+The host then sets `[data-collapsed]`, to style the fill for instance.
 
 ### Hooks
 
 | Hook | Use |
 | ---- | --- |
 | `[dragging]` | Grabbing cursor, active state |
-| `[data-active="min"\|"max"]` | Range overlap stacking |
-| `[data-collapsed]` | `min === max`, side-by-side thumb layout |
+| `[data-active="min"\|"max"]` | The thumb last moved or focused, to raise it or style it |
+| `[data-collapsed]` | `min === max`, the thumbs side by side |
 
 See the playground below for working examples (compact thumbs, seek label, price range).
 
@@ -292,6 +294,13 @@ host.addEventListener(EVENTS.SLIDER_CHANGE, (event) => {
 | `setValues(min, max, { active?, emit? })` | Anti-cross update. |
 | `$max`, `$min`, `min`, `max`, `boundsMin`, `boundsMax` | Range state. |
 | `formatValue` | Applied to both thumbs. |
+
+## Migration from 6.x
+
+Version 7.0 lays the range thumbs on a track two thumbs shorter than the host,
+as the range geometry always assumed: update the range thumb and fill CSS, and
+drop the `[data-collapsed]` offsets. Step-by-step guide in the
+[README](https://github.com/agencecinq/ui/tree/main/packages/slider#migration).
 
 ## Playground
 

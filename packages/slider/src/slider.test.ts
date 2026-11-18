@@ -154,43 +154,41 @@ describe("cinq-slider-range, drag", () => {
     </cinq-slider-range>
   `;
 
-  /**
-   * The value right after the press, then at the end. Measured from the press:
-   * the range geometry and its documented CSS disagree by half a thumb, so a
-   * press moves the min thumb a little (tracked apart from this drag).
-   */
-  async function dragFromPress(id: string, dx: number): Promise<number> {
-    const $host = document.querySelector("cinq-slider-range")!;
-    const values: number[] = [];
-    const record = () => values.push(valueOf(id));
+  it("leaves both thumbs in place on a press", async () => {
+    mount(range);
 
-    $host.addEventListener(EVENTS.SLIDER_CHANGE, record);
-    await commands.drag(`#${id}`, { dx });
-    $host.removeEventListener(EVENTS.SLIDER_CHANGE, record);
+    await commands.drag("#min");
+    await commands.drag("#max");
 
-    return values[values.length - 1] - values[0];
-  }
+    expect(valueOf("min")).toBe(20);
+    expect(valueOf("max")).toBe(80);
+  });
 
   it("moves the dragged thumb only, and marks it active", async () => {
     mount(range);
 
     const $host = document.querySelector("cinq-slider-range")!;
 
-    // 64 px of a 320 px track is a fifth of the 0 to 100 span. The press and
-    // the end are each snapped to the step: one step of rounding either way.
-    expect(Math.abs((await dragFromPress("min", 64)) - 20)).toBeLessThanOrEqual(1);
+    // 64 px of a 320 px track is a fifth of the 0 to 100 span.
+    await commands.drag("#min", { dx: 64 });
+    expect(valueOf("min")).toBe(40);
     expect(valueOf("max")).toBe(80);
     expect($host.getAttribute("data-active")).toBe("min");
 
-    expect(Math.abs((await dragFromPress("max", -32)) + 10)).toBeLessThanOrEqual(1);
+    await commands.drag("#max", { dx: -32 });
+    expect(valueOf("max")).toBe(70);
     expect($host.getAttribute("data-active")).toBe("max");
   });
 
-  it("keeps the minimum below the maximum", async () => {
+  it("puts the thumbs side by side, not over each other, when they meet", async () => {
     mount(range);
 
     await commands.drag("#min", { dx: 300 });
 
-    expect(valueOf("min")).toBeLessThanOrEqual(valueOf("max"));
+    const min = document.getElementById("min")!.getBoundingClientRect();
+    const max = document.getElementById("max")!.getBoundingClientRect();
+
+    expect(valueOf("min")).toBe(80);
+    expect(min.right).toBeCloseTo(max.left, 0);
   });
 });
