@@ -91,6 +91,69 @@ describe("keyboard", () => {
     expect(document.activeElement).toBe($("fighter"));
   });
 
+  it("only moves the focus on Home and End without data-delay", async () => {
+    mount();
+
+    await press($("fighter"), "End");
+    await wait(50);
+
+    expect(document.activeElement).toBe($("thief"));
+    expect(selected("fighter")).toBe(true);
+    expect(selected("thief")).toBe(false);
+  });
+
+  it("activates the tab focused with End after data-delay", async () => {
+    mount(markup.replace('data-hash="false"', 'data-hash="false" data-delay="20"'));
+
+    await press($("fighter"), "End");
+    await wait(60);
+
+    expect(selected("thief")).toBe(true);
+    expect($("thief-panel").hidden).toBe(false);
+  });
+
+  it("leaves PageUp and PageDown to the browser", async () => {
+    mount();
+
+    await press($("cleric"), "PageDown");
+    expect(document.activeElement).toBe($("cleric"));
+
+    await press($("cleric"), "PageUp");
+    expect(document.activeElement).toBe($("cleric"));
+  });
+
+  it("leaves the keys pressed with a modifier to the browser", () => {
+    mount();
+    $("fighter").focus();
+
+    const event = new KeyboardEvent("keydown", {
+      key: "ArrowRight",
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    $("fighter").dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(document.activeElement).toBe($("fighter"));
+  });
+
+  it("cancels the default action of the arrow keys, so the page does not scroll", () => {
+    mount();
+    $("fighter").focus();
+
+    const event = new KeyboardEvent("keydown", {
+      key: "ArrowDown",
+      bubbles: true,
+      cancelable: true,
+    });
+
+    $("fighter").dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
   it("only moves the focus with the arrow keys without data-delay", async () => {
     mount();
 

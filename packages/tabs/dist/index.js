@@ -55,15 +55,27 @@ var e = {
 	};
 }, r = document.documentElement, { body: i } = document;
 r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
+var a = (e, t, n) => {
+	if (e.altKey || e.ctrlKey || e.metaKey) return;
+	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
+		ArrowUp: i,
+		ArrowLeft: o ? a : i,
+		ArrowDown: a,
+		ArrowRight: o ? i : a,
+		Home: 0,
+		End: r
+	}[e.key];
+	if (s !== void 0) return e.preventDefault(), t[s].focus(), s;
+};
 //#endregion
 //#region src/utils/getHash.ts
-function a(e) {
+function o(e) {
 	let t = e.indexOf("#");
 	return t === -1 ? "" : e.substring(t + 1);
 }
 //#endregion
 //#region src/TabPanel.ts
-var o = class {
+var s = class {
 	el;
 	id;
 	constructor(e) {
@@ -79,7 +91,7 @@ var o = class {
 	destroy() {
 		this.el.removeAttribute("hidden"), this.el.classList.remove("is-active");
 	}
-}, s = class {
+}, c = class {
 	el;
 	active = !1;
 	id = "";
@@ -121,7 +133,7 @@ var o = class {
 	destroy() {
 		this.el.removeAttribute("tabindex"), this.el.removeAttribute("aria-selected"), this.el.classList.remove("is-active"), this.el.removeEventListener("click", this.handleClick);
 	}
-}, c = class extends HTMLElement {
+}, l = class extends HTMLElement {
 	$tabList;
 	current = 0;
 	tabPanels = [];
@@ -145,9 +157,9 @@ var o = class {
 			let e = parseInt(n, 10);
 			this.delay = Number.isNaN(e) ? 0 : e;
 		}
-		if (this.href = this.hash && a(window.location.hash) || "", !this.$tabList) return;
-		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new s(e, t)), this.tabs.forEach((t, n) => {
-			this.tabPanels.push(new o(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TABS_ACTIVATE, () => {
+		if (this.href = this.hash && o(window.location.hash) || "", !this.$tabList) return;
+		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new c(e, t)), this.tabs.forEach((t, n) => {
+			this.tabPanels.push(new s(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TABS_ACTIVATE, () => {
 				this.current = n, this.deactivateTabs(), this.deactivateTabPanels(), t.activate(!1), this.tabPanels.find((e) => e.id === t.controls)?.activate(), this.hash && (this.href = t.id, window.location.hash = t.id);
 			});
 		}), this.href) {
@@ -164,37 +176,17 @@ var o = class {
 	initEvents() {
 		this.$tabList?.addEventListener("keydown", this.handleKeydown);
 	}
-	get #e() {
-		let e = this.$tabList ?? this;
-		return e ? getComputedStyle(e).direction === "rtl" : !1;
-	}
 	handleKeydown = (e) => {
-		let { key: t, code: n, target: r } = e, i = JSON.parse(r.getAttribute("aria-selected")), a = () => {
-			this.current = 0 > this.current - 1 ? this.tabs.length - 1 : this.current - 1, this.tabs[this.current].focus(), this.delay && setTimeout(() => {
-				this.tabs[this.current].toggle(!1);
-			}, this.delay);
-		}, o = () => {
-			this.current = this.current + 1 > this.tabs.length - 1 ? 0 : this.current + 1, this.tabs[this.current].focus(), this.delay && setTimeout(() => {
-				this.tabs[this.current].toggle(!1);
-			}, this.delay);
-		}, s = () => {
-			e.preventDefault(), this.current = 0, this.tabs[this.current].toggle();
-		}, c = () => {
-			e.preventDefault(), this.current = this.tabs.length - 1, this.tabs[this.current].toggle();
-		}, l = this.#e, u = {
-			ArrowUp: a,
-			ArrowDown: o,
-			ArrowLeft: l ? o : a,
-			ArrowRight: l ? a : o,
-			End: c,
-			Home: s,
-			PageUp: s,
-			PageDown: c,
-			Delete: () => i && this.delete(e),
-			Backspace: () => i && this.delete(e),
-			default: () => !1
-		};
-		return (u[t || n] || u.default)();
+		let { key: t } = e, n = e.target, r = this.tabs.map((e) => e.el), i = r.indexOf(n);
+		if (i === -1) return;
+		if (t === "Delete" || t === "Backspace") {
+			n.getAttribute("aria-selected") === "true" && this.delete(e);
+			return;
+		}
+		let o = a(e, r, i);
+		o !== void 0 && (this.current = o, this.delay && setTimeout(() => {
+			this.tabs[this.current].toggle(!1);
+		}, this.delay));
 	};
 	deactivateTabs = () => this.tabs.forEach((e) => e.deactivate());
 	deactivateTabPanels = () => this.tabPanels.forEach((e) => e.deactivate());
@@ -205,6 +197,6 @@ var o = class {
 		this.$tabList?.removeEventListener("keydown", this.handleKeydown), this.tabs.forEach((e) => e.destroy()), this.tabPanels.forEach((e) => e.destroy()), this.tabs = [], this.tabPanels = [];
 	}
 };
-customElements.get("cinq-tabs") || customElements.define("cinq-tabs", c);
+customElements.get("cinq-tabs") || customElements.define("cinq-tabs", l);
 //#endregion
-export { c as Tabs };
+export { l as Tabs };

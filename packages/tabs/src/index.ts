@@ -1,4 +1,4 @@
-import { EVENTS } from "@agencecinq/utils";
+import { EVENTS, focusByKey } from "@agencecinq/utils";
 import getHash from "./utils/getHash.js";
 import { hash, delay as defaultDelay } from "./config.js";
 import TabPanel from "./TabPanel.js";
@@ -114,71 +114,37 @@ export class Tabs extends HTMLElement {
     this.$tabList?.addEventListener("keydown", this.handleKeydown);
   }
 
-  get #isRtl(): boolean {
-    const el = this.$tabList ?? this;
-    return el ? getComputedStyle(el).direction === "rtl" : false;
-  }
-
   handleKeydown = (event: KeyboardEvent) => {
-    const { key, code, target } = event;
+    const { key } = event;
+    const $target = event.target as HTMLElement;
+    const elements = this.tabs.map(tab => tab.el);
+    const index = elements.indexOf($target);
 
-    const selected = JSON.parse(
-      (target as HTMLElement).getAttribute("aria-selected") as string,
-    );
+    if (index === -1) {
+      return;
+    }
 
-    const previous = () => {
-      this.current =
-        0 > this.current - 1 ? this.tabs.length - 1 : this.current - 1;
-      this.tabs[this.current].focus();
-
-      if (this.delay) {
-        setTimeout(() => {
-          this.tabs[this.current].toggle(false);
-        }, this.delay);
+    if (key === "Delete" || key === "Backspace") {
+      if ($target.getAttribute("aria-selected") === "true") {
+        this.delete(event);
       }
-    };
 
-    const next = () => {
-      this.current =
-        this.current + 1 > this.tabs.length - 1 ? 0 : this.current + 1;
-      this.tabs[this.current].focus();
+      return;
+    }
 
-      if (this.delay) {
-        setTimeout(() => {
-          this.tabs[this.current].toggle(false);
-        }, this.delay);
-      }
-    };
+    const destination = focusByKey(event, elements, index);
 
-    const first = () => {
-      event.preventDefault();
-      this.current = 0;
-      this.tabs[this.current].toggle();
-    };
+    if (destination === undefined) {
+      return;
+    }
 
-    const last = () => {
-      event.preventDefault();
-      this.current = this.tabs.length - 1;
-      this.tabs[this.current].toggle();
-    };
+    this.current = destination;
 
-    const rtl = this.#isRtl;
-
-    const codes: Record<string, () => void | boolean> = {
-      ArrowUp: previous,
-      ArrowDown: next,
-      ArrowLeft: rtl ? next : previous,
-      ArrowRight: rtl ? previous : next,
-      End: last,
-      Home: first,
-      PageUp: first,
-      PageDown: last,
-      Delete: () => selected && this.delete(event),
-      Backspace: () => selected && this.delete(event),
-      default: () => false,
-    };
-
-    return (codes[key || code] || codes.default)();
+    if (this.delay) {
+      setTimeout(() => {
+        this.tabs[this.current].toggle(false);
+      }, this.delay);
+    }
   };
 
   deactivateTabs = () => this.tabs.forEach(tab => tab.deactivate());

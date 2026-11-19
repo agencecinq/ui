@@ -1,7 +1,6 @@
 import { default as TabPanel } from './TabPanel.js';
 import { default as Tab } from './Tab.js';
 export declare class Tabs extends HTMLElement {
-    #private;
     $tabList: HTMLElement | null;
     current: number;
     tabPanels: TabPanel[];
@@ -17,7 +16,7 @@ export declare class Tabs extends HTMLElement {
      */
     init(): void;
     initEvents(): void;
-    handleKeydown: (event: KeyboardEvent) => boolean | void;
+    handleKeydown: (event: KeyboardEvent) => void;
     deactivateTabs: () => void;
     deactivateTabPanels: () => void;
     delete({ target }: KeyboardEvent): boolean;

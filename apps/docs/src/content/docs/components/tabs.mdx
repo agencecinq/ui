@@ -85,7 +85,7 @@ Configure via data attributes:
 | Attribute         | Type          | Default | Description                                                                       |
 | ----------------- | ------------- | ------- | --------------------------------------------------------------------------------- |
 | `data-hash`  | `true/false`  | `true`  | Sync the active tab id to `location.hash` on activation.                          |
-| `data-delay` | `number (ms)` | `0`     | When `> 0`, arrow key navigation activates the focused tab after the given delay. |
+| `data-delay` | `number (ms)` | `0`     | When `> 0`, the tab focused with the arrow, Home or End keys activates after the given delay. |
 
 ## API
 
@@ -107,7 +107,7 @@ Configure via data attributes:
 
 ### Automatic activation (`data-delay`)
 
-When `data-delay` is greater than `0`, moving focus with arrow keys will automatically activate the tab after the given delay (in ms):
+When `data-delay` is greater than `0`, moving focus with the arrow, Home or End keys will automatically activate the tab after the given delay (in ms):
 
 ```html
 <cinq-tabs data-hash="true" data-delay="300">
@@ -605,7 +605,7 @@ You can safely nest `<cinq-tabs>` as long as each tablist / panel group is scope
 
 ### RTL
 
-If the tablist inherits `direction: rtl` (e.g. `dir="rtl"`), left/right arrow navigation follows the reading direction.
+In a right-to-left context, ArrowLeft and ArrowRight swap. The tabs read the direction with `:dir(rtl)`: a `dir="rtl"` on the page or an ancestor is enough, a CSS `direction: rtl` alone is not.
 
 ```html
 <div dir="rtl">
