@@ -1,5 +1,6 @@
+import { focusByKey } from "@agencecinq/utils";
 import type { State } from "./utils.js";
-import { dispatchBeforetoggle, focusByKey, queueToggle } from "./utils.js";
+import { dispatchBeforetoggle, queueToggle } from "./utils.js";
 
 const BUTTONS = "button[aria-expanded][aria-controls]";
 const TOP_LEVEL_ITEMS = `a[href], ${BUTTONS}`;
@@ -341,7 +342,7 @@ export class DisclosureNavigation extends HTMLElement {
       return this.#menuItems($target)[0]?.focus();
     }
 
-    return focusByKey(event, items, index);
+    focusByKey(event, items, index);
   };
 }
 

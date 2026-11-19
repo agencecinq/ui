@@ -21,7 +21,7 @@ Inspired by [`@19h47/disclosure-navigation`](https://github.com/19h47/19h47-disc
 - **Built on the platform.** Native `<button>`, the `hidden` attribute,
   [`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements),
   [`ToggleEvent`](https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent) as popovers
-  fire it, `AbortController`. No dependency.
+  fire it, `AbortController`.
 
 ## Installation
 

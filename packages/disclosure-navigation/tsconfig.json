@@ -5,6 +5,7 @@
     "rootDir": "./src",
     "types": ["node", "vite/client"]
   },
+  "references": [{ "path": "../utils" }],
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
 }
