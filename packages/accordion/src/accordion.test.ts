@@ -82,6 +82,33 @@ describe("keyboard", () => {
     expect(document.activeElement).toBe($("owlbear"));
   });
 
+  it("swaps left and right in a right-to-left accordion", async () => {
+    mount(markup.replace('<cinq-accordion id="host"', '<cinq-accordion id="host" dir="rtl"'));
+
+    await press($("owlbear"), "ArrowLeft");
+    expect(document.activeElement).toBe($("beholder"));
+
+    await press($("beholder"), "ArrowRight");
+    expect(document.activeElement).toBe($("owlbear"));
+  });
+
+  it("leaves the keys pressed with a modifier to the browser", () => {
+    mount();
+    $("owlbear").focus();
+
+    const event = new KeyboardEvent("keydown", {
+      key: "ArrowDown",
+      altKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    $("owlbear").dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(document.activeElement).toBe($("owlbear"));
+  });
+
   it("follows the focused header as current", async () => {
     const $host = mount();
 

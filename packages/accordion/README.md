@@ -117,9 +117,13 @@ collisions.
 | `Tab` / `Shift + Tab` | Move focus through focusable elements in the page. |
 | `Space` / `Enter` | Toggle the focused header (native button behavior). |
 | `Arrow Up` / `Arrow Down` | Move focus between accordion headers. |
-| `Arrow Left` / `Arrow Right` | Move focus between accordion headers. |
+| `Arrow Left` / `Arrow Right` | Move focus between accordion headers, following the reading direction. |
 | `Home` | Focus the first header. |
 | `End` | Focus the last header. |
+
+The arrow keys wrap at both ends. In a right-to-left context, read with
+`:dir(rtl)` so a `dir` attribute is enough, Arrow Left and Arrow Right swap.
+Keys pressed with Alt, Ctrl or Meta are left to the browser.
 
 ### Programmatic API
 
