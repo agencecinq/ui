@@ -1,39 +1,29 @@
+import { focusByKey as e } from "@agencecinq/utils";
 //#region src/utils.ts
-var e = (e) => e === "open" ? "closed" : "open", t = /* @__PURE__ */ new WeakMap(), n = (t, n, r) => {
+var t = (e) => e === "open" ? "closed" : "open", n = /* @__PURE__ */ new WeakMap(), r = (e, n, r) => {
 	let i = new ToggleEvent("beforetoggle", {
 		cancelable: n === "open",
-		oldState: e(n),
+		oldState: t(n),
 		newState: n,
 		source: r
 	});
-	return t.dispatchEvent(i);
-}, r = (n, r, i) => {
-	let a = t.get(n), o = a?.oldState ?? e(r);
+	return e.dispatchEvent(i);
+}, i = (e, r, i) => {
+	let a = n.get(e), o = a?.oldState ?? t(r);
 	clearTimeout(a?.timeout);
 	let s = setTimeout(() => {
-		let e = new ToggleEvent("toggle", {
+		let t = new ToggleEvent("toggle", {
 			oldState: o,
 			newState: r,
 			source: i
 		});
-		t.delete(n), n.dispatchEvent(e);
+		n.delete(e), e.dispatchEvent(t);
 	});
-	t.set(n, {
+	n.set(e, {
 		oldState: o,
 		timeout: s
 	});
-}, i = (e, t, n) => {
-	if (e.altKey || e.ctrlKey || e.metaKey) return;
-	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
-		ArrowUp: i,
-		ArrowLeft: o ? a : i,
-		ArrowDown: a,
-		ArrowRight: o ? i : a,
-		Home: 0,
-		End: r
-	}[e.key];
-	s !== void 0 && (e.preventDefault(), t[s].focus());
-}, a = "button[aria-expanded][aria-controls]", o = `a[href], ${a}`, s = "a[href], button:enabled, [tabindex]:not([tabindex^=\"-\"])", c = (e) => e.ariaExpanded === "true", l = (e) => e.ariaControlsElements ?? [], u = (e, t) => l(e).some((e) => e.contains(t)), d = (e, t) => t !== null && (e.contains(t) || u(e, t)), f = (e, t) => l(e).every((r) => n(r, t, e)), p = class extends HTMLElement {
+}, a = "button[aria-expanded][aria-controls]", o = `a[href], ${a}`, s = "a[href], button:enabled, [tabindex]:not([tabindex^=\"-\"])", c = (e) => e.ariaExpanded === "true", l = (e) => e.ariaControlsElements ?? [], u = (e, t) => l(e).some((e) => e.contains(t)), d = (e, t) => t !== null && (e.contains(t) || u(e, t)), f = (e, t) => l(e).every((n) => r(n, t, e)), p = class extends HTMLElement {
 	#e = null;
 	#t = /* @__PURE__ */ new WeakMap();
 	#n = null;
@@ -84,8 +74,8 @@ var e = (e) => e === "open" ? "closed" : "open", t = /* @__PURE__ */ new WeakMap
 	}
 	#c(e, t) {
 		let n = t ? "open" : "closed";
-		e.ariaExpanded = t.toString(), !t && e === this.#n && (this.#n = null), l(e).forEach((i) => {
-			r(i, n, e), t ? (this.#t.set(i, i.hidden || !0), i.hidden = !1) : (i.matches(":focus-within") && e.focus(), i.hidden = this.#t.get(i) ?? !0);
+		e.ariaExpanded = t.toString(), !t && e === this.#n && (this.#n = null), l(e).forEach((r) => {
+			i(r, n, e), t ? (this.#t.set(r, r.hidden || !0), r.hidden = !1) : (r.matches(":focus-within") && e.focus(), r.hidden = this.#t.get(r) ?? !0);
 		});
 	}
 	#l(e) {
@@ -118,10 +108,13 @@ var e = (e) => e === "open" ? "closed" : "open", t = /* @__PURE__ */ new WeakMap
 		let t = e.target;
 		return this.contains(t) ? (e.preventDefault(), this.close(this.#i.findLast((e) => u(e, t)))) : this.close();
 	};
-	#g = (e) => {
+	#g = (t) => {
 		if (this.dataset.arrowKeys === "false") return;
-		let t = e.target, n = this.#i.filter((e) => u(e, t)), r = n.find((e) => !n.some((t) => u(t, e))), a = r ? this.#o(r) : this.#a([this], o), s = a.indexOf(t);
-		if (s !== -1) return !r && e.key === "ArrowDown" && t instanceof HTMLButtonElement && c(t) ? (e.preventDefault(), this.#o(t)[0]?.focus()) : i(e, a, s);
+		let n = t.target, r = this.#i.filter((e) => u(e, n)), i = r.find((e) => !r.some((t) => u(t, e))), a = i ? this.#o(i) : this.#a([this], o), s = a.indexOf(n);
+		if (s !== -1) {
+			if (!i && t.key === "ArrowDown" && n instanceof HTMLButtonElement && c(n)) return t.preventDefault(), this.#o(n)[0]?.focus();
+			e(t, a, s);
+		}
 	};
 };
 customElements.get("cinq-disclosure-navigation") || customElements.define("cinq-disclosure-navigation", p);

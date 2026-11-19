@@ -123,6 +123,25 @@ Types: `DragOptions`, `DragValues`, `DragEndValues`, `DragTracker`.
 | `scheduleRestoreReturnFocus(closingHost?)` | Restore after the current turn, unless focus already moved elsewhere. |
 | `addTrapFocus(container, elementToFocus?)` | Keep Tab inside a non-modal overlay. |
 | `removeTrapFocus(elementToFocus?)` | Remove the trap, optionally move focus. |
+| `focusByKey(event, elements, index)` | Move focus between `elements` with the arrow, Home and End keys, from `elements[index]`. Returns the new index, or `undefined` for a key left to the browser. |
+
+`focusByKey()` wraps at both ends, swaps left and right in a right-to-left
+context (read with `:dir(rtl)`, so a `dir` attribute is enough), cancels the
+default action of the keys it handles, and leaves the keys pressed with Alt,
+Ctrl or Meta to the browser. The component picks the elements and acts on the
+new index, to activate a tab for instance.
+
+```js
+import { focusByKey } from "@agencecinq/utils";
+
+#handleKeydown = (event) => {
+  const index = this.$buttons.indexOf(event.target);
+
+  if (index !== -1) {
+    focusByKey(event, this.$buttons, index);
+  }
+};
+```
 
 ## Scroll lock
 

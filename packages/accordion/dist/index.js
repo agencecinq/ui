@@ -55,13 +55,22 @@ var e = {
 	};
 }, i = document.documentElement, { body: a } = document;
 i.hasAttribute("data-debug"), window.addEventListener("pointermove", r(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-//#endregion
-//#region src/utils.ts
-var o = (e) => {
-	e.classList.remove("is-active");
+var o = (e, t, n) => {
+	if (e.altKey || e.ctrlKey || e.metaKey) return;
+	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
+		ArrowUp: i,
+		ArrowLeft: o ? a : i,
+		ArrowDown: a,
+		ArrowRight: o ? i : a,
+		Home: 0,
+		End: r
+	}[e.key];
+	if (s !== void 0) return e.preventDefault(), t[s].focus(), s;
 }, s = (e) => {
+	e.classList.remove("is-active");
+}, c = (e) => {
 	e.classList.add("is-active");
-}, c = () => decodeURIComponent(document.location.hash.replace(/^#\/?/, "")), l = class {
+}, l = () => decodeURIComponent(document.location.hash.replace(/^#\/?/, "")), u = class {
 	el;
 	$body = null;
 	$button = null;
@@ -89,14 +98,14 @@ var o = (e) => {
 			this.#e = 0, this.$body && (this.$body.style.setProperty("max-height", `${this.height}px`), this.#t = window.setTimeout(() => {
 				this.#t = 0, this.$body?.style.removeProperty("max-height");
 			}, this.transitionDuration));
-		}), s(this.el), this.isOpen = !0, !0);
+		}), c(this.el), this.isOpen = !0, !0);
 	}
 	close(n = !0) {
 		return !this.$button || !this.$body || !this.open || n && !t(this.el, e.ACCORDION_CLOSE, this.#s) ? !1 : (this.$button.setAttribute("aria-expanded", "false"), this.el.setAttribute("data-open", "false"), this.#o(), this.$body.style.setProperty("max-height", `${this.height}px`), this.#n(), this.#e = requestAnimationFrame(() => {
 			this.#e = 0, this.$body?.style.setProperty("max-height", "0");
 		}), this.#t = window.setTimeout(() => {
 			this.#t = 0, this.$body?.setAttribute("hidden", "");
-		}, this.transitionDuration), o(this.el), this.isOpen = !1, !0);
+		}, this.transitionDuration), s(this.el), this.isOpen = !1, !0);
 	}
 	toggle() {
 		return !this.isDeselectable && this.open ? !1 : this.open ? this.close() : this.openPanel();
@@ -105,7 +114,7 @@ var o = (e) => {
 		this.$button?.focus();
 	}
 	destroy() {
-		this.#n(), this.$button?.removeEventListener("click", this.#r), this.$button?.removeEventListener("focus", this.#i), this.$button?.removeEventListener("blur", this.#a), window.removeEventListener("resize", this.#o), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), o(this.el), this.$body = null, this.$button = null, this.$inner = null;
+		this.#n(), this.$button?.removeEventListener("click", this.#r), this.$button?.removeEventListener("focus", this.#i), this.$button?.removeEventListener("blur", this.#a), window.removeEventListener("resize", this.#o), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), s(this.el), this.$body = null, this.$button = null, this.$inner = null;
 	}
 	#n() {
 		this.#e &&= (cancelAnimationFrame(this.#e), 0), this.#t &&= (clearTimeout(this.#t), 0);
@@ -131,13 +140,13 @@ var o = (e) => {
 			index: this.index
 		};
 	}
-}, u = {
+}, d = {
 	multiselectable: !1,
 	hash: !0
-}, d = class extends HTMLElement {
+}, f = class extends HTMLElement {
 	panels = [];
 	current = 0;
-	options = { ...u };
+	options = { ...d };
 	connectedCallback() {
 		this.init();
 	}
@@ -147,9 +156,9 @@ var o = (e) => {
 	init() {
 		this.options = {
 			multiselectable: n(this.getAttribute("data-multiselectable")),
-			hash: n(this.getAttribute("data-hash"), u.hash)
+			hash: n(this.getAttribute("data-hash"), d.hash)
 		}, this.panels = [...this.querySelectorAll("[data-panel]")].filter((e) => e.closest("cinq-accordion") === this).map((e, t) => {
-			let n = new l(e, t);
+			let n = new u(e, t);
 			return n.init(), n;
 		}), this.addEventListener(e.ACCORDION_OPEN, this.#e), this.addEventListener("keydown", this.#n), this.options.hash && (window.addEventListener("hashchange", this.#t), this.#t());
 	}
@@ -166,7 +175,7 @@ var o = (e) => {
 		}));
 	};
 	#t = () => {
-		let e = c();
+		let e = l();
 		e && this.panels.forEach((t, n) => {
 			t.$body && t.$body.id === e && (this.current = n, this.panels.forEach((e, t) => {
 				t !== n && e.close(!1);
@@ -174,28 +183,10 @@ var o = (e) => {
 		});
 	};
 	#n = (e) => {
-		let t = e.target, n = this.panels.findIndex((e) => e.$button != null && e.$button.contains(t));
-		if (n < 0) return;
-		this.current = n;
-		let r = () => {
-			this.current = this.current - 1 < 0 ? this.panels.length - 1 : this.current - 1, this.panels[this.current]?.focus(), e.preventDefault();
-		}, i = () => {
-			this.current = this.current + 1 > this.panels.length - 1 ? 0 : this.current + 1, this.panels[this.current]?.focus(), e.preventDefault();
-		};
-		({
-			ArrowUp: r,
-			ArrowDown: i,
-			ArrowLeft: r,
-			ArrowRight: i,
-			Home: () => {
-				this.current = 0, this.panels[0]?.focus(), e.preventDefault();
-			},
-			End: () => {
-				this.current = this.panels.length - 1, this.panels[this.current]?.focus(), e.preventDefault();
-			}
-		})[e.key]?.();
+		let t = e.target, n = this.panels.flatMap(({ $button: e }) => e ? [e] : []), r = n.findIndex((e) => e.contains(t));
+		r < 0 || (this.current = o(e, n, r) ?? r);
 	};
 };
-customElements.get("cinq-accordion") || customElements.define("cinq-accordion", d);
+customElements.get("cinq-accordion") || customElements.define("cinq-accordion", f);
 //#endregion
-export { d as Accordion, l as Panel };
+export { f as Accordion, u as Panel };

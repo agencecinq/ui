@@ -154,8 +154,12 @@ Set `data-hash="false"` on nested hosts to avoid hash collisions.
 | `Tab` / `Shift + Tab` | Move focus through focusable elements. |
 | `Space` / `Enter` | Toggle the focused header (native button). |
 | `Arrow Up` / `Arrow Down` | Move focus between headers. |
-| `Arrow Left` / `Arrow Right` | Move focus between headers. |
+| `Arrow Left` / `Arrow Right` | Move focus between headers, following the reading direction. |
 | `Home` / `End` | Focus first / last header. |
+
+The arrow keys wrap at both ends, and Arrow Left and Arrow Right swap in a
+right-to-left context (`dir="rtl"`). Keys pressed with Alt, Ctrl or Meta are left
+to the browser.
 
 ## API
 

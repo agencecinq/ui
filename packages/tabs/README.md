@@ -104,7 +104,7 @@ Configured via data attributes on `<cinq-tabs>`:
 | Attribute | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
 | `data-hash` | boolean | `true` | Sync the active tab id to `location.hash` on activation. |
-| `data-delay` | number (ms) | `0` | When `> 0`, arrow key navigation activates the focused tab after the delay. `0` is manual activation. |
+| `data-delay` | number (ms) | `0` | When `> 0`, the tab focused with the arrow, Home or End keys activates after the delay. `0` is manual activation. |
 
 ### Keyboard
 
@@ -112,9 +112,14 @@ Configured via data attributes on `<cinq-tabs>`:
 | --- | -------- |
 | `Tab` | Move focus into the tablist, then to the active tabpanel. |
 | `Enter` / `Space` | Activate the focused tab. |
-| `ArrowLeft` / `ArrowRight` | Move focus between tabs (follows reading direction in RTL). |
+| `ArrowLeft` / `ArrowRight` | Move focus between tabs, following the reading direction. |
+| `ArrowUp` / `ArrowDown` | Move focus between tabs. |
 | `Home` / `End` | Focus the first / last tab. |
-| `Delete` / `Backspace` | Remove the focused tab when `data-deletable` is set. |
+| `Delete` / `Backspace` | Remove the focused tab when it is selected and has `data-deletable`. |
+
+The arrow keys wrap at both ends. In a right-to-left context, read with
+`:dir(rtl)` so a `dir` attribute is enough, ArrowLeft and ArrowRight swap.
+Keys pressed with Alt, Ctrl or Meta are left to the browser.
 
 ### Programmatic API
 
@@ -157,6 +162,24 @@ $tabs.addEventListener(EVENTS.TABS_ACTIVATE, ({ detail }) => {
   console.log(detail.controls, detail.element);
 });
 ```
+
+## Migration
+
+### From 11.x to 12.0
+
+The keyboard runs on `focusByKey()` from `@agencecinq/utils`, shared with the
+accordion and the disclosure navigation, and follows the tabs pattern of the APG.
+
+1. **Expect Home and End to move the focus only.** They activated the first or
+   last tab at once. They now focus it, like the arrow keys, and `data-delay`
+   activates it after the delay. Press Enter or Space to activate it.
+2. **Drop PageUp and PageDown from your docs or tests.** They went to the first
+   and last tabs. They are now left to the browser.
+3. **Set the reading direction with `dir`.** It was read from the CSS
+   `direction` of the tablist. It is now read with `:dir(rtl)`: a `dir="rtl"` on
+   the page or an ancestor is enough, a CSS `direction: rtl` alone is not.
+4. **Expect the keys pressed with Alt, Ctrl or Meta to reach the browser.** They
+   moved the focus too.
 
 ## Build setup
 

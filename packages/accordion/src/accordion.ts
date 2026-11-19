@@ -1,4 +1,4 @@
-import { EVENTS, parseBoolean } from "@agencecinq/utils";
+import { EVENTS, focusByKey, parseBoolean } from "@agencecinq/utils";
 import { Panel } from "./Panel.js";
 import type { Detail, Options } from "./types.js";
 import { getURLHash } from "./utils.js";
@@ -112,52 +112,16 @@ export class Accordion extends HTMLElement {
 
   #handleKeydown = (event: KeyboardEvent): void => {
     const target = event.target as Node;
-    const index = this.panels.findIndex(
-      (panel) => panel.$button != null && panel.$button.contains(target),
+    const $buttons = this.panels.flatMap(({ $button }) =>
+      $button ? [$button] : [],
     );
+    const index = $buttons.findIndex(($button) => $button.contains(target));
 
     if (index < 0) {
       return;
     }
 
-    this.current = index;
-
-    const previous = (): void => {
-      this.current =
-        this.current - 1 < 0 ? this.panels.length - 1 : this.current - 1;
-      this.panels[this.current]?.focus();
-      event.preventDefault();
-    };
-
-    const next = (): void => {
-      this.current =
-        this.current + 1 > this.panels.length - 1 ? 0 : this.current + 1;
-      this.panels[this.current]?.focus();
-      event.preventDefault();
-    };
-
-    const first = (): void => {
-      this.current = 0;
-      this.panels[0]?.focus();
-      event.preventDefault();
-    };
-
-    const last = (): void => {
-      this.current = this.panels.length - 1;
-      this.panels[this.current]?.focus();
-      event.preventDefault();
-    };
-
-    const handlers: Record<string, () => void> = {
-      ArrowUp: previous,
-      ArrowDown: next,
-      ArrowLeft: previous,
-      ArrowRight: next,
-      Home: first,
-      End: last,
-    };
-
-    handlers[event.key]?.();
+    this.current = focusByKey(event, $buttons, index) ?? index;
   };
 }
 

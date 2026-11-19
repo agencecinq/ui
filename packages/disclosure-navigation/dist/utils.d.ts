@@ -12,10 +12,4 @@ export declare const dispatchBeforetoggle: ($element: HTMLElement, newState: Sta
  * new state.
  */
 export declare const queueToggle: ($element: HTMLElement, newState: State, $source: HTMLButtonElement) => void;
-/**
- * Moves focus between `elements` with the arrow, Home and End keys, wrapping at
- * both ends. Left and right follow the reading direction of the focused element.
- * Keys pressed with a modifier are left to the browser.
- */
-export declare const focusByKey: (event: KeyboardEvent, elements: HTMLElement[], index: number) => void;
 //# sourceMappingURL=utils.d.ts.map

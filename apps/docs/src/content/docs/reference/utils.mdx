@@ -161,6 +161,12 @@ already contains focus):
 | `rememberReturnFocus(element?)` | Stash page control (first call wins). |
 | `restoreReturnFocus()` | Focus stashed element and clear stash. |
 | `scheduleRestoreReturnFocus(closingHost?)` | Defer restore until after close animations. Skip if focus already moved outside. |
+| `focusByKey(event, elements, index)` | Move focus between `elements` with the arrow, Home and End keys. Returns the new index, or `undefined` for a key left to the browser. |
+
+`focusByKey()` is the keyboard of the accordion, the tabs and the disclosure
+navigation. It wraps at both ends, swaps left and right in a right-to-left context
+(read with `:dir(rtl)`), cancels the default action of the keys it handles, and
+leaves the keys pressed with Alt, Ctrl or Meta to the browser.
 
 ## Scroll lock
 
