@@ -9,3 +9,4 @@ export * from './environment.js';
 export * from './focus.js';
 export * from './clamp.js';
 export * from './drag.js';
+export * from './focus-by-key.js';

@@ -227,6 +227,17 @@ var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
 			});
 		}
 	};
+}, A = (e, t, n) => {
+	if (e.altKey || e.ctrlKey || e.metaKey) return;
+	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
+		ArrowUp: i,
+		ArrowLeft: o ? a : i,
+		ArrowDown: a,
+		ArrowRight: o ? i : a,
+		Home: 0,
+		End: r
+	}[e.key];
+	if (s !== void 0) return e.preventDefault(), t[s].focus(), s;
 };
 //#endregion
-export { e as EVENTS, T as addTrapFocus, c as body, f as breakpoints, D as clamp, _ as debounce, h as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, g as enableScroll, x as getFocusableElements, s as html, l as isDebug, d as mouse, a as parseBoolean, r as parseList, i as parseNumber, p as production, S as rememberReturnFocus, E as removeTrapFocus, C as restoreReturnFocus, w as scheduleRestoreReturnFocus, u as scroll, o as throttle, k as trackDrag };
+export { e as EVENTS, T as addTrapFocus, c as body, f as breakpoints, D as clamp, _ as debounce, h as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, g as enableScroll, A as focusByKey, x as getFocusableElements, s as html, l as isDebug, d as mouse, a as parseBoolean, r as parseList, i as parseNumber, p as production, S as rememberReturnFocus, E as removeTrapFocus, C as restoreReturnFocus, w as scheduleRestoreReturnFocus, u as scroll, o as throttle, k as trackDrag };
