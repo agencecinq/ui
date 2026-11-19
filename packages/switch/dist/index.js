@@ -1,63 +1,6 @@
-//#region ../utils/dist/index.js
-var e = {
-	DRAWER_BEFORE_CLOSE: "drawer:before-close",
-	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	SHEET_BEFORE_CLOSE: "sheet:before-close",
-	SHEET_BEFORE_OPEN: "sheet:before-open",
-	MODAL_BEFORE_CLOSE: "modal:before-close",
-	MODAL_BEFORE_OPEN: "modal:before-open",
-	SPINBUTTON_CHANGE: "spinbutton:change",
-	TOAST_OPEN: "toast:open",
-	TOAST_CLOSE: "toast:close",
-	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
-	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
-	DRILLDOWN_OPEN: "drilldown:open",
-	DRILLDOWN_CLOSE: "drilldown:close",
-	DROPZONE_CHANGE: "dropzone:change",
-	DROPZONE_REJECT: "dropzone:reject",
-	SWITCH_ACTIVATE: "switch:activate",
-	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_OPEN: "accordion:open",
-	ACCORDION_CLOSE: "accordion:close",
-	COMBOBOX_LOADING: "combobox:loading",
-	COMBOBOX_LOADED: "combobox:loaded",
-	COMBOBOX_UPDATE: "combobox:update",
-	COMBOBOX_SUBMIT: "combobox:submit",
-	COMBOBOX_EMPTY: "combobox:empty",
-	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
-	SLIDER_CHANGE: "slider:change",
-	SNAKE_EAT: "snake:eat",
-	SNAKE_OVER: "snake:over",
-	SNAKE_REPLAY: "snake:replay",
-	CALENDAR_RENDER: "calendar:render",
-	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
-	CALENDAR_CHANGE: "calendar:change",
-	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
-	TABS_ACTIVATE: "tabs:activate",
-	TABS_DELETE: "tabs:delete",
-	CART_BEFORE_ADD: "cart:before-add",
-	CART_BEFORE_UPDATE: "cart:before-update",
-	CART_UPDATE: "cart:update",
-	VARIANT_CHANGE: "variant:change"
-}, t = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, n = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-//#endregion
+import { EVENTS as e, dispatchEvent as t } from "@agencecinq/utils";
 //#region src/switch.ts
-var a = class extends HTMLElement {
+var n = class extends HTMLElement {
 	static formAssociated = !0;
 	static observedAttributes = ["aria-checked", "value"];
 	#e = this.attachInternals();
@@ -118,6 +61,6 @@ var a = class extends HTMLElement {
 		this.#e.setFormValue(e, t);
 	}
 };
-customElements.get("cinq-switch") || customElements.define("cinq-switch", a);
+customElements.get("cinq-switch") || customElements.define("cinq-switch", n);
 //#endregion
-export { a as Switch };
+export { n as Switch };

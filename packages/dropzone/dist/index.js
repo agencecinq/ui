@@ -1,87 +1,30 @@
-//#region ../utils/dist/index.js
-var e = {
-	DRAWER_BEFORE_CLOSE: "drawer:before-close",
-	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	SHEET_BEFORE_CLOSE: "sheet:before-close",
-	SHEET_BEFORE_OPEN: "sheet:before-open",
-	MODAL_BEFORE_CLOSE: "modal:before-close",
-	MODAL_BEFORE_OPEN: "modal:before-open",
-	SPINBUTTON_CHANGE: "spinbutton:change",
-	TOAST_OPEN: "toast:open",
-	TOAST_CLOSE: "toast:close",
-	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
-	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
-	DRILLDOWN_OPEN: "drilldown:open",
-	DRILLDOWN_CLOSE: "drilldown:close",
-	DROPZONE_CHANGE: "dropzone:change",
-	DROPZONE_REJECT: "dropzone:reject",
-	SWITCH_ACTIVATE: "switch:activate",
-	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_OPEN: "accordion:open",
-	ACCORDION_CLOSE: "accordion:close",
-	COMBOBOX_LOADING: "combobox:loading",
-	COMBOBOX_LOADED: "combobox:loaded",
-	COMBOBOX_UPDATE: "combobox:update",
-	COMBOBOX_SUBMIT: "combobox:submit",
-	COMBOBOX_EMPTY: "combobox:empty",
-	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
-	SLIDER_CHANGE: "slider:change",
-	SNAKE_EAT: "snake:eat",
-	SNAKE_OVER: "snake:over",
-	SNAKE_REPLAY: "snake:replay",
-	CALENDAR_RENDER: "calendar:render",
-	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
-	CALENDAR_CHANGE: "calendar:change",
-	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
-	TABS_ACTIVATE: "tabs:activate",
-	TABS_DELETE: "tabs:delete",
-	CART_BEFORE_ADD: "cart:before-add",
-	CART_BEFORE_UPDATE: "cart:before-update",
-	CART_UPDATE: "cart:update",
-	VARIANT_CHANGE: "variant:change"
-}, t = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, n = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-//#endregion
+import { EVENTS as e, dispatchEvent as t } from "@agencecinq/utils";
 //#region src/filter.ts
-function a(e, t) {
+function n(e, t) {
 	let n = t.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean), r = e.name.toLowerCase(), i = e.type.toLowerCase();
 	return !n.length || n.some((e) => e.startsWith(".") ? r.endsWith(e) : e.endsWith("/*") ? i.startsWith(e.slice(0, -1)) : i === e);
 }
-function o(e, { accept: t, maxSize: n, multiple: r }) {
-	let i = [], o = [];
+function r(e, { accept: t, maxSize: r, multiple: i }) {
+	let a = [], o = [];
 	return e.forEach((e) => {
-		a(e, t) ? n && e.size > n ? o.push({
+		n(e, t) ? r && e.size > r ? o.push({
 			file: e,
 			reason: "size"
-		}) : !r && i.length ? o.push({
+		}) : !i && a.length ? o.push({
 			file: e,
 			reason: "multiple"
-		}) : i.push(e) : o.push({
+		}) : a.push(e) : o.push({
 			file: e,
 			reason: "accept"
 		});
 	}), {
-		accepted: i,
+		accepted: a,
 		rejected: o
 	};
 }
 //#endregion
 //#region src/dropzone.ts
-var s = class extends HTMLElement {
+var i = class extends HTMLElement {
 	$label = null;
 	$input = null;
 	#e = 0;
@@ -144,15 +87,15 @@ var s = class extends HTMLElement {
 		}, { cancelable: !1 });
 	};
 	#s(n) {
-		let r = this.$input, i = o(n, {
-			accept: r.accept,
+		let i = this.$input, a = r(n, {
+			accept: i.accept,
 			maxSize: this.maxSize,
-			multiple: r.multiple
+			multiple: i.multiple
 		});
-		return i.rejected.length && t(this, e.DROPZONE_REJECT, {
-			rejected: i.rejected,
-			$input: r
-		}, { cancelable: !1 }), i;
+		return a.rejected.length && t(this, e.DROPZONE_REJECT, {
+			rejected: a.rejected,
+			$input: i
+		}, { cancelable: !1 }), a;
 	}
 	#c() {
 		this.$input && (this.$input.dispatchEvent(new Event("input", { bubbles: !0 })), this.$input.dispatchEvent(new Event("change", { bubbles: !0 })));
@@ -161,6 +104,6 @@ var s = class extends HTMLElement {
 		this.#e = 0, this.removeAttribute("dragover");
 	}
 };
-customElements.get("cinq-dropzone") || customElements.define("cinq-dropzone", s);
+customElements.get("cinq-dropzone") || customElements.define("cinq-dropzone", i);
 //#endregion
-export { s as Dropzone, a as accepts, o as filter };
+export { i as Dropzone, n as accepts, r as filter };

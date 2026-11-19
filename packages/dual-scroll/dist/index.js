@@ -1,18 +1,6 @@
-//#region ../utils/dist/index.js
-var e = (e, t) => {
-	if (e == null || e === "") return t;
-	let n = Number(e);
-	return Number.isFinite(n) ? n : t;
-}, t = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug"), window.addEventListener("pointermove", t(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var i = (e, t, n) => Math.min(Math.max(e, t), n), a = .01, o = 1, s = .1, c = "[data-scroll-column=\"left\"]", l = "[data-scroll-column=\"right\"]", u = class extends HTMLElement {
+import { clamp as e, parseNumber as t } from "@agencecinq/utils";
+//#region src/types.ts
+var n = .01, r = 1, i = .1, a = "[data-scroll-column=\"left\"]", o = "[data-scroll-column=\"right\"]", s = class extends HTMLElement {
 	static observedAttributes = ["spring"];
 	#e = null;
 	#t = null;
@@ -52,7 +40,7 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = .01, o = 1, s = .1, c = "[
 	}
 	init() {
 		if (!this.#n) {
-			if (this.#e = this.querySelector(c), this.#t = this.querySelector(l), !this.#e || !this.#t) throw Error("DualScroll requires [data-scroll-column=\"left\"] and [data-scroll-column=\"right\"]");
+			if (this.#e = this.querySelector(a), this.#t = this.querySelector(o), !this.#e || !this.#t) throw Error("DualScroll requires [data-scroll-column=\"left\"] and [data-scroll-column=\"right\"]");
 			this.#i = !0, window.addEventListener("wheel", this.#d, { passive: !1 }), this.addEventListener("touchstart", this.#f, { passive: !1 }), document.addEventListener("touchmove", this.#p, {
 				passive: !1,
 				capture: !0
@@ -69,31 +57,31 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = .01, o = 1, s = .1, c = "[
 		this.#n &&= (this.#i = !1, this.#a = !1, this.#o = !1, this.#r &&= (cancelAnimationFrame(this.#r), 0), window.removeEventListener("wheel", this.#d), this.removeEventListener("touchstart", this.#f), document.removeEventListener("touchmove", this.#p, { capture: !0 }), document.removeEventListener("touchend", this.#m, { capture: !0 }), document.removeEventListener("touchcancel", this.#m, { capture: !0 }), this.#a = !1, this.#n.disconnect(), null);
 	}
 	sync() {
-		let e = this.clientHeight;
-		if (e === 0) return;
-		this.style.setProperty("--dual-scroll-pane-height", `${e}px`);
-		let t = Math.max(this.#e?.children.length ?? 0, this.#t?.children.length ?? 0);
-		this.#u = e + e * t, this.#l = i(this.#l, 0, this.#u), this.#o ||= (this.#l = e, this.#c = e, !0), this.#g();
+		let t = this.clientHeight;
+		if (t === 0) return;
+		this.style.setProperty("--dual-scroll-pane-height", `${t}px`);
+		let n = Math.max(this.#e?.children.length ?? 0, this.#t?.children.length ?? 0);
+		this.#u = t + t * n, this.#l = e(this.#l, 0, this.#u), this.#o ||= (this.#l = t, this.#c = t, !0), this.#g();
 	}
 	#h = () => {
 		if (!this.#i) return;
-		let e = this.#_();
-		this.#c += (this.#l - this.#c) * e, this.#c = Math.round(i(this.#c, -1, this.#u + 1)), this.#g(), this.#r = requestAnimationFrame(this.#h);
+		let t = this.#_();
+		this.#c += (this.#l - this.#c) * t, this.#c = Math.round(e(this.#c, -1, this.#u + 1)), this.#g(), this.#r = requestAnimationFrame(this.#h);
 	};
 	#g() {
 		this.#t && (this.#t.style.transform = `translate3d(0, ${this.#c}px, 0)`), this.#e && (this.#e.style.transform = `translate3d(0, ${-this.#c}px, 0)`);
 	}
 	#_() {
-		return i(e(this.getAttribute("spring"), s), a, 1);
+		return e(t(this.getAttribute("spring"), i), n, 1);
 	}
-	#v(e) {
-		e !== 0 && this.#u !== 0 && (this.#l = Math.round(i(this.#l + e * -1, 0, this.#u)));
+	#v(t) {
+		t !== 0 && this.#u !== 0 && (this.#l = Math.round(e(this.#l + t * -1, 0, this.#u)));
 	}
 	#y(e, t) {
 		let n = this.getBoundingClientRect();
 		return e >= n.left && e <= n.right && t >= n.top && t <= n.bottom;
 	}
 };
-customElements.get("cinq-dual-scroll") || customElements.define("cinq-dual-scroll", u);
+customElements.get("cinq-dual-scroll") || customElements.define("cinq-dual-scroll", s);
 //#endregion
-export { u as DualScroll, s as SPRING_DEFAULT, o as SPRING_MAX, a as SPRING_MIN };
+export { s as DualScroll, i as SPRING_DEFAULT, r as SPRING_MAX, n as SPRING_MIN };

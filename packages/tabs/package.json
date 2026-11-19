@@ -31,11 +31,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
-    "@agencecinq/utils": "*"
+  "dependencies": {
+    "@agencecinq/utils": "workspace:^"
   },
   "devDependencies": {
-    "@agencecinq/utils": "workspace:*",
     "@vitest/browser-playwright": "^4.1.11",
     "playwright": "^1.64.1",
     "vite": "^8.2.0",

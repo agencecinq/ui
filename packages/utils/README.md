@@ -16,6 +16,15 @@ with Vite or another bundler loads one copy.
 pnpm add @agencecinq/utils
 ```
 
+A page without a bundler maps the package in its import map, next to the
+components:
+
+```html
+<script type="importmap">
+  { "imports": { "@agencecinq/utils": "/assets/utils.js" } }
+</script>
+```
+
 ## Events
 
 Custom events follow `{package}:{action}` in kebab-case. Use the `EVENTS`

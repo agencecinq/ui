@@ -1,139 +1,6 @@
-//#region ../utils/dist/index.js
-var e = {
-	DRAWER_BEFORE_CLOSE: "drawer:before-close",
-	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	SHEET_BEFORE_CLOSE: "sheet:before-close",
-	SHEET_BEFORE_OPEN: "sheet:before-open",
-	MODAL_BEFORE_CLOSE: "modal:before-close",
-	MODAL_BEFORE_OPEN: "modal:before-open",
-	SPINBUTTON_CHANGE: "spinbutton:change",
-	TOAST_OPEN: "toast:open",
-	TOAST_CLOSE: "toast:close",
-	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
-	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
-	DRILLDOWN_OPEN: "drilldown:open",
-	DRILLDOWN_CLOSE: "drilldown:close",
-	DROPZONE_CHANGE: "dropzone:change",
-	DROPZONE_REJECT: "dropzone:reject",
-	SWITCH_ACTIVATE: "switch:activate",
-	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_OPEN: "accordion:open",
-	ACCORDION_CLOSE: "accordion:close",
-	COMBOBOX_LOADING: "combobox:loading",
-	COMBOBOX_LOADED: "combobox:loaded",
-	COMBOBOX_UPDATE: "combobox:update",
-	COMBOBOX_SUBMIT: "combobox:submit",
-	COMBOBOX_EMPTY: "combobox:empty",
-	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
-	SLIDER_CHANGE: "slider:change",
-	SNAKE_EAT: "snake:eat",
-	SNAKE_OVER: "snake:over",
-	SNAKE_REPLAY: "snake:replay",
-	CALENDAR_RENDER: "calendar:render",
-	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
-	CALENDAR_CHANGE: "calendar:change",
-	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
-	TABS_ACTIVATE: "tabs:activate",
-	TABS_DELETE: "tabs:delete",
-	CART_BEFORE_ADD: "cart:before-add",
-	CART_BEFORE_UPDATE: "cart:before-update",
-	CART_UPDATE: "cart:update",
-	VARIANT_CHANGE: "variant:change"
-}, t = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, n = (e, t) => {
-	if (e == null || e === "") return t;
-	let n = Number(e);
-	return Number.isFinite(n) ? n : t;
-}, r = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", i = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, a = document.documentElement, { body: o } = document;
-a.hasAttribute("data-debug"), window.addEventListener("pointermove", i(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
-	let { host: n, target: r, start: i, move: a, end: o } = t, s = null, l = ({ startX: e, startY: t, samples: n }) => {
-		let r = n[0], i = n[n.length - 1], a = i.time - r.time, o = {
-			dx: i.x - e,
-			dy: i.y - t,
-			vx: 0,
-			vy: 0
-		};
-		return a <= 0 ? o : {
-			...o,
-			vx: (i.x - r.x) / a,
-			vy: (i.y - r.y) / a
-		};
-	}, u = ({ samples: e }, { clientX: t, clientY: n, timeStamp: r }) => {
-		let i = r - c;
-		for (e.push({
-			x: t,
-			y: n,
-			time: r
-		}); e.length > 1 && e[0].time < i;) e.shift();
-	}, d = (e) => {
-		let { pointerId: t, $target: r } = e;
-		s = null, n?.removeAttribute("dragging"), r.hasPointerCapture(t) && r.releasePointerCapture(t);
-	}, f = (e) => {
-		let { button: t, pointerId: a, clientX: o, clientY: c, timeStamp: l } = e;
-		if (s || t !== 0) return;
-		let u = r ? r(e) : e.currentTarget;
-		if (!u) return;
-		let f = {
-			pointerId: a,
-			$target: u,
-			startX: o,
-			startY: c,
-			samples: [{
-				x: o,
-				y: c,
-				time: l
-			}]
-		};
-		s = f, n?.setAttribute("dragging", ""), u.setPointerCapture(a), i?.(e) === !1 && d(f);
-	}, p = (e) => {
-		let t = s;
-		t && e.pointerId === t.pointerId && (u(t, e), a?.(e, l(t)));
-	}, m = (e) => {
-		let t = s, { pointerId: n, type: r } = e;
-		if (!t || n !== t.pointerId) return;
-		let i = r !== "pointerup";
-		i || u(t, e);
-		let a = {
-			...l(t),
-			canceled: i
-		};
-		d(t), o?.(e, a);
-	}, h = [
-		["pointerdown", f],
-		["pointermove", p],
-		["pointerup", m],
-		["pointercancel", m],
-		["lostpointercapture", m]
-	];
-	h.forEach(([t, n]) => {
-		e.addEventListener(t, n);
-	});
-	let g = () => {
-		s && d(s);
-	};
-	return {
-		cancel: g,
-		destroy: () => {
-			g(), h.forEach(([t, n]) => {
-				e.removeEventListener(t, n);
-			});
-		}
-	};
-}, u = class {
+import { EVENTS as e, clamp as t, dispatchEvent as n, parseBoolean as r, parseNumber as i, trackDrag as a } from "@agencecinq/utils";
+//#region src/keyboard.ts
+var o = class {
 	#e;
 	constructor(e) {
 		this.#e = e;
@@ -162,7 +29,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 			} else n === "ArrowUp" ? s(a - i) : n === "ArrowDown" && s(a + i);
 		}
 	};
-}, d = ({ ratio: e }) => `${e * 100}%`, f = (e) => String(e), p = (e) => e === "clip" || e === "none" || e === "resize" ? e : "resize", m = class extends HTMLElement {
+}, s = ({ ratio: e }) => `${e * 100}%`, c = (e) => String(e), l = (e) => e === "clip" || e === "none" || e === "resize" ? e : "resize", u = class extends HTMLElement {
 	static observedAttributes = [
 		"data-mode",
 		"data-step",
@@ -174,8 +41,8 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 	step = 1;
 	page = 10;
 	fixed = !1;
-	formatSize = d;
-	formatValue = f;
+	formatSize = s;
+	formatValue = c;
 	#e = null;
 	#t = null;
 	#n = null;
@@ -190,7 +57,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 	}
 	init() {
 		if (this.$separator = this.querySelector("[role=\"separator\"], [role=\"slider\"]"), !this.$separator) throw Error("cinq-windowsplitter: nested [role=\"separator\"] or [role=\"slider\"] not found");
-		this.#o(), this.$separator.style.touchAction = "none", this.#n = new u(this), this.$separator.addEventListener("keydown", this.#n.handle), this.$separator.addEventListener("pointerdown", this.#p), this.#i = l(this.$separator, {
+		this.#o(), this.$separator.style.touchAction = "none", this.#n = new o(this), this.$separator.addEventListener("keydown", this.#n.handle), this.$separator.addEventListener("pointerdown", this.#p), this.#i = a(this.$separator, {
 			host: this,
 			target: this.#f,
 			start: this.#m,
@@ -201,8 +68,8 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 	destroy() {
 		this.#r && this.$separator && (this.#n && this.$separator.removeEventListener("keydown", this.#n.handle), this.$separator.removeEventListener("pointerdown", this.#p), this.$separator.style.removeProperty("touch-action"), this.#r = !1), this.#i?.destroy(), this.#i = null, this.#a = null, this.#t?.disconnect(), this.#t = null, this.#n = null, this.$separator = null;
 	}
-	attributeChangedCallback(e, t, i) {
-		this.#r && (e === "data-mode" ? (this.mode = p(i), this.sync()) : e === "data-step" ? this.step = n(i, 1) : e === "data-page" ? this.page = n(i, 10) : e === "data-fixed" && (this.fixed = r(i)));
+	attributeChangedCallback(e, t, n) {
+		this.#r && (e === "data-mode" ? (this.mode = l(n), this.sync()) : e === "data-step" ? this.step = i(n, 1) : e === "data-page" ? this.page = i(n, 10) : e === "data-fixed" && (this.fixed = r(n)));
 	}
 	get orientation() {
 		return this.$separator?.getAttribute("aria-orientation") ?? null;
@@ -211,13 +78,13 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 		return (this.$separator?.ariaControlsElements ?? [])[0] ?? null;
 	}
 	get min() {
-		return n(this.$separator?.getAttribute("aria-valuemin"), 0);
+		return i(this.$separator?.getAttribute("aria-valuemin"), 0);
 	}
 	get max() {
-		return n(this.$separator?.getAttribute("aria-valuemax"), 100);
+		return i(this.$separator?.getAttribute("aria-valuemax"), 100);
 	}
 	get value() {
-		return n(this.$separator?.getAttribute("aria-valuenow"), this.min);
+		return i(this.$separator?.getAttribute("aria-valuenow"), this.min);
 	}
 	set value(e) {
 		this.setValue(e, !1);
@@ -238,10 +105,10 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 	sync() {
 		this.$separator && (this.$separator.setAttribute("aria-valuetext", this.formatValue(this.value)), this.#c(this.value, !1));
 	}
-	setValue(e, t = !0) {
+	setValue(e, n = !0) {
 		if (!this.$separator || this.disabled) return !1;
-		let n = this.value, r = s(Math.round(e), this.min, this.max), i = r !== n || !this.$separator.hasAttribute("aria-valuenow");
-		return this.$separator.setAttribute("aria-valuenow", String(r)), this.$separator.setAttribute("aria-valuetext", this.formatValue(r)), this.#c(r, t && i), i;
+		let r = this.value, i = t(Math.round(e), this.min, this.max), a = i !== r || !this.$separator.hasAttribute("aria-valuenow");
+		return this.$separator.setAttribute("aria-valuenow", String(i)), this.$separator.setAttribute("aria-valuetext", this.formatValue(i)), this.#c(i, n && a), a;
 	}
 	collapse(e = !0) {
 		return this.disabled || this.collapsed ? !1 : (this.#e = this.value, this.setValue(this.min, e));
@@ -255,7 +122,7 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 		return this.collapsed ? this.restore(e) : this.collapse(e);
 	}
 	#o() {
-		this.mode = p(this.getAttribute("data-mode")), this.step = n(this.getAttribute("data-step"), 1), this.page = n(this.getAttribute("data-page"), 10), this.fixed = r(this.getAttribute("data-fixed"));
+		this.mode = l(this.getAttribute("data-mode")), this.step = i(this.getAttribute("data-step"), 1), this.page = i(this.getAttribute("data-page"), 10), this.fixed = r(this.getAttribute("data-fixed"));
 	}
 	#s() {
 		this.#t?.disconnect(), this.#t = new ResizeObserver(() => this.#c(this.value, !1)), this.#t.observe(this);
@@ -285,8 +152,8 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 		});
 		this.orientation === "vertical" ? this.$primary.style.width = i : this.$primary.style.height = i;
 	}
-	#u(n, r, i) {
-		if (!n) return;
+	#u(t, r, i) {
+		if (!t) return;
 		let a = {
 			value: r,
 			min: this.min,
@@ -294,13 +161,13 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 			ratio: i,
 			collapsed: r === this.min
 		};
-		t(this, e.WINDOWSPLITTER_CHANGE, a, { cancelable: !1 });
+		n(this, e.WINDOWSPLITTER_CHANGE, a, { cancelable: !1 });
 	}
-	#d({ dx: e, dy: t }) {
-		let { min: n, max: r } = this, i = this.#a;
-		if (!i) return this.value;
-		let a = this.orientation === "vertical" ? e : t, o = i.length > 0 ? i.ratio + a / i.length : 0;
-		return s(Math.round(n + (r - n) * o), n, r);
+	#d({ dx: e, dy: n }) {
+		let { min: r, max: i } = this, a = this.#a;
+		if (!a) return this.value;
+		let o = this.orientation === "vertical" ? e : n, s = a.length > 0 ? a.ratio + o / a.length : 0;
+		return t(Math.round(r + (i - r) * s), r, i);
 	}
 	#f = () => this.disabled || this.fixed ? null : this.$separator;
 	#p = (e) => {
@@ -320,6 +187,6 @@ var s = (e, t, n) => Math.min(Math.max(e, t), n), c = 50, l = (e, t = {}) => {
 		this.#a = null;
 	};
 };
-customElements.get("cinq-windowsplitter") || customElements.define("cinq-windowsplitter", m);
+customElements.get("cinq-windowsplitter") || customElements.define("cinq-windowsplitter", u);
 //#endregion
-export { m as WindowSplitter };
+export { u as WindowSplitter };

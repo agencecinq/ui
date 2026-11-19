@@ -26,11 +26,10 @@
     "build": "vite build",
     "dev": "vite build --watch"
   },
-  "peerDependencies": {
-    "@agencecinq/utils": ">=7.10.0"
+  "dependencies": {
+    "@agencecinq/utils": "workspace:^"
   },
   "devDependencies": {
-    "@agencecinq/utils": "workspace:*",
     "vite": "^8.2.0",
     "vite-plugin-dts": "^5.0.3"
   },
