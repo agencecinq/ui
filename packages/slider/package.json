@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/slider",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "Accessible, WAI-ARIA slider as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",

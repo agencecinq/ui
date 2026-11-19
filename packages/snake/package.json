@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/snake",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Canvas Snake as a lightweight Web Component.",
   "type": "module",
   "license": "MIT",

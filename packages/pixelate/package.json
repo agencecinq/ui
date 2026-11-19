@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/pixelate",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Canvas pixelation for wrapped images. Drive block size via the pixel attribute (sandbox).",
   "type": "module",

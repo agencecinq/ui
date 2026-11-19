@@ -1,5 +1,36 @@
 # @agencecinq/docs
 
+## 4.4.38
+
+### Patch Changes
+
+- Updated dependencies [d4751f5]
+- Updated dependencies [e3a32bb]
+- Updated dependencies [f741ba7]
+- Updated dependencies [40544f4]
+- Updated dependencies [0508d43]
+- Updated dependencies [2043c18]
+  - @agencecinq/accordion@4.1.0
+  - @agencecinq/disclosure-navigation@3.1.0
+  - @agencecinq/tabs@12.0.0
+  - @agencecinq/calendar@4.3.0
+  - @agencecinq/combobox@2.1.0
+  - @agencecinq/disclosure-button@3.1.0
+  - @agencecinq/drawer@9.1.0
+  - @agencecinq/drilldown@1.4.0
+  - @agencecinq/dropzone@1.1.0
+  - @agencecinq/dual-scroll@0.1.0
+  - @agencecinq/modal@6.1.0
+  - @agencecinq/pixelate@0.1.0
+  - @agencecinq/sheet@3.2.0
+  - @agencecinq/slider@7.1.0
+  - @agencecinq/snake@1.2.0
+  - @agencecinq/spinbutton@4.1.0
+  - @agencecinq/switch@4.1.0
+  - @agencecinq/toast@1.1.0
+  - @agencecinq/windowsplitter@3.1.0
+  - @agencecinq/utils@10.0.0
+
 ## 4.4.37
 
 ### Patch Changes

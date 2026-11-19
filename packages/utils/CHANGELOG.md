@@ -1,5 +1,16 @@
 # @agencecinq/utils
 
+## 10.0.0
+
+### Major Changes
+
+- 2043c18: - Remove the environment exports `html`, `body`, `isDebug`, `scroll`, `mouse`, `breakpoints` and `production`, with the `pointermove` listener and the media queries they set up on import (see the README migration from 9.x).
+  - Declare `"sideEffects": false`: the package does nothing on import, so a bundler keeps only what a page imports.
+
+### Minor Changes
+
+- 0508d43: - Add `focusByKey(event, elements, index)`, from `@agencecinq/disclosure-navigation`: the arrow, Home and End keys move focus between `elements`, wrapping, with left and right swapped in a right-to-left context and the keys pressed with a modifier left to the browser. It returns the index of the element that took the focus, so the accordion, the tabs and the disclosure navigation share one keyboard.
+
 ## 9.1.1
 
 ### Patch Changes

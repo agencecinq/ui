@@ -1,5 +1,20 @@
 # @agencecinq/accordion
 
+## 4.1.0
+
+### Minor Changes
+
+- d4751f5: - Move the arrow, Home and End keys onto `focusByKey()` from `@agencecinq/utils`, the keyboard the tabs and the disclosure navigation share.
+  - Arrow Left and Arrow Right follow the reading direction: they swap in a right-to-left context.
+  - Keys pressed with Alt, Ctrl or Meta are left to the browser.
+- 40544f4: - Import `@agencecinq/utils` rather than bundle it, and list it in `dependencies` instead of `peerDependencies`: a page built with Vite or another bundler gets it with the component and loads one copy for all the components. A page without a bundler maps `@agencecinq/utils` in its import map.
+
+### Patch Changes
+
+- Updated dependencies [0508d43]
+- Updated dependencies [2043c18]
+  - @agencecinq/utils@10.0.0
+
 ## 4.0.0
 
 ### Major Changes

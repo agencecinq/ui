@@ -1,5 +1,25 @@
 # @agencecinq/tabs
 
+## 12.0.0
+
+### Major Changes
+
+- f741ba7: - Move the keyboard onto `focusByKey()` from `@agencecinq/utils`, shared with the accordion and the disclosure navigation, and follow the tabs pattern of the APG (see the README migration from 11.x).
+  - Home and End move the focus only, like the arrow keys, and `data-delay` activates the focused tab after the delay. They activated it at once.
+  - PageUp and PageDown are left to the browser. They went to the first and last tabs.
+  - The reading direction is read with `:dir(rtl)`, from a `dir` attribute, instead of the CSS `direction` of the tablist.
+  - The arrow keys cancel their default action, so the page no longer scrolls, and the keys pressed with Alt, Ctrl or Meta are left to the browser.
+
+### Minor Changes
+
+- 40544f4: - Import `@agencecinq/utils` rather than bundle it, and list it in `dependencies` instead of `peerDependencies`: a page built with Vite or another bundler gets it with the component and loads one copy for all the components. A page without a bundler maps `@agencecinq/utils` in its import map.
+
+### Patch Changes
+
+- Updated dependencies [0508d43]
+- Updated dependencies [2043c18]
+  - @agencecinq/utils@10.0.0
+
 ## 11.0.0
 
 ### Major Changes
