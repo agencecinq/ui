@@ -1,154 +1,21 @@
-//#region ../utils/dist/index.js
-var e = {
-	DRAWER_BEFORE_CLOSE: "drawer:before-close",
-	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	SHEET_BEFORE_CLOSE: "sheet:before-close",
-	SHEET_BEFORE_OPEN: "sheet:before-open",
-	MODAL_BEFORE_CLOSE: "modal:before-close",
-	MODAL_BEFORE_OPEN: "modal:before-open",
-	SPINBUTTON_CHANGE: "spinbutton:change",
-	TOAST_OPEN: "toast:open",
-	TOAST_CLOSE: "toast:close",
-	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
-	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
-	DRILLDOWN_OPEN: "drilldown:open",
-	DRILLDOWN_CLOSE: "drilldown:close",
-	DROPZONE_CHANGE: "dropzone:change",
-	DROPZONE_REJECT: "dropzone:reject",
-	SWITCH_ACTIVATE: "switch:activate",
-	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_OPEN: "accordion:open",
-	ACCORDION_CLOSE: "accordion:close",
-	COMBOBOX_LOADING: "combobox:loading",
-	COMBOBOX_LOADED: "combobox:loaded",
-	COMBOBOX_UPDATE: "combobox:update",
-	COMBOBOX_SUBMIT: "combobox:submit",
-	COMBOBOX_EMPTY: "combobox:empty",
-	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
-	SLIDER_CHANGE: "slider:change",
-	SNAKE_EAT: "snake:eat",
-	SNAKE_OVER: "snake:over",
-	SNAKE_REPLAY: "snake:replay",
-	CALENDAR_RENDER: "calendar:render",
-	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
-	CALENDAR_CHANGE: "calendar:change",
-	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
-	TABS_ACTIVATE: "tabs:activate",
-	TABS_DELETE: "tabs:delete",
-	CART_BEFORE_ADD: "cart:before-add",
-	CART_BEFORE_UPDATE: "cart:before-update",
-	CART_UPDATE: "cart:update",
-	VARIANT_CHANGE: "variant:change"
-}, t = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, n = (e, t) => {
-	if (e == null || e === "") return t;
-	let n = Number(e);
-	return Number.isFinite(n) ? n : t;
-}, r = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, i = document.documentElement, { body: a } = document;
-i.hasAttribute("data-debug"), window.addEventListener("pointermove", r(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
-	let { host: n, target: r, start: i, move: a, end: o } = t, c = null, l = ({ startX: e, startY: t, samples: n }) => {
-		let r = n[0], i = n[n.length - 1], a = i.time - r.time, o = {
-			dx: i.x - e,
-			dy: i.y - t,
-			vx: 0,
-			vy: 0
-		};
-		return a <= 0 ? o : {
-			...o,
-			vx: (i.x - r.x) / a,
-			vy: (i.y - r.y) / a
-		};
-	}, u = ({ samples: e }, { clientX: t, clientY: n, timeStamp: r }) => {
-		let i = r - s;
-		for (e.push({
-			x: t,
-			y: n,
-			time: r
-		}); e.length > 1 && e[0].time < i;) e.shift();
-	}, d = (e) => {
-		let { pointerId: t, $target: r } = e;
-		c = null, n?.removeAttribute("dragging"), r.hasPointerCapture(t) && r.releasePointerCapture(t);
-	}, f = (e) => {
-		let { button: t, pointerId: a, clientX: o, clientY: s, timeStamp: l } = e;
-		if (c || t !== 0) return;
-		let u = r ? r(e) : e.currentTarget;
-		if (!u) return;
-		let f = {
-			pointerId: a,
-			$target: u,
-			startX: o,
-			startY: s,
-			samples: [{
-				x: o,
-				y: s,
-				time: l
-			}]
-		};
-		c = f, n?.setAttribute("dragging", ""), u.setPointerCapture(a), i?.(e) === !1 && d(f);
-	}, p = (e) => {
-		let t = c;
-		t && e.pointerId === t.pointerId && (u(t, e), a?.(e, l(t)));
-	}, m = (e) => {
-		let t = c, { pointerId: n, type: r } = e;
-		if (!t || n !== t.pointerId) return;
-		let i = r !== "pointerup";
-		i || u(t, e);
-		let a = {
-			...l(t),
-			canceled: i
-		};
-		d(t), o?.(e, a);
-	}, h = [
-		["pointerdown", f],
-		["pointermove", p],
-		["pointerup", m],
-		["pointercancel", m],
-		["lostpointercapture", m]
-	];
-	h.forEach(([t, n]) => {
-		e.addEventListener(t, n);
-	});
-	let g = () => {
-		c && d(c);
-	};
-	return {
-		cancel: g,
-		destroy: () => {
-			g(), h.forEach(([t, n]) => {
-				e.removeEventListener(t, n);
-			});
-		}
-	};
-}, l = (e, t, n) => {
+import { EVENTS as e, clamp as t, dispatchEvent as n, parseNumber as r, trackDrag as i } from "@agencecinq/utils";
+//#region src/geometry.ts
+var a = (e, t, n) => {
 	let r = n - t;
 	return r > 0 ? (e - t) / r : 0;
-}, u = (e, t, n) => t + e * (n - t), d = (e) => e.toString().split(".")[1]?.length ?? 0, f = (e, t, n, r) => {
-	if (r <= 0) return o(e, t, n);
-	let i = t + Math.round((e - t) / r) * r, a = Math.max(d(t), d(r));
-	return o(Number(i.toFixed(a)), t, n);
-}, p = (e, t) => Math.max(0, e - t), m = (e, t) => Math.max(0, e - 2 * t), h = (e, t, n, r) => r || n ? e === "min" ? t : 0 : e === "max" ? t : 0, g = (e, t, n, r, i) => {
-	let a = i ? t.height : t.width, s = i ? t.top : t.left, c = p(a, n);
+}, o = (e, t, n) => t + e * (n - t), s = (e) => e.toString().split(".")[1]?.length ?? 0, c = (e, n, r, i) => {
+	if (i <= 0) return t(e, n, r);
+	let a = n + Math.round((e - n) / i) * i, o = Math.max(s(n), s(i));
+	return t(Number(a.toFixed(o)), n, r);
+}, l = (e, t) => Math.max(0, e - t), u = (e, t) => Math.max(0, e - 2 * t), d = (e, t, n, r) => r || n ? e === "min" ? t : 0 : e === "max" ? t : 0, f = (e, n, r, i, a) => {
+	let o = a ? n.height : n.width, s = a ? n.top : n.left, c = l(o, r);
 	if (c <= 0) return 0;
-	let l = o((e - s - n / 2) / c, 0, 1);
-	return i || r ? 1 - l : l;
-}, _ = (e, t, n, r, i, a, s, c, l) => {
-	let u = h(n, s, c, l), d = o(e - (l ? t.top : t.left) - u, 0, a), f = a > 0 ? d / a : 0, p = i - r;
-	return l || c ? i - p * f : r + p * f;
-}, v = class {
+	let u = e - s - r / 2, d = t(u / c, 0, 1);
+	return a || i ? 1 - d : d;
+}, p = (e, n, r, i, a, o, s, c, l) => {
+	let u = d(r, s, c, l), f = e - (l ? n.top : n.left) - u, p = t(f, 0, o), m = o > 0 ? p / o : 0, h = a - i;
+	return l || c ? a - h * m : i + h * m;
+}, m = class {
 	#e;
 	#t;
 	#n;
@@ -203,7 +70,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
 	static isEnd(e) {
 		return e === "End";
 	}
-}, y = class extends HTMLElement {
+}, h = class extends HTMLElement {
 	static observedAttributes = ["data-step", "data-page"];
 	step = 1;
 	page = 10;
@@ -230,8 +97,8 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
 	disconnectedCallback() {
 		this.destroy();
 	}
-	attributeChangedCallback(e, t, r) {
-		e === "data-step" ? this.step = n(r, 1) : e === "data-page" && (this.page = n(r, 10));
+	attributeChangedCallback(e, t, n) {
+		e === "data-step" ? this.step = r(n, 1) : e === "data-page" && (this.page = r(n, 10));
 	}
 	rect() {
 		return this.getBoundingClientRect();
@@ -249,7 +116,7 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
 		e.setAttribute("aria-valuetext", n);
 	}
 	bindThumb(e) {
-		e.tabIndex < 0 && !e.hasAttribute("tabindex") && (e.tabIndex = 0), e.style.touchAction = "none", e.addEventListener("keydown", this.#i), this.#n.set(e, c(e, {
+		e.tabIndex < 0 && !e.hasAttribute("tabindex") && (e.tabIndex = 0), e.style.touchAction = "none", e.addEventListener("keydown", this.#i), this.#n.set(e, i(e, {
 			host: this,
 			start: this.#o,
 			move: this.#s,
@@ -286,27 +153,27 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
 	get offset() {
 		return this.#r?.offset ?? 0;
 	}
-}, b = class extends y {
+}, g = class extends h {
 	$thumb = null;
 	get orientation() {
 		return this.$thumb?.getAttribute("aria-orientation") ?? null;
 	}
 	get min() {
-		return n(this.$thumb?.getAttribute("aria-valuemin"), 0);
+		return r(this.$thumb?.getAttribute("aria-valuemin"), 0);
 	}
 	get max() {
-		return n(this.$thumb?.getAttribute("aria-valuemax"), 100);
+		return r(this.$thumb?.getAttribute("aria-valuemax"), 100);
 	}
 	get value() {
-		return n(this.$thumb?.getAttribute("aria-valuenow"), this.min);
+		return r(this.$thumb?.getAttribute("aria-valuenow"), this.min);
 	}
 	get ratio() {
-		return l(this.value, this.min, this.max);
+		return a(this.value, this.min, this.max);
 	}
 	init() {
 		let e = this.querySelectorAll("[role=\"slider\"]");
 		if (e.length !== 1) throw Error("cinq-slider: exactly one [role=\"slider\"] thumb is required");
-		this.$thumb = e[0], this.step = n(this.getAttribute("data-step"), 1), this.page = n(this.getAttribute("data-page"), 10), this.bindThumb(this.$thumb), this.observeResize(), this.sync();
+		this.$thumb = e[0], this.step = r(this.getAttribute("data-step"), 1), this.page = r(this.getAttribute("data-page"), 10), this.bindThumb(this.$thumb), this.observeResize(), this.sync();
 	}
 	destroy() {
 		this.$thumb && this.unbindThumb(this.$thumb), this.disconnectResize(), this.clearDragState(), this.$thumb = null;
@@ -318,12 +185,12 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
 		this.#e(this.value, !1);
 	}
 	setValue(e, t = {}) {
-		let { emit: n = !0 } = t, r = f(e, this.min, this.max, this.step);
+		let { emit: n = !0 } = t, r = c(e, this.min, this.max, this.step);
 		this.#e(r, n);
 	}
 	valueFromPointer(e, t) {
-		let { clientY: n, clientX: r } = e, i = this.getBoundingClientRect(), { min: a, max: o } = this, { offsetHeight: s, offsetWidth: c } = t, l = this.isVertical;
-		return u(g((l ? n : r) + this.offset, i, l ? s : c, this.isRtl, l), a, o);
+		let { clientY: n, clientX: r } = e, i = this.getBoundingClientRect(), { min: a, max: s } = this, { offsetHeight: c, offsetWidth: l } = t, u = this.isVertical;
+		return o(f((u ? n : r) + this.offset, i, u ? c : l, this.isRtl, u), a, s);
 	}
 	commitPointerValue(e, t) {
 		this.setValue(this.valueFromPointer(e, t));
@@ -331,33 +198,33 @@ var o = (e, t, n) => Math.min(Math.max(e, t), n), s = 50, c = (e, t = {}) => {
 	onKeydown(e) {
 		if (!this.$thumb) return;
 		let { key: t } = e;
-		if (v.isHome(t)) {
+		if (m.isHome(t)) {
 			e.preventDefault(), this.setValue(this.min);
 			return;
 		}
-		if (v.isEnd(t)) {
+		if (m.isEnd(t)) {
 			e.preventDefault(), this.setValue(this.max);
 			return;
 		}
-		let n = new v(this.step, this.page, this.isRtl, this.isVertical).delta(t);
+		let n = new m(this.step, this.page, this.isRtl, this.isVertical).delta(t);
 		if (!n) return;
 		let { preventDefault: r, delta: i } = n;
 		r && e.preventDefault(), i !== 0 && this.setValue(this.value + i);
 	}
-	#e(n, r) {
+	#e(t, r) {
 		if (!this.$thumb) return;
-		let { min: i, max: a } = this, o = l(n, i, a);
-		this.$thumb.setAttribute("aria-valuenow", String(n)), this.setValuetext(this.$thumb, n), this.style.setProperty("--value", String(n)), this.style.setProperty("--ratio", String(o)), r && t(this, e.SLIDER_CHANGE, {
-			min: n,
-			max: n,
+		let { min: i, max: o } = this, s = a(t, i, o);
+		this.$thumb.setAttribute("aria-valuenow", String(t)), this.setValuetext(this.$thumb, t), this.style.setProperty("--value", String(t)), this.style.setProperty("--ratio", String(s)), r && n(this, e.SLIDER_CHANGE, {
+			min: t,
+			max: t,
 			$thumb: this.$thumb
 		}, { cancelable: !1 });
 	}
 };
-customElements.get("cinq-slider") || customElements.define("cinq-slider", b);
+customElements.get("cinq-slider") || customElements.define("cinq-slider", g);
 //#endregion
 //#region src/slider-range.ts
-var x = class extends y {
+var _ = class extends h {
 	$max = null;
 	$min = null;
 	#e = "min";
@@ -370,10 +237,10 @@ var x = class extends y {
 		return this.#n;
 	}
 	get min() {
-		return n(this.$min?.getAttribute("aria-valuenow"), this.#t);
+		return r(this.$min?.getAttribute("aria-valuenow"), this.#t);
 	}
 	get max() {
-		return n(this.$max?.getAttribute("aria-valuenow"), this.#n);
+		return r(this.$max?.getAttribute("aria-valuenow"), this.#n);
 	}
 	get orientation() {
 		return this.$max?.getAttribute("aria-orientation") ?? null;
@@ -381,8 +248,8 @@ var x = class extends y {
 	init() {
 		let e = [...this.querySelectorAll("[role=\"slider\"]")];
 		if (e.length !== 2) throw Error("cinq-slider-range: exactly two [role=\"slider\"] thumbs are required");
-		let [t, r] = e;
-		this.$max = t, this.$min = r, this.step = n(this.getAttribute("data-step"), 1), this.page = n(this.getAttribute("data-page"), 10), this.#t = n(this.$max.getAttribute("aria-valuemin"), 0), this.#n = n(this.$max.getAttribute("aria-valuemax"), 100), this.bindThumb(this.$max), this.bindThumb(this.$min), this.observeResize(), this.sync();
+		let [t, n] = e;
+		this.$max = t, this.$min = n, this.step = r(this.getAttribute("data-step"), 1), this.page = r(this.getAttribute("data-page"), 10), this.#t = r(this.$max.getAttribute("aria-valuemin"), 0), this.#n = r(this.$max.getAttribute("aria-valuemax"), 100), this.bindThumb(this.$max), this.bindThumb(this.$min), this.observeResize(), this.sync();
 	}
 	destroy() {
 		for (let e of [this.$max, this.$min]) e && this.unbindThumb(e);
@@ -404,7 +271,7 @@ var x = class extends y {
 	}
 	valueFromPointer(e, t) {
 		let { clientY: n, clientX: r } = e, { offsetHeight: i, offsetWidth: a } = t, o = t === this.$min ? "min" : "max", s = this.isVertical ? i : a;
-		return _((this.isVertical ? n : r) + this.offset - s / 2, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
+		return p((this.isVertical ? n : r) + this.offset - s / 2, this.getBoundingClientRect(), o, this.#t, this.#n, this.#i(s), s, this.isRtl, this.isVertical);
 	}
 	commitPointerValue(e, t) {
 		let n = this.valueFromPointer(e, t);
@@ -415,19 +282,19 @@ var x = class extends y {
 		if (!t) return;
 		this.#e = t;
 		let { key: n } = e, r = t === "min" ? this.min : this.max;
-		if (v.isHome(n)) {
+		if (m.isHome(n)) {
 			e.preventDefault();
 			let n = t === "min" ? this.#t : this.min;
 			t === "min" ? this.setValues(n, this.max, { active: "min" }) : this.setValues(this.min, n, { active: "max" });
 			return;
 		}
-		if (v.isEnd(n)) {
+		if (m.isEnd(n)) {
 			e.preventDefault();
 			let n = t === "max" ? this.#n : this.max;
 			t === "min" ? this.setValues(n, this.max, { active: "min" }) : this.setValues(this.min, n, { active: "max" });
 			return;
 		}
-		let i = new v(this.step, this.page, this.isRtl, this.isVertical).delta(n);
+		let i = new m(this.step, this.page, this.isRtl, this.isVertical).delta(n);
 		if (!i) return;
 		let { delta: a } = i;
 		a !== 0 && (e.preventDefault(), t === "min" ? this.setValues(r + a, this.max, { active: "min" }) : this.setValues(this.min, r + a, { active: "max" }));
@@ -436,23 +303,23 @@ var x = class extends y {
 		return e === this.$min ? "min" : e === this.$max ? "max" : null;
 	}
 	#i(e) {
-		return m(this.isVertical ? this.clientHeight : this.clientWidth, e);
+		return u(this.isVertical ? this.clientHeight : this.clientWidth, e);
 	}
-	#a(n, r, i, a) {
+	#a(t, r, i, o) {
 		if (!this.$min || !this.$max) return;
-		let o = this.#t, s = this.#n, c = f(n, o, s, this.step), u = f(r, o, s, this.step);
-		i === "min" ? c = Math.min(c, u) : u = Math.max(u, c), this.#e = i, this.setAttribute("data-active", i), this.$min.setAttribute("aria-valuenow", String(c)), this.$max.setAttribute("aria-valuenow", String(u)), this.$min.setAttribute("aria-valuemax", String(u)), this.$max.setAttribute("aria-valuemin", String(c)), this.setValuetext(this.$min, c), this.setValuetext(this.$max, u);
-		let d = l(c, o, s), p = l(u, o, s);
-		if (this.style.setProperty("--min", String(c)), this.style.setProperty("--max", String(u)), this.style.setProperty("--min-ratio", String(d)), this.style.setProperty("--max-ratio", String(p)), c === u ? this.setAttribute("data-collapsed", "") : this.removeAttribute("data-collapsed"), a) {
-			let n = i === "min" ? this.$min : this.$max;
-			t(this, e.SLIDER_CHANGE, {
-				min: c,
-				max: u,
-				$thumb: n
+		let s = this.#t, l = this.#n, u = c(t, s, l, this.step), d = c(r, s, l, this.step);
+		i === "min" ? u = Math.min(u, d) : d = Math.max(d, u), this.#e = i, this.setAttribute("data-active", i), this.$min.setAttribute("aria-valuenow", String(u)), this.$max.setAttribute("aria-valuenow", String(d)), this.$min.setAttribute("aria-valuemax", String(d)), this.$max.setAttribute("aria-valuemin", String(u)), this.setValuetext(this.$min, u), this.setValuetext(this.$max, d);
+		let f = a(u, s, l), p = a(d, s, l);
+		if (this.style.setProperty("--min", String(u)), this.style.setProperty("--max", String(d)), this.style.setProperty("--min-ratio", String(f)), this.style.setProperty("--max-ratio", String(p)), u === d ? this.setAttribute("data-collapsed", "") : this.removeAttribute("data-collapsed"), o) {
+			let t = i === "min" ? this.$min : this.$max;
+			n(this, e.SLIDER_CHANGE, {
+				min: u,
+				max: d,
+				$thumb: t
 			}, { cancelable: !1 });
 		}
 	}
 };
-customElements.get("cinq-slider-range") || customElements.define("cinq-slider-range", x);
+customElements.get("cinq-slider-range") || customElements.define("cinq-slider-range", _);
 //#endregion
-export { b as Slider, x as SliderRange };
+export { g as Slider, _ as SliderRange };

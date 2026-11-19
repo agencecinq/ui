@@ -1,18 +1,6 @@
-//#region ../utils/dist/index.js
-var e = (e, t) => {
-	if (e == null || e === "") return t;
-	let n = Number(e);
-	return Number.isFinite(n) ? n : t;
-}, t = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, n = document.documentElement, { body: r } = document;
-n.hasAttribute("data-debug"), window.addEventListener("pointermove", t(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class extends HTMLElement {
+import { clamp as e, parseNumber as t } from "@agencecinq/utils";
+//#region src/types.ts
+var n = 0, r = 256, i = class extends HTMLElement {
 	static observedAttributes = ["pixel"];
 	$img = null;
 	$canvas = null;
@@ -48,7 +36,7 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 		this.#n &&= (cancelAnimationFrame(this.#n), 0);
 	}
 	#a() {
-		return i(e(this.getAttribute("pixel"), 256), 0, 256);
+		return e(t(this.getAttribute("pixel"), 256), 0, 256);
 	}
 	#o() {
 		let { clientWidth: e, clientHeight: t } = this.$canvas;
@@ -83,6 +71,6 @@ var i = (e, t, n) => Math.min(Math.max(e, t), n), a = 0, o = 256, s = class exte
 		(this.$canvas.width !== s || this.$canvas.height !== c) && (this.$canvas.width = s, this.$canvas.height = c), this.#e.setTransform(1, 0, 0, 1, 0, 0), this.#e.clearRect(0, 0, s, c), this.#e.imageSmoothingEnabled = !1, this.#e.drawImage(this.$img, r, i, a, o, 0, 0, s, c);
 	}
 };
-customElements.get("cinq-pixelate") || customElements.define("cinq-pixelate", s);
+customElements.get("cinq-pixelate") || customElements.define("cinq-pixelate", i);
 //#endregion
-export { o as PIXEL_MAX, a as PIXEL_MIN, s as Pixelate };
+export { r as PIXEL_MAX, n as PIXEL_MIN, i as Pixelate };

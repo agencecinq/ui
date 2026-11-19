@@ -1,81 +1,12 @@
-//#region ../utils/dist/index.js
-var e = {
-	DRAWER_BEFORE_CLOSE: "drawer:before-close",
-	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	SHEET_BEFORE_CLOSE: "sheet:before-close",
-	SHEET_BEFORE_OPEN: "sheet:before-open",
-	MODAL_BEFORE_CLOSE: "modal:before-close",
-	MODAL_BEFORE_OPEN: "modal:before-open",
-	SPINBUTTON_CHANGE: "spinbutton:change",
-	TOAST_OPEN: "toast:open",
-	TOAST_CLOSE: "toast:close",
-	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
-	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
-	DRILLDOWN_OPEN: "drilldown:open",
-	DRILLDOWN_CLOSE: "drilldown:close",
-	DROPZONE_CHANGE: "dropzone:change",
-	DROPZONE_REJECT: "dropzone:reject",
-	SWITCH_ACTIVATE: "switch:activate",
-	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_OPEN: "accordion:open",
-	ACCORDION_CLOSE: "accordion:close",
-	COMBOBOX_LOADING: "combobox:loading",
-	COMBOBOX_LOADED: "combobox:loaded",
-	COMBOBOX_UPDATE: "combobox:update",
-	COMBOBOX_SUBMIT: "combobox:submit",
-	COMBOBOX_EMPTY: "combobox:empty",
-	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
-	SLIDER_CHANGE: "slider:change",
-	SNAKE_EAT: "snake:eat",
-	SNAKE_OVER: "snake:over",
-	SNAKE_REPLAY: "snake:replay",
-	CALENDAR_RENDER: "calendar:render",
-	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
-	CALENDAR_CHANGE: "calendar:change",
-	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
-	TABS_ACTIVATE: "tabs:activate",
-	TABS_DELETE: "tabs:delete",
-	CART_BEFORE_ADD: "cart:before-add",
-	CART_BEFORE_UPDATE: "cart:before-update",
-	CART_UPDATE: "cart:update",
-	VARIANT_CHANGE: "variant:change"
-}, t = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, n = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, r = document.documentElement, { body: i } = document;
-r.hasAttribute("data-debug"), window.addEventListener("pointermove", n(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var a = (e, t, n) => {
-	if (e.altKey || e.ctrlKey || e.metaKey) return;
-	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
-		ArrowUp: i,
-		ArrowLeft: o ? a : i,
-		ArrowDown: a,
-		ArrowRight: o ? i : a,
-		Home: 0,
-		End: r
-	}[e.key];
-	if (s !== void 0) return e.preventDefault(), t[s].focus(), s;
-};
-//#endregion
+import { EVENTS as e, dispatchEvent as t, focusByKey as n } from "@agencecinq/utils";
 //#region src/utils/getHash.ts
-function o(e) {
+function r(e) {
 	let t = e.indexOf("#");
 	return t === -1 ? "" : e.substring(t + 1);
 }
 //#endregion
 //#region src/TabPanel.ts
-var s = class {
+var i = class {
 	el;
 	id;
 	constructor(e) {
@@ -91,7 +22,7 @@ var s = class {
 	destroy() {
 		this.el.removeAttribute("hidden"), this.el.classList.remove("is-active");
 	}
-}, c = class {
+}, a = class {
 	el;
 	active = !1;
 	id = "";
@@ -133,7 +64,7 @@ var s = class {
 	destroy() {
 		this.el.removeAttribute("tabindex"), this.el.removeAttribute("aria-selected"), this.el.classList.remove("is-active"), this.el.removeEventListener("click", this.handleClick);
 	}
-}, l = class extends HTMLElement {
+}, o = class extends HTMLElement {
 	$tabList;
 	current = 0;
 	tabPanels = [];
@@ -157,9 +88,9 @@ var s = class {
 			let e = parseInt(n, 10);
 			this.delay = Number.isNaN(e) ? 0 : e;
 		}
-		if (this.href = this.hash && o(window.location.hash) || "", !this.$tabList) return;
-		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new c(e, t)), this.tabs.forEach((t, n) => {
-			this.tabPanels.push(new s(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TABS_ACTIVATE, () => {
+		if (this.href = this.hash && r(window.location.hash) || "", !this.$tabList) return;
+		if (this.tabs = [...this.$tabList.querySelectorAll("[role=\"tab\"]")].map((e, t) => new a(e, t)), this.tabs.forEach((t, n) => {
+			this.tabPanels.push(new i(this.querySelector(`#${t.controls}[role="tabpanel"]`))), t.init(), t.el.addEventListener(e.TABS_ACTIVATE, () => {
 				this.current = n, this.deactivateTabs(), this.deactivateTabPanels(), t.activate(!1), this.tabPanels.find((e) => e.id === t.controls)?.activate(), this.hash && (this.href = t.id, window.location.hash = t.id);
 			});
 		}), this.href) {
@@ -170,20 +101,20 @@ var s = class {
 			let e = this.tabs.findIndex((e) => e.active);
 			e >= 0 && (this.current = e);
 		}
-		let r = this.tabs[this.current];
-		r && (this.deactivateTabs(), this.deactivateTabPanels(), r.activate(!1), this.tabPanels.find((e) => e.id === r.controls)?.activate()), this.initEvents();
+		let o = this.tabs[this.current];
+		o && (this.deactivateTabs(), this.deactivateTabPanels(), o.activate(!1), this.tabPanels.find((e) => e.id === o.controls)?.activate()), this.initEvents();
 	}
 	initEvents() {
 		this.$tabList?.addEventListener("keydown", this.handleKeydown);
 	}
 	handleKeydown = (e) => {
-		let { key: t } = e, n = e.target, r = this.tabs.map((e) => e.el), i = r.indexOf(n);
-		if (i === -1) return;
+		let { key: t } = e, r = e.target, i = this.tabs.map((e) => e.el), a = i.indexOf(r);
+		if (a === -1) return;
 		if (t === "Delete" || t === "Backspace") {
-			n.getAttribute("aria-selected") === "true" && this.delete(e);
+			r.getAttribute("aria-selected") === "true" && this.delete(e);
 			return;
 		}
-		let o = a(e, r, i);
+		let o = n(e, i, a);
 		o !== void 0 && (this.current = o, this.delay && setTimeout(() => {
 			this.tabs[this.current].toggle(!1);
 		}, this.delay));
@@ -197,6 +128,6 @@ var s = class {
 		this.$tabList?.removeEventListener("keydown", this.handleKeydown), this.tabs.forEach((e) => e.destroy()), this.tabPanels.forEach((e) => e.destroy()), this.tabs = [], this.tabPanels = [];
 	}
 };
-customElements.get("cinq-tabs") || customElements.define("cinq-tabs", l);
+customElements.get("cinq-tabs") || customElements.define("cinq-tabs", o);
 //#endregion
-export { l as Tabs };
+export { o as Tabs };

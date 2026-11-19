@@ -1,4 +1,8 @@
-import { html, body, scroll } from "./environment.js";
+/** The position disableScroll() keeps for enableScroll(). */
+const scroll = {
+	x: 0,
+	y: 0,
+};
 
 
 /**
@@ -31,20 +35,22 @@ const reset = (positionX: number, positionY: number) => {
 export function disableScroll() {
 	// console.info('disableScroll');
 
-	const documentElementScrollLeft = html.scrollLeft;
-	const documentElementScrollTop = html.scrollTop;
+	const { documentElement: $html, body: $body } = document;
 
-	const bodyScrollLeft = body.scrollLeft;
-	const bodyScrollTop = body.scrollTop;
+	const documentElementScrollLeft = $html.scrollLeft;
+	const documentElementScrollTop = $html.scrollTop;
+
+	const bodyScrollLeft = $body.scrollLeft;
+	const bodyScrollTop = $body.scrollTop;
 
 	scroll.x = window.scrollX || documentElementScrollLeft || bodyScrollLeft;
 	scroll.y = window.scrollY || documentElementScrollTop || bodyScrollTop || 0;
 
 	// console.log('disableScroll',scroll)
 
-	html.style.setProperty("overflow", "hidden");
-	html.style.setProperty("height", "100%");
-	html.style.setProperty("scroll-padding-top", "0px");
+	$html.style.setProperty("overflow", "hidden");
+	$html.style.setProperty("height", "100%");
+	$html.style.setProperty("scroll-padding-top", "0px");
 
 	// eslint-disable-next-line
 	reset(scroll.x, scroll.y);
@@ -64,10 +70,12 @@ export function enableScroll(position: number | boolean | undefined = 0): void {
 
 	// console.log('enableScroll', { scroll, resumeScroll, currentPosition });
 
+	const { documentElement: $html } = document;
+
 	// unlock scroll position
-	html.style.removeProperty("overflow");
-	html.style.removeProperty("height");
-	html.style.removeProperty("scroll-padding-top");
+	$html.style.removeProperty("overflow");
+	$html.style.removeProperty("height");
+	$html.style.removeProperty("scroll-padding-top");
 
 	// resume scroll position if possible
 	if (resumeScroll) {

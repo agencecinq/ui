@@ -1,76 +1,10 @@
-//#region ../utils/dist/index.js
-var e = {
-	DRAWER_BEFORE_CLOSE: "drawer:before-close",
-	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	SHEET_BEFORE_CLOSE: "sheet:before-close",
-	SHEET_BEFORE_OPEN: "sheet:before-open",
-	MODAL_BEFORE_CLOSE: "modal:before-close",
-	MODAL_BEFORE_OPEN: "modal:before-open",
-	SPINBUTTON_CHANGE: "spinbutton:change",
-	TOAST_OPEN: "toast:open",
-	TOAST_CLOSE: "toast:close",
-	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
-	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
-	DRILLDOWN_OPEN: "drilldown:open",
-	DRILLDOWN_CLOSE: "drilldown:close",
-	DROPZONE_CHANGE: "dropzone:change",
-	DROPZONE_REJECT: "dropzone:reject",
-	SWITCH_ACTIVATE: "switch:activate",
-	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_OPEN: "accordion:open",
-	ACCORDION_CLOSE: "accordion:close",
-	COMBOBOX_LOADING: "combobox:loading",
-	COMBOBOX_LOADED: "combobox:loaded",
-	COMBOBOX_UPDATE: "combobox:update",
-	COMBOBOX_SUBMIT: "combobox:submit",
-	COMBOBOX_EMPTY: "combobox:empty",
-	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
-	SLIDER_CHANGE: "slider:change",
-	SNAKE_EAT: "snake:eat",
-	SNAKE_OVER: "snake:over",
-	SNAKE_REPLAY: "snake:replay",
-	CALENDAR_RENDER: "calendar:render",
-	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
-	CALENDAR_CHANGE: "calendar:change",
-	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
-	TABS_ACTIVATE: "tabs:activate",
-	TABS_DELETE: "tabs:delete",
-	CART_BEFORE_ADD: "cart:before-add",
-	CART_BEFORE_UPDATE: "cart:before-update",
-	CART_UPDATE: "cart:update",
-	VARIANT_CHANGE: "variant:change"
-}, t = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, n = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", r = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, i = document.documentElement, { body: a } = document;
-i.hasAttribute("data-debug"), window.addEventListener("pointermove", r(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-var o = (e, t, n) => {
-	if (e.altKey || e.ctrlKey || e.metaKey) return;
-	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
-		ArrowUp: i,
-		ArrowLeft: o ? a : i,
-		ArrowDown: a,
-		ArrowRight: o ? i : a,
-		Home: 0,
-		End: r
-	}[e.key];
-	if (s !== void 0) return e.preventDefault(), t[s].focus(), s;
-}, s = (e) => {
+import { EVENTS as e, dispatchEvent as t, focusByKey as n, parseBoolean as r } from "@agencecinq/utils";
+//#region src/utils.ts
+var i = (e) => {
 	e.classList.remove("is-active");
-}, c = (e) => {
+}, a = (e) => {
 	e.classList.add("is-active");
-}, l = () => decodeURIComponent(document.location.hash.replace(/^#\/?/, "")), u = class {
+}, o = () => decodeURIComponent(document.location.hash.replace(/^#\/?/, "")), s = class {
 	el;
 	$body = null;
 	$button = null;
@@ -88,7 +22,7 @@ var o = (e, t, n) => {
 	init() {
 		if (this.$button = this.el.querySelector("[data-header]") || this.el.querySelector("button"), !this.$button) throw Error("Accordion panel: header button not found");
 		if (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? document.getElementById(this.$button.getAttribute("aria-controls") || ""), !this.$body) throw Error("Accordion panel: aria-controls target not found");
-		this.$inner = this.$body.querySelector("[data-inner]") || this.$body.firstElementChild, this.isDeselectable = n(this.el.getAttribute("data-deselectable")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.#o(), this.$button.addEventListener("click", this.#r), this.$button.addEventListener("focus", this.#i), this.$button.addEventListener("blur", this.#a), window.addEventListener("resize", this.#o);
+		this.$inner = this.$body.querySelector("[data-inner]") || this.$body.firstElementChild, this.isDeselectable = r(this.el.getAttribute("data-deselectable")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.#o(), this.$button.addEventListener("click", this.#r), this.$button.addEventListener("focus", this.#i), this.$button.addEventListener("blur", this.#a), window.addEventListener("resize", this.#o);
 	}
 	get open() {
 		return this.$button?.getAttribute("aria-expanded") === "true";
@@ -98,14 +32,14 @@ var o = (e, t, n) => {
 			this.#e = 0, this.$body && (this.$body.style.setProperty("max-height", `${this.height}px`), this.#t = window.setTimeout(() => {
 				this.#t = 0, this.$body?.style.removeProperty("max-height");
 			}, this.transitionDuration));
-		}), c(this.el), this.isOpen = !0, !0);
+		}), a(this.el), this.isOpen = !0, !0);
 	}
 	close(n = !0) {
 		return !this.$button || !this.$body || !this.open || n && !t(this.el, e.ACCORDION_CLOSE, this.#s) ? !1 : (this.$button.setAttribute("aria-expanded", "false"), this.el.setAttribute("data-open", "false"), this.#o(), this.$body.style.setProperty("max-height", `${this.height}px`), this.#n(), this.#e = requestAnimationFrame(() => {
 			this.#e = 0, this.$body?.style.setProperty("max-height", "0");
 		}), this.#t = window.setTimeout(() => {
 			this.#t = 0, this.$body?.setAttribute("hidden", "");
-		}, this.transitionDuration), s(this.el), this.isOpen = !1, !0);
+		}, this.transitionDuration), i(this.el), this.isOpen = !1, !0);
 	}
 	toggle() {
 		return !this.isDeselectable && this.open ? !1 : this.open ? this.close() : this.openPanel();
@@ -114,7 +48,7 @@ var o = (e, t, n) => {
 		this.$button?.focus();
 	}
 	destroy() {
-		this.#n(), this.$button?.removeEventListener("click", this.#r), this.$button?.removeEventListener("focus", this.#i), this.$button?.removeEventListener("blur", this.#a), window.removeEventListener("resize", this.#o), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), s(this.el), this.$body = null, this.$button = null, this.$inner = null;
+		this.#n(), this.$button?.removeEventListener("click", this.#r), this.$button?.removeEventListener("focus", this.#i), this.$button?.removeEventListener("blur", this.#a), window.removeEventListener("resize", this.#o), this.$body && (this.$body.style.removeProperty("max-height"), this.$body.style.removeProperty("overflow")), i(this.el), this.$body = null, this.$button = null, this.$inner = null;
 	}
 	#n() {
 		this.#e &&= (cancelAnimationFrame(this.#e), 0), this.#t &&= (clearTimeout(this.#t), 0);
@@ -140,13 +74,13 @@ var o = (e, t, n) => {
 			index: this.index
 		};
 	}
-}, d = {
+}, c = {
 	multiselectable: !1,
 	hash: !0
-}, f = class extends HTMLElement {
+}, l = class extends HTMLElement {
 	panels = [];
 	current = 0;
-	options = { ...d };
+	options = { ...c };
 	connectedCallback() {
 		this.init();
 	}
@@ -155,10 +89,10 @@ var o = (e, t, n) => {
 	}
 	init() {
 		this.options = {
-			multiselectable: n(this.getAttribute("data-multiselectable")),
-			hash: n(this.getAttribute("data-hash"), d.hash)
+			multiselectable: r(this.getAttribute("data-multiselectable")),
+			hash: r(this.getAttribute("data-hash"), c.hash)
 		}, this.panels = [...this.querySelectorAll("[data-panel]")].filter((e) => e.closest("cinq-accordion") === this).map((e, t) => {
-			let n = new u(e, t);
+			let n = new s(e, t);
 			return n.init(), n;
 		}), this.addEventListener(e.ACCORDION_OPEN, this.#e), this.addEventListener("keydown", this.#n), this.options.hash && (window.addEventListener("hashchange", this.#t), this.#t());
 	}
@@ -175,7 +109,7 @@ var o = (e, t, n) => {
 		}));
 	};
 	#t = () => {
-		let e = l();
+		let e = o();
 		e && this.panels.forEach((t, n) => {
 			t.$body && t.$body.id === e && (this.current = n, this.panels.forEach((e, t) => {
 				t !== n && e.close(!1);
@@ -183,10 +117,10 @@ var o = (e, t, n) => {
 		});
 	};
 	#n = (e) => {
-		let t = e.target, n = this.panels.flatMap(({ $button: e }) => e ? [e] : []), r = n.findIndex((e) => e.contains(t));
-		r < 0 || (this.current = o(e, n, r) ?? r);
+		let t = e.target, r = this.panels.flatMap(({ $button: e }) => e ? [e] : []), i = r.findIndex((e) => e.contains(t));
+		i < 0 || (this.current = n(e, r, i) ?? i);
 	};
 };
-customElements.get("cinq-accordion") || customElements.define("cinq-accordion", f);
+customElements.get("cinq-accordion") || customElements.define("cinq-accordion", l);
 //#endregion
-export { f as Accordion, u as Panel };
+export { l as Accordion, s as Panel };

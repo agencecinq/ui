@@ -1,67 +1,6 @@
-//#region ../utils/dist/index.js
-var e = {
-	DRAWER_BEFORE_CLOSE: "drawer:before-close",
-	DRAWER_BEFORE_OPEN: "drawer:before-open",
-	SHEET_BEFORE_CLOSE: "sheet:before-close",
-	SHEET_BEFORE_OPEN: "sheet:before-open",
-	MODAL_BEFORE_CLOSE: "modal:before-close",
-	MODAL_BEFORE_OPEN: "modal:before-open",
-	SPINBUTTON_CHANGE: "spinbutton:change",
-	TOAST_OPEN: "toast:open",
-	TOAST_CLOSE: "toast:close",
-	DISCLOSURE_BUTTON_OPEN: "disclosure-button:open",
-	DISCLOSURE_BUTTON_CLOSE: "disclosure-button:close",
-	DRILLDOWN_OPEN: "drilldown:open",
-	DRILLDOWN_CLOSE: "drilldown:close",
-	DROPZONE_CHANGE: "dropzone:change",
-	DROPZONE_REJECT: "dropzone:reject",
-	SWITCH_ACTIVATE: "switch:activate",
-	SWITCH_DEACTIVATE: "switch:deactivate",
-	ACCORDION_OPEN: "accordion:open",
-	ACCORDION_CLOSE: "accordion:close",
-	COMBOBOX_LOADING: "combobox:loading",
-	COMBOBOX_LOADED: "combobox:loaded",
-	COMBOBOX_UPDATE: "combobox:update",
-	COMBOBOX_SUBMIT: "combobox:submit",
-	COMBOBOX_EMPTY: "combobox:empty",
-	WINDOWSPLITTER_CHANGE: "windowsplitter:change",
-	SLIDER_CHANGE: "slider:change",
-	SNAKE_EAT: "snake:eat",
-	SNAKE_OVER: "snake:over",
-	SNAKE_REPLAY: "snake:replay",
-	CALENDAR_RENDER: "calendar:render",
-	CALENDAR_BEFORE_CHANGE: "calendar:before-change",
-	CALENDAR_CHANGE: "calendar:change",
-	TABS_BEFORE_ACTIVATE: "tabs:before-activate",
-	TABS_ACTIVATE: "tabs:activate",
-	TABS_DELETE: "tabs:delete",
-	CART_BEFORE_ADD: "cart:before-add",
-	CART_BEFORE_UPDATE: "cart:before-update",
-	CART_UPDATE: "cart:update",
-	VARIANT_CHANGE: "variant:change"
-}, t = (e, t, n, r = {}) => {
-	let { bubbles: i = !0, cancelable: a = !0 } = r;
-	return e.dispatchEvent(new CustomEvent(t, {
-		bubbles: i,
-		cancelable: a,
-		detail: n
-	}));
-}, n = (e, t) => {
-	if (e == null || e === "") return t;
-	let n = Number(e);
-	return Number.isFinite(n) ? n : t;
-}, r = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", i = (e, t) => {
-	let n = null, r = null, i = () => {
-		r && e(...r), n = null;
-	};
-	return (...e) => {
-		r = e, n ||= setTimeout(i, t);
-	};
-}, a = document.documentElement, { body: o } = document;
-a.hasAttribute("data-debug"), window.addEventListener("pointermove", i(({ x: e, y: t }) => {}, 100), { passive: !0 }), window.matchMedia("(width >= 64rem)"), window.matchMedia("(min-width: 1280px)"), window.matchMedia("(min-width: 1440px)"), window.matchMedia("(min-width: 1920px)");
-//#endregion
+import { EVENTS as e, dispatchEvent as t, parseBoolean as n, parseNumber as r } from "@agencecinq/utils";
 //#region src/keyboard.ts
-var s = class {
+var i = class {
 	#e;
 	constructor(e) {
 		this.#e = e;
@@ -145,10 +84,10 @@ var s = class {
 		let { length: n } = t.input.value;
 		t.input.setSelectionRange(n, n);
 	}
-}, c = (e, t) => {
+}, a = (e, t) => {
 	e.value = t;
 };
-function l(e, t, n, r) {
+function o(e, t, n, r) {
 	return {
 		id: `${n}-option-${e}`,
 		index: e,
@@ -156,23 +95,23 @@ function l(e, t, n, r) {
 		selected: e === t
 	};
 }
-function u({ id: e, index: t, size: n, selected: r }) {
+function s({ id: e, index: t, size: n, selected: r }) {
 	let i = r ? " aria-selected=\"true\"" : "";
 	return ` id="${e}" role="option" aria-posinset="${t + 1}" aria-setsize="${n}"${i}`;
 }
-var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
+var c = (e, t) => `<li${s(t)}>${e}</li>`, l = [
 	"data-mode",
 	"data-select-mode",
 	"data-debounce",
 	"data-min-length",
 	"data-open-on-empty",
 	"data-autoselect"
-], p = class extends HTMLElement {
+], u = class extends HTMLElement {
 	static observedAttributes = [
 		"value",
 		"disabled",
 		"expanded",
-		...f
+		...l
 	];
 	$input = null;
 	$listbox = null;
@@ -186,12 +125,12 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	debounce = 0;
 	minLength = 0;
 	openOnEmpty = !1;
-	write = c;
+	write = a;
 	onSelect = null;
 	#e = "";
 	#t = !1;
 	#n = null;
-	#r = d;
+	#r = c;
 	#i = 0;
 	#a = null;
 	#o = null;
@@ -207,7 +146,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 	attributeChangedCallback(e, t, n) {
 		this.#l || t === n || (e === "value" ? this.setValue(n ?? "", { reflect: !1 }) : e === "disabled" ? this.#f() : e === "expanded" ? n === null ? this.hide({ force: !0 }) : this.ensureOpen().then((e) => {
 			e && this.blurOption();
-		}) : f.includes(e) && this.#d());
+		}) : l.includes(e) && this.#d());
 	}
 	get value() {
 		return this.#e;
@@ -297,14 +236,14 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		if (this.$input = this.querySelector("[role=\"combobox\"]") || this.querySelector("input"), this.$listbox = this.querySelector("[role=\"listbox\"]"), !this.isConnected || !this.$input || !this.$listbox || !this.#n) return;
 		this.#d(), this.autocomplete = this.$input.getAttribute("aria-autocomplete") || "list";
 		let e = this.getAttribute("value");
-		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new s(this), this.#C(-1), this.hide({
+		e === null ? this.$input.value && this.setValue(this.$input.value) : this.setValue(e, { reflect: !1 }), this.#f(), this.#s = new i(this), this.#C(-1), this.hide({
 			force: !0,
 			clear: !1
 		}), this.#p(), this.#c = !0;
 	}
 	#d() {
 		let e = this.getAttribute("data-mode") ?? "managed", t = this.getAttribute("data-select-mode") ?? "value";
-		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, n(this.getAttribute("data-debounce"), 0)), this.minLength = Math.max(0, n(this.getAttribute("data-min-length"), 0)), this.openOnEmpty = r(this.getAttribute("data-open-on-empty")), this.autoselect = r(this.getAttribute("data-autoselect"));
+		this.mode = e === "external" ? "external" : "managed", this.selectMode = t === "custom" ? "custom" : "value", this.debounce = Math.max(0, r(this.getAttribute("data-debounce"), 0)), this.minLength = Math.max(0, r(this.getAttribute("data-min-length"), 0)), this.openOnEmpty = n(this.getAttribute("data-open-on-empty")), this.autoselect = n(this.getAttribute("data-autoselect"));
 	}
 	#f() {
 		let e = this.disabled;
@@ -349,7 +288,7 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		this.#u.innerHTML = "";
 		let { length: n } = t, { id: r } = this.#u;
 		t.forEach((t, i) => {
-			let a = l(i, e, r, n);
+			let a = o(i, e, r, n);
 			this.#u.insertAdjacentHTML("beforeend", this.#r(t, a));
 		}), this.#C(e);
 	}
@@ -475,6 +414,6 @@ var d = (e, t) => `<li${u(t)}>${e}</li>`, f = [
 		this.#l = !0, e ? this.setAttribute("busy", "") : this.removeAttribute("busy"), this.#l = !1;
 	}
 };
-customElements.get("cinq-combobox") || customElements.define("cinq-combobox", p);
+customElements.get("cinq-combobox") || customElements.define("cinq-combobox", u);
 //#endregion
-export { p as Combobox, l as optionRenderProps, u as serializeOptionAttrs };
+export { u as Combobox, o as optionRenderProps, s as serializeOptionAttrs };
