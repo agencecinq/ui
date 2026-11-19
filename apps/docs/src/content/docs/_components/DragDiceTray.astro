@@ -72,6 +72,10 @@ const dice = [
   const THROW = 0.4;
   /** Speed kept per 16 ms frame while a die slides. */
   const FRICTION = 0.94;
+  /** Distance in px a thrown die travels to turn one face. */
+  const FACE = 24;
+  /** Delays in ms between the faces of a die rolled in place. */
+  const TUMBLE = [60, 90, 130, 180];
 
   type Point = { x: number; y: number };
 
@@ -83,6 +87,8 @@ const dice = [
   /** Where each die rests in the tray, and where it was when the press started. */
   const positions = new WeakMap<HTMLElement, Point>();
   const origins = new WeakMap<HTMLElement, Point>();
+  /** The next face of a die rolled in place. */
+  const tumbles = new WeakMap<HTMLElement, number>();
 
   function place($die: HTMLElement, { x, y }: Point): Point {
     const width = ($tray?.clientWidth ?? 0) - $die.offsetWidth;
@@ -133,10 +139,44 @@ const dice = [
     }
   }
 
-  /** Slides from the release speed, bounces off the walls, then rolls. */
+  /** Shows a random face, never the one already showing, and announces nothing. */
+  function flip($die: HTMLElement): void {
+    const faces = Number($die.dataset.faces);
+    const $value = $die.querySelector("[data-value]");
+    const current = $value?.textContent;
+    let value = current;
+
+    while (value === current) {
+      value = (1 + Math.floor(Math.random() * faces)).toString();
+    }
+
+    if ($value) {
+      $value.textContent = value;
+    }
+  }
+
+  /** Turns a few faces, slower and slower, then rolls. */
+  function tumble($die: HTMLElement, delays = TUMBLE): void {
+    const [delay, ...rest] = delays;
+
+    clearTimeout(tumbles.get($die));
+
+    if (delay === undefined || reduceMotion.matches) {
+      roll($die);
+      return;
+    }
+
+    flip($die);
+    tumbles.set($die, window.setTimeout(() => tumble($die, rest), delay));
+  }
+
+  /** Slides from the release speed, bounces off the walls, turning a face every FACE px, then rolls. */
   function throwDie($die: HTMLElement, { vx, vy }: DragValues): void {
     let speed = { x: vx, y: vy };
     let last = performance.now();
+    let travel = 0;
+
+    clearTimeout(tumbles.get($die));
 
     const frame = (now: number): void => {
       const elapsed = now - last;
@@ -145,6 +185,12 @@ const dice = [
       const next = place($die, { x: x + speed.x * elapsed, y: y + speed.y * elapsed });
 
       last = now;
+      travel += Math.hypot(next.x - x, next.y - y);
+
+      if (travel >= FACE) {
+        travel %= FACE;
+        flip($die);
+      }
 
       // A wall stopped the die on that axis: bounce back, losing some speed.
       if (next.x !== x + speed.x * elapsed) {
@@ -204,7 +250,7 @@ const dice = [
         }
 
         if (Math.hypot(dx, dy) < TAP) {
-          roll($die);
+          tumble($die);
           return;
         }
 
@@ -225,7 +271,7 @@ const dice = [
     $dice.forEach(($die) => {
       $die.addEventListener("click", (event) => {
         if (event.detail === 0) {
-          roll($die);
+          tumble($die);
         }
       });
     });
