@@ -6,8 +6,9 @@
 > Shared event names and helpers for CINQ UI Web Components.
 
 The contract between CINQ UI packages: event constants, event dispatch
-helpers, focus and scroll utilities, and attribute parsers. Most component
-packages list it as a peer dependency.
+helpers, focus and scroll utilities, and attribute parsers. Every component
+package depends on it and imports it rather than bundling it, so a page built
+with Vite or another bundler loads one copy.
 
 ## Installation
 
@@ -167,6 +168,21 @@ import { focusByKey } from "@agencecinq/utils";
 | `debounce(fn, wait)` | Trailing debounce. |
 
 ## Migration
+
+### From 9.x to 10.0
+
+The environment exports are gone, with the `pointermove` listener and the media
+queries they set up on import. Nothing in the components used them, and the
+package now has no side effect, so a bundler keeps only what you import.
+
+1. **Replace `html` and `body`** with `document.documentElement` and
+   `document.body`.
+2. **Replace `breakpoints`** with your own `window.matchMedia()` queries.
+3. **Replace `mouse`** with your own `pointermove` listener.
+4. **Replace `isDebug`** with `document.documentElement.hasAttribute("data-debug")`.
+5. **Replace `production`** with `import.meta.env.PROD` in a Vite project.
+6. **Drop `scroll`.** `disableScroll()` and `enableScroll()` keep the position
+   for themselves.
 
 ### From 8.x to 9.0
 

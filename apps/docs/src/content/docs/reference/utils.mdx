@@ -14,8 +14,9 @@ reference when you wire events or reuse overlay helpers in your own code.
 pnpm add @agencecinq/utils
 ```
 
-Most component packages list `@agencecinq/utils` as a peer dependency. Import
-from the package directly when you listen to events or call helpers:
+Every component package depends on `@agencecinq/utils` and imports it, so a page
+built with a bundler loads one copy. Import from the package directly when you
+listen to events or call helpers:
 
 ```js
 import { EVENTS, dispatchEvent, disableScroll, enableScroll } from "@agencecinq/utils";

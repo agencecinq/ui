@@ -59,53 +59,43 @@ var e = {
 	if (e == null || e === "") return t;
 	let n = Number(e);
 	return Number.isFinite(n) ? n : t;
-}, a = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", o = (e, t) => {
+}, a = (e, t = !1) => e == null ? t : e !== "false" && e !== "0", o = {
+	x: 0,
+	y: 0
+}, s = (e, t) => {
+	e !== void 0 && (o.x = e), t !== void 0 && (o.y = t), window.scrollTo(o.x, o.y);
+};
+function c() {
+	let { documentElement: e, body: t } = document, n = e.scrollLeft, r = e.scrollTop, i = t.scrollLeft, a = t.scrollTop;
+	o.x = window.scrollX || n || i, o.y = window.scrollY || r || a || 0, e.style.setProperty("overflow", "hidden"), e.style.setProperty("height", "100%"), e.style.setProperty("scroll-padding-top", "0px"), s(o.x, o.y);
+}
+function l(e = 0) {
+	let t = !0, n = o.y;
+	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1);
+	let { documentElement: r } = document;
+	r.style.removeProperty("overflow"), r.style.removeProperty("height"), r.style.removeProperty("scroll-padding-top"), t && s(o.x, n);
+}
+//#endregion
+//#region src/throttle.ts
+var u = (e, t) => {
 	let n = null, r = null, i = () => {
 		r && e(...r), n = null;
 	};
 	return (...e) => {
 		r = e, n ||= setTimeout(i, t);
 	};
-}, s = document.documentElement, { body: c } = document, l = s.hasAttribute("data-debug"), u = {
-	y: 0,
-	x: 0
-}, d = {
-	x: 0,
-	y: 0
-};
-window.addEventListener("pointermove", o(({ x: e, y: t }) => {
-	d.x = e, d.y = t;
-}, 100), { passive: !0 });
-var f = {
-	lg: window.matchMedia("(width >= 64rem)"),
-	xl: window.matchMedia("(min-width: 1280px)"),
-	"2xl": window.matchMedia("(min-width: 1440px)"),
-	"3xl": window.matchMedia("(min-width: 1920px)")
-}, p = !0, m = (e, t) => {
-	e !== void 0 && (u.x = e), t !== void 0 && (u.y = t), window.scrollTo(u.x, u.y);
-};
-function h() {
-	let e = s.scrollLeft, t = s.scrollTop, n = c.scrollLeft, r = c.scrollTop;
-	u.x = window.scrollX || e || n, u.y = window.scrollY || t || r || 0, s.style.setProperty("overflow", "hidden"), s.style.setProperty("height", "100%"), s.style.setProperty("scroll-padding-top", "0px"), m(u.x, u.y);
-}
-function g(e = 0) {
-	let t = !0, n = u.y;
-	typeof e == "number" ? n = e : typeof e == "boolean" && e === !1 && (t = !1), s.style.removeProperty("overflow"), s.style.removeProperty("height"), s.style.removeProperty("scroll-padding-top"), t && m(u.x, n);
-}
-//#endregion
-//#region src/debounce.ts
-var _ = (e, t) => {
+}, d = (e, t) => {
 	let n = null;
 	return (...r) => {
 		n && clearTimeout(n), n = setTimeout(() => {
 			n = null, e(...r);
 		}, t);
 	};
-}, v = {}, y = null;
-function b(e) {
+}, f = {}, p = null;
+function m(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function x(e) {
+function h(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -119,41 +109,41 @@ function x(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => b(e) && e.getAttribute("tabindex") !== "-1");
+	return Array.from(e.querySelectorAll(t)).filter((e) => m(e) && e.getAttribute("tabindex") !== "-1");
 }
-function S(e) {
-	if (y) return;
+function g(e) {
+	if (p) return;
 	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-	t && t !== document.body && t.isConnected && (y = t);
+	t && t !== document.body && t.isConnected && (p = t);
 }
-function C() {
-	y?.focus(), y = null;
+function _() {
+	p?.focus(), p = null;
 }
-function w(e) {
+function v(e) {
 	queueMicrotask(() => {
 		let t = document.activeElement;
-		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || C();
+		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || _();
 	});
 }
-function T(e, t = e) {
-	let n = x(e);
+function y(e, t = e) {
+	let n = h(e);
 	if (n.length === 0) return;
 	let r = n[0], i = n[n.length - 1];
-	S(), E(), v.keydown = (t) => {
+	g(), b(), f.keydown = (t) => {
 		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", v.keydown), t.focus(), t instanceof HTMLInputElement && [
+	}, document.addEventListener("keydown", f.keydown), t.focus(), t instanceof HTMLInputElement && [
 		"search",
 		"text",
 		"email",
 		"url"
 	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
 }
-function E(e = null) {
-	v.keydown && document.removeEventListener("keydown", v.keydown), e && e.focus();
+function b(e = null) {
+	f.keydown && document.removeEventListener("keydown", f.keydown), e && e.focus();
 }
 //#endregion
 //#region src/clamp.ts
-var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
+var x = (e, t, n) => Math.min(Math.max(e, t), n), S = 50, C = (e, t = {}) => {
 	let { host: n, target: r, start: i, move: a, end: o } = t, s = null, c = ({ startX: e, startY: t, samples: n }) => {
 		let r = n[0], i = n[n.length - 1], a = i.time - r.time, o = {
 			dx: i.x - e,
@@ -167,7 +157,7 @@ var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
 			vy: (i.y - r.y) / a
 		};
 	}, l = ({ samples: e }, { clientX: t, clientY: n, timeStamp: r }) => {
-		let i = r - O;
+		let i = r - S;
 		for (e.push({
 			x: t,
 			y: n,
@@ -227,7 +217,7 @@ var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
 			});
 		}
 	};
-}, A = (e, t, n) => {
+}, w = (e, t, n) => {
 	if (e.altKey || e.ctrlKey || e.metaKey) return;
 	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
 		ArrowUp: i,
@@ -240,4 +230,4 @@ var D = (e, t, n) => Math.min(Math.max(e, t), n), O = 50, k = (e, t = {}) => {
 	if (s !== void 0) return e.preventDefault(), t[s].focus(), s;
 };
 //#endregion
-export { e as EVENTS, T as addTrapFocus, c as body, f as breakpoints, D as clamp, _ as debounce, h as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, g as enableScroll, A as focusByKey, x as getFocusableElements, s as html, l as isDebug, d as mouse, a as parseBoolean, r as parseList, i as parseNumber, p as production, S as rememberReturnFocus, E as removeTrapFocus, C as restoreReturnFocus, w as scheduleRestoreReturnFocus, u as scroll, o as throttle, k as trackDrag };
+export { e as EVENTS, y as addTrapFocus, x as clamp, d as debounce, c as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, l as enableScroll, w as focusByKey, h as getFocusableElements, a as parseBoolean, r as parseList, i as parseNumber, g as rememberReturnFocus, b as removeTrapFocus, _ as restoreReturnFocus, v as scheduleRestoreReturnFocus, u as throttle, C as trackDrag };
