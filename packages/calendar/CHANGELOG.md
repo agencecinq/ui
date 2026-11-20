@@ -1,5 +1,12 @@
 # @agencecinq/calendar
 
+## 4.3.1
+
+### Patch Changes
+
+- Updated dependencies [ff4db3c]
+  - @agencecinq/utils@11.0.0
+
 ## 4.3.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @agencecinq/accordion
 
+## 4.2.0
+
+### Minor Changes
+
+- 5fda1c4: - Find each panel body through `ariaControlsElements` alone, without reading `aria-controls` with `getElementById()` when the property is missing, like the tabs, the disclosure button, the disclosure navigation and the window splitter. Browsers without `ariaControlsElements` (before Chrome 135, Firefox 136 and Safari 16.4) throw on init.
+
+### Patch Changes
+
+- Updated dependencies [ff4db3c]
+  - @agencecinq/utils@11.0.0
+
 ## 4.1.0
 
 ### Minor Changes

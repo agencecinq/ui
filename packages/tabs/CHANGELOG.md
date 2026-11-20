@@ -1,5 +1,12 @@
 # @agencecinq/tabs
 
+## 12.0.1
+
+### Patch Changes
+
+- Updated dependencies [ff4db3c]
+  - @agencecinq/utils@11.0.0
+
 ## 12.0.0
 
 ### Major Changes

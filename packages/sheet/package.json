@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/sheet",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Accessible bottom sheet Web Component on native <dialog>, content-sized with drag-to-dismiss.",
   "type": "module",
   "license": "MIT",
