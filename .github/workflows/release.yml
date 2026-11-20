@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Trusted publishing needs npm 11.5.1 or later: pnpm 10 publishes through npm.
+      - run: npm install --global npm@11
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: changesets/action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          publish-script: pnpm release
+          commit-message: ":bookmark: Version packages"
+          pr-title: ":bookmark: Version packages"

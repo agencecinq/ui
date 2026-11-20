@@ -81,20 +81,23 @@ pnpm change
 - Choose the version bump (Patch for fixes, Minor for features).
 - Write a brief description of the change.
 
-### 2. Versioning
+Commit the change file with your work and merge the pull request.
 
-Before releasing, generate the changelogs and update versions:
+### 2. Version and release
+
+The [Release workflow](.github/workflows/release.yml) runs on every push to `main`.
+
+- While change files are pending, it opens or updates a `:bookmark: Version packages` pull request, with the new versions and changelogs.
+- Merging that pull request publishes the packages to npm, then pushes the git tags and creates the GitHub releases.
+
+The workflow publishes through [npm trusted publishing](https://docs.npmjs.com/trusted-publishers): no token, no one-time password, and each version gets a provenance attestation. Do not run `pnpm release` from a local machine.
+
+### Add a package
+
+npm only trusts the workflow for packages it knows. Publish a new package once by hand (`pnpm --filter <name> publish --access public`), then trust the workflow with npm 11.15.0 or later:
 
 ```bash
-pnpm version-packages
-```
-
-### 3. Release to NPM
-
-To build and publish the packages to the `@agencecinq` scope:
-
-```bash
-pnpm release
+npm trust github @agencecinq/<name> --file release.yml --repo agencecinq/ui --allow-publish
 ```
 
 ---
