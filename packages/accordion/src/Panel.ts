@@ -35,14 +35,10 @@ export class Panel {
       throw new Error("Accordion panel: header button not found");
     }
 
-    // IDL: `ariaControlsElements` reflects `aria-controls` ID references.
     this.$body =
       ((this.$button.ariaControlsElements ?? [])[0] as
         | HTMLElement
-        | undefined) ??
-      (document.getElementById(
-        this.$button.getAttribute("aria-controls") || "",
-      ) as HTMLElement | null);
+        | undefined) ?? null;
 
     if (!this.$body) {
       throw new Error("Accordion panel: aria-controls target not found");

@@ -91,11 +91,13 @@ var u = (e, t) => {
 			n = null, e(...r);
 		}, t);
 	};
-}, f = {}, p = null;
-function m(e) {
+};
+//#endregion
+//#region src/focus.ts
+function f(e) {
 	return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
 }
-function h(e) {
+function p(e) {
 	if (!e) return [];
 	let t = [
 		"summary",
@@ -109,41 +111,11 @@ function h(e) {
 		"iframe",
 		"[contenteditable]"
 	].join(",");
-	return Array.from(e.querySelectorAll(t)).filter((e) => m(e) && e.getAttribute("tabindex") !== "-1");
-}
-function g(e) {
-	if (p) return;
-	let t = e ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-	t && t !== document.body && t.isConnected && (p = t);
-}
-function _() {
-	p?.focus(), p = null;
-}
-function v(e) {
-	queueMicrotask(() => {
-		let t = document.activeElement;
-		t instanceof HTMLElement && t !== document.body && !e?.contains(t) || _();
-	});
-}
-function y(e, t = e) {
-	let n = h(e);
-	if (n.length === 0) return;
-	let r = n[0], i = n[n.length - 1];
-	g(), b(), f.keydown = (t) => {
-		t.key === "Tab" && (t.shiftKey ? (document.activeElement === r || document.activeElement === e) && (t.preventDefault(), i.focus()) : document.activeElement === i && (t.preventDefault(), r.focus()));
-	}, document.addEventListener("keydown", f.keydown), t.focus(), t instanceof HTMLInputElement && [
-		"search",
-		"text",
-		"email",
-		"url"
-	].includes(t.type) && t.value && t.setSelectionRange(0, t.value.length);
-}
-function b(e = null) {
-	f.keydown && document.removeEventListener("keydown", f.keydown), e && e.focus();
+	return Array.from(e.querySelectorAll(t)).filter((e) => f(e) && e.getAttribute("tabindex") !== "-1");
 }
 //#endregion
 //#region src/clamp.ts
-var x = (e, t, n) => Math.min(Math.max(e, t), n), S = 50, C = (e, t = {}) => {
+var m = (e, t, n) => Math.min(Math.max(e, t), n), h = 50, g = (e, t = {}) => {
 	let { host: n, target: r, start: i, move: a, end: o } = t, s = null, c = ({ startX: e, startY: t, samples: n }) => {
 		let r = n[0], i = n[n.length - 1], a = i.time - r.time, o = {
 			dx: i.x - e,
@@ -157,7 +129,7 @@ var x = (e, t, n) => Math.min(Math.max(e, t), n), S = 50, C = (e, t = {}) => {
 			vy: (i.y - r.y) / a
 		};
 	}, l = ({ samples: e }, { clientX: t, clientY: n, timeStamp: r }) => {
-		let i = r - S;
+		let i = r - h;
 		for (e.push({
 			x: t,
 			y: n,
@@ -206,18 +178,18 @@ var x = (e, t, n) => Math.min(Math.max(e, t), n), S = 50, C = (e, t = {}) => {
 	m.forEach(([t, n]) => {
 		e.addEventListener(t, n);
 	});
-	let h = () => {
+	let g = () => {
 		s && u(s);
 	};
 	return {
-		cancel: h,
+		cancel: g,
 		destroy: () => {
-			h(), m.forEach(([t, n]) => {
+			g(), m.forEach(([t, n]) => {
 				e.removeEventListener(t, n);
 			});
 		}
 	};
-}, w = (e, t, n) => {
+}, _ = (e, t, n) => {
 	if (e.altKey || e.ctrlKey || e.metaKey) return;
 	let r = t.length - 1, i = n === 0 ? r : n - 1, a = n === r ? 0 : n + 1, o = t[n].matches(":dir(rtl)"), s = {
 		ArrowUp: i,
@@ -230,4 +202,4 @@ var x = (e, t, n) => Math.min(Math.max(e, t), n), S = 50, C = (e, t = {}) => {
 	if (s !== void 0) return e.preventDefault(), t[s].focus(), s;
 };
 //#endregion
-export { e as EVENTS, y as addTrapFocus, x as clamp, d as debounce, c as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, l as enableScroll, w as focusByKey, h as getFocusableElements, a as parseBoolean, r as parseList, i as parseNumber, g as rememberReturnFocus, b as removeTrapFocus, _ as restoreReturnFocus, v as scheduleRestoreReturnFocus, u as throttle, C as trackDrag };
+export { e as EVENTS, m as clamp, d as debounce, c as disableScroll, n as dispatchBeforeEvent, t as dispatchEvent, l as enableScroll, _ as focusByKey, p as getFocusableElements, a as parseBoolean, r as parseList, i as parseNumber, u as throttle, g as trackDrag };

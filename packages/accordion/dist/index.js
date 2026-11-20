@@ -21,7 +21,7 @@ var i = (e) => {
 	}
 	init() {
 		if (this.$button = this.el.querySelector("[data-header]") || this.el.querySelector("button"), !this.$button) throw Error("Accordion panel: header button not found");
-		if (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? document.getElementById(this.$button.getAttribute("aria-controls") || ""), !this.$body) throw Error("Accordion panel: aria-controls target not found");
+		if (this.$body = (this.$button.ariaControlsElements ?? [])[0] ?? null, !this.$body) throw Error("Accordion panel: aria-controls target not found");
 		this.$inner = this.$body.querySelector("[data-inner]") || this.$body.firstElementChild, this.isDeselectable = r(this.el.getAttribute("data-deselectable")), this.isOpen = this.$button.getAttribute("aria-expanded") === "true", this.#o(), this.$button.addEventListener("click", this.#r), this.$button.addEventListener("focus", this.#i), this.$button.addEventListener("blur", this.#a), window.addEventListener("resize", this.#o);
 	}
 	get open() {
