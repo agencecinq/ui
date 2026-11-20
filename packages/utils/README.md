@@ -128,11 +128,6 @@ Types: `DragOptions`, `DragValues`, `DragEndValues`, `DragTracker`.
 | Export | Role |
 | ------ | ---- |
 | `getFocusableElements(container)` | Visible, tabbable descendants. |
-| `rememberReturnFocus(element?)` | Stash the page control to refocus later (first call wins). |
-| `restoreReturnFocus()` | Focus the stashed element and clear it. |
-| `scheduleRestoreReturnFocus(closingHost?)` | Restore after the current turn, unless focus already moved elsewhere. |
-| `addTrapFocus(container, elementToFocus?)` | Keep Tab inside a non-modal overlay. |
-| `removeTrapFocus(elementToFocus?)` | Remove the trap, optionally move focus. |
 | `focusByKey(event, elements, index)` | Move focus between `elements` with the arrow, Home and End keys, from `elements[index]`. Returns the new index, or `undefined` for a key left to the browser. |
 
 `focusByKey()` wraps at both ends, swaps left and right in a right-to-left
@@ -177,6 +172,20 @@ import { focusByKey } from "@agencecinq/utils";
 | `debounce(fn, wait)` | Trailing debounce. |
 
 ## Migration
+
+### From 10.x to 11.0
+
+`addTrapFocus()`, `removeTrapFocus()`, `rememberReturnFocus()`,
+`restoreReturnFocus()` and `scheduleRestoreReturnFocus()` are gone. No component
+used them since the drawer, the sheet and the modal open a native `<dialog>`.
+
+1. **Open the overlay as a modal `<dialog>`** with `showModal()` or
+   `command="show-modal"`. The browser keeps Tab inside the dialog, makes the
+   rest of the page inert and gives the focus back to the control that opened
+   it when the dialog closes.
+2. **For a non-modal overlay**, use a `popover` or a non-modal `<dialog>`. Tab
+   leaves it like any other content, which is the expected behavior for a
+   non-modal overlay.
 
 ### From 9.x to 10.0
 

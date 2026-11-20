@@ -159,18 +159,12 @@ drag.destroy();
 
 ## Focus helpers
 
-The return-focus helpers bring focus back to the page control that opened an
-overlay. The trap helpers are for non-modal overlays (a modal `<dialog>`
-already contains focus):
+A modal `<dialog>` keeps Tab inside itself and gives the focus back to the
+control that opened it, so utils has no focus trap.
 
 | Export | Role |
 | ------ | ---- |
-| `addTrapFocus(container, elementToFocus?)` | Tab cycle inside an open overlay. |
-| `removeTrapFocus(elementToFocus?)` | Tear down trap, optionally move focus. |
 | `getFocusableElements(container)` | Visible, tabbable descendants. |
-| `rememberReturnFocus(element?)` | Stash page control (first call wins). |
-| `restoreReturnFocus()` | Focus stashed element and clear stash. |
-| `scheduleRestoreReturnFocus(closingHost?)` | Defer restore until after close animations. Skip if focus already moved outside. |
 | `focusByKey(event, elements, index)` | Move focus between `elements` with the arrow, Home and End keys. Returns the new index, or `undefined` for a key left to the browser. |
 
 `focusByKey()` is the keyboard of the accordion, the tabs and the disclosure
