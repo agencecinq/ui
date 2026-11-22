@@ -35,9 +35,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - uses: changesets/action@v2
+      # changesets/action@v2 requires the Changesets CLI v3: the repository is on v2.
+      - uses: changesets/action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          publish-script: pnpm release
-          commit-message: ":bookmark: Version packages"
-          pr-title: ":bookmark: Version packages"
+          publish: pnpm release
+          commit: ":bookmark: Version packages"
+          title: ":bookmark: Version packages"
