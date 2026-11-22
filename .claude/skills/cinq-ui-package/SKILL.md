@@ -28,7 +28,7 @@ Design and ship a behavior-only accessible Web Component in `packages/<name>/`.
 5. Build: pnpm -C packages/<name> build
 6. Docs: apps/docs/.../components/<name>.mdx + playground Astro
 7. README + CHANGELOG + version bump
-8. changeset + pnpm release (npm) — separate from git push / Pages deploy
+8. changeset (pnpm change), the Release workflow publishes to npm
 ```
 
 **Do not** skip the spec when the API or APG mapping is non-trivial.
@@ -183,16 +183,15 @@ RTL: `getComputedStyle(host).direction === 'rtl'` (same as tabs). Mirror horizon
 
 ## Release
 
-Versions live in `package.json` + `CHANGELOG.md`. Use changesets:
+Versions live in `package.json` + `CHANGELOG.md`. Add a changeset with your work:
 
 ```bash
 pnpm change
-pnpm version-packages   # if changesets pending
-pnpm build
-pnpm release            # npm publish — requires OTP if 2FA
 ```
 
-Git push to `main` deploys docs only (`.github/workflows/pages.yml`), not npm.
+On every push to `main`, `.github/workflows/release.yml` opens or updates the `:bookmark: Version packages` pull request while changesets are pending. Merging it publishes to npm through trusted publishing (no token, no OTP). Never publish from a local machine. `.github/workflows/pages.yml` deploys the docs.
+
+A new package is published once by hand, then trusted with `npm trust github @agencecinq/<name> --file release.yml --repo agencecinq/ui --allow-publish` (see README).
 
 Breaking API → major bump. Event renames / data attr renames → major + migration note.
 
