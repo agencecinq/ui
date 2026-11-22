@@ -275,3 +275,5 @@ document.getElementById("menu-drawer").addEventListener("toggle", (event) => {
 ```bash
 pnpm -C packages/drilldown build
 ```
+
+See the [interactive docs](https://agencecinq.github.io/ui/components/drilldown/) for live examples.

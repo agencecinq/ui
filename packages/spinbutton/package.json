@@ -2,6 +2,7 @@
   "name": "@agencecinq/spinbutton",
   "version": "4.1.1",
   "description": "Accessible, WAI-ARIA spinbutton as a lightweight Web Component.",
+  "homepage": "https://agencecinq.github.io/ui/components/spinbutton/",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

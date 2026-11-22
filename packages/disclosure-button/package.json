@@ -2,6 +2,7 @@
   "name": "@agencecinq/disclosure-button",
   "version": "3.1.1",
   "description": "Accessible WAI-ARIA disclosure button Web Component.",
+  "homepage": "https://agencecinq.github.io/ui/components/disclosure-button/",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",
