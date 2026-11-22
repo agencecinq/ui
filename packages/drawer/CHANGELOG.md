@@ -1,5 +1,13 @@
 # @agencecinq/drawer
 
+## 9.1.2
+
+### Patch Changes
+
+- 7e9e5c5: Add the package description and author, so npm shows the description instead of the README badges. In utils, list the `types` condition first in `exports`, as TypeScript expects.
+- Updated dependencies [7e9e5c5]
+  - @agencecinq/utils@11.0.1
+
 ## 9.1.1
 
 ### Patch Changes
