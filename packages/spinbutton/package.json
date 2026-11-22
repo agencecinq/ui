@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/spinbutton",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Accessible, WAI-ARIA spinbutton as a lightweight Web Component.",
   "homepage": "https://agencecinq.github.io/ui/components/spinbutton/",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/drawer",
-  "version": "9.1.2",
+  "version": "9.1.3",
   "description": "Before-hooks for an off-canvas native <dialog>, with a Liquid snippet for Shopify themes.",
   "homepage": "https://agencecinq.github.io/ui/components/drawer/",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

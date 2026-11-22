@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/modal",
-  "version": "6.1.2",
+  "version": "6.1.3",
   "description": "Before-hooks for the native modal <dialog>.",
   "homepage": "https://agencecinq.github.io/ui/components/modal/",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

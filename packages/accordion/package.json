@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/accordion",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Accessible, WAI-ARIA accordion as a lightweight Web Component.",
   "homepage": "https://agencecinq.github.io/ui/components/accordion/",
   "type": "module",

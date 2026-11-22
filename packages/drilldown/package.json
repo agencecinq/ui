@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/drilldown",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Accessible drill-down navigation Web Component: nested panels with back buttons.",
   "homepage": "https://agencecinq.github.io/ui/components/drilldown/",
   "type": "module",

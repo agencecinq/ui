@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/windowsplitter",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Accessible WAI-ARIA window splitter as a lightweight Web Component.",
   "homepage": "https://agencecinq.github.io/ui/components/windowsplitter/",
   "type": "module",
