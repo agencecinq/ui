@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/combobox",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Accessible editable combobox with list autocomplete as a lightweight Web Component.",
   "homepage": "https://agencecinq.github.io/ui/components/combobox/",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/snake",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Canvas Snake as a lightweight Web Component.",
   "homepage": "https://agencecinq.github.io/ui/components/snake/",
   "type": "module",

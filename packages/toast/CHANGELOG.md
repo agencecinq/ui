@@ -1,5 +1,13 @@
 # @agencecinq/toast
 
+## 1.1.2
+
+### Patch Changes
+
+- f65565b: Point the npm homepage to the package docs on agencecinq.github.io/ui, instead of the repository README.
+- Updated dependencies [f65565b]
+  - @agencecinq/utils@11.0.2
+
 ## 1.1.1
 
 ### Patch Changes

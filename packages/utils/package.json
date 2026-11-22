@@ -1,6 +1,6 @@
 {
   "name": "@agencecinq/utils",
-  "version": "11.0.1",
+  "version": "11.0.2",
   "description": "Shared event names and helpers for CINQ UI Web Components.",
   "homepage": "https://agencecinq.github.io/ui/reference/utils/",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

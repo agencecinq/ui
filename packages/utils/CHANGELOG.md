@@ -1,5 +1,11 @@
 # @agencecinq/utils
 
+## 11.0.2
+
+### Patch Changes
+
+- f65565b: Point the npm homepage to the package docs on agencecinq.github.io/ui, instead of the repository README.
+
 ## 11.0.1
 
 ### Patch Changes
