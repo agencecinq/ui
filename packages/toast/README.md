@@ -110,3 +110,5 @@ While auto-dismiss runs, the host sets `--toast-progress` from `0%` to `100%`
   (pointer, keyboard focus, reduced motion, …).
 - If focus is inside the toast when it closes, the active element is blurred
   (focus was never stolen on open).
+
+See the [interactive docs](https://agencecinq.github.io/ui/components/toast/) for live examples.

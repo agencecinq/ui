@@ -2,6 +2,7 @@
   "name": "@agencecinq/accordion",
   "version": "4.2.0",
   "description": "Accessible, WAI-ARIA accordion as a lightweight Web Component.",
+  "homepage": "https://agencecinq.github.io/ui/components/accordion/",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

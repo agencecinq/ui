@@ -2,6 +2,7 @@
   "name": "@agencecinq/sheet",
   "version": "3.2.1",
   "description": "Accessible bottom sheet Web Component on native <dialog>, content-sized with drag-to-dismiss.",
+  "homepage": "https://agencecinq.github.io/ui/components/sheet/",
   "type": "module",
   "license": "MIT",
   "author": "Jérémy Levron <jeremy@agencecinq.com> (https://agencecinq.com)",

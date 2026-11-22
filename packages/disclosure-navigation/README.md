@@ -329,3 +329,5 @@ closes the others or opens on hover, becomes one host.
 pnpm --filter @agencecinq/disclosure-navigation build
 pnpm --filter @agencecinq/disclosure-navigation test # Chromium, Firefox and WebKit
 ```
+
+See the [interactive docs](https://agencecinq.github.io/ui/components/disclosure-navigation/) for live examples.

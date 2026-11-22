@@ -2,6 +2,7 @@
   "name": "@agencecinq/disclosure-navigation",
   "version": "3.1.1",
   "description": "Accessible WAI-ARIA disclosure navigation Web Component: submenus opened by buttons, on hover too.",
+  "homepage": "https://agencecinq.github.io/ui/components/disclosure-navigation/",
   "keywords": [
     "disclosure",
     "navigation",
