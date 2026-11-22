@@ -7,15 +7,13 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "typecheck": "turbo check-types",
-    "change": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm build && changeset publish"
+    "change": "changeset"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.1",
+    "@changesets/cli": "^3.0.3",
     "@types/node": "^26.2.0",
     "turbo": "^2.11.7",
     "vite": "^8.2.4"
   },
-  "packageManager": "pnpm@10.33.2"
+  "packageManager": "pnpm@12.21.0"
 }

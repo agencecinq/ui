@@ -6,8 +6,8 @@ Welcome to the **CINQ UI** monorepo. This repository is managed as a monorepo us
 
 Before starting, ensure you have the following installed:
 
-- **Node.js** (v22 or higher)
-- **pnpm** (v10 or higher)
+- **Node.js** (v22.11 or higher)
+- **pnpm** 12, pinned in `packageManager`. pnpm 10 or later switches to it on its own.
 
 ---
 
@@ -90,7 +90,7 @@ The [Release workflow](.github/workflows/release.yml) runs on every push to `mai
 - While change files are pending, it opens or updates a `:bookmark: Version packages` pull request, with the new versions and changelogs.
 - Merging that pull request publishes the packages to npm, then pushes the git tags and creates the GitHub releases.
 
-The workflow publishes through [npm trusted publishing](https://docs.npmjs.com/trusted-publishers): no token, no one-time password, and each version gets a provenance attestation. Do not run `pnpm release` from a local machine.
+The workflow publishes through [npm trusted publishing](https://docs.npmjs.com/trusted-publishers): no token, no one-time password, and each version gets a provenance attestation. One job builds and packs the packages, and only the next one, which runs no build, can publish the tarballs. Do not publish from a local machine.
 
 ### Add a package
 
